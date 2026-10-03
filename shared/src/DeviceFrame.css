@@ -1,0 +1,63 @@
+.device {
+  /* Scale the shell, never the screen's own pixel box. */
+  transform: scale(var(--device-scale));
+  transform-origin: top center;
+  width: var(--device-body-w);
+  height: var(--device-body-h);
+}
+
+.device__body {
+  position: relative;
+  width: var(--device-body-w);
+  height: var(--device-body-h);
+  border-radius: var(--device-body-radius);
+  padding: var(--device-bezel);
+  box-sizing: border-box;
+  background: #1c1c1e;
+  /* A Figma stroke draws inside the frame, so an inset shadow keeps the body at
+     exactly BODY.width. A 1px border would grow it to 428.2 (CLAUDE.md:116). */
+  box-shadow:
+    inset 0 0 0 1px #3a3a3c,
+    0 24px 60px rgb(0 0 0 / 28%);
+}
+
+.device[data-body='off'] .device__body {
+  padding: 0;
+  width: var(--device-screen-w);
+  height: var(--device-screen-h);
+  border-radius: var(--device-screen-radius);
+  background: none;
+  box-shadow: none;
+}
+
+.device__screen {
+  position: relative;
+  width: var(--device-screen-w);
+  height: var(--device-screen-h);
+  border-radius: var(--device-screen-radius);
+  background: #fff;
+
+  /* `clip`, not `hidden`. An overflow:hidden box is still programmatically
+     scrollable (CLAUDE.md:119), which is how a focus() inside an animating sheet
+     makes the whole device lurch and drift back (CLAUDE.md:123). `clip` cannot
+     scroll, so that failure mode is structurally impossible here rather than
+     something each screen has to remember to avoid. Needs Safari 16+. */
+  overflow: clip;
+}
+
+.device__screen > .device__island {
+  position: absolute;
+  top: var(--device-island-top);
+  left: 50%;
+  margin-left: calc(var(--device-island-w) / -2);
+  width: var(--device-island-w);
+  height: var(--device-island-h);
+  border-radius: var(--device-island-radius);
+  background: #000;
+}
+
+/* Safe-area insets, exposed so screens can pad without re-deriving them. */
+.device__screen {
+  --safe-top: var(--device-safe-top);
+  --safe-bottom: var(--device-safe-bottom);
+}

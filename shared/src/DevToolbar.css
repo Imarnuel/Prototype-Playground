@@ -1,0 +1,100 @@
+.devbar {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+/* All four, not just button (CLAUDE.md:118). */
+.devbar button,
+.devbar input,
+.devbar textarea,
+.devbar select {
+  font: inherit;
+}
+
+.devbar__handle {
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.devbar__handle:active {
+  transform: scale(0.97);
+}
+
+.devbar__panel {
+  width: 260px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 12px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 8%),
+    0 12px 32px rgb(0 0 0 / 18%);
+  transition-property: opacity, transform;
+}
+
+.devbar__panel[data-open='off'] {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+}
+
+.devbar__panel[data-open='on'] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.devbar__group + .devbar__group {
+  margin-top: 12px;
+}
+
+.devbar__groupTitle {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8e8e93;
+}
+
+.devbar__items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.devbar__item {
+  position: relative;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #f2f2f7;
+  color: #111;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.devbar__item:hover {
+  background: #e5e5ea;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .devbar__handle,
+  .devbar__panel {
+    transition-duration: 0ms !important;
+  }
+}

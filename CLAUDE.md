@@ -5,16 +5,37 @@ Optimise for something that demos convincingly end to end. Don't over-engineer, 
 
 ## Project specifics
 
-> Fill these in at the start of the project. Leave nothing as a guess.
+> Repo-level defaults. Per-case-study values live in `prototypes/<study>/CLAUDE.md`.
 
-- Stack:
-- Figma file key / main page / section:
-- Design tokens live in: (mark each token `[var]` = Figma variable, or `[literal]` = read off a frame)
-- Shared components live in:
-- Mock API module:
-- State:
-- Dev toolbar:
-- Device frame: (logical size, status-bar inset — see "Device metrics" below)
+- Stack: Vite 5 + React 18 + TypeScript 5 (strict), npm workspaces. Not chosen freely —
+  the "Known traps" section below is written against this stack and only applies here.
+- Figma file key / main page / section: **unset — per case study.** No Figma file is
+  attached to the playground itself. Record the key, page and section in the study's own
+  `CLAUDE.md` before pulling design context.
+- Design tokens live in: `shared/src/device.ts` (device + iOS chrome) and
+  `shared/src/motion.ts` (durations, easings, springs, press scale).
+  All `[literal]` — read off the "Device metrics (iOS)" spec in this file, not a Figma frame.
+  **There are no colour or type tokens yet, and none were invented.** A case study adds its
+  own under `prototypes/<study>/src/tokens.ts`, marked `[var]` once a Figma file supplies
+  variables.
+- Shared components live in: `shared/src` — `DeviceFrame`, `DevToolbar`, `useReducedMotion`.
+- Mock API module: `shared/src/mockApi.ts`. Single `request()` entry point with simulated
+  latency, per-endpoint failure rates, and dev-toolbar overrides. Nothing calls `setTimeout` directly.
+- State: per-prototype React state. Nothing is shared across studies — each is a separate app.
+- Dev toolbar: `shared/src/DevToolbar.tsx`. Off by default; opt in with `?dev=1`
+  (`devFlagEnabled()`).
+- Device frame: iPhone 15 Pro — 393x852 logical, safe-area insets 59 top / 34 bottom,
+  Dynamic Island 125x36.67 at 11 from the screen top, uniform 2.75mm bezel (16.601px).
+  Geometry is derived in `shared/src/device.ts` from the mm figures, not hardcoded.
+
+### Values used here that this file does not specify
+
+Both are real device values, flagged rather than silently absorbed (section 2: never guess):
+
+| Value | Used | Why it is not from this file |
+|---|---|---|
+| Display corner radius 55pt | `SCREEN_RADIUS` | The file gives the rule `outer = screen + bezel` but never the screen radius itself. |
+| Home-indicator inset 34pt | `SAFE_AREA.bottom` | The file specifies the 59pt top inset only. |
 
 ---
 

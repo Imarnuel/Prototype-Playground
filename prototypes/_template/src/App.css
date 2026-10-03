@@ -1,0 +1,48 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /* --safe-top/--safe-bottom come from .device__screen; never re-derive them. */
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  flex: 0 0 auto;
+}
+
+.navbar__title {
+  /* Size and weight come from IOS tokens in JS; this rule owns only the reset.
+     Default <p>/<h1> margins survive absolute positioning and show up as a
+     mystery offset (CLAUDE.md:115). */
+  margin: 0;
+  color: #000;
+  letter-spacing: -0.02em;
+}
+
+.screen__body {
+  flex: 1 1 auto;
+  /* A flex child in a column context needs min-height:0 or it refuses to shrink
+     below intrinsic size (CLAUDE.md:113-114). */
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.placeholder {
+  margin: 0;
+  color: #8e8e93;
+  font-size: 15px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.placeholder--empty {
+  color: #c7c7cc;
+}

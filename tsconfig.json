@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@playground/shared": ["./shared/src/index.ts"]
+    }
+  },
+  "include": ["shared/src", "prototypes/*/src", "prototypes/*/vite.config.ts"]
+}
