@@ -3,3 +3,7 @@ dist/
 *.tsbuildinfo
 .DS_Store
 *.local
+
+# Unoptimised photo originals. Multi-megapixel camera files have no business in
+# git; only the optimised WebP output under assets/products/ is committed.
+prototypes/*/assets/products-src/

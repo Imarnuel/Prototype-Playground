@@ -13,6 +13,7 @@ time. Read it before building.
 shared/              composed by every study — device frame, motion, mock API, dev toolbar
 prototypes/
   _template/         starting point, and the harness the frame geometry is measured against
+  supermart-pos/     Freshvale Supermart POS — packaged-goods till (first study)
   <case-study>/      one per study
 ```
 
