@@ -1,5 +1,12 @@
+/* Self-hosted so the demo does not depend on a font CDN at presentation time.
+   Without real Inter the fallback is metrically wider — the H1 measured 131.83px
+   against the design's 112. */
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
 @import '@playground/shared/device-frame.css';
 @import '@playground/shared/dev-toolbar.css';
+@import './tokens/tokens.css';
 
 * {
   box-sizing: border-box;
@@ -13,10 +20,11 @@ body {
   align-items: flex-start;
   padding: 40px 0;
   background: #e9e9ee;
-  font-family: -apple-system, system-ui, 'Segoe UI', sans-serif;
+  /* Inter is the family every type style in the Figma system resolves to. */
+  font-family: Inter, -apple-system, system-ui, 'Segoe UI', sans-serif;
 }
 
-/* All four need it, not just button (CLAUDE.md:118). */
+/* All four, not just button. */
 button,
 input,
 textarea,

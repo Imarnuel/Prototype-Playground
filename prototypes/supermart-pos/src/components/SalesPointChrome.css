@@ -1,0 +1,202 @@
+/* --- Search --- */
+.searchBar {
+  display: flex;
+  gap: var(--spacing-200);
+  align-items: center;
+  width: 100%;
+}
+
+.textField,
+.filterButton {
+  height: 40px;
+  background: var(--color-container-input-default);
+  border-radius: var(--radius-300);
+  /* The design context reports `border: 1px solid black`, which contradicts both the
+     design's own screenshot (a light grey hairline) and the existence of a dedicated
+     Color/border/input token at #cfd3d8. The token is used. Logged as #21.
+
+     Drawn as an INSET shadow, not a border: a Figma stroke is painted inside the
+     frame, so a real border makes the field 42px wide against the design's 40 and
+     steals 2px from the flexible search field beside it. */
+  box-shadow:
+    inset 0 0 0 var(--border-width-sm) var(--color-border-input),
+    var(--shadow-xs);
+}
+
+.textField {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  gap: var(--spacing-200);
+  align-items: center;
+  padding: var(--spacing-300);
+}
+
+.textField__input {
+  flex: 1 1 0;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  padding: 0;
+  font-size: var(--type-Body-Base-size);
+  font-weight: var(--type-Body-Base-weight);
+  line-height: var(--type-Body-Base-line-height);
+  letter-spacing: var(--type-Body-Base-letter-spacing);
+  color: var(--color-text-default);
+}
+
+.textField__input::placeholder {
+  color: var(--color-text-subtlest);
+}
+
+.filterButton {
+  display: flex;
+  gap: var(--spacing-50);
+  align-items: center;
+  padding: 0 var(--spacing-300);
+  flex: none;
+  cursor: pointer;
+  /* A <button> carries a UA default `border: 2px outset`, so dropping the explicit
+     border in favour of the inset stroke above made this 44px wide, not 40 — and
+     stole 4px from the search field sharing its row. Every button here needs this. */
+  border: 0;
+}
+
+/* --- Filter chips --- */
+.filterBar {
+  display: flex;
+  gap: var(--spacing-200);
+  align-items: flex-start;
+  width: 100%;
+  overflow-x: auto;
+  /* The design draws this bar 666px wide inside a 393px screen with gradient
+     "Filter Spacer" fades at each end — a static mock of a horizontally scrolling
+     row. Built as a real scroller; the fades are the mock's way of showing it. */
+  scrollbar-width: none;
+}
+
+.filterBar::-webkit-scrollbar {
+  display: none;
+}
+
+.filterChip {
+  flex: none;
+  padding: 8px 12px;
+  border-radius: 32px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  transition-property: background-color, color, border-color;
+}
+
+/* Inset, so the chip stays 36px tall as designed. A real border makes it 38, which
+   grows the filter bar, grows the header, and pushes the product grid down 2px. */
+.filterChip[data-active='off'] {
+  background: none;
+  border: 0;
+  box-shadow: inset 0 0 0 var(--border-width-sm) var(--color-border-default);
+  color: var(--color-text-default);
+}
+
+.filterChip[data-active='on'] {
+  background: var(--color-container-brand-bold-default);
+  border: 0;
+  color: var(--color-text-inverse);
+}
+
+/* --- Tab bar --- */
+.tabBar {
+  position: absolute;
+  bottom: 3px;
+  left: 0;
+  width: 393px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px 20px;
+  backdrop-filter: blur(4px);
+  background: linear-gradient(to top, rgb(255 255 255 / 50%), rgb(255 255 255 / 0%));
+}
+
+.tabBar__nav {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  background: var(--color-surface-default);
+  border-radius: 1000px;
+  overflow: clip;
+  /* First layer is the 0.75px stroke, inset — as a border it makes the bar 90px
+     tall against the design's 88 and lifts it 2px off the bottom. */
+  box-shadow:
+    inset 0 0 0 0.75px var(--color-border-subtle),
+    0 0.5px 1px 0 rgb(0 0 0 / 10%),
+    0 20px 24px -4px rgb(10 13 18 / 8%),
+    0 8px 8px -4px rgb(10 13 18 / 3%);
+}
+
+.tabBar__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-25);
+  align-items: center;
+  padding: var(--spacing-200) 14px 6px;
+  border: 0;
+  background: none;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.tabBar__item[data-active='on'] {
+  background: var(--color-container-brand-default);
+  border-radius: 32px;
+  padding-left: 22px;
+  padding-right: 22px;
+}
+
+.tabBar__item:last-child {
+  padding-left: var(--spacing-600);
+  padding-right: var(--spacing-600);
+}
+
+.tabBar__label {
+  /* Label/Xsmall */
+  font-size: var(--type-Label-Xsmall-size);
+  font-weight: var(--type-Label-Xsmall-weight);
+  line-height: var(--type-Label-Xsmall-line-height);
+  letter-spacing: var(--type-Label-Xsmall-letter-spacing);
+  white-space: nowrap;
+}
+
+/* --- View cart --- */
+.viewCart {
+  position: absolute;
+  left: 16px;
+  width: 361px;
+  display: flex;
+  gap: var(--spacing-200);
+  align-items: center;
+  justify-content: center;
+  padding: 12px var(--spacing-300);
+  border: 0;
+  border-radius: var(--radius-300);
+  background: var(--color-container-brand-bold-default);
+  filter: drop-shadow(0 1px 1px rgb(10 13 18 / 5%));
+  cursor: pointer;
+}
+
+.viewCart__label {
+  /* Label/Large. The design colours this with Color/icon/inverse — an ICON token on
+     a text node. Same value (#ffffff) but the wrong semantic, so the text token is
+     used. Logged as #24. */
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  color: var(--color-text-inverse);
+  text-align: center;
+  white-space: nowrap;
+}

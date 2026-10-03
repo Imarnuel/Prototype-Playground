@@ -79,6 +79,19 @@ export const CURRENCY = {
 
 export const VAT_STANDARD_RATE = 0.075;
 
+/**
+ * At or below this count a stock figure renders as a warning rather than normal.
+ *
+ * INTERPRETED. The Sales Point frame shows 32 as normal, 2 as warning and 0 as
+ * danger, which only bounds the threshold to somewhere in 3..31; 5 is a reasonable
+ * shop threshold, not a value read from the frame.
+ *
+ * It lives here rather than in the card because the seed data has to be able to
+ * REACH the state: `catalogue:verify` asserts a low-stock product exists, which it
+ * can only do against the same number the card renders from.
+ */
+export const LOW_STOCK_AT = 5;
+
 export const CATEGORY_ORDER: readonly Category[] = [
   "Beverages",
   "Snacks & Confectionery",
@@ -233,7 +246,7 @@ export const PRODUCTS: readonly Product[] = [
     priceMinor: 70000,
     barcode: '6151000000126',
     taxClass: 'standard',
-    stock: 48,
+    stock: 3,
     image: 'malt.webp',
   },
   {
@@ -269,7 +282,7 @@ export const PRODUCTS: readonly Product[] = [
     priceMinor: 350000,
     barcode: '6152000000031',
     taxClass: 'standard',
-    stock: 35,
+    stock: 1,
     image: 'choc.webp',
   },
   {

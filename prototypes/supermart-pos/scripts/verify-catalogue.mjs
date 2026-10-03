@@ -8,7 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {
-  PRODUCTS, CATEGORIES, CATEGORY_ORDER, BRANDS, CURRENCY,
+  PRODUCTS, CATEGORIES, CATEGORY_ORDER, BRANDS, CURRENCY, LOW_STOCK_AT,
   formatPrice, fullName, lineTotalMinor, findByBarcode, vatRateFor,
 } from '../src/data/catalogue.ts';
 
@@ -88,6 +88,12 @@ check('a product with no image exists (fallback state)', noPhoto.length > 0,
   noPhoto.map((p) => p.id).join(', '));
 check('an out-of-stock product exists', oos.length > 0, oos.map((p) => p.id).join(', '));
 check('a discounted product exists', discounted.length > 0, discounted.map((p) => p.id).join(', '));
+// The Sales Point card renders three stock states. All three must be reachable from
+// the seed data, or one of them can never be demoed.
+const low = PRODUCTS.filter((p) => p.stock > 0 && p.stock <= LOW_STOCK_AT);
+check(`a low-stock product exists (0 < stock <= ${LOW_STOCK_AT})`, low.length > 0,
+  low.map((p) => `${p.id}:${p.stock}`).join(', '));
+check('a normal-stock product exists', PRODUCTS.some((p) => p.stock > LOW_STOCK_AT));
 
 const longest = PRODUCTS.reduce((a, b) => (b.name.length > a.name.length ? b : a));
 check('a long name exists to force truncation', longest.name.length >= 45,

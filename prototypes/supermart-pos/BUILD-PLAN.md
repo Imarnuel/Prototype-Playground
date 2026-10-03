@@ -227,7 +227,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 7 | Section Header `88:8155` contains a `Status/info` child with `hidden="true"` | Noted — hidden layers must not be built |
 | 8 | Band 1 frames are named "Sales point **v1**" while later bands have "Sales point". A superseded version may still be on the board | Open — needs to be told which is current |
 | 9 | **Status bar is the wrong device.** 89 of 95 `Status Bar - iPhone` instances are **402x50 at x=-5** on a 393-wide frame — a 402pt (iPhone 16 Pro) component on a 393pt (iPhone 15 Pro) frame, overhanging 5px left and 4px right. The other 6 are correctly 393x50 | Open |
-| 10 | **Header sits at y=50, but the Dynamic Island safe-area inset is 59.** Content at y=50 clears the island's bottom edge (47.67) by 2.33px, against 11.33px at 59 | **Blocks screen 1 — needs a decision** |
+| 10 | **Header sits at y=50, but the Dynamic Island safe-area inset is 59.** Content at y=50 clears the island's bottom edge (47.67) by 2.33px, against 11.33px at 59 | **RESOLVED — follow the device (59).** See "Resolved deviations" |
 | 11 | Letter-spacing values filed under a colour namespace: `Color/container/accent/indigo/heading/h4` = −0.48, `/h5` = −0.20. `Heading/h4` and `Heading/h5` bind `letterSpacing` to them | Handled in the generator, documented in `src/tokens/TOKENS.md` |
 | 12 | Five type-style pairs differ only by case, and four are **not** equivalent — `Heading/H4` is 14/20 while `Heading/h4` is 20/24. System looks mid-migration from literal to primitive-composed styles | Both kept under exact Figma names; CSS property names preserve case |
 | 13 | `H/6` holds a **unitless line-height ratio (1.4)** while the other 20 styles hold px. `H/6` and `Body/Reg/Large` also hold letter-spacing −2 against −0.16…−0.96 elsewhere — probably −2% in a px field | Ratio handled by `lineHeightCss`; the −2 is **unresolved** |
@@ -235,6 +235,16 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 15 | Components doing real work under default Figma names: `Frame 4908` x77, `Frame 4909` x18, `Frame 5071` x1 | Open — need naming before they can be built as components |
 | 16 | Both `trash-01` (79 uses) and `trash-03` (107 uses) are in use — two different trash icons for the same action | Open |
 | 17 | `List` (26 uses) and `list` (2 uses) — case-variant component names, same pattern as the type styles | Open |
+| 18 | Frame `88:8079` filter chips read **"All, Alcohol, Energy drinks, Soft drinks, Soft drinks"** — "Soft drinks" twice, and none match the catalogue | Chips are DERIVED from `CATEGORY_ORDER` instead |
+| 19 | **Row 3 product cards are a different design.** Rows 1–2 use Label/Large 16/24 names and 14px stock; row 3 uses Inter Semi Bold **15**/20 and **13**px. Neither 15 nor 13 exists anywhere in the token set | Built to the rows 1–2 spec; row 3 treated as the stale one |
+| 20 | Card 2's stock label is a hardcoded **`#a64907`**. The system has no warning or orange token among its 57 semantic colours | Kept as the literal with a comment; needs a real token upstream |
+| 21 | Design context reports `border: 1px solid black` on Text field and Filter, contradicting both the frame's own screenshot (light grey hairline) and the dedicated `Color/border/input` (#cfd3d8) | `Color/border/input` used |
+| 22 | The image scrim is on 5 of 6 product cards and missing on card 1 | Applied uniformly — an inconsistent scrim across one grid is more visibly wrong than either choice |
+| 23 | The two INACTIVE tab bar labels use different tokens: Dashboard `Color/text/default`, More `Color/text/secondary` | Followed exactly, not normalised |
+| 24 | `Color/icon/inverse` used as a TEXT colour ("View cart") and as a SURFACE fill (header overflow button). Same value as the text/surface tokens, wrong semantic | Correct semantic tokens used |
+| 25 | Stock unit label is "ea" on four cards and "each" on two | "ea" used throughout |
+| 26 | All six cards show the same product ("Fanta Orange 50cl", ₦1,000) with real-brand photography (Fanta, Coca-Cola, Sprite) | Replaced by the fictional catalogue — the reason it exists |
+| 27 | **Icons cannot be downloaded.** This environment's network policy denies `www.figma.com:443`, so `download_assets` returns unfetchable URLs | **Open — 11 icons reserved by `<AssetSlot>`, none substituted or redrawn.** See `src/assets/icons/MANIFEST.md` |
 
 ## Work order
 
@@ -242,7 +252,8 @@ Screens get built 1–3 at a time, by node ID.
 
 | # | Screen | Node | Status |
 |---|---|---|---|
-| 1 | Sales point (band 4) | `88:8079` | **tokens + inventory done; build not started** |
+| 1 | Sales point (band 4) | `88:8079` | **built and verified** — 1 coordinate outside 0.5px, 21/21 flow checks |
+| 2 | _to be chosen_ | | not started |
 
 ## Foundation — done
 
@@ -278,12 +289,78 @@ Icon names (`trash-01`, `x-circle`, `cube-01`, `bank-note-02`, `coins-stacked-02
 of the three subscribed libraries — so they are either local to the file or from an
 unsubscribed source. Assets must come from `download_assets` on the instance nodes.
 
-## Before screen 1 can be built
+## Resolved deviations from the design
 
-1. **Decide the safe-area conflict** (inconsistency #10): build the header at the
-   design's y=50, or at the device's 59pt Dynamic Island inset.
-2. Read band 4's Section Header title (`88:8155`).
-3. `get_design_context` on `88:8079` alone, with a screenshot, then `download_assets`
-   for its icons and imagery.
-4. Name `Frame 4908` (#15) if it appears in this screen — 77 uses across the board
-   means it is a real component.
+Deliberate, agreed differences. **Do not "fix" these back** — each is a decision, not a bug.
+
+### Safe-area top inset: 59, not the design's 50
+
+The frames place the header at `y=50`, the height of the `Status Bar - iPhone`
+component they use. The real Dynamic Island safe-area inset is **59pt**.
+
+Agreed: **follow the device.** Everything below the status bar therefore sits **9px
+lower than the frame**, and a coordinate diff against the design will read a constant
+`+9` on every child below the header — that is expected and correct, not drift.
+
+Why: at `y=50` content clears the island's bottom edge (11 + 36.67 = 47.67) by just
+2.33px, which is the cramped-cutout failure the root agreement warns about. At 59 the
+clearance is 11.33px, near-symmetric with the 11pt above the island. The design's own
+status bar is 402pt wide (inconsistency #9) — an iPhone 16 Pro component — so the
+50pt figure was most likely never checked against a 393pt Dynamic Island device.
+
+`shared/src/device.ts` already holds `SAFE_AREA.top = 59`, so no code changes; screens
+pad with `var(--safe-top)` and must **not** hardcode 50.
+
+### Status bar is 393 wide, not the component's 402
+
+Inconsistency #9: 89 of 95 instances are a 402pt (iPhone 16 Pro) status bar on a 393pt
+frame. Built at 393, matching the 6 correct instances.
+
+### The frame's own 32px corner radius is not applied
+
+The frame carries `rounded-[32px]`. It renders inside a real device shell already
+clipped at 55px, so a second radius would paint a visible rounded rectangle inside the
+phone. Dropped deliberately.
+
+### Filter chips come from the catalogue
+
+Inconsistency #18. The frame's chips are placeholder labels with one duplicated and do
+not match the catalogue, so they are derived from `CATEGORY_ORDER` — one source of
+truth per concept.
+
+### Product names are clamped to two lines
+
+The frame sets every name to `nowrap`, which only works because all six cards say
+"Fanta Orange 50cl". Real names run to 48 characters and would overflow the 172px
+card, so they clamp.
+
+## Screen 1 — verification record
+
+| Check | Result |
+|---|---|
+| Coordinate diff vs design, live DOM, production build | 14 elements x 4 axes; **1 outside 0.5px** |
+| Remaining diff | header title text run 110.72 vs 112 (−1.28px) — Figma vs Chromium text shaping, left-aligned, nothing downstream depends on it |
+| Flow walk | **21/21**: all states, filters, search, empty, error, retry, cart, reduced motion |
+| Typecheck / catalogue / tokens | clean / 0 failing / 0 failing |
+
+Fixed during verification, each caught by measurement rather than by eye:
+
+1. **Borders grew 8 boxes by 2px.** Figma strokes draw inside the frame, so `border`
+   made the filter bar 38 instead of 36, which grew the header and pushed the product
+   grid down 2px. Converted to inset `box-shadow`.
+2. **Inter was never loading.** The H1 measured 131.83 against the design's 112 on a
+   fallback font. Self-hosted via `@fontsource/inter`; now 110.72.
+3. **A `<button>`'s UA default `border: 2px outset`** surfaced the moment the explicit
+   border came off, making the filter button 44 wide and stealing 4px from the search
+   field beside it.
+4. **The dev toolbar's "Sales point" did not reset.** Returning from a forced state
+   kept the previous search text, so the default screen came back empty.
+5. **The low-stock warning state was unreachable.** The catalogue's minimum non-zero
+   stock was 14 against a threshold of 5, so the design's warning colour could never
+   be demoed. Two products now run low, and `catalogue:verify` asserts it stays so.
+
+## Before screen 2
+
+1. Read band 4's Section Header title (`88:8155`) — still unread.
+2. Name `Frame 4908` (#15) — 77 uses across the board means it is a real component.
+3. Decide whether the 393x1170 Cart frames (#6) are scroll views or separate screens.
