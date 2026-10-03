@@ -5,13 +5,22 @@ specific to this study.
 
 ## Figma source
 
-**Not yet attached.** Fill these in before pulling any design context — section 1
-of the root agreement, and nothing here should be a guess:
+- File key: `OWq8E2gQpWnYjPwLlPI5HA`
+- Section / board: `88:7008` — "Sales point", 15348 x 16105
+- Screens: 90 top-level frames, 85 at **393x852** — the same size as
+  `shared/src/device.ts`, so frames map to the device frame 1:1 with no rescaling
+- Main page: **not recorded.** Only the section was given; the page it sits on was
+  never queried, and is not needed while every call targets node IDs inside it.
+- Frames shown in the case study deck: **not yet chosen.** Needed to know which
+  frames must be populated from `figma/catalogue.csv`.
 
-- File key:
-- Main page:
-- Section / board:
-- Frames shown in the case study deck:
+The board map, the numbered work order and the running log of design
+inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
+anything — it records eight open inconsistencies, including that 31 frames share the
+name "Customer added", so **screens must be referenced by node ID, never by name**.
+
+Nothing has been built from this board yet, and no `get_design_context` call has
+been made against any screen.
 
 ## The store
 
