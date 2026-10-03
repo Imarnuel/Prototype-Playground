@@ -226,21 +226,64 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 6 | Three Cart frames are **393x1170**, taller than the 852 device: `88:16572`, `88:17099`, `88:16833` | Open — decide whether these are scroll-extended views of one screen or separate screens |
 | 7 | Section Header `88:8155` contains a `Status/info` child with `hidden="true"` | Noted — hidden layers must not be built |
 | 8 | Band 1 frames are named "Sales point **v1**" while later bands have "Sales point". A superseded version may still be on the board | Open — needs to be told which is current |
+| 9 | **Status bar is the wrong device.** 89 of 95 `Status Bar - iPhone` instances are **402x50 at x=-5** on a 393-wide frame — a 402pt (iPhone 16 Pro) component on a 393pt (iPhone 15 Pro) frame, overhanging 5px left and 4px right. The other 6 are correctly 393x50 | Open |
+| 10 | **Header sits at y=50, but the Dynamic Island safe-area inset is 59.** Content at y=50 clears the island's bottom edge (47.67) by 2.33px, against 11.33px at 59 | **Blocks screen 1 — needs a decision** |
+| 11 | Letter-spacing values filed under a colour namespace: `Color/container/accent/indigo/heading/h4` = −0.48, `/h5` = −0.20. `Heading/h4` and `Heading/h5` bind `letterSpacing` to them | Handled in the generator, documented in `src/tokens/TOKENS.md` |
+| 12 | Five type-style pairs differ only by case, and four are **not** equivalent — `Heading/H4` is 14/20 while `Heading/h4` is 20/24. System looks mid-migration from literal to primitive-composed styles | Both kept under exact Figma names; CSS property names preserve case |
+| 13 | `H/6` holds a **unitless line-height ratio (1.4)** while the other 20 styles hold px. `H/6` and `Body/Reg/Large` also hold letter-spacing −2 against −0.16…−0.96 elsewhere — probably −2% in a px field | Ratio handled by `lineHeightCss`; the −2 is **unresolved** |
+| 14 | 11 colour tokens sit outside the semantic `Color/*` system, including `Omnix Neutral/400` (a foreign system) and `Primary / White` (spaces around the slash) | Exported as `legacyColor`; prefer semantic tokens |
+| 15 | Components doing real work under default Figma names: `Frame 4908` x77, `Frame 4909` x18, `Frame 5071` x1 | Open — need naming before they can be built as components |
+| 16 | Both `trash-01` (79 uses) and `trash-03` (107 uses) are in use — two different trash icons for the same action | Open |
+| 17 | `List` (26 uses) and `list` (2 uses) — case-variant component names, same pattern as the type styles | Open |
 
 ## Work order
 
-Not yet agreed. Screens get built 1–3 at a time, by node ID.
+Screens get built 1–3 at a time, by node ID.
 
-| # | Screens | Nodes | Status |
+| # | Screen | Node | Status |
 |---|---|---|---|
-| 1 | _to be chosen_ | | not started |
+| 1 | Sales point (band 4) | `88:8079` | **tokens + inventory done; build not started** |
 
-## Before the first screen
+## Foundation — done
 
-1. Confirm the section is `88:7008` and not `88:2016`.
-2. Confirm which "Sales point" frame is current (band 1 "v1" vs the later ones).
-3. `get_variable_defs` on the section, to learn whether the file uses Figma variables.
-   The repo currently has **no colour or type tokens** and none were invented; this is
-   what decides whether they come in as `[var]` or `[literal]`.
-4. Read the chosen band's Section Header title.
-5. Then `get_design_context` on one frame at a time — never a whole band at once.
+| Step | Result |
+|---|---|
+| Section confirmed | `88:7008`, confirmed by the user |
+| Variables pulled | 138 variables -> `src/tokens/` (57 semantic colours, 21 type styles, 168 CSS properties) |
+| Component census | 2475 instances, 50 distinct components (see below) |
+| Libraries | 3 community kits subscribed: Material 3 Design Kit, Simple Design System, iOS 18 and iPadOS 18. **No custom org library**, so there is no published component library to mirror |
+| Code Connect | **Unavailable** — needs a Dev/Full seat on Organization or Enterprise. Nothing is mapped, so every component is built from design context |
+
+### Component census — the 20 most used
+
+| Uses | Component | | Uses | Component |
+|---|---|---|---|---|
+| 321 | Product image | | 62 | `.Modal footer` |
+| 319 | Qty input field | | 62 | Badge |
+| 245 | x-circle | | 61 | Divider |
+| 200 | chevron-right | | 60 | cube-01 |
+| 142 | dots-horizontal | | 52 | Text field |
+| 135 | Button | | 51 | user-02 |
+| 118 | chevron-down | | 51 | check |
+| 107 | trash-03 | | 49 | `.Modal header` |
+| 95 | Status Bar - iPhone | | 26 | List |
+| 79 | trash-01 | | 18 | Filter |
+| 77 | **Frame 4908** | | 16 | Section Header |
+
+`Product image` at 321 uses is the single most-used component on the board, which is
+why the image pipeline matters: 42 product photos are still missing.
+
+Icon names (`trash-01`, `x-circle`, `cube-01`, `bank-note-02`, `coins-stacked-02`,
+`percent-03`, `layout-alt-02`) follow the Untitled UI convention, which is **not** one
+of the three subscribed libraries — so they are either local to the file or from an
+unsubscribed source. Assets must come from `download_assets` on the instance nodes.
+
+## Before screen 1 can be built
+
+1. **Decide the safe-area conflict** (inconsistency #10): build the header at the
+   design's y=50, or at the device's 59pt Dynamic Island inset.
+2. Read band 4's Section Header title (`88:8155`).
+3. `get_design_context` on `88:8079` alone, with a screenshot, then `download_assets`
+   for its icons and imagery.
+4. Name `Frame 4908` (#15) if it appears in this screen — 77 uses across the board
+   means it is a real component.

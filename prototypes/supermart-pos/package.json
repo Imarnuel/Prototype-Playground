@@ -10,7 +10,9 @@
     "catalogue:verify": "node --experimental-strip-types scripts/verify-catalogue.mjs",
     "catalogue:csv": "node --experimental-strip-types scripts/export-figma-csv.mjs",
     "images:manifest": "node --experimental-strip-types scripts/image-manifest.mjs",
-    "images:optimise": "node --experimental-strip-types scripts/optimise-images.mjs"
+    "images:optimise": "node --experimental-strip-types scripts/optimise-images.mjs",
+    "tokens:gen": "node scripts/gen-tokens.mjs",
+    "tokens:verify": "node --experimental-strip-types scripts/verify-tokens.mjs"
   },
   "dependencies": {
     "@playground/shared": "*",
