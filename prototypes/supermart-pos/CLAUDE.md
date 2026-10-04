@@ -16,11 +16,21 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records eight open inconsistencies, including that 31 frames share the
-name "Customer added", so **screens must be referenced by node ID, never by name**.
+anything — it records **47** inconsistencies, including that 31 frames share the name
+"Customer added", so **screens must be referenced by node ID, never by name**.
 
-Nothing has been built from this board yet, and no `get_design_context` call has
-been made against any screen.
+### Built so far — band 4, "Adding customer to an order"
+
+| # | Screen | Node | State |
+|---|---|---|---|
+| 1 | Sales Point | `88:8079` | 1 coordinate outside 0.5px, 21/21 flow |
+| 2 | Cart / Order Preview | `88:8164` | 0 outside 0.5px, 19/19 flow |
+| 3 | Select customer (empty + populated) | `88:11845`, `88:12043` | 0 outside tolerance, 17/17 flow |
+
+Next: Customer added (`88:8243`).
+
+**Hosted preview:** <https://claude.ai/artifact/LnsiYh4uBeTNY1J3XDMJHX> — rebuild and
+republish it with `npm run build:hosted`.
 
 ## The store
 
@@ -85,20 +95,38 @@ Seeded so every state can be demoed without editing data (root agreement §4, §
 ## Commands
 
 ```bash
-npm run catalogue:verify   # 35 invariants: check digits, money, totals, states, CSV agreement
+npm run dev                # iterate; open with ?dev=1 for the toolbar
+npm run build && npm run preview   # demo from here, not dev
+
+npm run catalogue:verify   # 37 invariants: check digits, money, totals, states, CSV agreement
 npm run catalogue:csv      # regenerate figma/catalogue.csv from catalogue.ts
+npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json
+npm run tokens:verify      # the generated tokens still match the Figma dump
+npm run motion:sample      # transitions animate in BOTH directions (needs a server)
 npm run images:manifest    # which photos are still missing
 npm run images:optimise -- --box <css-px>   # --box MUST come from a measured frame
+npm run build:hosted       # publish-ready bundle for the hosted preview
 ```
 
 Run `catalogue:verify` after any edit to `catalogue.ts`. An invalid check digit or a
-total that stops reconciling shows up live in a demo.
+total that stops reconciling shows up live in a demo. Run `motion:sample` after any
+change to a presented surface — checking a transition is "visible" cannot catch an
+entrance that never animates.
 
 ## Still open
 
-- No Figma file attached, so no colour or type tokens, and the screen is a catalogue
-  readout rather than POS UI. Nothing invented in their place.
-- **No product photography.** 42 photos expected, 0 present. `assets/products/` is
-  empty and `images:manifest` lists exactly what is missing.
+- **21 icons and 42 product photos are unavailable.** This environment's network
+  policy denies `www.figma.com:443`, so `download_assets` returns URLs that cannot be
+  fetched. Every icon is reserved at its exact size by `<AssetSlot>` and listed in
+  `src/assets/icons/MANIFEST.md`; nothing was substituted or redrawn.
 - `images:optimise --box` defaults to a placeholder 112px. The real value is the
   largest CSS box a product photo is drawn into, measured off the design.
+- **The Cart's title-bar trash clears the whole order in one tap** — no confirmation
+  or undo, and none is designed in this band (BUILD-PLAN #35).
+- **The Cart shows no order total** in the frame; one was added as a minimal honest
+  addition and needs design input (BUILD-PLAN #32).
+- The sheet **exit curve** is heavily back-loaded and is deferred to `better-ui`,
+  which owns motion and is not installed (BUILD-PLAN #37).
+- **No motion is authored anywhere in the Figma file** — `get_motion_context` returns
+  `{"nodes":[]}` for all 90 frames. Transitions come from `shared/src/motion.ts`,
+  documented as the project's baseline rather than design-derived.

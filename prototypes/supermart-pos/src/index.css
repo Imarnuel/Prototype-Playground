@@ -1,9 +1,9 @@
 /* Self-hosted so the demo does not depend on a font CDN at presentation time.
    Without real Inter the fallback is metrically wider — the H1 measured 131.83px
    against the design's 112. */
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/500.css';
-@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-500.css';
+@import '@fontsource/inter/latin-600.css';
 @import '@playground/shared/device-frame.css';
 @import '@playground/shared/dev-toolbar.css';
 @import './tokens/tokens.css';

@@ -127,7 +127,10 @@ export function App() {
         )}
       </DeviceFrame>
 
-      <DevToolbar items={items} enabled={devFlagEnabled()} />
+      {/* Off by default everywhere, per the root agreement. The showcase flag is
+          set only for the hosted build, where there is no address bar to append
+          `?dev=1` to and the toolbar is the only way to reach the other states. */}
+      <DevToolbar items={items} enabled={devFlagEnabled() || import.meta.env.VITE_SHOWCASE === '1'} />
     </>
   );
 }
