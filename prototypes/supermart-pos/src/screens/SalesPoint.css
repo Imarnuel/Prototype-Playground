@@ -148,7 +148,11 @@
   );
 }
 
-/* Design has this at top:703 on a 50px status bar; +9 for the 59pt safe area. */
+/* Bottom-docked, so it does NOT take the +9 safe-area shift.
+   The shift applies to content flowing from the top; an element anchored near the
+   bottom keeps its bottom-relative position or it creeps toward the home indicator.
+   Design: 703..751 with the tab bar at 761, a 10px gap. Shifting it to 712 left a
+   1px gap. 852 - 751 = 101 from the bottom restores it. */
 .viewCart {
-  top: 712px;
+  bottom: 101px;
 }

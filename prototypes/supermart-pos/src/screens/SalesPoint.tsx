@@ -22,10 +22,17 @@ type Load =
   | { status: 'error'; error: Error }
   | { status: 'ready'; products: readonly Product[] };
 
-export function SalesPoint({ forceState }: { forceState?: 'loading' | 'error' | 'empty' }) {
+type SalesPointProps = {
+  forceState?: 'loading' | 'error' | 'empty';
+  /** Comes from the shared cart — this screen does not keep its own copy. */
+  cartCount: number;
+  onAddProduct: (p: Product) => void;
+  onViewCart: () => void;
+};
+
+export function SalesPoint({ forceState, cartCount, onAddProduct, onViewCart }: SalesPointProps) {
   const [filter, setFilter] = useState<ProductFilter>('All');
   const [query, setQuery] = useState('');
-  const [cart, setCart] = useState<Product[]>([]);
   const [load, setLoad] = useState<Load>({ status: 'loading' });
 
   const run = useCallback(() => {
@@ -57,7 +64,7 @@ export function SalesPoint({ forceState }: { forceState?: 'loading' | 'error' | 
       <header className="salesPoint__header">
         <div className="salesPoint__headerRow">
           <h1 className="salesPoint__title">Sales Point</h1>
-          <button type="button" className="salesPoint__overflow" onClick={() => setCart([])}>
+          <button type="button" className="salesPoint__overflow" onClick={onViewCart} aria-label="More options">
             <AssetSlot name="dots-horizontal" width={20} height={20} />
           </button>
         </div>
@@ -96,14 +103,14 @@ export function SalesPoint({ forceState }: { forceState?: 'loading' | 'error' | 
         {state.status === 'ready' && visible.length > 0 && (
           <div className="productGrid">
             {visible.map((p) => (
-              <ProductCard key={p.id} product={p} onPress={(x) => setCart((c) => [...c, x])} />
+              <ProductCard key={p.id} product={p} onPress={onAddProduct} />
             ))}
           </div>
         )}
       </main>
 
       <div className="salesPoint__bottomScrim" />
-      <ViewCartButton count={cart.length} onPress={() => setCart([])} />
+      <ViewCartButton count={cartCount} onPress={onViewCart} />
       <TabBar onNavigate={() => {}} />
     </div>
   );

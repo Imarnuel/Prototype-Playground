@@ -1,0 +1,347 @@
+.cart {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-surface-default);
+  /* Frame carries a 28px radius — the Sales Point frame carries 32px for the same
+     device. Neither is applied: the device shell already clips at 55px. Logged #28. */
+}
+
+.cart__titleBar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  height: 56px;
+  padding: 12px 16px;
+  flex: none;
+  /* Design places the title bar at y=58 over a 50px status bar — an 8px gap. The
+     status bar here is 59 (the real inset), so the gap is preserved rather than the
+     absolute y: 59 + 8 = 67, which is the design's 58 + the agreed +9 shift. */
+  margin-top: 8px;
+  background: var(--color-surface-default);
+  overflow: clip;
+}
+
+.cart__titleLeft {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  gap: 12px;
+  align-items: center;
+}
+
+.cart__title {
+  margin: 0;
+  flex: 1 1 0;
+  min-width: 0;
+  /* Heading/H2 */
+  font-size: var(--type-Heading-H2-size);
+  font-weight: var(--type-Heading-H2-weight);
+  line-height: var(--type-Heading-H2-line-height);
+  letter-spacing: var(--type-Heading-H2-letter-spacing);
+  color: var(--color-text-default);
+}
+
+.cart__titleActions {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex: none;
+}
+
+.cart__iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  flex: none;
+  border: 0;
+  border-radius: 100px;
+  background: var(--color-container-neutral-default);
+  cursor: pointer;
+}
+
+.cart__scroll {
+  flex: 1 1 auto;
+  /* Without min-height:0 a flex child refuses to shrink below intrinsic size and
+     the list stops scrolling. */
+  min-height: 0;
+  overflow-y: auto;
+  /* Content block sits at left 12 with a 361 width, leaving 20 on the right — the
+     frame's own asymmetry against the 16px margins used by the title bar and
+     footer. Followed rather than normalised. Logged #29. */
+  padding: 16px 20px 150px 12px;
+}
+
+.addCustomer {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 0;
+  border-radius: var(--radius-300);
+  background: var(--color-surface-default);
+  /* 2px stroke, inset. The design colours it with
+     Color/container/neutral/subtle/hover — a HOVER token on a static border. Same
+     value as the resting container token, wrong semantic. Logged #31. */
+  box-shadow: inset 0 0 0 var(--border-width-md) var(--color-container-neutral-subtle-hover);
+  cursor: pointer;
+}
+
+.addCustomer__left {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.addCustomer__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: var(--radius-full);
+  background: var(--color-container-accent-pink-default);
+  overflow: clip;
+}
+
+.addCustomer__label {
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  letter-spacing: var(--type-Label-Large-letter-spacing);
+  color: var(--color-text-default);
+}
+
+.cart__lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cartLine {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 20px 0;
+  /* Inset, so the divider does not add 1px to every row's height. */
+  box-shadow: inset 0 -1px 0 0 var(--color-border-subtle);
+}
+
+.cartLine__main {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  gap: 14px;
+  align-items: center;
+}
+
+.cartLine__image {
+  position: relative;
+  display: block;
+  width: 68px;
+  height: 68px;
+  flex: none;
+  border-radius: var(--radius-100);
+  background: var(--color-container-neutral-default);
+  overflow: clip;
+}
+
+.cartLine__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cartLine__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    179.7deg,
+    rgb(0 0 0 / 0%) 50%,
+    rgb(0 0 0 / 40%) 64.588%,
+    rgb(0 0 0 / 80%) 99.743%
+  );
+}
+
+.cartLine__info {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.cartLine__name {
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  letter-spacing: var(--type-Label-Large-letter-spacing);
+  color: var(--color-text-default);
+  /* The frame sets nowrap, which only holds because its names are short. Real names
+     reach 48 characters. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.cartLine__trailing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  align-self: stretch;
+  flex: none;
+  padding-left: 12px;
+}
+
+.cartLine__remove {
+  display: flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.cartLine__price {
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  letter-spacing: var(--type-Label-Large-letter-spacing);
+  color: var(--color-text-default);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cart__empty {
+  padding: 48px 8px;
+  text-align: center;
+}
+
+.cart__emptyTitle {
+  margin: 0 0 4px;
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  color: var(--color-text-default);
+}
+
+.cart__emptyBody {
+  margin: 0;
+  font-size: var(--type-Body-Base-size);
+  line-height: var(--type-Body-Base-line-height);
+  letter-spacing: var(--type-Body-Base-letter-spacing);
+  color: var(--color-text-subtle);
+}
+
+.cart__bottomScrim {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 393px;
+  height: 206px;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  background: linear-gradient(
+    to bottom,
+    rgb(246 247 248 / 0%) 33.537%,
+    rgb(255 255 255 / 90%) 58.748%,
+    rgb(255 255 255 / 100%) 122.42%
+  );
+}
+
+/* Bottom-docked, so no +9 shift: design 773..821 on an 852 screen leaves 31. */
+.cart__footer {
+  position: absolute;
+  left: 16px;
+  bottom: 31px;
+  width: 361px;
+  display: flex;
+  gap: var(--spacing-200);
+  align-items: center;
+}
+
+.cart__checkout,
+.cart__queue {
+  display: flex;
+  gap: var(--spacing-200);
+  align-items: center;
+  justify-content: center;
+  padding: 12px var(--spacing-300);
+  border: 0;
+  border-radius: var(--radius-300);
+  filter: drop-shadow(0 1px 1px rgb(10 13 18 / 5%));
+  cursor: pointer;
+}
+
+.cart__checkout {
+  flex: 1 1 0;
+  min-width: 0;
+  background: var(--color-container-brand-bold-default);
+}
+
+.cart__queue {
+  flex: none;
+  background: var(--color-container-brand-default);
+}
+
+.cart__checkout:disabled,
+.cart__queue:disabled {
+  background: var(--color-container-disabled);
+  cursor: default;
+  filter: none;
+}
+
+.cart__checkoutLabel,
+.cart__queueLabel {
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* The design colours this with Color/icon/inverse — an icon token on text. */
+.cart__checkoutLabel { color: var(--color-text-inverse); }
+.cart__queueLabel { color: var(--color-text-brand); }
+
+.cart__checkout:disabled .cart__checkoutLabel,
+.cart__queue:disabled .cart__queueLabel {
+  color: var(--color-text-on-disabled);
+}
+
+/* Not in the frame — see the comment at its call site. Sits above the footer. */
+.cart__total {
+  position: absolute;
+  left: 16px;
+  bottom: 87px;
+  width: 361px;
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  color: var(--color-text-subtle);
+}
+
+.cart__total strong {
+  font-size: var(--type-Heading-H2-size);
+  font-weight: var(--type-Heading-H2-weight);
+  line-height: var(--type-Heading-H2-line-height);
+  letter-spacing: var(--type-Heading-H2-letter-spacing);
+  color: var(--color-text-default);
+}

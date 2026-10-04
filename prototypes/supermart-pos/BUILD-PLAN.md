@@ -245,6 +245,12 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 25 | Stock unit label is "ea" on four cards and "each" on two | "ea" used throughout |
 | 26 | All six cards show the same product ("Fanta Orange 50cl", ₦1,000) with real-brand photography (Fanta, Coca-Cola, Sprite) | Replaced by the fictional catalogue — the reason it exists |
 | 27 | **Icons cannot be downloaded.** This environment's network policy denies `www.figma.com:443`, so `download_assets` returns unfetchable URLs | **Open — 11 icons reserved by `<AssetSlot>`, none substituted or redrawn.** See `src/assets/icons/MANIFEST.md` |
+| 28 | The Cart frame carries a **28px** corner radius; the Sales Point frame carries **32px** — same device, same band | Neither applied; the device shell clips at 55px |
+| 29 | Cart content sits at left 12 with width 361, so its right margin is 20 against the 16 used by the title bar and footer | Followed as drawn |
+| 30 | **The Cart's six rows disagree with each other.** Five use gap 4, `Color/border/default` and "ea"; the sixth uses gap 8, `Color/border/input` and "each". Row 5 name is 18/22, row 6 is 15/22 — neither is a token | Five-row majority built |
+| 31 | The Add-customer card's border uses `Color/container/neutral/subtle/hover` — a **hover** token on a static border | Followed (same value), flagged |
+| 32 | **The Cart shows no order total**, and its button reads "Checkout (5)" over **six** priced rows whose line prices reconcile with nothing (₦10,000 on one row, ₦1,000 on five at the same quantity) | Total added as a minimal honest addition; **needs design input** |
+| 33 | **No motion is authored anywhere in the file.** `get_motion_context` returns `{"nodes":[]}` for the Cart, the Sales Point, and all 90 frames in the section | Transitions use the project's own documented baseline, explicitly not design-derived |
 
 ## Work order
 
@@ -253,7 +259,8 @@ Screens get built 1–3 at a time, by node ID.
 | # | Screen | Node | Status |
 |---|---|---|---|
 | 1 | Sales point (band 4) | `88:8079` | **built and verified** — 1 coordinate outside 0.5px, 21/21 flow checks |
-| 2 | _to be chosen_ | | not started |
+| 2 | Cart / Order Preview (band 4) | `88:8164` | **built and verified** — 0 coordinates outside 0.5px, 19/19 flow checks |
+| 3 | _to be chosen_ — band 4 continues with Add customer (`88:11845`) | | not started |
 
 ## Foundation — done
 
@@ -364,3 +371,27 @@ Fixed during verification, each caught by measurement rather than by eye:
 1. Read band 4's Section Header title (`88:8155`) — still unread.
 2. Name `Frame 4908` (#15) — 77 uses across the board means it is a real component.
 3. Decide whether the 393x1170 Cart frames (#6) are scroll views or separate screens.
+
+## Band 4 — "Adding customer to an order"
+
+Title read from `88:8155`. The band is one flow: Sales point -> Cart -> Add customer
+-> Customer added. Screens 1 and 2 are the first two steps.
+
+## Motion
+
+`get_motion_context` was run against the Cart, the Sales Point and the whole section,
+recursive, and returned `{"nodes":[]}` every time: **there is no authored motion in
+this file**. Per the Figma motion skill's own rule, none was fabricated from it.
+
+Transitions in the prototype therefore come from `shared/src/motion.ts`, which is
+documented as the project's baseline rather than design-derived, and covers what a
+static frame cannot express: press feedback, the presented-sheet transition and its
+exit, and the skeleton pulse. If motion is later authored in Figma, replace the values
+in that module rather than adding a second set beside it.
+
+## Resolved: `Frame 4908` is `CloseButton` (#15)
+
+77 uses, always 40x40 at the leading edge of a title bar, always wrapping a 20x20
+`x-close` — a dismiss action, not a back action. Built as
+`src/components/CloseButton.tsx`. Its 40x40 target is under the 44x44 minimum, so the
+hit area is expanded with `::after` rather than by growing the glyph.

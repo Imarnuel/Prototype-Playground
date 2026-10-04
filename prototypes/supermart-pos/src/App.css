@@ -1,2 +1,27 @@
-/* Screen-level styles live with their screen. This file holds only what the app
-   shell needs around the device frame. */
+/* The Cart is presented over the Sales Point. There is NO motion authored in the
+   Figma file — get_motion_context returns {"nodes":[]} for this frame, the Sales
+   Point, and all 90 frames in the section — so this uses the project's own motion
+   constants, which are documented as a baseline rather than design-derived. It is
+   not claimed to be the designed transition. */
+.sheet {
+  position: absolute;
+  inset: 0;
+  transition-property: transform, opacity;
+  will-change: transform;
+}
+
+.sheet[data-open='off'] {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.sheet[data-open='on'] {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet {
+    transition-duration: 0ms !important;
+  }
+}

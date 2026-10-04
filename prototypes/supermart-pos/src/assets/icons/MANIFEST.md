@@ -23,10 +23,20 @@ To unblock: allow `www.figma.com` in the environment's Network access, then re-r
 | `cart.svg` | 20 x 17.896 | Tab bar - Sales Point (selected) | `I88:8153;2232:7413;2227:7825` |
 | `menu-01.svg` | 20 x 20 | Tab bar - More | `I88:8153;2232:7414;2227:7827` |
 | `shopping-cart-01.svg` | 16 x 16 | View cart button | `I88:8154;2398:7604` |
+| `x-close.svg` | 20 x 20 | Cart close button | `I88:8168;2049:9449` |
+| `trash-03.svg` | 20 x 20 | Cart title bar — clear order | `88:8174` |
+| `user-02.svg` | 16 x 16 | Add customer avatar | `88:8179` |
+| `plus-circle.svg` | 24 x 24 | Add customer trailing | `88:8181` |
+| `minus.svg` | 16 x 16 | Quantity stepper — decrease | `I88:8188;1569:4487;1565:4393` |
+| `plus.svg` | 16 x 16 | Quantity stepper — increase | `I88:8188;1569:4491;1565:4395` |
+| `x-circle.svg` | 20 x 20 | Cart line — remove | `88:8190` |
+| `chevron-right.svg` | 16 x 16 | Checkout button | `I88:8241;2398:7606` |
 
 Two of these are mis-named upstream and the FILE is what matters, not the node name:
 the node called `chevron-down` renders **filter-lines**, and the node called `plus`
-renders **shopping-cart-01**.
+renders **shopping-cart-01**. A third: the Cart's close button renders **x-close**
+(confirmed by the asset and the component description) while design context names its
+inner layer `chevron-left`.
 
 Before styling any of these, check the SVG's own stroke colour — a white-stroked icon
 on a light background is invisible (root agreement, fidelity rules).

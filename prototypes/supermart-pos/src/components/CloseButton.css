@@ -1,0 +1,22 @@
+.closeButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border: 0;
+  border-radius: 1000px;
+  background: var(--color-container-neutral-default);
+  cursor: pointer;
+  overflow: visible;
+}
+
+/* The design's target is 40x40, under the 44x44 minimum. Expanded with ::after
+   rather than by growing the button, so the glyph and the circle stay on spec. */
+.closeButton::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+}

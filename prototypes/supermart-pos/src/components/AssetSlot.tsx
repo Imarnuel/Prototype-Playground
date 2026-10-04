@@ -26,6 +26,10 @@ export function AssetSlot({ name, width, height }: { name: string; width: number
 
 /** Every slot the Sales Point screen is waiting on, for the dev toolbar readout. */
 export const PENDING_ICONS = [
+  // Sales Point
   'cellular-connection', 'wifi', 'battery', 'dots-horizontal', 'search-sm',
   'filter-lines', 'ellipse-79', 'grid-01', 'cart', 'menu-01', 'shopping-cart-01',
+  // Cart
+  'x-close', 'trash-03', 'user-02', 'plus-circle', 'minus', 'plus', 'x-circle',
+  'chevron-right',
 ] as const;

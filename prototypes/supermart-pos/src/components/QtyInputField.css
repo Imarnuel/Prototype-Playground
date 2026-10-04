@@ -1,0 +1,48 @@
+.qtyField {
+  display: flex;
+  gap: var(--spacing-50);
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 4px var(--spacing-200);
+  flex: none;
+  background: var(--color-container-input-default);
+  border-radius: var(--radius-200);
+  /* Inset, not border: a Figma stroke draws inside the frame. */
+  box-shadow: inset 0 0 0 var(--border-width-sm) var(--color-border-default);
+}
+
+.qtyField__step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  flex: none;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-container-neutral-less-bold-default);
+  cursor: pointer;
+  overflow: clip;
+}
+
+.qtyField__step:disabled {
+  background: var(--color-container-disabled);
+  cursor: default;
+}
+
+.qtyField__value {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  flex: none;
+  white-space: nowrap;
+  font-size: var(--type-Body-Base-size);
+  font-weight: var(--type-Body-Base-weight);
+  line-height: var(--type-Body-Base-line-height);
+  letter-spacing: var(--type-Body-Base-letter-spacing);
+  color: var(--color-text-default);
+}
