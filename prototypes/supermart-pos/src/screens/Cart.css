@@ -246,21 +246,6 @@
   color: var(--color-text-subtle);
 }
 
-.cart__bottomScrim {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 393px;
-  height: 206px;
-  pointer-events: none;
-  backdrop-filter: blur(8px);
-  background: linear-gradient(
-    to bottom,
-    rgb(246 247 248 / 0%) 33.537%,
-    rgb(255 255 255 / 90%) 58.748%,
-    rgb(255 255 255 / 100%) 122.42%
-  );
-}
 
 /* Bottom-docked, so no +9 shift: design 773..821 on an 852 screen leaves 31. */
 .cart__footer {

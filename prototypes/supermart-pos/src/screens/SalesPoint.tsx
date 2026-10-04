@@ -3,6 +3,7 @@ import { AssetSlot } from '../components/AssetSlot';
 import { ProductCard } from '../components/ProductCard';
 import { FilterBar, SearchBar, TabBar, ViewCartButton } from '../components/SalesPointChrome';
 import { StatusBar } from '../components/StatusBar';
+import { BottomScrim } from '../components/BottomScrim';
 import { fetchProducts, type ProductFilter } from '../api/pos';
 import { CATEGORY_ORDER, fullName, type Product } from '../data/catalogue';
 import './SalesPoint.css';
@@ -109,7 +110,7 @@ export function SalesPoint({ forceState, cartCount, onAddProduct, onViewCart }: 
         )}
       </main>
 
-      <div className="salesPoint__bottomScrim" />
+      <BottomScrim height={272} />
       <ViewCartButton count={cartCount} onPress={onViewCart} />
       <TabBar onNavigate={() => {}} />
     </div>

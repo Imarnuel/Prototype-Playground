@@ -132,21 +132,6 @@
   cursor: pointer;
 }
 
-.salesPoint__bottomScrim {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 393px;
-  height: 272px;
-  pointer-events: none;
-  backdrop-filter: blur(8px);
-  background: linear-gradient(
-    to bottom,
-    rgb(246 247 248 / 0%) 33.537%,
-    rgb(255 255 255 / 90%) 58.748%,
-    rgb(255 255 255 / 100%) 122.42%
-  );
-}
 
 /* Bottom-docked, so it does NOT take the +9 safe-area shift.
    The shift applies to content flowing from the top; an element anchored near the

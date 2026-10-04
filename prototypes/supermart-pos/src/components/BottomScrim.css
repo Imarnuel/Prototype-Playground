@@ -1,0 +1,42 @@
+.bottomScrim {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 393px;
+  pointer-events: none;
+  /* The fill. Percentages are the gradient's stops AFTER Figma's gradientTransform:
+     raw stops 0 / 0.28365 / 1 map to 33.537% / 58.748% / 122.42% down the box. The
+     third lands past the bottom edge on purpose, so the white reaches ~96.5% rather
+     than a flat 100% at the very bottom. */
+  background: linear-gradient(
+    to bottom,
+    rgb(246 247 248 / 0%) 33.537%,
+    rgb(255 255 255 / 90%) 58.748%,
+    rgb(255 255 255 / 100%) 122.42%
+  );
+}
+
+.bottomScrim__blur {
+  position: absolute;
+  inset: 0;
+  /* Figma stores radius 16. Figma's blur radius and CSS blur() are different units —
+     the conventional mapping is 2:1, which is also what Figma's own code export
+     emits (8px). Kept at 8px; if it ever reads too soft or too sharp this is the
+     single value to change. */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* Masked by the fill's own alpha ramp, so the blur fades in with the white instead
+     of starting at a hard edge. These stops MUST track the fill's. */
+  mask-image: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0%) 33.537%,
+    rgb(0 0 0 / 90%) 58.748%,
+    rgb(0 0 0 / 100%) 122.42%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0%) 33.537%,
+    rgb(0 0 0 / 90%) 58.748%,
+    rgb(0 0 0 / 100%) 122.42%
+  );
+}

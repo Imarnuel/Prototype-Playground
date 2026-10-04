@@ -5,6 +5,7 @@ import { formatPrice } from '../data/catalogue';
 import type { Customer } from '../data/customers';
 import { cartTotal, lineTotal, productFor, type CartLine } from '../state/cart';
 import { StatusBar } from '../components/StatusBar';
+import { BottomScrim } from '../components/BottomScrim';
 import './Cart.css';
 
 /**
@@ -114,7 +115,7 @@ export function Cart({
         )}
       </div>
 
-      <div className="cart__bottomScrim" />
+      <BottomScrim height={206} />
 
       <div className="cart__footer">
         <button type="button" className="cart__checkout" onClick={onCheckout} disabled={lines.length === 0}>

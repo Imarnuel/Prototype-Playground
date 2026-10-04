@@ -265,6 +265,8 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 45 | The empty state's concentric rings use hardcoded `#f2f2f3` and `#dfe0e2`, with no token behind either; only the innermost ring uses `Color/border/default` | Kept as literals, flagged |
 | 46 | Two of the twelve customer rows read **"Location"** instead of a name — leftover placeholder text | Replaced with names in the same style, so a demo does not show a row called "Location" |
 | 47 | The add-customer **form** is not in band 4 — the sheet's CTA has no designed destination here | CTA seeds the list, so the empty state has somewhere to go. **Needs design input** |
+| 48 | **The bottom scrim's blur was wrong, and the generated code could not have revealed it.** The codegen emits `backdrop-blur-[8px]`; the node itself holds `effects: [{ type: 'BACKGROUND_BLUR', radius: 16 }]` over a gradient whose alpha runs 0 to 0.9 to 1. A Figma BACKGROUND_BLUR is **modulated by the layer's own alpha**, so the blur fades in with the white. CSS `backdrop-filter` blurs the element's whole box evenly, which cut a hard seam across the content at the scrim's top edge — measured at a 1.97 step against a 0.10 content baseline | **Fixed.** Blur moved to its own layer masked by the fill's alpha ramp. Step at the edge now 0.10, identical to the no-scrim baseline |
+| 49 | Figma stores the blur radius as **16**; its own code export emits **8px**. These are different units (the conventional mapping is 2:1) | 8px kept, matching the export. One value to change if it ever reads wrong |
 
 ## Work order
 
