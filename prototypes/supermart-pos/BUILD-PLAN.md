@@ -255,6 +255,16 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 35 | **The Cart's title-bar trash clears the whole order in one tap** — no confirmation, no undo, no distinct treatment. Measured: 4 lines to 0 with no dialog | **Open — needs design input.** Not invented here; the board's unbuilt "More options" frame (`88:15458`) may hold the intended pattern |
 | 36 | **The sheet's ENTRY was an instant cut.** It mounted already in its open state, so there was no rendered starting frame to transition from — measured `translateY 0.0` at every frame including t=44ms. Only the exit had ever been checked | **Fixed.** Two-phase mount; entry now measures 0% → 55.9% → 91.8% at t=20/104/204ms. `npm run motion:sample` guards it |
 | 37 | The sheet's **exit curve is heavily back-loaded**: 0.2% travelled at 25% of the duration, 2.8% at 50%, 46.8% at 90% — visually motionless for roughly the first 150ms after the tap. `EASING.in` is `cubic-bezier(0.7, 0, 0.84, 0)` | **Open — deferred to `better-ui`**, which owns motion. Measured, not retuned on taste |
+| 38 | The Cart's **Add customer row differs between frames**: `88:8164` draws a 32px pink circle with `user-02` and `Color/text/default`; `88:11845` draws a bare 20px `heroicons:user-16-solid` with `Color/text/brand` | Built as `88:8164` draws it, since that is the Cart's own frame |
+| 39 | The Cart's **title-bar trailing icon** is `trash-03` in `88:8164` and `trash-01` in `88:11845` / `88:12043` | `trash-03` kept, per the Cart's own frame |
+| 40 | The Cart's **per-line remove icon** is `x-circle` in `88:8164` (rows 1–5) but `trash-01` throughout `88:11845` | `x-circle` kept, per the Cart's own frame |
+| 41 | `88:11845` renders the Cart **with a TabBar and its footer at y=706**; `88:8164` has no TabBar and its footer at y=773 | Built as `88:8164`; the sheet overlays it either way |
+| 42 | The two "Add customer" frames show the sheet's **empty** (`88:11845`) and **populated** (`88:12043`) states — they are one component, not two screens | Both built as states of one sheet |
+| 43 | **Invisible controls.** The modal header holds a `check` Button Icon at `opacity: 0`, and every one of the twelve customer rows carries a trailing "All" label at `opacity: 0` — identical on all of them, so its meaning is undefined | Neither built. An affordance nobody can see is not an affordance |
+| 44 | **Two different buttons for one action.** The empty state's "Add customer" is brand-bold with inverse text, a 16px `plus` and gap 8; the populated state's is brand-subtle with default text, a 20px `add-one` and gap 16 | Both followed as drawn |
+| 45 | The empty state's concentric rings use hardcoded `#f2f2f3` and `#dfe0e2`, with no token behind either; only the innermost ring uses `Color/border/default` | Kept as literals, flagged |
+| 46 | Two of the twelve customer rows read **"Location"** instead of a name — leftover placeholder text | Replaced with names in the same style, so a demo does not show a row called "Location" |
+| 47 | The add-customer **form** is not in band 4 — the sheet's CTA has no designed destination here | CTA seeds the list, so the empty state has somewhere to go. **Needs design input** |
 
 ## Work order
 
@@ -264,7 +274,8 @@ Screens get built 1–3 at a time, by node ID.
 |---|---|---|---|
 | 1 | Sales point (band 4) | `88:8079` | **built and verified** — 1 coordinate outside 0.5px, 21/21 flow checks |
 | 2 | Cart / Order Preview (band 4) | `88:8164` | **built and verified** — 0 coordinates outside 0.5px, 19/19 flow checks |
-| 3 | _to be chosen_ — band 4 continues with Add customer (`88:11845`) | | not started |
+| 3 | Select customer sheet — empty + populated (band 4) | `88:11845`, `88:12043` | **built and verified** — 0 measurements outside tolerance, 17/17 flow checks |
+| 4 | _to be chosen_ — band 4 ends with Customer added (`88:8243`) | | not started |
 
 ## Foundation — done
 

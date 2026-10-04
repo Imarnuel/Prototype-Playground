@@ -2,6 +2,7 @@ import { AssetSlot } from '../components/AssetSlot';
 import { CloseButton } from '../components/CloseButton';
 import { QtyInputField } from '../components/QtyInputField';
 import { formatPrice } from '../data/catalogue';
+import type { Customer } from '../data/customers';
 import { cartTotal, lineTotal, productFor, type CartLine } from '../state/cart';
 import { StatusBar } from '../components/StatusBar';
 import './Cart.css';
@@ -20,11 +21,15 @@ type CartProps = {
   onCheckout: () => void;
   onQueue: () => void;
   onAddCustomer: () => void;
+  onMoreOptions: () => void;
   onClearAll: () => void;
+  /** Set once a customer is picked in the Select customer sheet. */
+  customer: Customer | null;
 };
 
 export function Cart({
-  lines, onClose, onQtyChange, onRemove, onCheckout, onQueue, onAddCustomer, onClearAll,
+  lines, onClose, onQtyChange, onRemove, onCheckout, onQueue, onAddCustomer,
+  onMoreOptions, onClearAll, customer,
 }: CartProps) {
   return (
     <div className="cart">
@@ -36,7 +41,7 @@ export function Cart({
           <h1 className="cart__title">Order Preview</h1>
         </div>
         <div className="cart__titleActions">
-          <button type="button" className="cart__iconButton" onClick={onAddCustomer} aria-label="More options">
+          <button type="button" className="cart__iconButton" onClick={onMoreOptions} aria-label="More options">
             <AssetSlot name="dots-horizontal" width={20} height={20} />
           </button>
           <button type="button" className="cart__iconButton" onClick={onClearAll} aria-label="Clear order">
@@ -51,7 +56,11 @@ export function Cart({
             <span className="addCustomer__avatar">
               <AssetSlot name="user-02" width={16} height={16} />
             </span>
-            <span className="addCustomer__label">Add customer</span>
+            {/* Once a customer is chosen the row carries their name. The designed
+                treatment for this is the "Customer added" frame (`88:8243`), which
+                is not built yet — this is the minimum that gives the selection a
+                visible consequence. Logged as #46. */}
+            <span className="addCustomer__label">{customer ? customer.name : 'Add customer'}</span>
           </span>
           <AssetSlot name="plus-circle" width={24} height={24} />
         </button>

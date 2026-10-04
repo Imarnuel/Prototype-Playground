@@ -32,4 +32,6 @@ export const PENDING_ICONS = [
   // Cart
   'x-close', 'trash-03', 'user-02', 'plus-circle', 'minus', 'plus', 'x-circle',
   'chevron-right',
+  // Select customer
+  'users-02', 'add-one',
 ] as const;

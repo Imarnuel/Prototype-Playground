@@ -1,12 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import {
   DeviceFrame, DevToolbar, SHEET_SPRING, devFlagEnabled, duration, useReducedMotion,
   type DevToolbarItem,
 } from '@playground/shared';
 import { SalesPoint } from './screens/SalesPoint';
 import { Cart } from './screens/Cart';
+import { SelectCustomer } from './screens/SelectCustomer';
 import { PENDING_ICONS } from './components/AssetSlot';
 import { PRODUCTS } from './data/catalogue';
+import { CUSTOMERS, type Customer } from './data/customers';
+import { usePresented } from './hooks/usePresented';
 import { addToCart, removeLine, setQty, type CartLine } from './state/cart';
 import './App.css';
 
@@ -17,43 +20,24 @@ export function App() {
   const [resetNonce, setResetNonce] = useState(0);
   const [lines, setLines] = useState<readonly CartLine[]>([]);
 
-  // Three states, not two, because a CSS transition needs a rendered starting frame.
-  //   cartOpen    — intent
-  //   cartMounted — in the tree, so the EXIT has something to animate
-  //   cartEntered — drives data-open, flipped one frame AFTER mount so the ENTRY has
-  //                 something to animate from
-  // Mounting straight into the open state skips the transition entirely: measured
-  // translateY 0.0 at every frame, an instant cut (root agreement §5).
   const [cartOpen, setCartOpen] = useState(false);
-  const [cartMounted, setCartMounted] = useState(false);
-  const [cartEntered, setCartEntered] = useState(false);
-  const reducedMotion = useReducedMotion();
-  const exitTimer = useRef<number>();
-  const enterFrame = useRef<number>();
+  // One hook owns presentation timing for every surface, so the entrance and exit
+  // fixes live in one place rather than being re-derived per sheet.
+  const { mounted: cartMounted, entered: cartEntered } = usePresented(cartOpen);
 
-  useEffect(() => {
-    if (cartOpen) {
-      setCartMounted(true);
-      // Two frames: the first commits the closed state to the compositor, the second
-      // flips it. One is not reliably enough — React can batch the mount and the flip
-      // into the same paint, which is the instant cut all over again.
-      enterFrame.current = requestAnimationFrame(() => {
-        enterFrame.current = requestAnimationFrame(() => setCartEntered(true));
-      });
-      return () => cancelAnimationFrame(enterFrame.current!);
-    }
-    setCartEntered(false);
-    if (!cartMounted) return;
-    const ms = duration(SHEET_SPRING.exitDuration, reducedMotion);
-    exitTimer.current = window.setTimeout(() => setCartMounted(false), ms);
-    return () => window.clearTimeout(exitTimer.current);
-  }, [cartOpen, cartMounted, reducedMotion]);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [customers, setCustomers] = useState<readonly Customer[]>(CUSTOMERS);
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const reducedMotion = useReducedMotion();
 
   const items: DevToolbarItem[] = [
     {
       label: 'Sales point',
       group: 'Screens',
-      onSelect: () => { setForced(undefined); setCartOpen(false); setResetNonce((n) => n + 1); },
+      onSelect: () => {
+        setForced(undefined); setCartOpen(false); setPickerOpen(false);
+        setCustomer(null); setCustomers(CUSTOMERS); setResetNonce((n) => n + 1);
+      },
     },
     { label: 'Cart (Order Preview)', group: 'Screens', onSelect: () => setCartOpen(true) },
     { label: 'Loading (skeleton)', group: 'States', onSelect: () => { setCartOpen(false); setForced('loading'); } },
@@ -74,6 +58,16 @@ export function App() {
         setLines(picks.reduce<readonly CartLine[]>((acc, p) => addToCart(acc, p), []));
         setCartOpen(true);
       },
+    },
+    {
+      label: 'Select customer',
+      group: 'Screens',
+      onSelect: () => { setCustomers(CUSTOMERS); setCartOpen(true); setPickerOpen(true); },
+    },
+    {
+      label: 'Select customer: empty',
+      group: 'States',
+      onSelect: () => { setCustomers([]); setCartOpen(true); setPickerOpen(true); },
     },
     {
       label: `${PENDING_ICONS.length} icons pending`,
@@ -112,8 +106,22 @@ export function App() {
               onRemove={(id) => setLines((l) => removeLine(l, id))}
               onCheckout={() => setCartOpen(false)}
               onQueue={() => { setLines([]); setCartOpen(false); }}
-              onAddCustomer={() => {}}
+              onAddCustomer={() => setPickerOpen(true)}
+              // "More options" is frame `88:15458`, not built yet.
+              onMoreOptions={() => setPickerOpen(true)}
               onClearAll={() => setLines([])}
+              customer={customer}
+            />
+
+            <SelectCustomer
+              open={pickerOpen}
+              customers={customers}
+              onClose={() => setPickerOpen(false)}
+              onSelect={(c) => { setCustomer(c); setPickerOpen(false); }}
+              // The add-customer FORM is not in this band; the sheet's own two
+              // states are. Seeding the list is the honest stand-in so the empty
+              // state has somewhere to go. Logged as #47.
+              onAddCustomer={() => setCustomers(CUSTOMERS)}
             />
           </div>
         )}

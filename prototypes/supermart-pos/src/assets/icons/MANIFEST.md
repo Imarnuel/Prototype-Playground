@@ -31,6 +31,8 @@ To unblock: allow `www.figma.com` in the environment's Network access, then re-r
 | `plus.svg` | 16 x 16 | Quantity stepper — increase | `I88:8188;1569:4491;1565:4395` |
 | `x-circle.svg` | 20 x 20 | Cart line — remove | `88:8190` |
 | `chevron-right.svg` | 16 x 16 | Checkout button | `I88:8241;2398:7606` |
+| `users-02.svg` | 40 x 40 | Select customer — empty state | `88:11938` |
+| `add-one.svg` | 20 x 20 | Select customer — add button (icon-park-solid:add-one) | `I88:12133;2481:15937` |
 
 Two of these are mis-named upstream and the FILE is what matters, not the node name:
 the node called `chevron-down` renders **filter-lines**, and the node called `plus`
