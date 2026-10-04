@@ -42,7 +42,10 @@ export function ProductCard({ product, onPress }: { product: Product; onPress: (
       </span>
 
       <span className="productCard__info">
-        <span className="productCard__name">{product.name}</span>
+        {/* Clamped to two lines in a 172px card, and the longest real name still
+            overflows that. `title` is the minimum way to reach the full value;
+            a designed affordance would be better and is logged as #34. */}
+        <span className="productCard__name" title={product.name}>{product.name}</span>
         <span className="productCard__details">
           <span className="productCard__price">{formatPrice(product.priceMinor)}</span>
           <AssetSlot name="ellipse-79" width={3} height={3} />

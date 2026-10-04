@@ -36,7 +36,10 @@
   flex: 1 1 0;
   min-width: 0;
   border: 0;
-  outline: none;
+  /* No `outline: none` here. Suppressing it left the only keyboard-reachable text
+     control in either screen with no visible focus indicator at all. The design
+     specifies no focus style, so the platform's own ring is the correct fix —
+     deleting the suppression beats building a custom one. */
   background: none;
   padding: 0;
   font-size: var(--type-Body-Base-size);

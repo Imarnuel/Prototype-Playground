@@ -12,6 +12,9 @@ export function SearchBar({ value, onChange }: { value: string; onChange: (v: st
           className="textField__input"
           value={value}
           placeholder="Search"
+          // The design shows no visible label, and a placeholder is not an accessible
+          // name — it disappears the moment anything is typed.
+          aria-label="Search products"
           onChange={(e) => onChange(e.target.value)}
         />
       </div>

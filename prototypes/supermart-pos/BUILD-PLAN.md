@@ -251,6 +251,8 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 31 | The Add-customer card's border uses `Color/container/neutral/subtle/hover` — a **hover** token on a static border | Followed (same value), flagged |
 | 32 | **The Cart shows no order total**, and its button reads "Checkout (5)" over **six** priced rows whose line prices reconcile with nothing (₦10,000 on one row, ₦1,000 on five at the same quantity) | Total added as a minimal honest addition; **needs design input** |
 | 33 | **No motion is authored anywhere in the file.** `get_motion_context` returns `{"nodes":[]}` for the Cart, the Sales Point, and all 90 frames in the section | Transitions use the project's own documented baseline, explicitly not design-derived |
+| 34 | Product names clamp to two lines in a 172px card and the longest real name still overflows. The design sets `nowrap`, which only holds for its own short placeholder names | `title` added as the minimum way to reach the full value; **a designed affordance is still needed** |
+| 35 | **The Cart's title-bar trash clears the whole order in one tap** — no confirmation, no undo, no distinct treatment. Measured: 4 lines to 0 with no dialog | **Open — needs design input.** Not invented here; the board's unbuilt "More options" frame (`88:15458`) may hold the intended pattern |
 
 ## Work order
 

@@ -75,7 +75,7 @@ export function Cart({
                       <span className="cartLine__scrim" />
                     </span>
                     <div className="cartLine__info">
-                      <span className="cartLine__name">{product.name}</span>
+                      <span className="cartLine__name" title={product.name}>{product.name}</span>
                       <QtyInputField
                         qty={line.qty}
                         max={product.stock}
