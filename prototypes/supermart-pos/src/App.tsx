@@ -17,19 +17,32 @@ export function App() {
   const [resetNonce, setResetNonce] = useState(0);
   const [lines, setLines] = useState<readonly CartLine[]>([]);
 
-  // `cartOpen` is intent; `cartMounted` keeps the sheet in the tree through its exit.
-  // Unmounting on `if (!open) return null` would cut the exit — a bug, not a style
-  // (root agreement §5).
+  // Three states, not two, because a CSS transition needs a rendered starting frame.
+  //   cartOpen    — intent
+  //   cartMounted — in the tree, so the EXIT has something to animate
+  //   cartEntered — drives data-open, flipped one frame AFTER mount so the ENTRY has
+  //                 something to animate from
+  // Mounting straight into the open state skips the transition entirely: measured
+  // translateY 0.0 at every frame, an instant cut (root agreement §5).
   const [cartOpen, setCartOpen] = useState(false);
   const [cartMounted, setCartMounted] = useState(false);
+  const [cartEntered, setCartEntered] = useState(false);
   const reducedMotion = useReducedMotion();
   const exitTimer = useRef<number>();
+  const enterFrame = useRef<number>();
 
   useEffect(() => {
     if (cartOpen) {
       setCartMounted(true);
-      return;
+      // Two frames: the first commits the closed state to the compositor, the second
+      // flips it. One is not reliably enough — React can batch the mount and the flip
+      // into the same paint, which is the instant cut all over again.
+      enterFrame.current = requestAnimationFrame(() => {
+        enterFrame.current = requestAnimationFrame(() => setCartEntered(true));
+      });
+      return () => cancelAnimationFrame(enterFrame.current!);
     }
+    setCartEntered(false);
     if (!cartMounted) return;
     const ms = duration(SHEET_SPRING.exitDuration, reducedMotion);
     exitTimer.current = window.setTimeout(() => setCartMounted(false), ms);
@@ -86,7 +99,7 @@ export function App() {
         {cartMounted && (
           <div
             className="sheet"
-            data-open={cartOpen ? 'on' : 'off'}
+            data-open={cartEntered ? 'on' : 'off'}
             style={{
               transitionDuration: `${cartOpen ? enterMs : exitMs}ms`,
               transitionTimingFunction: cartOpen ? SHEET_SPRING.easing : SHEET_SPRING.exitEasing,

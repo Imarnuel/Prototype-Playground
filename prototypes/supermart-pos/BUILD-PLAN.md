@@ -253,6 +253,8 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 33 | **No motion is authored anywhere in the file.** `get_motion_context` returns `{"nodes":[]}` for the Cart, the Sales Point, and all 90 frames in the section | Transitions use the project's own documented baseline, explicitly not design-derived |
 | 34 | Product names clamp to two lines in a 172px card and the longest real name still overflows. The design sets `nowrap`, which only holds for its own short placeholder names | `title` added as the minimum way to reach the full value; **a designed affordance is still needed** |
 | 35 | **The Cart's title-bar trash clears the whole order in one tap** — no confirmation, no undo, no distinct treatment. Measured: 4 lines to 0 with no dialog | **Open — needs design input.** Not invented here; the board's unbuilt "More options" frame (`88:15458`) may hold the intended pattern |
+| 36 | **The sheet's ENTRY was an instant cut.** It mounted already in its open state, so there was no rendered starting frame to transition from — measured `translateY 0.0` at every frame including t=44ms. Only the exit had ever been checked | **Fixed.** Two-phase mount; entry now measures 0% → 55.9% → 91.8% at t=20/104/204ms. `npm run motion:sample` guards it |
+| 37 | The sheet's **exit curve is heavily back-loaded**: 0.2% travelled at 25% of the duration, 2.8% at 50%, 46.8% at 90% — visually motionless for roughly the first 150ms after the tap. `EASING.in` is `cubic-bezier(0.7, 0, 0.84, 0)` | **Open — deferred to `better-ui`**, which owns motion. Measured, not retuned on taste |
 
 ## Work order
 
