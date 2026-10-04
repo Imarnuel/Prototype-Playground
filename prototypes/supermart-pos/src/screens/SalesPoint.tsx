@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { AssetSlot } from '../components/AssetSlot';
+import { Icon } from '../components/Icon';
 import { ProductCard } from '../components/ProductCard';
 import { FilterBar, SearchBar, TabBar, ViewCartButton } from '../components/SalesPointChrome';
 import { StatusBar } from '../components/StatusBar';
@@ -66,11 +66,15 @@ export function SalesPoint({ forceState, cartCount, onAddProduct, onViewCart }: 
         <div className="salesPoint__headerRow">
           <h1 className="salesPoint__title">Sales Point</h1>
           <button type="button" className="salesPoint__overflow" onClick={onViewCart} aria-label="More options">
-            <AssetSlot name="dots-horizontal" width={20} height={20} />
+            <Icon name="dots-horizontal" />
           </button>
         </div>
         <div className="salesPoint__searchAndFilters">
-          <SearchBar value={query} onChange={setQuery} />
+          <SearchBar
+            value={query}
+            onChange={setQuery}
+            onClearFilters={() => { setFilter('All'); setQuery(''); }}
+          />
           <FilterBar filters={FILTERS} active={filter} onSelect={setFilter} />
         </div>
       </header>

@@ -1,13 +1,15 @@
 import { DURATION, EASING, duration, useReducedMotion } from '@playground/shared';
-import { AssetSlot } from './AssetSlot';
+import { Icon } from './Icon';
 import type { ProductFilter } from '../api/pos';
 import './SalesPointChrome.css';
 
-export function SearchBar({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+export function SearchBar({
+  value, onChange, onClearFilters,
+}: { value: string; onChange: (v: string) => void; onClearFilters: () => void }) {
   return (
     <div className="searchBar">
       <div className="textField">
-        <AssetSlot name="search-sm" width={20} height={20} />
+        <Icon name="search-sm" />
         <input
           className="textField__input"
           value={value}
@@ -19,9 +21,22 @@ export function SearchBar({ value, onChange }: { value: string; onChange: (v: st
         />
       </div>
       {/* The design names this icon node `chevron-down` but renders the filter-lines
-          asset. The asset is what ships; the node name is wrong upstream. */}
-      <button type="button" className="filterButton" onClick={() => onChange('')}>
-        <AssetSlot name="filter-lines" width={16} height={16} />
+          asset. The asset is what ships; the node name is wrong upstream.
+
+          Band 4 designs no filter sheet, so this resets the category chip and the
+          search instead of opening one — a real action in the icon's own domain
+          rather than a control that does nothing. Logged as #51.
+
+          It needs an explicit name: it is the only icon-only control here without
+          visible text, and the icons are decorative (`alt=""`), so nothing else
+          would name it. */}
+      <button
+        type="button"
+        className="filterButton"
+        onClick={onClearFilters}
+        aria-label="Clear filters"
+      >
+        <Icon name="filter-lines" />
       </button>
     </div>
   );
@@ -54,18 +69,18 @@ export function TabBar({ onNavigate }: { onNavigate: (tab: string) => void }) {
     <div className="tabBar">
       <div className="tabBar__nav">
         <button type="button" className="tabBar__item" onClick={() => onNavigate('Dashboard')}>
-          <AssetSlot name="grid-01" width={20} height={20} />
+          <Icon name="grid-01" />
           {/* text/default here and text/secondary on "More" — both unselected. The
               design is inconsistent between its own two inactive tabs; followed
               exactly rather than normalised. Logged as inconsistency #23. */}
           <span className="tabBar__label" style={{ color: 'var(--color-text-default)' }}>Dashboard</span>
         </button>
         <button type="button" className="tabBar__item" data-active="on" onClick={() => onNavigate('Sales Point')}>
-          <AssetSlot name="cart" width={20} height={17.896} />
+          <Icon name="cart" />
           <span className="tabBar__label" style={{ color: 'var(--color-text-selected)' }}>Sales Point</span>
         </button>
         <button type="button" className="tabBar__item" onClick={() => onNavigate('More')}>
-          <AssetSlot name="menu-01" width={20} height={20} />
+          <Icon name="menu-01" />
           <span className="tabBar__label" style={{ color: 'var(--color-text-secondary)' }}>More</span>
         </button>
       </div>
@@ -77,7 +92,7 @@ export function ViewCartButton({ count, onPress }: { count: number; onPress: () 
   return (
     <button type="button" className="viewCart" onClick={onPress}>
       {/* Node is named `plus` upstream but renders shopping-cart-01. */}
-      <AssetSlot name="shopping-cart-01" width={16} height={16} />
+      <Icon name="shopping-cart-01" />
       <span className="viewCart__label">View cart{count > 0 ? ` (${count})` : ''}</span>
     </button>
   );

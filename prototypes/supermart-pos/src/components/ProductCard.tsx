@@ -1,6 +1,6 @@
 import { PRESS_SCALE, duration, DURATION, useReducedMotion } from '@playground/shared';
 import { LOW_STOCK_AT, formatPrice, type Product } from '../data/catalogue';
-import { AssetSlot } from './AssetSlot';
+import { Icon } from './Icon';
 import './ProductCard.css';
 
 /**
@@ -48,7 +48,7 @@ export function ProductCard({ product, onPress }: { product: Product; onPress: (
         <span className="productCard__name" title={product.name}>{product.name}</span>
         <span className="productCard__details">
           <span className="productCard__price">{formatPrice(product.priceMinor)}</span>
-          <AssetSlot name="ellipse-79" width={3} height={3} />
+          <Icon name="ellipse-79" />
           <span className="productCard__stock" style={{ color: stockColor(product.stock) }}>
             {product.stock} ea
           </span>

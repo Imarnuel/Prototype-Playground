@@ -1,4 +1,4 @@
-import { AssetSlot } from './AssetSlot';
+import { Icon } from './Icon';
 import './CloseButton.css';
 
 /**
@@ -14,7 +14,7 @@ import './CloseButton.css';
 export function CloseButton({ onPress, label = 'Close' }: { onPress: () => void; label?: string }) {
   return (
     <button type="button" className="closeButton" onClick={onPress} aria-label={label}>
-      <AssetSlot name="x-close" width={20} height={20} />
+      <Icon name="x-close" />
     </button>
   );
 }

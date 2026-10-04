@@ -1,4 +1,4 @@
-import { AssetSlot } from './AssetSlot';
+import { Icon } from './Icon';
 import './StatusBar.css';
 
 /**
@@ -21,9 +21,9 @@ export function StatusBar() {
             the island's own 125 — close enough that the 1px is not worth deviating. */}
         <div className="statusBar__islandSpacer" />
         <div className="statusBar__levels">
-          <AssetSlot name="cellular-connection" width={19.2} height={12.226} />
-          <AssetSlot name="wifi" width={17.142} height={12.328} />
-          <AssetSlot name="battery" width={27.328} height={13} />
+          <Icon name="cellular-connection" />
+          <Icon name="wifi" />
+          <Icon name="battery" />
         </div>
       </div>
     </div>

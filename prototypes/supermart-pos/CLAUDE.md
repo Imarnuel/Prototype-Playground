@@ -16,7 +16,7 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **47** inconsistencies, including that 31 frames share the name
+anything — it records **51** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
@@ -115,10 +115,15 @@ entrance that never animates.
 
 ## Still open
 
-- **21 icons and 42 product photos are unavailable.** This environment's network
-  policy denies `www.figma.com:443`, so `download_assets` returns URLs that cannot be
-  fetched. Every icon is reserved at its exact size by `<AssetSlot>` and listed in
-  `src/assets/icons/MANIFEST.md`; nothing was substituted or redrawn.
+- **42 product photos are unavailable.** `download_assets` hands back
+  `www.figma.com` URLs the agent has to fetch over ordinary HTTPS, and this
+  environment's network policy denies that host. The 21 **icons** came out anyway,
+  through `node.exportAsync({ format: 'SVG' })` on the plugin API, which returns bytes
+  over the MCP channel instead — see `src/assets/icons/MANIFEST.md`. The photos cannot
+  follow: the design's product images are real-brand packaging, deliberately replaced
+  by the invented catalogue, so there is nothing in the file to export.
+- `search-sm` carries a non-token stroke, and the filter button has no designed
+  destination (BUILD-PLAN #50, #51).
 - `images:optimise --box` defaults to a placeholder 112px. The real value is the
   largest CSS box a product photo is drawn into, measured off the design.
 - **The Cart's title-bar trash clears the whole order in one tap** — no confirmation

@@ -1,4 +1,4 @@
-import { AssetSlot } from '../components/AssetSlot';
+import { Icon } from '../components/Icon';
 import { CloseButton } from '../components/CloseButton';
 import { QtyInputField } from '../components/QtyInputField';
 import { formatPrice } from '../data/catalogue';
@@ -43,10 +43,10 @@ export function Cart({
         </div>
         <div className="cart__titleActions">
           <button type="button" className="cart__iconButton" onClick={onMoreOptions} aria-label="More options">
-            <AssetSlot name="dots-horizontal" width={20} height={20} />
+            <Icon name="dots-horizontal" />
           </button>
           <button type="button" className="cart__iconButton" onClick={onClearAll} aria-label="Clear order">
-            <AssetSlot name="trash-03" width={20} height={20} />
+            <Icon name="trash-03" />
           </button>
         </div>
       </header>
@@ -55,7 +55,7 @@ export function Cart({
         <button type="button" className="addCustomer" onClick={onAddCustomer}>
           <span className="addCustomer__left">
             <span className="addCustomer__avatar">
-              <AssetSlot name="user-02" width={16} height={16} />
+              <Icon name="user-02" />
             </span>
             {/* Once a customer is chosen the row carries their name. The designed
                 treatment for this is the "Customer added" frame (`88:8243`), which
@@ -63,7 +63,7 @@ export function Cart({
                 visible consequence. Logged as #46. */}
             <span className="addCustomer__label">{customer ? customer.name : 'Add customer'}</span>
           </span>
-          <AssetSlot name="plus-circle" width={24} height={24} />
+          <Icon name="plus-circle" />
         </button>
 
         {lines.length === 0 ? (
@@ -100,7 +100,7 @@ export function Cart({
                       onClick={() => onRemove(line.productId)}
                       aria-label={`Remove ${product.name}`}
                     >
-                      <AssetSlot name="x-circle" width={20} height={20} />
+                      <Icon name="x-circle" />
                     </button>
                     {/* Line total, not unit price: quantity x price, computed from the
                         catalogue so the lines always sum to the order total. The frame
@@ -120,7 +120,7 @@ export function Cart({
       <div className="cart__footer">
         <button type="button" className="cart__checkout" onClick={onCheckout} disabled={lines.length === 0}>
           <span className="cart__checkoutLabel">Checkout ({lines.length})</span>
-          <AssetSlot name="chevron-right" width={16} height={16} />
+          <Icon name="chevron-right" />
         </button>
         <button type="button" className="cart__queue" onClick={onQueue} disabled={lines.length === 0}>
           <span className="cart__queueLabel">Queue order</span>

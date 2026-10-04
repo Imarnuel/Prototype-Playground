@@ -1,4 +1,4 @@
-import { AssetSlot } from './AssetSlot';
+import { Icon } from './Icon';
 import './QtyInputField.css';
 
 /**
@@ -20,7 +20,7 @@ export function QtyInputField({
         onClick={() => onChange(qty - 1)}
         aria-label="Decrease quantity"
       >
-        <AssetSlot name="minus" width={16} height={16} />
+        <Icon name="minus" />
       </button>
       <span className="qtyField__value">
         <span>{qty}</span>
@@ -35,7 +35,7 @@ export function QtyInputField({
         disabled={qty >= max}
         aria-label="Increase quantity"
       >
-        <AssetSlot name="plus" width={16} height={16} />
+        <Icon name="plus" />
       </button>
     </div>
   );

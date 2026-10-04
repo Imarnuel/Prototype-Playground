@@ -6,7 +6,6 @@ import {
 import { SalesPoint } from './screens/SalesPoint';
 import { Cart } from './screens/Cart';
 import { SelectCustomer } from './screens/SelectCustomer';
-import { PENDING_ICONS } from './components/AssetSlot';
 import { PRODUCTS } from './data/catalogue';
 import { CUSTOMERS, type Customer } from './data/customers';
 import { usePresented } from './hooks/usePresented';
@@ -68,11 +67,6 @@ export function App() {
       label: 'Select customer: empty',
       group: 'States',
       onSelect: () => { setCustomers([]); setCartOpen(true); setPickerOpen(true); },
-    },
-    {
-      label: `${PENDING_ICONS.length} icons pending`,
-      group: 'Assets',
-      onSelect: () => console.info('Awaiting from Figma:', PENDING_ICONS.join(', ')),
     },
   ];
 

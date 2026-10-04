@@ -1,0 +1,6 @@
+.icon {
+  display: block;
+  flex: none;
+  /* Never stretched: the root width/height on each file is its real size. */
+  max-width: none;
+}

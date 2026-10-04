@@ -1,9 +1,0 @@
-.assetSlot {
-  display: inline-block;
-  flex: none;
-  /* Neutral, not invisible and not a drawing: the same container token the design
-     uses behind a missing product image, so a pending icon reads as "awaiting
-     asset" rather than as a broken or intentional mark. */
-  background: var(--color-container-neutral-default);
-  border-radius: var(--radius-50);
-}

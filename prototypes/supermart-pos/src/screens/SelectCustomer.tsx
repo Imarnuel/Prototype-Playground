@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { SHEET_SPRING, duration, useReducedMotion } from '@playground/shared';
-import { AssetSlot } from '../components/AssetSlot';
+import { Icon } from '../components/Icon';
 import { CloseButton } from '../components/CloseButton';
 import { CUSTOMERS, type Customer } from '../data/customers';
 import { usePresented } from '../hooks/usePresented';
@@ -60,7 +60,7 @@ export function SelectCustomer({ open, customers, onClose, onSelect, onAddCustom
               <div className="customerEmpty__rings">
                 <div className="customerEmpty__ring2">
                   <div className="customerEmpty__ring3">
-                    <AssetSlot name="users-02" width={40} height={40} />
+                    <Icon name="users-02" />
                   </div>
                 </div>
               </div>
@@ -71,14 +71,14 @@ export function SelectCustomer({ open, customers, onClose, onSelect, onAddCustom
                 </p>
               </div>
               <button type="button" className="customerEmpty__cta" onClick={onAddCustomer}>
-                <AssetSlot name="plus" width={16} height={16} />
+                <Icon name="plus" />
                 <span className="customerEmpty__ctaLabel">Add customer</span>
               </button>
             </div>
           ) : (
             <>
               <div className="customerSearch">
-                <AssetSlot name="search-sm" width={20} height={20} />
+                <Icon name="search-sm" />
                 <input
                   className="customerSearch__input"
                   value={query}
@@ -93,7 +93,7 @@ export function SelectCustomer({ open, customers, onClose, onSelect, onAddCustom
                   and a 20px icon, against brand-bold with inverse text and a 16px
                   icon. Both followed as drawn. Logged as #44. */}
               <button type="button" className="customerAdd" onClick={onAddCustomer}>
-                <AssetSlot name="add-one" width={20} height={20} />
+                <Icon name="add-one" />
                 <span className="customerAdd__label">Add customer</span>
               </button>
 
