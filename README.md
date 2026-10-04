@@ -17,21 +17,50 @@ prototypes/
   <case-study>/      one per study
 ```
 
-## Commands
+## Running the prototype
+
+Requires **Node 18 or newer** (Vite 5). Verified from a clean clone.
 
 ```bash
 npm install
-npm run typecheck                                  # whole workspace, strict
-
-npm run dev     --workspace @playground/template   # iterate
-npm run build   --workspace @playground/template   # always verify here too
-npm run preview --workspace @playground/template   # and demo from here, not dev
+npm run dev --workspace @playground/supermart-pos
 ```
 
-Demo from `build` + `preview`. Dev and production builds diverge in both directions —
-see "Dev build vs production build" in `CLAUDE.md`.
+Then open **<http://localhost:5173/?dev=1>**.
 
-Append `?dev=1` to reach the dev toolbar. It is off by default.
+`?dev=1` is not optional if you want to see more than one screen: the dev toolbar is
+off by default, and it is how every screen and state is reached in one tap.
+
+To demo, build first — the working agreement is explicit that dev and production
+builds diverge in both directions:
+
+```bash
+npm run build   --workspace @playground/supermart-pos
+npm run preview --workspace @playground/supermart-pos
+```
+
+### Other commands
+
+```bash
+npm run typecheck                                      # whole workspace, strict
+npm run dev --workspace @playground/template           # the frame-geometry harness
+
+# inside prototypes/supermart-pos
+npm run catalogue:verify   # 35 invariants on the product data
+npm run tokens:verify      # generated tokens still match the Figma dump
+npm run motion:sample      # transitions animate in both directions (needs a server)
+npm run images:manifest    # which product photos are still missing
+```
+
+### What you will see
+
+Product tiles and icons render as neutral grey blocks. That is expected, not a
+failure: 21 icons and 42 product photos could not be downloaded from Figma, and
+nothing was substituted or hand-drawn in their place. The layout is real; only the
+artwork is absent. See `prototypes/supermart-pos/src/assets/icons/MANIFEST.md`.
+
+The missing photos also mean the browser console shows `404`s for
+`/products/*.webp`. Harmless — the tiles fall back to their neutral fill.
 
 ## Starting a case study
 
