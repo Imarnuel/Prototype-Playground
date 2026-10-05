@@ -370,7 +370,7 @@ card, so they clamp.
 
 The screens were built to a measured coordinate diff, which proved geometry and left
 everything else — colour, stroke, shadow, gradient, blur — resting on the code export.
-`npm run figma:audit` now reads **149 properties off the Figma nodes themselves** via
+`npm run figma:audit` now reads **207 properties off the Figma nodes themselves** via
 the plugin API and compares each against the built element's computed style. Ten real
 differences came out of the first run:
 
@@ -400,6 +400,26 @@ Two things the audit has to get right to be worth running:
   were only spelling; the audit now paints both and compares pixels before calling
   one a finding. All three came back at **0/255 max channel delta**.
 - **Text width is deliberately not asserted** — see #56.
+
+### Cart, inspected node by node
+
+The first audit pass covered the Cart with 24 properties against selectors I had
+guessed. Re-done properly against its full node tree — title bar, add-customer row,
+every line row, the qty field, the trailing column and both footer buttons — it is
+**82 properties**, and one more difference came out of it:
+
+- `88:8189` Frame 4975, the line's trailing column, is `SPACE_BETWEEN` with
+  `itemSpacing: 4`. The built column had no gap. It changes nothing at today's
+  content, because a 72px column never gets tight enough for the minimum to bind,
+  but without it a longer price lets the remove button and the price touch.
+
+Two things checked and found already correct, recorded so they are not re-checked:
+
+- **The three bottom scrims resolve to the same stop percentages** — 33.537% /
+  58.748% / 122.418% — even though their boxes are 272 (Sales Point), 206 (Cart) and
+  338 (the sheet's underlying screen). Figma's gradient transform scales with the box,
+  so the shared `BottomScrim` taking a height prop and fixed percentages is right.
+- **The Cart frame carries no TabBar**, and the built Cart does not render one.
 
 ### Generated packshots stand in for photography
 

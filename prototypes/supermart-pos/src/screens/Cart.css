@@ -208,6 +208,10 @@
 .cartLine__trailing {
   display: flex;
   flex-direction: column;
+  /* Frame 4975 is SPACE_BETWEEN with itemSpacing 4. The 72px column never gets tight
+     enough for the gap to bind, so it changes nothing today — it is the design's own
+     minimum, and without it a longer price would let the two items touch. */
+  gap: 4px;
   align-items: flex-end;
   justify-content: space-between;
   align-self: stretch;
