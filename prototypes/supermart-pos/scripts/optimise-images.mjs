@@ -16,7 +16,10 @@
  * Usage: node --experimental-strip-types scripts/optimise-images.mjs --box <css-px>
  *
  * --box is the largest CSS box in the design. It MUST come from a measured frame.
- * The default below is a placeholder and is reported as such.
+ * Measured: `.productCard__image` renders 160x108 on all 43 cards, and the design's
+ * own "Product Image" frame is 160x108 too, so 160 is the long side. The default
+ * below is the old placeholder, kept so a run without --box still reports itself
+ * as unmeasured rather than silently using a number nobody checked.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -24,7 +27,7 @@ import sharp from 'sharp';
 
 const args = process.argv.slice(2);
 const boxArg = args.includes('--box') ? Number(args[args.indexOf('--box') + 1]) : null;
-const BOX = boxArg ?? 112;
+const BOX = boxArg ?? 160;
 const SCALE = 3;
 const TARGET = BOX * SCALE;
 

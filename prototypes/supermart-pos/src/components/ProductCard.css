@@ -26,7 +26,8 @@
   height: 108px;
   border-radius: var(--radius-200);
   /* Also the empty state: 42 of the 43 products have no photo yet, so this token is
-     what most cards show. It is the same fill the design puts behind an image. */
+     what most cards show, and the card renders no <img> at all for them. It is the
+     same fill the design puts behind an image. */
   background: var(--color-container-neutral-default);
   overflow: clip;
 }

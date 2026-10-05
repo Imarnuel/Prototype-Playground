@@ -20,8 +20,31 @@ function stockColor(stock: number): string {
   return 'var(--color-text-secondary)';
 }
 
+/**
+ * Product photos, resolved through the bundler.
+ *
+ * They were requested as `/products/<file>`, which Vite serves only out of a `public/`
+ * directory — and there is none; the pipeline writes to `assets/products/`. So every
+ * card asked for a URL that could not resolve, and the 42 products whose photo has not
+ * been shot rendered a broken-image glyph on top of the neutral fill instead of the
+ * fill alone. Measured in a production build: 42 broken <img>.
+ *
+ * A glob makes absence a build-time fact rather than a runtime 404 — a name with no
+ * file is simply not in the map, so the card falls back without a failed request.
+ * The pattern is relative: `import.meta.glob` does not resolve path aliases
+ * (CLAUDE.md "Figma -> code").
+ */
+const PHOTOS = import.meta.glob('../../assets/products/*.webp', {
+  eager: true, query: '?url', import: 'default',
+}) as Record<string, string>;
+
+const photoFor = (file: string | null | undefined) =>
+  (file ? PHOTOS[`../../assets/products/${file}`] : undefined);
+
 export function ProductCard({ product, onPress }: { product: Product; onPress: (p: Product) => void }) {
   const reducedMotion = useReducedMotion();
+
+  const photo = photoFor(product.image);
 
   return (
     <button
@@ -31,8 +54,8 @@ export function ProductCard({ product, onPress }: { product: Product; onPress: (
       style={{ ['--press-duration' as string]: `${duration(DURATION.instant, reducedMotion)}ms`, ['--press-scale' as string]: String(PRESS_SCALE) }}
     >
       <span className="productCard__image">
-        {product.image ? (
-          <img className="productCard__img" src={`/products/${product.image}`} alt="" />
+        {photo ? (
+          <img className="productCard__img" src={photo} alt="" />
         ) : null}
         {/* The design puts this scrim on 5 of its 6 cards and omits it on the first.
             Applied to all of them here: the omission reads as an oversight, and an

@@ -16,7 +16,7 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **52** inconsistencies, including that 31 frames share the name
+anything — it records **53** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
@@ -83,7 +83,7 @@ Seeded so every state can be demoed without editing data (root agreement §4, §
 
 | State | Product |
 |---|---|
-| No photo (fallback) | Palmrise Sweetcorn 340g Tin |
+| No photo (fallback) | Palmrise Sweetcorn 340g Tin — and, until photos exist, all 43 |
 | Out of stock | Bluewell Apple Juice 1L Carton |
 | Discounted | Palmrise Vegetable Oil 3L, Freshvale Toilet Tissue 4-pack |
 | Long name (truncation) | Unscented Antibacterial Laundry Detergent Powder — 48 chars |
@@ -115,17 +115,15 @@ entrance that never animates.
 
 ## Still open
 
-- **42 product photos are unavailable.** `download_assets` hands back
-  `www.figma.com` URLs the agent has to fetch over ordinary HTTPS, and this
-  environment's network policy denies that host. The 21 **icons** came out anyway,
-  through `node.exportAsync({ format: 'SVG' })` on the plugin API, which returns bytes
-  over the MCP channel instead — see `src/assets/icons/MANIFEST.md`. The photos cannot
-  follow: the design's product images are real-brand packaging, deliberately replaced
-  by the invented catalogue, so there is nothing in the file to export.
+- **All 43 products are photoless, and the design cannot supply them.** Counted in
+  the file: the whole 90-frame section holds **354 image fills but only 10 distinct
+  images**, and just four of those are grid photos — reused 109, 61, 60 and 59 times.
+  All four are **real-brand stock** (a Fanta can, a Coca-Cola bottle, a Sprite can, a
+  Fanta bottle), under cards that all read "Fanta Orange 50cl, ₦1,000". That is the
+  placeholder set this study was commissioned to replace, so it is not a source.
+  Photos are a **content decision**, not a fetch — see "Getting photos" below.
 - `search-sm` carries a non-token stroke, and the filter button has no designed
   destination (BUILD-PLAN #50, #51).
-- `images:optimise --box` defaults to a placeholder 112px. The real value is the
-  largest CSS box a product photo is drawn into, measured off the design.
 - **The Cart's title-bar trash clears the whole order in one tap** — no confirmation
   or undo, and none is designed in this band (BUILD-PLAN #35).
 - **The Cart shows no order total** in the frame; one was added as a minimal honest
@@ -135,3 +133,23 @@ entrance that never animates.
 - **No motion is authored anywhere in the Figma file** — `get_motion_context` returns
   `{"nodes":[]}` for all 90 frames. Transitions come from `shared/src/motion.ts`,
   documented as the project's baseline rather than design-derived.
+
+## Getting photos
+
+43 shots of packaged goods against a plain background, one per `image` field in
+`catalogue.ts`. Drop the originals in `assets/products-src/` (gitignored) and run:
+
+```bash
+npm run images:optimise -- --box 160
+```
+
+**160 is measured, not assumed**: `.productCard__image` renders 160x108 on all 43
+cards, and the design's own "Product Image" frame is 160x108. The pipeline sniffs the
+real format, resizes against a square box with `fit: 'outside'` (because
+`object-fit: cover` is driven by the short side), writes WebP q80 with metadata
+stripped, and reports mean absolute pixel error at display size so a sizing mistake
+is a number rather than an impression.
+
+Nothing else needs changing: `ProductCard` resolves photos with `import.meta.glob`
+over `assets/products/`, so a file appearing in that directory is enough. Until then
+every card shows the designed neutral fill, with no `<img>` and no failed request.

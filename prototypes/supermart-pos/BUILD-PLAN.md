@@ -270,6 +270,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 50 | `search-sm`'s stroke is `#5B6579`, which is **not a token**. The nearest variable is `Color/icon/subtle` `#5E6A82`, and `filter-lines` — the icon sitting 8px away from it in the same search field — does use that token | Kept the literal `#5B6579` the export carries, so the icon matches the frame. **Needs design input**: one of the two icons in that field is off-token |
 | 51 | The filter button in the search field has no designed destination anywhere in band 4 — no filter sheet, no sort menu, no active-filter state | Wired to reset the category chip and the query, which is the only coherent action available from the state the band designs. **Needs design input** |
 | 52 | **Every frame carries its own status-bar instance.** That is a Figma necessity — a frame is the screen, so a designer pastes one in for it to read — not a platform fact. iOS draws the status bar once, above the app, and a presented sheet passes under it | **Fixed structurally.** Moved to `shared/src/StatusBar.tsx`, rendered once by `DeviceFrame` beside the Dynamic Island. Screens reserve the inset with `padding-top: var(--safe-top)` |
+| 53 | **The whole 90-frame section holds 354 image fills but only 10 distinct images.** Four are grid photos, reused 109 / 61 / 60 / 59 times; all four are real-brand stock (Fanta can, Coca-Cola bottle, Sprite can, Fanta bottle) under cards that every one of them labels "Fanta Orange 50cl, ₦1,000". It is a mock, never a catalogue | Not a source for this build — it is the placeholder set the study replaces. Photos are a content decision, recorded under "Getting photos" in the study's CLAUDE.md |
 
 ## Work order
 
@@ -360,6 +361,26 @@ truth per concept.
 The frame sets every name to `nowrap`, which only works because all six cards say
 "Fanta Orange 50cl". Real names run to 48 characters and would overflow the 172px
 card, so they clamp.
+
+### Product photos resolved through a path that could not work
+
+`ProductCard` requested `/products/<file>`, which Vite serves only out of a `public/`
+directory. There is none — the pipeline writes to `assets/products/`. So the URL could
+never resolve, and because the fallback keyed off `product.image` being falsy rather
+than the file existing, all 42 products carrying a filename rendered a broken-image
+glyph over the neutral fill. Measured in a production build: **42 broken `<img>`**.
+The CSS even carried a comment claiming the neutral fill was "what most cards show",
+which the code had stopped making true.
+
+Now resolved with `import.meta.glob` over `../../assets/products/*.webp` — a relative
+pattern, since glob does not resolve path aliases. A name with no file is simply
+absent from the map, so absence is a build-time fact and the card renders no `<img>`
+at all. Re-measured in the same production build: **0 broken images, 0 failed
+requests, 0 cards rendering an `<img>`,** 43 cards on the designed fill.
+
+The `--box` placeholder went with it. `.productCard__image` renders **160x108** on all
+43 cards and the design's own "Product Image" frame is 160x108, so the pipeline's
+default is 160 — measured, where 112 was a guess nobody had checked.
 
 ### The status bar is device chrome, not screen content
 
