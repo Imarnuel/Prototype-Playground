@@ -151,7 +151,9 @@
   border: 0;
   border-radius: var(--radius-300);
   background: var(--color-container-brand-bold-default);
-  filter: drop-shadow(0 1px 1px rgb(10 13 18 / 5%));
+  /* The frame's own DROP_SHADOW, #0a0d120d at 0,1 blur 2 spread 0, which is what
+     --shadow-xs holds. A drop-shadow filter at blur 1 is a different Gaussian. */
+  box-shadow: var(--shadow-xs);
   cursor: pointer;
 }
 
@@ -207,7 +209,9 @@
   border: 0;
   border-radius: var(--radius-300);
   background: var(--color-container-brand-default);
-  filter: drop-shadow(0 1px 1px rgb(10 13 18 / 5%));
+  /* The frame's own DROP_SHADOW, #0a0d120d at 0,1 blur 2 spread 0, which is what
+     --shadow-xs holds. A drop-shadow filter at blur 1 is a different Gaussian. */
+  box-shadow: var(--shadow-xs);
   cursor: pointer;
 }
 

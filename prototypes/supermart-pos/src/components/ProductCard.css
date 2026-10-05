@@ -8,10 +8,15 @@
   text-align: left;
   background: var(--color-surface-overlay-default);
   border-radius: var(--radius-300);
+  /* The card's own three drop shadows, in the frame's own order. The SPREADS were
+     dropped when these were first written — -2px on the second and 0.5px on the
+     third — which made the card sit on a larger, softer pool of shadow than the
+     design draws. They are not the --shadow-lg token: that carries alphas 08/14/08
+     against this node's 03/05/03. */
   box-shadow:
-    0 0 1px 0 rgb(0 0 0 / 1%),
-    0 12px 16px 0 rgb(10 13 18 / 2%),
-    0 4px 6px 0 rgb(10 13 18 / 1%);
+    0 4px 6px 0 rgb(10 13 18 / 1%),
+    0 12px 16px -2px rgb(10 13 18 / 2%),
+    0 0 1px 0.5px rgb(0 0 0 / 1%);
   cursor: pointer;
   transition: transform var(--press-duration) cubic-bezier(0.65, 0, 0.35, 1);
 }
@@ -45,11 +50,15 @@
   position: absolute;
   inset: 0;
   border-radius: var(--radius-200);
+  /* Resolved from the paint's own gradientTransform rather than the codegen, which
+     emitted 179.8deg / 64.588% / 99.743% — close, but not the node's values. The
+     fill's 0.8 layer opacity is folded into the stop alphas (0.5 -> 0.4, 1 -> 0.8),
+     which is equivalent and keeps this to one declaration. */
   background: linear-gradient(
-    179.8deg,
+    180deg,
     rgb(0 0 0 / 0%) 50%,
-    rgb(0 0 0 / 40%) 64.588%,
-    rgb(0 0 0 / 80%) 99.743%
+    rgb(0 0 0 / 40%) 64.663%,
+    rgb(0 0 0 / 80%) 100%
   );
 }
 

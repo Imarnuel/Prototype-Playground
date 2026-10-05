@@ -47,19 +47,24 @@ export function FilterBar({
 }: { filters: readonly ProductFilter[]; active: ProductFilter; onSelect: (f: ProductFilter) => void }) {
   const reducedMotion = useReducedMotion();
   return (
-    <div className="filterBar">
-      {filters.map((f) => (
-        <button
-          key={f}
-          type="button"
-          className="filterChip"
-          data-active={f === active ? 'on' : 'off'}
-          onClick={() => onSelect(f)}
-          style={{ transitionDuration: `${duration(DURATION.fast, reducedMotion)}ms`, transitionTimingFunction: EASING.inOut }}
-        >
-          {f}
-        </button>
-      ))}
+    /* The wrapper is what bleeds to the screen edge and carries the design's fade;
+       the inner element is the scroller. One element cannot be both: a fade inside
+       an overflow-x container scrolls away with the chips. */
+    <div className="filterBarWrap">
+      <div className="filterBar">
+        {filters.map((f) => (
+          <button
+            key={f}
+            type="button"
+            className="filterChip"
+            data-active={f === active ? 'on' : 'off'}
+            onClick={() => onSelect(f)}
+            style={{ transitionDuration: `${duration(DURATION.fast, reducedMotion)}ms`, transitionTimingFunction: EASING.inOut }}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

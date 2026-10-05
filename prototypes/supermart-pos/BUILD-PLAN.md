@@ -271,6 +271,10 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 51 | The filter button in the search field has no designed destination anywhere in band 4 — no filter sheet, no sort menu, no active-filter state | Wired to reset the category chip and the query, which is the only coherent action available from the state the band designs. **Needs design input** |
 | 52 | **Every frame carries its own status-bar instance.** That is a Figma necessity — a frame is the screen, so a designer pastes one in for it to read — not a platform fact. iOS draws the status bar once, above the app, and a presented sheet passes under it | **Fixed structurally.** Moved to `shared/src/StatusBar.tsx`, rendered once by `DeviceFrame` beside the Dynamic Island. Screens reserve the inset with `padding-top: var(--safe-top)` |
 | 53 | **The whole 90-frame section holds 354 image fills but only 10 distinct images.** Four are grid photos, reused 109 / 61 / 60 / 59 times; all four are real-brand stock (Fanta can, Coca-Cola bottle, Sprite can, Fanta bottle) under cards that every one of them labels "Fanta Orange 50cl, ₦1,000". It is a mock, never a catalogue | Not a source for this build — it is the placeholder set the study replaces. Photos are a content decision, recorded under "Getting photos" in the study's CLAUDE.md |
+| 54 | **The search field and the filter button each carry a SECOND stroke** — a linear gradient over the solid `Color/border/input`, black fading up from the bottom edge at 15% layer opacity on the field and 10% on the button. The code export emits only the solid one | **Fixed.** Built as a 1px gradient ring (gradient fill clipped to the border box by an xor mask), resolved from each paint's own `gradientTransform` |
+| 55 | **The Cart's add-customer row is the only OUTSIDE stroke in the three screens** — 2px, `#0c0e180a`, drawn outside the 361x56 frame while every other stroke is INSIDE | **Fixed.** A non-inset spread ring. The project-wide `box-shadow: inset` rule is for INSIDE strokes; applying it here shrank the white fill by 2px on every side instead of ringing the row |
+| 56 | **Figma reports an auto-width text node's width as an integer.** Every one in the frame is whole: 73, 112, 46, 17, 50, 90, 72, 138, 37, 56, 57, 27 — which real advances never are | Not fixable and not a CSS error. Measured against 12 strings: mean 0.769px, max 1.500px, with no consistent sign (one is +0.125). Pinning Inter v3 (`@fontsource/inter@4.5.15`) moves it to mean 0.730 / max 1.156 — 0.04px for a three-year-old font, so it was tested and reverted |
+| 57 | The filter bar's second "Filter Spacer" is nested **inside the last chip** at x=447, off-screen past the 393 frame | Not built. The right-edge spacer at x=338 is real and is built; this one is a stray |
 
 ## Work order
 
@@ -361,6 +365,41 @@ truth per concept.
 The frame sets every name to `nowrap`, which only works because all six cards say
 "Fanta Orange 50cl". Real names run to 48 characters and would overflow the 172px
 card, so they clamp.
+
+### Property-level audit against the Figma nodes
+
+The screens were built to a measured coordinate diff, which proved geometry and left
+everything else — colour, stroke, shadow, gradient, blur — resting on the code export.
+`npm run figma:audit` now reads **149 properties off the Figma nodes themselves** via
+the plugin API and compares each against the built element's computed style. Ten real
+differences came out of the first run:
+
+| Node | Property | Was | Figma |
+|---|---|---|---|
+| `88:8088` Text field | second stroke | absent | gradient, black 15% from the bottom edge |
+| `88:8089` Filter button | second stroke | absent | gradient, black 10% over the full height |
+| `88:8090` Filter Bar | width | 361, stopping at the gutter | 666 at x=16, clipped by the screen at 393 |
+| `88:8091` Filter Spacer | right-edge fade | absent | `#f9fafb` 0 to 1 over 55px |
+| `88:8104` Product Card | shadow spreads | both 0 | -2px and 0.5px |
+| `88:8113` Product Image | scrim | 179.8deg / 64.588% / 99.743% | 180deg / 64.663% / 100% |
+| `88:8154` View cart | shadow | `drop-shadow(0 1px 1px)` | `0 1px 2px 0 #0a0d120d` |
+| `88:8176` Add customer row | stroke | 2px INSET | 2px **OUTSIDE** |
+| `88:8241`, `88:8242` Cart footer | shadow | `drop-shadow(0 1px 1px)` | `0 1px 2px 0 #0a0d120d` |
+| `88:12133` Add customer button | shadow | absent | `0 1px 2px 0 #0a0d120d` |
+
+The `drop-shadow` filter appearing four times was one root cause: a filter blur and a
+box-shadow blur are different Gaussians, so `drop-shadow(0 1px 1px)` is not the frame's
+`0 1px 2px`. All four now use `--shadow-xs`, which holds exactly that value.
+
+Two things the audit has to get right to be worth running:
+
+- **Compound values are compared computed-to-computed.** The browser and the
+  production build's CSS minifier both re-spell gradients and shadows in a normal form
+  (dropping a leading `0%`, a trailing `100%`, a default `180deg`). Comparing a
+  hand-written Figma string against a computed one reported three differences that
+  were only spelling; the audit now paints both and compares pixels before calling
+  one a finding. All three came back at **0/255 max channel delta**.
+- **Text width is deliberately not asserted** — see #56.
 
 ### Generated packshots stand in for photography
 

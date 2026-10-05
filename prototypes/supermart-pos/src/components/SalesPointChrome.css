@@ -8,6 +8,7 @@
 
 .textField,
 .filterButton {
+  position: relative;
   height: 40px;
   background: var(--color-container-input-default);
   border-radius: var(--radius-300);
@@ -21,6 +22,38 @@
   box-shadow:
     inset 0 0 0 var(--border-width-sm) var(--color-border-input),
     var(--shadow-xs);
+}
+
+/* Both fields carry a SECOND stroke in Figma, a linear gradient over the solid one:
+   black fading up from the bottom edge, at 15% layer opacity on the text field and
+   10% on the filter button. The codegen does not emit it — only the solid
+   Color/border/input — so it was missing. Drawn as a 1px gradient ring: a gradient
+   fill clipped to the border box by an xor mask, which is the only way to put a
+   gradient on a border without `border-image` stretching the radius.
+
+   Resolved from the paint's own gradientTransform: both run at 0deg (bottom to top);
+   the text field's fades out by 19.71% of its height, the filter button's across the
+   full 40px. */
+.textField::after,
+.filterButton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: var(--border-width-sm);
+  pointer-events: none;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+}
+
+.textField::after {
+  background: linear-gradient(0deg, rgb(0 0 0 / 15%) 0%, rgb(0 0 0 / 0%) 19.71%);
+}
+
+.filterButton::after {
+  background: linear-gradient(0deg, rgb(0 0 0 / 10%) 0%, rgb(0 0 0 / 0%) 100%);
 }
 
 .textField {
@@ -67,16 +100,44 @@
 }
 
 /* --- Filter chips --- */
+.filterBarWrap {
+  position: relative;
+  width: 100%;
+  /* The design's Filter Bar is 666px wide at x=16 inside a 16px-padded parent, so it
+     overflows to the right and is clipped by the screen, not by the gutter. Built to
+     377 it stopped 16px short and a scrolled chip was cut off early.
+
+     Widened, not negatively margined: a negative margin does not change the used
+     width of a `width: 100%` box, it only lets the box overflow, so the scroller
+     stayed 345 wide. Growing the width by the parent's right padding puts the right
+     edge on the screen edge at 393, where `overflow: clip` on the device screen cuts
+     it, exactly as the frame is cut. */
+  width: calc(100% + var(--spacing-400));
+}
+
 .filterBar {
   display: flex;
   gap: var(--spacing-200);
   align-items: flex-start;
   width: 100%;
   overflow-x: auto;
-  /* The design draws this bar 666px wide inside a 393px screen with gradient
-     "Filter Spacer" fades at each end — a static mock of a horizontally scrolling
-     row. Built as a real scroller; the fades are the mock's way of showing it. */
   scrollbar-width: none;
+}
+
+/* The design's "Filter Spacer" — a 55px gradient over the right end of the bar, so
+   chips scrolling out fade rather than cut. Its own colour is #f9fafb, which is NOT
+   the screen fill (#f6f7f9) it fades into; the design's value is kept and the
+   mismatch is logged. The left spacer in the frame sits inside the LAST chip at
+   x=447, off-screen, so it is a stray and is not built. */
+.filterBarWrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 55px;
+  height: 36px;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgb(249 250 251 / 0%) 14.545%, rgb(249 250 251 / 100%) 97.273%);
 }
 
 .filterBar::-webkit-scrollbar {
@@ -188,7 +249,7 @@
   border: 0;
   border-radius: var(--radius-300);
   background: var(--color-container-brand-bold-default);
-  filter: drop-shadow(0 1px 1px rgb(10 13 18 / 5%));
+  box-shadow: var(--shadow-xs);
   cursor: pointer;
 }
 

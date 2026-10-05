@@ -91,10 +91,13 @@
   border: 0;
   border-radius: var(--radius-300);
   background: var(--color-surface-default);
-  /* 2px stroke, inset. The design colours it with
-     Color/container/neutral/subtle/hover — a HOVER token on a static border. Same
-     value as the resting container token, wrong semantic. Logged #31. */
-  box-shadow: inset 0 0 0 var(--border-width-md) var(--color-container-neutral-subtle-hover);
+  /* 2px stroke drawn OUTSIDE the frame — the one stroke on these screens that is not
+     INSIDE, so the usual inset treatment is wrong here: inset shrank the white fill by
+     2px on every side instead of ringing the row. A non-inset spread ring matches, and
+     box-shadow never affects layout, so the row still measures 361x56.
+     The design colours it with Color/container/neutral/subtle/hover — a HOVER token on
+     a static border. Same value as the resting container token, wrong semantic. #31. */
+  box-shadow: 0 0 0 var(--border-width-md) var(--color-container-neutral-subtle-hover);
   cursor: pointer;
 }
 
@@ -272,7 +275,10 @@
   padding: 12px var(--spacing-300);
   border: 0;
   border-radius: var(--radius-300);
-  filter: drop-shadow(0 1px 1px rgb(10 13 18 / 5%));
+  /* The frame's own DROP_SHADOW on both buttons: #0a0d120d at 0,1 blur 2, spread 0.
+     It was approximated as a drop-shadow filter at blur 1, which is a different
+     Gaussian; --shadow-xs is the token holding exactly that value. */
+  box-shadow: var(--shadow-xs);
   cursor: pointer;
 }
 
@@ -291,7 +297,7 @@
 .cart__queue:disabled {
   background: var(--color-container-disabled);
   cursor: default;
-  filter: none;
+  box-shadow: none;
 }
 
 .cart__checkoutLabel,

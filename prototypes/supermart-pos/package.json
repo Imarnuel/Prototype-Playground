@@ -15,7 +15,8 @@
     "tokens:verify": "node --experimental-strip-types scripts/verify-tokens.mjs",
     "motion:sample": "node scripts/sample-motion.mjs",
     "build:hosted": "node scripts/build-hosted.mjs",
-    "images:packshots": "node --experimental-strip-types scripts/gen-packshots.mjs"
+    "images:packshots": "node --experimental-strip-types scripts/gen-packshots.mjs",
+    "figma:audit": "node scripts/figma-audit.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
