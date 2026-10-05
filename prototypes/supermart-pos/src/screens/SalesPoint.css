@@ -4,6 +4,11 @@
   flex-direction: column;
   height: 100%;
   background: var(--color-surface-secondary-default);
+  /* The status bar is device chrome drawn above the app (shared/src/StatusBar.tsx),
+     so the screen reserves its inset rather than laying one out. The background runs
+     up underneath it, as an iOS screen's does. */
+  padding-top: var(--safe-top);
+  box-sizing: border-box;
   /* The frame carries a 32px corner radius of its own. Not applied: this renders
      inside a real device shell whose screen is already clipped at 55px, so a second
      radius would paint a visible rounded rectangle inside the phone. */

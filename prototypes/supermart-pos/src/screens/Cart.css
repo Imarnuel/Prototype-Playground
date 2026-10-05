@@ -4,6 +4,11 @@
   flex-direction: column;
   height: 100%;
   background: var(--color-surface-default);
+  /* See SalesPoint.css — the status bar is device chrome, so this reserves the inset
+     instead of rendering one. On a real device a sheet slides UNDER the status bar;
+     rendering one per screen put two clocks on screen at once mid-transition. */
+  padding-top: var(--safe-top);
+  box-sizing: border-box;
   /* Frame carries a 28px radius — the Sales Point frame carries 32px for the same
      device. Neither is applied: the device shell already clips at 55px. Logged #28. */
 }

@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
+import { StatusBar } from './StatusBar';
 import {
   BEZEL,
   BODY,
@@ -50,12 +51,16 @@ export function DeviceFrame({ children, scale = 1, showBody = true }: DeviceFram
       <div className="device__body">
         <div className="device__screen" data-testid="device-screen">
           {children}
+          {/* System chrome, drawn once above the app rather than by each screen —
+              see StatusBar.tsx. Rendered whatever `showBody` is: the Figma frames
+              carry a status bar, so a frame-less screenshot still needs one. */}
+          <StatusBar />
           {/* The island lives inside the screen, not the body: it is a display
               feature, and CLAUDE.md:136 specifies its 11pt offset against the
               screen. Positioned against the body it resolves against the body's
               padding box and lands one bezel (16.6px) too high, on the bezel
-              itself. Painting order is DOM order, so it sits above `children`
-              without an inline z-index (CLAUDE.md:117). */}
+              itself. Painting order is DOM order, so it sits above `children` and
+              the status bar without an inline z-index (CLAUDE.md:117). */}
           {showBody && <div className="device__island" data-testid="device-island" aria-hidden="true" />}
         </div>
       </div>

@@ -1,7 +1,11 @@
 # Icons
 
-All 21 are present. They are the screens' own Figma exports — nothing here was
-substituted, redrawn, or traced.
+All 21 are present, 18 here and 3 in `shared/src/assets/`. They are the screens' own
+Figma exports — nothing here was substituted, redrawn, or traced.
+
+`cellular-connection`, `wifi` and `battery` are not in this set: they are the status
+bar's glyphs, and the status bar is device chrome drawn by `DeviceFrame`, not screen
+content. They live with it in `shared/src/assets/`.
 
 ## How they got here, and why it was not obvious
 

@@ -269,6 +269,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 49 | Figma stores the blur radius as **16**; its own code export emits **8px**. These are different units (the conventional mapping is 2:1) | 8px kept, matching the export. One value to change if it ever reads wrong |
 | 50 | `search-sm`'s stroke is `#5B6579`, which is **not a token**. The nearest variable is `Color/icon/subtle` `#5E6A82`, and `filter-lines` — the icon sitting 8px away from it in the same search field — does use that token | Kept the literal `#5B6579` the export carries, so the icon matches the frame. **Needs design input**: one of the two icons in that field is off-token |
 | 51 | The filter button in the search field has no designed destination anywhere in band 4 — no filter sheet, no sort menu, no active-filter state | Wired to reset the category chip and the query, which is the only coherent action available from the state the band designs. **Needs design input** |
+| 52 | **Every frame carries its own status-bar instance.** That is a Figma necessity — a frame is the screen, so a designer pastes one in for it to read — not a platform fact. iOS draws the status bar once, above the app, and a presented sheet passes under it | **Fixed structurally.** Moved to `shared/src/StatusBar.tsx`, rendered once by `DeviceFrame` beside the Dynamic Island. Screens reserve the inset with `padding-top: var(--safe-top)` |
 
 ## Work order
 
@@ -359,6 +360,32 @@ truth per concept.
 The frame sets every name to `nowrap`, which only works because all six cards say
 "Fanta Orange 50cl". Real names run to 48 characters and would overflow the 172px
 card, so they clamp.
+
+### The status bar is device chrome, not screen content
+
+Mirroring the file's composition put a `<StatusBar />` in both `SalesPoint` and
+`Cart`. The consequence was measurable rather than theoretical: through the whole
+cart transition **two status bars were visible at once** — one fixed at y=0 and a
+second travelling up the screen with the sheet, sampled at y=686.1, 382.4, 142.9,
+55.6, 20.1, 5.6. Two clocks, both reading 9:41.
+
+It now lives in `shared/src/StatusBar.tsx` and is rendered once by `DeviceFrame`,
+overlaid on the screen rather than laid out by it, so the sheet slides under it the
+way it does on a device. Re-running the same sample: **1 status bar at every frame,
+y=0 throughout.**
+
+Three consequences worth recording:
+
+- The three status glyphs moved to `shared/src/assets/` with it. They are device
+  chrome, so the prototype's icon set is 18, not 21.
+- It is `aria-hidden`. On a device this is system UI outside the app's accessibility
+  tree, and a screen reader should not announce the app's own clock. The audit's Cart
+  text-run count went 168 to 167 — that is the second clock leaving the DOM, not the
+  aria change; the walker is `querySelectorAll('*')` and does not filter hidden nodes.
+- The one thing an app genuinely owns here is the status-bar *style*
+  (`preferredStatusBarStyle`, light vs dark content). No screen in this band needs
+  anything but dark content, so no prop was added — an unused one is a dead flag.
+  If a dark screen arrives, that is where it goes.
 
 ### 8px below the filter chips — requested, not designed
 

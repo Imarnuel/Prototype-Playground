@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { ProductCard } from '../components/ProductCard';
 import { FilterBar, SearchBar, TabBar, ViewCartButton } from '../components/SalesPointChrome';
-import { StatusBar } from '../components/StatusBar';
 import { BottomScrim } from '../components/BottomScrim';
 import { fetchProducts, type ProductFilter } from '../api/pos';
 import { CATEGORY_ORDER, fullName, type Product } from '../data/catalogue';
@@ -60,8 +59,6 @@ export function SalesPoint({ forceState, cartCount, onAddProduct, onViewCart }: 
 
   return (
     <div className="salesPoint">
-      <StatusBar />
-
       <header className="salesPoint__header">
         <div className="salesPoint__headerRow">
           <h1 className="salesPoint__title">Sales Point</h1>

@@ -18,7 +18,11 @@ Optimise for something that demos convincingly end to end. Don't over-engineer, 
   **There are no colour or type tokens yet, and none were invented.** A case study adds its
   own under `prototypes/<study>/src/tokens.ts`, marked `[var]` once a Figma file supplies
   variables.
-- Shared components live in: `shared/src` — `DeviceFrame`, `DevToolbar`, `useReducedMotion`.
+- Shared components live in: `shared/src` — `DeviceFrame`, `StatusBar`, `DevToolbar`,
+  `useReducedMotion`. The status bar is **device chrome**: `DeviceFrame` draws it once,
+  beside the Dynamic Island. A screen never renders one, it reserves the inset with
+  `padding-top: var(--safe-top)`. Figma puts a status bar in every frame because a
+  frame is the screen; that is a file convention, not the platform.
 - Mock API module: `shared/src/mockApi.ts`. Single `request()` entry point with simulated
   latency, per-endpoint failure rates, and dev-toolbar overrides. Nothing calls `setTimeout` directly.
 - State: per-prototype React state. Nothing is shared across studies — each is a separate app.

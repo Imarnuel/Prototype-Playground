@@ -61,3 +61,70 @@
   --safe-top: var(--device-safe-top);
   --safe-bottom: var(--device-safe-bottom);
 }
+
+/* --- iOS status bar --- */
+
+/* Overlaid, not in flow: it is system chrome drawn above the app, so a screen does
+   not lay it out and a presented sheet passes under it. Screens reserve the space
+   with `padding-top: var(--safe-top)` instead. Painting order is DOM order, so it
+   sits above `children` without an inline z-index (CLAUDE.md:117), and below the
+   island, which DeviceFrame renders after it. */
+.device__screen > .statusBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--device-safe-top);
+  padding-top: 21px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+.statusBar__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.statusBar__time {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 16px;
+  padding-right: 6px;
+  /* SF Pro Semibold 17/22 in the design. SF Pro is a system font on Apple platforms
+     and is not web-available, so the stack falls back to the platform UI font —
+     which is SF Pro on the devices this is demoed from. */
+  font-family: -apple-system, "SF Pro Text", system-ui, sans-serif;
+  font-weight: 590;
+  font-size: 17px;
+  line-height: 22px;
+  /* The status-bar component's own colour from the Figma file, the same value its
+     three glyphs are exported with. Hardcoded because this is device chrome: shared
+     has no access to a case study's token set, and must not grow a dependency on one. */
+  color: #141f33;
+  white-space: nowrap;
+}
+
+.statusBar__islandSpacer {
+  width: 124px;
+  height: 10px;
+  flex: none;
+}
+
+.statusBar__levels {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  padding-left: 6px;
+  padding-right: 16px;
+}

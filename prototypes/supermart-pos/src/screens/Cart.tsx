@@ -4,7 +4,6 @@ import { QtyInputField } from '../components/QtyInputField';
 import { formatPrice } from '../data/catalogue';
 import type { Customer } from '../data/customers';
 import { cartTotal, lineTotal, productFor, type CartLine } from '../state/cart';
-import { StatusBar } from '../components/StatusBar';
 import { BottomScrim } from '../components/BottomScrim';
 import './Cart.css';
 
@@ -34,8 +33,6 @@ export function Cart({
 }: CartProps) {
   return (
     <div className="cart">
-      <StatusBar />
-
       <header className="cart__titleBar">
         <div className="cart__titleLeft">
           <CloseButton onPress={onClose} label="Close order preview" />
