@@ -38,13 +38,27 @@ const PHOTOS = import.meta.glob('../../assets/products/*.webp', {
   eager: true, query: '?url', import: 'default',
 }) as Record<string, string>;
 
-const photoFor = (file: string | null | undefined) =>
-  (file ? PHOTOS[`../../assets/products/${file}`] : undefined);
+/**
+ * Drawn stand-ins, one per product, generated from the catalogue by
+ * scripts/gen-packshots.mjs. They are NOT photography and are not presented as it.
+ * The Figma file has four real-brand stock photos reused across the whole section,
+ * which is the placeholder set this study replaced — see the study's CLAUDE.md.
+ *
+ * A real photo always wins: drop one into assets/products/ and that product stops
+ * using its packshot, with nothing to delete and no per-product switch to flip.
+ */
+const PACKSHOTS = import.meta.glob('../../assets/packshots/*.svg', {
+  eager: true, query: '?url', import: 'default',
+}) as Record<string, string>;
+
+const imageFor = (p: Product) =>
+  (p.image ? PHOTOS[`../../assets/products/${p.image}`] : undefined)
+  ?? PACKSHOTS[`../../assets/packshots/${p.id}.svg`];
 
 export function ProductCard({ product, onPress }: { product: Product; onPress: (p: Product) => void }) {
   const reducedMotion = useReducedMotion();
 
-  const photo = photoFor(product.image);
+  const photo = imageFor(product);
 
   return (
     <button

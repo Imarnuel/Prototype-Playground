@@ -103,7 +103,8 @@ npm run catalogue:csv      # regenerate figma/catalogue.csv from catalogue.ts
 npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json
 npm run tokens:verify      # the generated tokens still match the Figma dump
 npm run motion:sample      # transitions animate in BOTH directions (needs a server)
-npm run images:manifest    # which photos are still missing
+npm run images:manifest    # which photos are missing, and packshot coverage
+npm run images:packshots   # regenerate the placeholder packshots from catalogue.ts
 npm run images:optimise -- --box <css-px>   # --box MUST come from a measured frame
 npm run build:hosted       # publish-ready bundle for the hosted preview
 ```
@@ -115,13 +116,14 @@ entrance that never animates.
 
 ## Still open
 
-- **All 43 products are photoless, and the design cannot supply them.** Counted in
-  the file: the whole 90-frame section holds **354 image fills but only 10 distinct
-  images**, and just four of those are grid photos — reused 109, 61, 60 and 59 times.
-  All four are **real-brand stock** (a Fanta can, a Coca-Cola bottle, a Sprite can, a
-  Fanta bottle), under cards that all read "Fanta Orange 50cl, ₦1,000". That is the
-  placeholder set this study was commissioned to replace, so it is not a source.
-  Photos are a **content decision**, not a fetch — see "Getting photos" below.
+- **No product photography exists, and the grid runs on generated packshots.**
+  Counted in the Figma file: the whole 90-frame section holds **354 image fills but
+  only 10 distinct images**, and just four of those are grid photos — reused 109, 61,
+  60 and 59 times. All four are **real-brand stock** (a Fanta can, a Coca-Cola bottle,
+  a Sprite can, a Fanta bottle), under cards that all read "Fanta Orange 50cl, ₦1,000".
+  That is the placeholder set this study replaced, so it is not a source — and a stock
+  library is not one either, since the seven brands are invented and no photograph of
+  a Freshvale product exists. See "Product images" below.
 - `search-sm` carries a non-token stroke, and the filter button has no designed
   destination (BUILD-PLAN #50, #51).
 - **The Cart's title-bar trash clears the whole order in one tap** — no confirmation
@@ -134,8 +136,47 @@ entrance that never animates.
   `{"nodes":[]}` for all 90 frames. Transitions come from `shared/src/motion.ts`,
   documented as the project's baseline rather than design-derived.
 
-## Getting photos
+## Product images
 
+### Generated packshots — what the grid shows today
+
+`scripts/gen-packshots.mjs` draws one SVG packshot per product into
+`assets/packshots/`, from `catalogue.ts`. They are **illustrations, not photography,
+and must never be presented as photography** — they are the designed stand-in that
+lets every other state of the grid be demoed truthfully.
+
+```bash
+npm run images:packshots   # regenerate after editing catalogue.ts
+```
+
+- **Vessel comes from the data.** `Tin`, `Can`, `Carton`, `Jar`, `Bottle`, `PET`,
+  `-pack`, `bags` and `wipes` are all explicit in each product's `size`, so the
+  silhouette is derived, not assigned. Category decides only where `size` is silent.
+  Current spread: bottle 11, box 8, pouch 6, tin 5, pack 4, carton 3, can 2, tube 2,
+  jar 1.
+- **Colour is category hue + brand shift + a stable hash of the product id.** All 42
+  files are distinct — checked by checksum, because category and brand alone collapse
+  four 50cl beverages from one brand into one identical tile, which is the exact
+  failure this study removed from the design.
+- **INTERPRETED: packshot colour encodes category, not flavour.** An orange soda is
+  drawn blue because it is a beverage. That makes a scrolling grid legible by
+  category, at the cost of looking wrong next to the product name. If per-product
+  colour is wanted instead, `CATEGORY_HUE` is the one thing to change.
+- **NOT DESIGN VALUES.** Every colour in that script is invented for the placeholder
+  system. There is no Figma source for packaging colour — the design's packaging is
+  photographed, not specified — so none of it is in `tokens.ts` and none of it is a
+  token.
+- **Composed for the card's scrim**, which is the design's own value (transparent to
+  50%, 40% black at 64.6%, 80% at the bottom). A product standing on the floor of the
+  tile loses its lower half to it, so each packshot is a lit backdrop with the product
+  filling the frame, the way the design's own photographs sit under it.
+- **`image: null` is respected.** Palmrise Sweetcorn gets no packshot, so the no-photo
+  fallback stays reachable exactly as the states table above promises. Verified in a
+  production build: 43 cards, 42 with an image, Sweetcorn alone on the neutral fill.
+
+### Real photography — how to take over
+
+A real photo always wins, per product, with nothing to delete and no switch to flip.
 43 shots of packaged goods against a plain background, one per `image` field in
 `catalogue.ts`. Drop the originals in `assets/products-src/` (gitignored) and run:
 
@@ -150,6 +191,6 @@ real format, resizes against a square box with `fit: 'outside'` (because
 stripped, and reports mean absolute pixel error at display size so a sizing mistake
 is a number rather than an impression.
 
-Nothing else needs changing: `ProductCard` resolves photos with `import.meta.glob`
-over `assets/products/`, so a file appearing in that directory is enough. Until then
-every card shows the designed neutral fill, with no `<img>` and no failed request.
+`ProductCard` resolves `assets/products/` first and falls back to
+`assets/packshots/`, so a file appearing in the products directory is enough to retire
+that product's packshot.

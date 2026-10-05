@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="324" viewBox="0 0 480 324" role="presentation">
+<defs>
+<linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="hsl(218 16% 95%)"/>
+<stop offset="1" stop-color="hsl(218 20% 86%)"/>
+</linearGradient>
+<radialGradient id="k" cx="0.5" cy="0.42" r="0.62">
+<stop offset="0" stop-color="#ffffff" stop-opacity="0.85"/>
+<stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="480" height="324" fill="url(#g)"/>
+<rect width="480" height="324" fill="url(#k)"/>
+<g transform="translate(240 298) scale(1.46) translate(-240 -204)">
+<ellipse cx="240" cy="206" rx="82" ry="12" fill="#0c0e18" opacity="0.1"/>
+<path d="M188 204V58l52 -46 52 46v146Z" fill="hsl(218 44% 45%)"/>
+    <path d="M188 58l52 -46 52 46-52 20Z" fill="hsl(218 46% 36%)"/>
+    <rect x="188" y="105" width="104" height="44" fill="hsl(218 28% 88%)"/>
+    <rect x="201" y="76" width="14" height="118" rx="7" fill="#ffffff" opacity="0.22"/>
+</g>
+</svg>

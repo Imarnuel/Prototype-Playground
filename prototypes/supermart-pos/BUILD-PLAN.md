@@ -362,6 +362,32 @@ The frame sets every name to `nowrap`, which only works because all six cards sa
 "Fanta Orange 50cl". Real names run to 48 characters and would overflow the 172px
 card, so they clamp.
 
+### Generated packshots stand in for photography
+
+With no photography available from the design and none obtainable (the container's
+network policy is an allowlist of package registries, so every stock host answers 403
+at CONNECT — and a stock library could not carry invented brands anyway), the grid
+would have demoed as 43 grey tiles.
+
+`scripts/gen-packshots.mjs` now draws one per product from the catalogue. Three things
+it had to get right, each caught by looking rather than assuming:
+
+1. **The scrim.** First pass stood each product on the floor of the tile, where the
+   card's scrim is 80% black, so every packshot's lower half went to mud. The scrim is
+   the design's own value and stays; the packshot is now a lit backdrop with the
+   product filling the frame, which is how the design's photographs sit under it.
+2. **Duplicates.** Category plus brand alone produced only **24 distinct files for 43
+   products** — four 50cl beverages from one brand collapsing into one tile, the exact
+   "Fanta Orange 50cl under every photo" failure this study replaced. A stable hash of
+   the product id now varies hue, width and label band: **42 distinct, by checksum.**
+3. **The no-photo state.** Giving all 43 a packshot would have made the designed
+   fallback unreachable, contradicting the study's own states table. `image: null` is
+   respected, so Sweetcorn has none.
+
+Verified in a production build: 43 cards, 42 images, 0 broken, 0 requests over 400,
+all intrinsic 480x324 into a measured 160x108 box (exactly 3x), all inlined under
+`assetsInlineLimit`, which is safe because they are `<img src>` and never CSS `url()`.
+
 ### Product photos resolved through a path that could not work
 
 `ProductCard` requested `/products/<file>`, which Vite serves only out of a `public/`
