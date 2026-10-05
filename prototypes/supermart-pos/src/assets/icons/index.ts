@@ -16,6 +16,7 @@
  */
 import add_one from './add-one.svg';
 import cart from './cart.svg';
+import check_circle from './check-circle.svg';
 import chevron_right from './chevron-right.svg';
 import dots_horizontal from './dots-horizontal.svg';
 import ellipse_79 from './ellipse-79.svg';
@@ -28,6 +29,7 @@ import plus_circle from './plus-circle.svg';
 import search_sm from './search-sm.svg';
 import shopping_cart_01 from './shopping-cart-01.svg';
 import trash_03 from './trash-03.svg';
+import trash_03_subtle from './trash-03-subtle.svg';
 import user_02 from './user-02.svg';
 import users_02 from './users-02.svg';
 import x_circle from './x-circle.svg';
@@ -36,6 +38,7 @@ import x_close from './x-close.svg';
 export type IconName =
   | 'add-one'
   | 'cart'
+  | 'check-circle'
   | 'chevron-right'
   | 'dots-horizontal'
   | 'ellipse-79'
@@ -48,6 +51,7 @@ export type IconName =
   | 'search-sm'
   | 'shopping-cart-01'
   | 'trash-03'
+  | 'trash-03-subtle'
   | 'user-02'
   | 'users-02'
   | 'x-circle'
@@ -56,6 +60,7 @@ export type IconName =
 export const ICONS: Record<IconName, { src: string; width: number; height: number }> = {
   'add-one': { src: add_one, width: 20, height: 20 },
   'cart': { src: cart, width: 19, height: 18 },
+  'check-circle': { src: check_circle, width: 48, height: 48 },
   'chevron-right': { src: chevron_right, width: 16, height: 16 },
   'dots-horizontal': { src: dots_horizontal, width: 20, height: 20 },
   'ellipse-79': { src: ellipse_79, width: 3, height: 3 },
@@ -68,6 +73,7 @@ export const ICONS: Record<IconName, { src: string; width: number; height: numbe
   'search-sm': { src: search_sm, width: 20, height: 20 },
   'shopping-cart-01': { src: shopping_cart_01, width: 16, height: 16 },
   'trash-03': { src: trash_03, width: 20, height: 20 },
+  'trash-03-subtle': { src: trash_03_subtle, width: 20, height: 20 },
   'user-02': { src: user_02, width: 16, height: 16 },
   'users-02': { src: users_02, width: 40, height: 40 },
   'x-circle': { src: x_circle, width: 20, height: 20 },

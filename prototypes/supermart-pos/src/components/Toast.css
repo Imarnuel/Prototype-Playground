@@ -1,0 +1,53 @@
+/* Frame 5071 `88:8401`: 200x132 at [97,360] on a 393x852 screen, Color/text/default
+   fill, radius 8, 16px padding, 4px gap, both axes centred. The 97/96 left-right split
+   is 1px off centre in the frame; centred here, since a 1px asymmetry on a centred
+   overlay reads as a mistake rather than a value. */
+.toast {
+  position: absolute;
+  top: 360px;
+  left: 50%;
+  margin-left: -100px;
+  width: 200px;
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-50);
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-400);
+  border-radius: var(--radius-200);
+  background: var(--color-text-default);
+  /* Nothing in this file cuts: the toast fades and lifts in both directions, and the
+     element stays mounted so the exit actually runs (root agreement section 5). */
+  transition-property: opacity, transform;
+  pointer-events: none;
+}
+
+.toast[data-open='off'] {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+}
+
+.toast[data-open='on'] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.toast__message {
+  /* Body/Large — Regular 16/24, -0.24. The frame's text box is 168x48, i.e. two
+     lines, which this message fills at exactly that width. */
+  margin: 0;
+  width: 168px;
+  font-size: var(--type-Body-Large-size);
+  font-weight: var(--type-Body-Large-weight);
+  line-height: var(--type-Body-Large-line-height);
+  letter-spacing: var(--type-Body-Large-letter-spacing);
+  color: var(--color-text-inverse);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    transition-duration: 0ms !important;
+  }
+}

@@ -277,6 +277,10 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 57 | The filter bar's second "Filter Spacer" is nested **inside the last chip** at x=447, off-screen past the 393 frame | Not built. The right-edge spacer at x=338 is real and is built; this one is a stray |
 | 58 | **The qty stepper has two different border colours in the same screen.** Its main component (`88:2065`) strokes with `Color/border/input` `#cfd3d8`, and **15 of the 18 instances** across the Cart and both sheet frames override that to `Color/border/default` `#252b3724`. The 3 that keep the component value are the last row of each frame — which are also 124 wide instead of 116, typeset 15/22 at -1% instead of 16/24, and carry `#f0f2f5` stepper buttons with white glyphs. Verified by sampling Figma's own raster, not by reading node values: rows 1-5 paint **(224, 225, 227)**, row 6 paints **(207, 211, 216)** | Followed the 15. The last row is plainly an older variant that was not updated with the rest, and a grid where one row's border is darker than the other five reads as a bug. **Needs design input**: the component's own token is the semantically right one for an input |
 | 59 | **The qty stepper's second, gradient stroke is applied to 53 of its 319 instances.** The paint is identical to the search field's — 0deg, black full-alpha on the bottom edge fading to nothing by 19.71% of the box, at 15% layer opacity — and all 53 sit in the 14 frames named "Customer added". The six rows in the Cart and both Select-customer frames carry the solid stroke alone. All 319 share one main component (`88:2065`), which has no gradient at all, so every one of the 53 is a per-instance addition | **Applied.** The three input surfaces — search field, filter button, qty stepper — now share one ring recipe in `index.css`. This DEVIATES from the three frames built, which show no gradient on the stepper; followed the input family instead, because the same paint on the search field two screens earlier makes 53 instances the intent and 266 the oversight. Three lines to revert |
+| 60 | **`88:8402` is byte-identical to `88:8243`** — same 86 nodes, same names, same geometry, same text. Two of band 4's three "Customer added" frames are the same frame | Built once. `88:8322` is the real second state: the same frame plus a toast |
+| 61 | **The footer and the bottom scrim move between the Cart and Customer added** although nothing between them changes: the footer sits at y=773 in `88:8164` and y=764 in `88:8243` (31px vs 40px from the screen bottom), and the scrim is [0,646,393,206] against [0,613,393,239]. Content height is identical — Frame 5005 is [12,130,361,736] in both | Kept the Cart's 31px and 206. A footer that jumps 9px when a customer is attached is a bug, not a state |
+| 62 | The toast reads **"Customer has been created"**, but band 4 never designs an add-customer form — the sheet's CTA is the only "create" affordance and it has no destination (#47) | Raised only on that CTA path, not on selecting an existing customer, which creates nothing. **Needs design input** once the form exists |
+| 63 | The customer row's trash is **20x20**, under the 44x44 minimum | Expanded with `::after { inset: -12px }` rather than growing the glyph |
 
 ## Work order
 
@@ -402,6 +406,44 @@ Two things the audit has to get right to be worth running:
   were only spelling; the audit now paints both and compares pixels before calling
   one a finding. All three came back at **0/255 max channel delta**.
 - **Text width is deliberately not asserted** — see #56.
+
+### Band 4 complete — Customer added is a STATE, not a screen
+
+`88:8243` is the Cart's own frame with two properties changed on one row, so it is
+built as state on the Cart rather than a fourth screen:
+
+| | Cart `88:8176` | Customer added `88:8255` |
+|---|---|---|
+| Label | "Add customer", Label/Base — Medium 16/24, -0.24 | the name, **Heading/H3** — Semi Bold 16/24, **-0.32** |
+| Trailing | `plus-circle` 24x24, icon stroke `#2c4a8b` | `trash-03` 20x20, icon stroke **`#9ea4b3`** |
+
+Everything else in the row — 361x56, radius 12, the 2px OUTSIDE stroke, 12px padding,
+the `#fce9f7` avatar with its `#d42189` glyph — is identical.
+
+`88:8322` adds one node, `Frame 5071` / `88:8401`: a 200x132 toast, `#141f33` at radius
+8, 16px padding, 4px gap, a 48x48 `check-circle` in `#038c4e`, and Body/Large text in
+`#ffffff` centred in a 168x48 box. It is vertically centred on the screen — (852-132)/2
+is exactly 360 — so unlike everything else it does NOT take the +9 safe-area shift.
+
+Two icons exported from their instances: `check-circle`, and a second `trash-03`,
+because the customer row's is `#9ea4b3` where the title bar's is `#20293C`.
+
+**A regression this caught in passing**: the Cart's line images still asked for
+`/products/<file>`, the path fixed in `ProductCard` weeks of work earlier but never
+here — every line rendered a broken-image glyph. The resolver now lives in
+`src/data/productImage.ts` and both screens read it, which is what section 4 asks for
+and what would have prevented the split in the first place.
+
+**And one I introduced**: making the row a `div` so the trash could be its own button
+shrank the empty state's target from 361x56 to 337x32. The plus moved back inside the
+pick button and the hit area is expanded over the row's padding; probing all four
+corners of the empty row now hits `.addCustomer__pick`.
+
+Verified: 231 properties against the Figma nodes, 0 differing; the new state's
+coordinate diff 0 outside 0.5px on all 22 measurements, the toast landing at
+96.5/360/200/132 exactly; 11/11 flow and motion checks, including that the toast fades
+in AND out over several frames rather than cutting, stays mounted through its exit, and
+zeroes under reduced motion; 0 unnamed controls, toast contrast 16.49:1.
 
 ### The input ring, and the limit of a three-frame audit
 

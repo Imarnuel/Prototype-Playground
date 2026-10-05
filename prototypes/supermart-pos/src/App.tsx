@@ -8,6 +8,7 @@ import { Cart } from './screens/Cart';
 import { SelectCustomer } from './screens/SelectCustomer';
 import { PRODUCTS } from './data/catalogue';
 import { CUSTOMERS, type Customer } from './data/customers';
+import { Toast } from './components/Toast';
 import { usePresented } from './hooks/usePresented';
 import { addToCart, removeLine, setQty, type CartLine } from './state/cart';
 import './App.css';
@@ -27,6 +28,9 @@ export function App() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [customers, setCustomers] = useState<readonly Customer[]>(CUSTOMERS);
   const [customer, setCustomer] = useState<Customer | null>(null);
+  /* `88:8322` is `88:8243` plus one toast, so the toast is state on the Cart rather
+     than a screen of its own. Its copy is the frame's. */
+  const [toast, setToast] = useState<string | null>(null);
   const reducedMotion = useReducedMotion();
 
   const items: DevToolbarItem[] = [
@@ -68,6 +72,23 @@ export function App() {
       group: 'States',
       onSelect: () => { setCustomers([]); setCartOpen(true); setPickerOpen(true); },
     },
+    {
+      label: 'Customer added',
+      group: 'Screens',
+      onSelect: () => {
+        setCustomers(CUSTOMERS); setCustomer(CUSTOMERS[0]);
+        setPickerOpen(false); setCartOpen(true); setToast(null);
+      },
+    },
+    {
+      label: 'Customer added: toast',
+      group: 'States',
+      onSelect: () => {
+        setCustomers(CUSTOMERS); setCustomer(CUSTOMERS[0]);
+        setPickerOpen(false); setCartOpen(true);
+        setToast('Customer has been created');
+      },
+    },
   ];
 
   const enterMs = duration(SHEET_SPRING.duration, reducedMotion);
@@ -105,6 +126,7 @@ export function App() {
               onMoreOptions={() => setPickerOpen(true)}
               onClearAll={() => setLines([])}
               customer={customer}
+              onRemoveCustomer={() => setCustomer(null)}
             />
 
             <SelectCustomer
@@ -115,7 +137,21 @@ export function App() {
               // The add-customer FORM is not in this band; the sheet's own two
               // states are. Seeding the list is the honest stand-in so the empty
               // state has somewhere to go. Logged as #47.
-              onAddCustomer={() => setCustomers(CUSTOMERS)}
+              onAddCustomer={() => {
+                setCustomers(CUSTOMERS);
+                /* The frame's copy is "Customer has been created", which only fits
+                   this path: the sheet's CTA stands in for the add-customer FORM that
+                   band 4 never designs (#47). Selecting an existing customer raises
+                   no toast, because nothing was created. */
+                setCustomer(CUSTOMERS[0]);
+                setPickerOpen(false);
+                setToast('Customer has been created');
+              }}
+            />
+            <Toast
+              open={toast !== null}
+              message={toast ?? ''}
+              onDismiss={() => setToast(null)}
             />
           </div>
         )}

@@ -190,7 +190,7 @@ const CART = [
   ['88:8176 add cust',      '.addCustomer',          'backgroundColor', 'rgb(255, 255, 255)'],
   ['88:8176 add cust',      '.addCustomer',          'boxShadow',       '0 0 0 2px rgba(12, 14, 24, 0.04)'],
   ['88:8176 add cust',      '.addCustomer',          'padding',         '12px'],
-  ['88:8177 add left',      '.addCustomer__left',    'columnGap',       '8px'],
+  ['88:8177 add left',      '.addCustomer__pick',    'columnGap',       '8px'],
   ['88:8178 avatar',        '.addCustomer__avatar',  'backgroundColor', 'rgb(252, 233, 247)'],
   ['88:8178 avatar',        '.addCustomer__avatar',  'borderRadius',    '9999px'],
   ['88:8178 avatar',        '.addCustomer__avatar',  'width',           '32px'],
@@ -284,6 +284,39 @@ const EMPTY = [
   ['88:11937 ring inner', '.customerEmpty__ring3', 'borderRadius',    '16px'],
   ['88:11942 cta',        '.customerEmpty__cta',   'backgroundColor', 'rgb(44, 74, 139)'],
   ['88:11942 cta',        '.customerEmpty__cta',   'borderRadius',    '12px'],
+];
+
+/* Customer added — `88:8243`, which is the Cart's own Frame 5010 with the label's
+   weight and tracking changed and the trailing control swapped. `88:8402` is a
+   byte-identical duplicate of it; `88:8322` is the same frame plus the toast below. */
+const ADDED = [
+  ['88:8255 row',           '.addCustomer',          'boxShadow',       '0 0 0 2px rgba(12, 14, 24, 0.04)'],
+  ['88:8255 row',           '.addCustomer',          'borderRadius',    '12px'],
+  ['88:8255 row',           '.addCustomer',          'padding',         '12px'],
+  ['88:8256 left',          '.addCustomer__pick',    'columnGap',       '8px'],
+  ['88:8257 avatar',        '.addCustomer__avatar',  'backgroundColor', 'rgb(252, 233, 247)'],
+  ['88:8257 avatar',        '.addCustomer__avatar',  'borderRadius',    '9999px'],
+  ['88:8259 name',          '.addCustomer__label',   'fontSize',        '16px'],
+  ['88:8259 name',          '.addCustomer__label',   'fontWeight',      '600'],
+  ['88:8259 name',          '.addCustomer__label',   'lineHeight',      '24px'],
+  ['88:8259 name',          '.addCustomer__label',   'letterSpacing',   '-0.32px'],
+  ['88:8259 name',          '.addCustomer__label',   'color',           'rgb(20, 31, 51)'],
+];
+
+/* The toast, `88:8401`: the only difference between `88:8322` and `88:8243`. */
+const TOAST = [
+  ['88:8401 toast',         '.toast',                'backgroundColor', 'rgb(20, 31, 51)'],
+  ['88:8401 toast',         '.toast',                'borderRadius',    '8px'],
+  ['88:8401 toast',         '.toast',                'padding',         '16px'],
+  ['88:8401 toast',         '.toast',                'rowGap',          '4px'],
+  ['88:8401 toast',         '.toast',                'width',           '200px'],
+  ['I...12156 message',     '.toast__message',       'fontSize',        '16px'],
+  ['I...12156 message',     '.toast__message',       'fontWeight',      '400'],
+  ['I...12156 message',     '.toast__message',       'lineHeight',      '24px'],
+  ['I...12156 message',     '.toast__message',       'letterSpacing',   '-0.24px'],
+  ['I...12156 message',     '.toast__message',       'color',           'rgb(255, 255, 255)'],
+  ['I...12156 message',     '.toast__message',       'textAlign',       'center'],
+  ['I...12156 message',     '.toast__message',       'width',           '168px'],
 ];
 
 const browser = await pw.chromium.launch({ executablePath: EXE });
@@ -383,8 +416,12 @@ await pick('Select customer');
 fails += await run('Select customer', SHEET);
 await pick('Select customer: empty');
 fails += await run('Select customer empty', EMPTY);
+await pick('Customer added');
+fails += await run('Customer added', ADDED);
+await pick('Customer added: toast');
+fails += await run('Customer added toast', TOAST);
 
-const total = SCALAR.length + COMPOUND.length + CART.length + SHEET.length + EMPTY.length;
+const total = SCALAR.length + COMPOUND.length + CART.length + SHEET.length + EMPTY.length + ADDED.length + TOAST.length;
 console.log('-'.repeat(60));
 console.log(`${total} properties checked against Figma nodes, ${fails} differ`);
 await browser.close();

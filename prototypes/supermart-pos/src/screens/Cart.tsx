@@ -2,6 +2,7 @@ import { Icon } from '../components/Icon';
 import { CloseButton } from '../components/CloseButton';
 import { QtyInputField } from '../components/QtyInputField';
 import { formatPrice } from '../data/catalogue';
+import { productImage } from '../data/productImage';
 import type { Customer } from '../data/customers';
 import { cartTotal, lineTotal, productFor, type CartLine } from '../state/cart';
 import { BottomScrim } from '../components/BottomScrim';
@@ -25,11 +26,12 @@ type CartProps = {
   onClearAll: () => void;
   /** Set once a customer is picked in the Select customer sheet. */
   customer: Customer | null;
+  onRemoveCustomer: () => void;
 };
 
 export function Cart({
   lines, onClose, onQtyChange, onRemove, onCheckout, onQueue, onAddCustomer,
-  onMoreOptions, onClearAll, customer,
+  onMoreOptions, onClearAll, customer, onRemoveCustomer,
 }: CartProps) {
   return (
     <div className="cart">
@@ -49,19 +51,44 @@ export function Cart({
       </header>
 
       <div className="cart__scroll">
-        <button type="button" className="addCustomer" onClick={onAddCustomer}>
-          <span className="addCustomer__left">
+        {/* One row, two states — "Customer added" (`88:8243`) is this same Frame 5010
+            with the label's weight and tracking changed and the trailing control
+            swapped, not a separate screen. With a customer attached the whole row
+            stops being a single button: the trailing control removes the customer,
+            so it cannot sit inside a button that opens the picker. */}
+        <div className="addCustomer" data-state={customer ? 'added' : 'empty'}>
+          <button
+            type="button"
+            className="addCustomer__pick"
+            onClick={onAddCustomer}
+            aria-label={customer ? `Change customer, currently ${customer.name}` : 'Add customer'}
+          >
             <span className="addCustomer__avatar">
               <Icon name="user-02" />
             </span>
-            {/* Once a customer is chosen the row carries their name. The designed
-                treatment for this is the "Customer added" frame (`88:8243`), which
-                is not built yet — this is the minimum that gives the selection a
-                visible consequence. Logged as #46. */}
             <span className="addCustomer__label">{customer ? customer.name : 'Add customer'}</span>
-          </span>
-          <Icon name="plus-circle" />
-        </button>
+
+            {/* With no customer the plus lives INSIDE the pick button, so the whole
+                row stays one target as the frame draws it. Only the added state
+                splits, because the trash is a different action. */}
+            {!customer && (
+              <span className="addCustomer__plus" aria-hidden="true">
+                <Icon name="plus-circle" />
+              </span>
+            )}
+          </button>
+
+          {customer && (
+            <button
+              type="button"
+              className="addCustomer__remove"
+              onClick={onRemoveCustomer}
+              aria-label={`Remove ${customer.name} from this order`}
+            >
+              <Icon name="trash-03-subtle" />
+            </button>
+          )}
+        </div>
 
         {lines.length === 0 ? (
           <div className="cart__empty">
@@ -76,8 +103,8 @@ export function Cart({
                 <li key={line.productId} className="cartLine">
                   <div className="cartLine__main">
                     <span className="cartLine__image">
-                      {product.image ? (
-                        <img className="cartLine__img" src={`/products/${product.image}`} alt="" />
+                      {productImage(product) ? (
+                        <img className="cartLine__img" src={productImage(product)} alt="" />
                       ) : null}
                       <span className="cartLine__scrim" />
                     </span>

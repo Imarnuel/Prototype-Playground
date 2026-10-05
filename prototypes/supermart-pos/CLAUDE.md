@@ -16,7 +16,7 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **59** inconsistencies, including that 31 frames share the name
+anything — it records **63** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
@@ -26,12 +26,18 @@ anything — it records **59** inconsistencies, including that 31 frames share t
 | 1 | Sales Point | `88:8079` | 1 coordinate outside 0.5px, 21/21 flow, +8px chip gap (requested) |
 | 2 | Cart / Order Preview | `88:8164` | 0 outside 0.5px, 19/19 flow |
 | 3 | Select customer (empty + populated) | `88:11845`, `88:12043` | 0 outside tolerance, 17/17 flow |
+| 4 | Customer added (+ toast) | `88:8243`, `88:8322` | 0 outside 0.5px, 11/11 flow and motion |
 
-All three pass `npm run figma:audit`: **208 properties read off the Figma nodes**
+All four pass `npm run figma:audit`: **231 properties read off the Figma nodes**
 (fills, strokes and their weight and alignment, radii, effects, auto-layout padding and
 spacing, full type spec) against computed style, **0 differing**.
 
-Next: Customer added (`88:8243`).
+**Band 4 is complete.** Customer added is built as STATE on the Cart, not a fourth
+screen: `88:8243` is the Cart's own frame with the customer row's label at Heading/H3
+instead of Label/Base and a trash in place of the plus-circle. `88:8402` is a
+byte-identical duplicate of it; `88:8322` is the same frame plus the toast.
+
+Next: a band to be chosen — see the board map above.
 
 **Hosted preview:** <https://claude.ai/artifact/LnsiYh4uBeTNY1J3XDMJHX> — rebuild and
 republish it with `npm run build:hosted`.
@@ -107,7 +113,7 @@ npm run catalogue:csv      # regenerate figma/catalogue.csv from catalogue.ts
 npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json
 npm run tokens:verify      # the generated tokens still match the Figma dump
 npm run motion:sample      # transitions animate in BOTH directions (needs a server)
-npm run figma:audit        # 208 properties read off the Figma NODES vs computed style
+npm run figma:audit        # 231 properties read off the Figma NODES vs computed style
 npm run images:manifest    # which photos are missing, and packshot coverage
 npm run images:packshots   # regenerate the placeholder packshots from catalogue.ts
 npm run images:optimise -- --box <css-px>   # --box MUST come from a measured frame
