@@ -1,4 +1,6 @@
 .qtyField {
+  /* The gradient ring in index.css positions against this. */
+  position: relative;
   display: flex;
   gap: var(--spacing-50);
   align-items: center;

@@ -276,6 +276,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 56 | **Figma reports an auto-width text node's width as an integer.** Every one in the frame is whole: 73, 112, 46, 17, 50, 90, 72, 138, 37, 56, 57, 27 — which real advances never are | Not fixable and not a CSS error. Measured against 12 strings: mean 0.769px, max 1.500px, with no consistent sign (one is +0.125). Pinning Inter v3 (`@fontsource/inter@4.5.15`) moves it to mean 0.730 / max 1.156 — 0.04px for a three-year-old font, so it was tested and reverted |
 | 57 | The filter bar's second "Filter Spacer" is nested **inside the last chip** at x=447, off-screen past the 393 frame | Not built. The right-edge spacer at x=338 is real and is built; this one is a stray |
 | 58 | **The qty stepper has two different border colours in the same screen.** Its main component (`88:2065`) strokes with `Color/border/input` `#cfd3d8`, and **15 of the 18 instances** across the Cart and both sheet frames override that to `Color/border/default` `#252b3724`. The 3 that keep the component value are the last row of each frame — which are also 124 wide instead of 116, typeset 15/22 at -1% instead of 16/24, and carry `#f0f2f5` stepper buttons with white glyphs. Verified by sampling Figma's own raster, not by reading node values: rows 1-5 paint **(224, 225, 227)**, row 6 paints **(207, 211, 216)** | Followed the 15. The last row is plainly an older variant that was not updated with the rest, and a grid where one row's border is darker than the other five reads as a bug. **Needs design input**: the component's own token is the semantically right one for an input |
+| 59 | **The qty stepper's second, gradient stroke is applied to 53 of its 319 instances.** The paint is identical to the search field's — 0deg, black full-alpha on the bottom edge fading to nothing by 19.71% of the box, at 15% layer opacity — and all 53 sit in the 14 frames named "Customer added". The six rows in the Cart and both Select-customer frames carry the solid stroke alone. All 319 share one main component (`88:2065`), which has no gradient at all, so every one of the 53 is a per-instance addition | **Applied.** The three input surfaces — search field, filter button, qty stepper — now share one ring recipe in `index.css`. This DEVIATES from the three frames built, which show no gradient on the stepper; followed the input family instead, because the same paint on the search field two screens earlier makes 53 instances the intent and 266 the oversight. Three lines to revert |
 
 ## Work order
 
@@ -401,6 +402,29 @@ Two things the audit has to get right to be worth running:
   were only spelling; the audit now paints both and compares pixels before calling
   one a finding. All three came back at **0/255 max channel delta**.
 - **Text width is deliberately not asserted** — see #56.
+
+### The input ring, and the limit of a three-frame audit
+
+`figma:audit` passed 207 properties against the three built frames while the qty
+stepper was still missing a stroke — because the frames it checks do not have it.
+Searching the whole section instead of the three frames: **319 qty-field instances,
+53 of them carrying a second, gradient stroke**, all in the 14 "Customer added"
+frames. The paint is the search field's, exactly: 0deg, black at full alpha on the
+bottom edge fading to nothing by 19.71% of the box, 15% layer opacity.
+
+All 319 share one main component (`88:2065`), which carries no gradient, so each of
+the 53 is a per-instance addition — and in `88:8243` it is rows 1-4 of 6, with row 5
+plain and row 6 on the other border colour entirely.
+
+Applied, and the recipe moved to `index.css` so the search field, the filter button
+and the qty stepper share one definition rather than three copies of a mask trick.
+Measured: the stepper's bottom border goes from (224, 225, 227) to (193, 194, 195),
+which is 15% black at the gradient's 92.9% alpha at that row's centre; the top edge
+is unchanged.
+
+**The lesson for the audit**: passing against the frames you built says nothing about
+the frames you have not. The counts above came from walking all 90 frames, which is
+what the next screen's audit should start from.
 
 ### Cart, inspected node by node
 

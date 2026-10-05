@@ -24,30 +24,6 @@
     var(--shadow-xs);
 }
 
-/* Both fields carry a SECOND stroke in Figma, a linear gradient over the solid one:
-   black fading up from the bottom edge, at 15% layer opacity on the text field and
-   10% on the filter button. The codegen does not emit it — only the solid
-   Color/border/input — so it was missing. Drawn as a 1px gradient ring: a gradient
-   fill clipped to the border box by an xor mask, which is the only way to put a
-   gradient on a border without `border-image` stretching the radius.
-
-   Resolved from the paint's own gradientTransform: both run at 0deg (bottom to top);
-   the text field's fades out by 19.71% of its height, the filter button's across the
-   full 40px. */
-.textField::after,
-.filterButton::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: var(--border-width-sm);
-  pointer-events: none;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-}
-
 .textField::after {
   background: linear-gradient(0deg, rgb(0 0 0 / 15%) 0%, rgb(0 0 0 / 0%) 19.71%);
 }

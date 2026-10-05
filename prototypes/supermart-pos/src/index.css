@@ -31,3 +31,47 @@ textarea,
 select {
   font: inherit;
 }
+
+/* --- The input ring ---------------------------------------------------------
+   Every input surface in this system carries TWO strokes in Figma: a solid one
+   (Color/border/input on the search field and the filter button, Color/border/default
+   on the qty stepper) and, over it, a linear gradient of black fading up from the
+   bottom edge. The code export emits only the solid one, so the gradient was missing
+   everywhere until it was read off each node's own `strokes` array.
+
+   All three use the same paint — 0deg, black at full alpha on the bottom edge fading
+   to nothing by 19.71% of the box height — differing only in layer opacity: 15% on
+   the search field and the qty stepper, 10% on the filter button.
+
+   Drawn as a 1px gradient ring: a gradient fill clipped to the border box by an xor
+   mask. `border-image` is the alternative and it does not follow a border radius.
+
+   The qty stepper's gradient is NOT in the three frames this study has built — those
+   six rows carry the solid stroke alone. It is on 53 of the 319 qty fields across the
+   section, all in the "Customer added" frames, and it is the same paint the search
+   field uses two screens earlier. Applied here for coherence across the input family;
+   logged as #59 with the counts. Delete these three lines to follow the built frames
+   literally instead. */
+.textField::after,
+.filterButton::after,
+.qtyField::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: var(--border-width-sm);
+  pointer-events: none;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+}
+
+.textField::after,
+.qtyField::after {
+  background: linear-gradient(0deg, rgb(0 0 0 / 15%) 0%, rgb(0 0 0 / 0%) 19.71%);
+}
+
+.filterButton::after {
+  background: linear-gradient(0deg, rgb(0 0 0 / 10%) 0%, rgb(0 0 0 / 0%) 100%);
+}

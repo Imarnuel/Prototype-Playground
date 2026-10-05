@@ -216,6 +216,11 @@ const CART = [
   ['88:8187 line name',     '.cartLine__name',       'color',           'rgb(20, 31, 51)'],
   // Qty field 88:8188
   ['88:8188 qty field',     '.qtyField',             'boxShadow',       'inset 0 0 0 1px rgba(37, 43, 55, 0.14)'],
+  // The second, gradient stroke. Not in this frame's six rows — it is on 53 of the
+  // 319 qty fields across the section, all in "Customer added", and is the same paint
+  // the search field carries. Applied for coherence; see index.css and BUILD-PLAN #59.
+  ['88:8267 qty ring',      '.qtyField',             '::after background',
+    'linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 19.71%)'],
   ['88:8188 qty field',     '.qtyField',             'borderRadius',    '8px'],
   ['88:8188 qty field',     '.qtyField',             'backgroundColor', 'rgb(255, 255, 255)'],
   ['88:8188 qty field',     '.qtyField',             'padding',         '4px 8px'],
