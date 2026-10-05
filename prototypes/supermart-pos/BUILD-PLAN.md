@@ -360,6 +360,22 @@ The frame sets every name to `nowrap`, which only works because all six cards sa
 "Fanta Orange 50cl". Real names run to 48 characters and would overflow the 172px
 card, so they clamp.
 
+### 8px below the filter chips — requested, not designed
+
+The frame ends the header flush with the chip row: filter bar bottom 216, header
+bottom 216, product grid 240, the 24px between them belonging to the scroll area.
+Because that 24px is the scroller's own top padding, it scrolls away with the
+content, so at any scroll offset above 0 a product card arrived flush against the
+chips and the boundary read as a clipped row rather than a scroll edge.
+
+8px of `padding-bottom` now sits on `.salesPoint__searchAndFilters`, inside the
+header, so it survives scrolling. Measured at scroll 0 / 180 / end: gap 8.00 at all
+three. A/B with the padding flipped to 0 live: gap 8 to 0, header 174 to 166, grid
+top 257 to 249 — the 8px is entirely this change.
+
+Everything below the header takes it; the bottom-docked View cart (703), tab bar
+(761) and scrim (580) do not, and re-measured unchanged.
+
 ## Screen 1 — verification record
 
 | Check | Result |

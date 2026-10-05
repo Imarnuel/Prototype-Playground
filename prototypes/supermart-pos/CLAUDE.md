@@ -23,7 +23,7 @@ anything — it records **51** inconsistencies, including that 31 frames share t
 
 | # | Screen | Node | State |
 |---|---|---|---|
-| 1 | Sales Point | `88:8079` | 1 coordinate outside 0.5px, 21/21 flow |
+| 1 | Sales Point | `88:8079` | 1 coordinate outside 0.5px, 21/21 flow, +8px chip gap (requested) |
 | 2 | Cart / Order Preview | `88:8164` | 0 outside 0.5px, 19/19 flow |
 | 3 | Select customer (empty + populated) | `88:11845`, `88:12043` | 0 outside tolerance, 17/17 flow |
 

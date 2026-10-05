@@ -57,7 +57,12 @@
   gap: 17px;
   align-items: flex-start;
   justify-content: center;
-  padding: 0 16px;
+  /* 8px below the chips is not in the frame — the design ends the header flush with
+     the chip row. Added on request: the scroller's own 24px top padding scrolls away
+     with the content, so a scrolled card arrived flush against the chips and the
+     boundary read as a clipped row rather than a scroll edge. This gap is in the
+     header, so it survives scrolling. Everything below moves down 8px. */
+  padding: 0 16px 8px;
 }
 
 .salesPoint__scroll {
