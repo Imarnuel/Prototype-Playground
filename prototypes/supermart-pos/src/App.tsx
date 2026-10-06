@@ -8,6 +8,7 @@ import { Cart } from './screens/Cart';
 import { SelectCustomer } from './screens/SelectCustomer';
 import { PRODUCTS } from './data/catalogue';
 import { CUSTOMERS, type Customer } from './data/customers';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Toast } from './components/Toast';
 import { usePresented } from './hooks/usePresented';
 import { addToCart, removeLine, setQty, type CartLine } from './state/cart';
@@ -33,15 +34,14 @@ export function App() {
   const [toast, setToast] = useState<string | null>(null);
   const reducedMotion = useReducedMotion();
 
+  const resetScreens = () => {
+    setForced(undefined); setCartOpen(false); setPickerOpen(false);
+    setCustomer(null); setCustomers(CUSTOMERS); setToast(null);
+    setResetNonce((n) => n + 1);
+  };
+
   const items: DevToolbarItem[] = [
-    {
-      label: 'Sales point',
-      group: 'Screens',
-      onSelect: () => {
-        setForced(undefined); setCartOpen(false); setPickerOpen(false);
-        setCustomer(null); setCustomers(CUSTOMERS); setResetNonce((n) => n + 1);
-      },
-    },
+    { label: 'Sales point', group: 'Screens', onSelect: resetScreens },
     { label: 'Cart (Order Preview)', group: 'Screens', onSelect: () => setCartOpen(true) },
     { label: 'Loading (skeleton)', group: 'States', onSelect: () => { setCartOpen(false); setForced('loading'); } },
     { label: 'Empty', group: 'States', onSelect: () => { setCartOpen(false); setForced('empty'); } },
@@ -97,64 +97,68 @@ export function App() {
   return (
     <>
       <DeviceFrame>
-        <SalesPoint
-          key={resetNonce}
-          forceState={forced}
-          cartCount={lines.length}
-          onAddProduct={(p) => setLines((l) => addToCart(l, p))}
-          onViewCart={() => setCartOpen(true)}
-        />
+        {/* A render failure most likely came from a cart line, so recovering also
+            empties the cart rather than re-rendering the line that threw. */}
+        <ErrorBoundary onReset={() => { setLines([]); resetScreens(); }}>
+          <SalesPoint
+            key={resetNonce}
+            forceState={forced}
+            cartCount={lines.length}
+            onAddProduct={(p) => setLines((l) => addToCart(l, p))}
+            onViewCart={() => setCartOpen(true)}
+          />
 
-        {cartMounted && (
-          <div
-            className="sheet"
-            data-open={cartEntered ? 'on' : 'off'}
-            style={{
-              transitionDuration: `${cartOpen ? enterMs : exitMs}ms`,
-              transitionTimingFunction: cartOpen ? SHEET_SPRING.easing : SHEET_SPRING.exitEasing,
-            }}
-          >
-            <Cart
-              lines={lines}
-              onClose={() => setCartOpen(false)}
-              onQtyChange={(id, qty) => setLines((l) => setQty(l, id, qty))}
-              onRemove={(id) => setLines((l) => removeLine(l, id))}
-              onCheckout={() => setCartOpen(false)}
-              onQueue={() => { setLines([]); setCartOpen(false); }}
-              onAddCustomer={() => setPickerOpen(true)}
-              // "More options" is frame `88:15458`, not built yet.
-              onMoreOptions={() => setPickerOpen(true)}
-              onClearAll={() => setLines([])}
-              customer={customer}
-              onRemoveCustomer={() => setCustomer(null)}
-            />
-
-            <SelectCustomer
-              open={pickerOpen}
-              customers={customers}
-              onClose={() => setPickerOpen(false)}
-              onSelect={(c) => { setCustomer(c); setPickerOpen(false); }}
-              // The add-customer FORM is not in this band; the sheet's own two
-              // states are. Seeding the list is the honest stand-in so the empty
-              // state has somewhere to go. Logged as #47.
-              onAddCustomer={() => {
-                setCustomers(CUSTOMERS);
-                /* The frame's copy is "Customer has been created", which only fits
-                   this path: the sheet's CTA stands in for the add-customer FORM that
-                   band 4 never designs (#47). Selecting an existing customer raises
-                   no toast, because nothing was created. */
-                setCustomer(CUSTOMERS[0]);
-                setPickerOpen(false);
-                setToast('Customer has been created');
+          {cartMounted && (
+            <div
+              className="sheet"
+              data-open={cartEntered ? 'on' : 'off'}
+              style={{
+                transitionDuration: `${cartOpen ? enterMs : exitMs}ms`,
+                transitionTimingFunction: cartOpen ? SHEET_SPRING.easing : SHEET_SPRING.exitEasing,
               }}
-            />
-            <Toast
-              open={toast !== null}
-              message={toast ?? ''}
-              onDismiss={() => setToast(null)}
-            />
-          </div>
-        )}
+            >
+              <Cart
+                lines={lines}
+                onClose={() => setCartOpen(false)}
+                onQtyChange={(id, qty) => setLines((l) => setQty(l, id, qty))}
+                onRemove={(id) => setLines((l) => removeLine(l, id))}
+                onCheckout={() => setCartOpen(false)}
+                onQueue={() => { setLines([]); setCartOpen(false); }}
+                onAddCustomer={() => setPickerOpen(true)}
+                // "More options" is frame `88:15458`, not built yet.
+                onMoreOptions={() => setPickerOpen(true)}
+                onClearAll={() => setLines([])}
+                customer={customer}
+                onRemoveCustomer={() => setCustomer(null)}
+              />
+
+              <SelectCustomer
+                open={pickerOpen}
+                customers={customers}
+                onClose={() => setPickerOpen(false)}
+                onSelect={(c) => { setCustomer(c); setPickerOpen(false); }}
+                // The add-customer FORM is not in this band; the sheet's own two
+                // states are. Seeding the list is the honest stand-in so the empty
+                // state has somewhere to go. Logged as #47.
+                onAddCustomer={() => {
+                  setCustomers(CUSTOMERS);
+                  /* The frame's copy is "Customer has been created", which only fits
+                     this path: the sheet's CTA stands in for the add-customer FORM that
+                     band 4 never designs (#47). Selecting an existing customer raises
+                     no toast, because nothing was created. */
+                  setCustomer(CUSTOMERS[0]);
+                  setPickerOpen(false);
+                  setToast('Customer has been created');
+                }}
+              />
+              <Toast
+                open={toast !== null}
+                message={toast ?? ''}
+                onDismiss={() => setToast(null)}
+              />
+            </div>
+          )}
+        </ErrorBoundary>
       </DeviceFrame>
 
       {/* Off by default everywhere, per the root agreement. The showcase flag is

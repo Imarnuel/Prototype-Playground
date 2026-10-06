@@ -82,3 +82,10 @@
   min-height: 0;
   overflow-y: auto;
 }
+
+/* The panel takes focus on open so a keyboard or screen-reader user lands inside the
+   dialog. It is a container, not a control, so it shows no ring of its own; the
+   controls inside keep the platform's. */
+.sheetPanel:focus {
+  outline: none;
+}
