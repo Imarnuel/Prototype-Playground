@@ -358,6 +358,9 @@
 
 .cart__queue {
   flex: none;
+  /* The frame's 120: Figma lays a hug-width button out on its label's width rounded
+     UP (96), so the real 95.4px label would make it 0.6px narrower than drawn. */
+  width: 120px;
   background: var(--color-container-brand-default);
 }
 

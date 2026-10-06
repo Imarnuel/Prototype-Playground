@@ -181,27 +181,30 @@ await pick(page, 'Cart: fill with 4 lines');
 const sample = (act) => page.evaluate((a) => new Promise((done) => {
   const s = document.querySelector('.device__screen').getBoundingClientRect();
   const out = [];
+  const times = [];
   const t0 = performance.now();
   const tick = () => {
     const p = document.querySelector('.quantitySheet');
     out.push(p ? Math.round(p.getBoundingClientRect().top - s.top) : null);
-    if (performance.now() - t0 < 700) requestAnimationFrame(tick); else done(out);
+    times.push(performance.now() - t0);
+    if (performance.now() - t0 < 700) requestAnimationFrame(tick); else done({ out, times });
   };
   if (a === 'open') document.querySelector('button.qtyField__value').click();
   else document.querySelector('.quantitySheet .closeButton').click();
   requestAnimationFrame(tick);
 }), act);
-const entering = await sample('open');
+const { out: entering } = await sample('open');
 await page.waitForTimeout(300);
-const leaving = await sample('close');
+const { out: leaving, times: leaveTimes } = await sample('close');
 const travel = (a) => new Set(a.filter((v) => v !== null && v > 335 && v < 846)).size;
 check('the sheet travels in over several frames', travel(entering) > 4 && entering.at(-1) === 335,
   `${travel(entering)} in-between frames, ends at ${entering.at(-1)}`);
 const gone = leaving.indexOf(null);
-// The shared exit curve is back-loaded (BUILD-PLAN #37): its last frame or two cover
-// most of the distance, so where the final sample lands varies run to run.
-check('and travels out, mounted well into its exit', travel(leaving) > 4 && gone > 0 && leaving[gone - 1] > 550,
-  `${travel(leaving)} in-between frames, last seen at ${leaving[gone - 1]} before unmounting`);
+// The shared exit curve is back-loaded (BUILD-PLAN #37), so where its last painted
+// frame lands varies run to run. What must hold is that the sheet stays mounted for
+// the whole exit — SHEET_SPRING.exitDuration, 300ms — and moves while it does.
+check('and travels out, mounted for its whole exit', travel(leaving) > 4 && gone > 0 && leaveTimes[gone] >= 290,
+  `${travel(leaving)} in-between frames, unmounted at ${Math.round(leaveTimes[gone])}ms`);
 await page.close();
 
 page = await open({ reducedMotion: 'reduce' });

@@ -251,7 +251,7 @@ export const type: Record<string, TypeStyle> = {
     size: 20,
     weight: 600,
     lineHeight: 1.399999976158142,
-    letterSpacing: -2,
+    letterSpacing: -0.4,
     composed: false
   },
   "Body/Base": {
@@ -278,7 +278,7 @@ export const type: Record<string, TypeStyle> = {
     size: 16,
     weight: 400,
     lineHeight: 24,
-    letterSpacing: -2,
+    letterSpacing: -0.32,
     composed: false
   },
   "Label/Base": {

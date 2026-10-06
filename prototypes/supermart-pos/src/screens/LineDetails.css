@@ -44,22 +44,28 @@
   min-width: 0;
 }
 
+/* `88:9527` carries no text style: Inter Semi Bold 18/22 at -2% tracking. */
 .lineDetails__name {
   font-size: 18px;
   font-weight: 600;
   line-height: 22px;
+  letter-spacing: -0.02em;
   color: var(--color-text-default);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/* `88:9529` / `88:9530` carry no text style: 16/20 at -0.2px, Regular for the size
+   and Semi Bold for the price. */
 .lineDetails__sub {
   display: flex;
   justify-content: space-between;
   gap: var(--spacing-200);
   font-size: 16px;
+  font-weight: 400;
   line-height: 20px;
+  letter-spacing: -0.2px;
   color: var(--color-text-subtle);
 }
 .lineDetails__sub strong { font-weight: 600; color: var(--color-text-default); }
@@ -70,10 +76,22 @@
   justify-content: space-between;
 }
 
+/* `88:9534`, no text style: Regular 16/20 at -0.2px. */
 .lineDetails__unitPrice {
   font-size: 16px;
+  font-weight: 400;
   line-height: 20px;
+  letter-spacing: -0.2px;
   color: var(--color-text-subtle);
+}
+
+/* The quantity field here (`88:9532`) sets its value in Body/Large — the Cart's own
+   field uses 14/20. Same component, the instance's own text override. */
+.lineDetails__qty .qtyField__value {
+  font-size: var(--type-Body-Large-size);
+  font-weight: var(--type-Body-Large-weight);
+  line-height: var(--type-Body-Large-line-height);
+  letter-spacing: var(--type-Body-Large-letter-spacing);
 }
 
 /* Divider/size=8px: a zero-height line with an 8px Color/border/subtle stroke drawn
@@ -200,15 +218,18 @@
 }
 
 /* Frame 5073 / 5074: 60x52 each; the chosen one radius Border radius/200. */
+/* Unchosen "₦" (`88:9564`) is Body/Reg/Large: 16/24 at -2%, which is -0.32px. */
 .segmented__option {
   flex: none;
   width: 60px;
   height: 52px;
+  font-size: var(--type-Body-Reg-Large-size);
+  font-weight: var(--type-Body-Reg-Large-weight);
+  line-height: var(--type-Body-Reg-Large-line-height);
+  letter-spacing: var(--type-Body-Reg-Large-letter-spacing);
   border: 0;
   border-radius: var(--radius-200);
   background: none;
-  font-size: 16px;
-  line-height: 24px;
   color: var(--color-text-subtlest);
   cursor: pointer;
 }

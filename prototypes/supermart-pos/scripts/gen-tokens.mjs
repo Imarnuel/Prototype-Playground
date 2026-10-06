@@ -29,6 +29,12 @@ const resolve = (raw, field, styleName) => {
   return null;
 };
 
+/* The variable dump writes letter-spacing as a bare number and drops its unit. Two
+   styles in this file are PERCENT, read off the style objects themselves
+   (`getStyleByIdAsync(...).letterSpacing.unit`); every other one is pixels. A bare
+   -2 taken as pixels set Body/Reg/Large six times too tight. */
+const PERCENT_LETTER_SPACING = new Set(['Body/Reg/Large', 'H/6']);
+
 const type = {};
 for (const [name, raw] of Object.entries(V)) {
   const m = typeof raw === 'string' && raw.match(FONT_RE);
@@ -46,7 +52,9 @@ for (const [name, raw] of Object.entries(V)) {
     size: resolve(size, 'size', name),
     weight: Number(weight.trim()),
     lineHeight: resolve(lineHeight, 'lineHeight', name),
-    letterSpacing: resolve(letterSpacing, 'letterSpacing', name),
+    letterSpacing: PERCENT_LETTER_SPACING.has(name)
+      ? (resolve(letterSpacing, 'letterSpacing', name) * resolve(size, 'size', name)) / 100
+      : resolve(letterSpacing, 'letterSpacing', name),
     /** True where one or more fields came from a primitive variable rather than a literal. */
     composed: refs.length > 0,
   };
