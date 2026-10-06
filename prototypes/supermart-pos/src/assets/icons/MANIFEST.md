@@ -1,6 +1,6 @@
 # Icons
 
-All 22 are present, 19 here and 3 in `shared/src/assets/`. `chevron-down` joined with
+All 24 are present, 21 here and 3 in `shared/src/assets/`. `chevron-down` joined with
 the order total (band `115:8774`), exported from its instance `88:8718`. They are the screens' own
 Figma exports — nothing here was substituted, redrawn, or traced.
 
