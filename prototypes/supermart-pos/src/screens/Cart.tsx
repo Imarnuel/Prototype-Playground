@@ -22,6 +22,8 @@ type CartProps = {
   onQtyChange: (productId: string, qty: number) => void;
   /** Opens the Quantity sheet over this line. */
   onEditQuantity: (productId: string) => void;
+  /** Opens Item details. Not designed which control opens it; the name does. */
+  onOpenDetails: (productId: string) => void;
   onRemove: (productId: string) => void;
   onCheckout: () => void;
   onQueue: () => void;
@@ -37,7 +39,7 @@ type CartProps = {
 };
 
 export function Cart({
-  lines, onClose, onQtyChange, onEditQuantity, onRemove, onCheckout, onQueue, onAddCustomer,
+  lines, onClose, onQtyChange, onEditQuantity, onOpenDetails, onRemove, onCheckout, onQueue, onAddCustomer,
   onMoreOptions, onClearAll, customer, onRemoveCustomer, totalOpen, onToggleTotal,
 }: CartProps) {
   const reducedMotion = useReducedMotion();
@@ -124,7 +126,8 @@ export function Cart({
                       <span className="cartLine__scrim" />
                     </span>
                     <div className="cartLine__info">
-                      <span className="cartLine__name" title={product.name}>{product.name}</span>
+                      <button type="button" className="cartLine__name" title={product.name}
+                        onClick={() => onOpenDetails(line.productId)}>{product.name}</button>
                       <QtyInputField
                         count={line.count}
                         unit={unitFor(product, line.unitId).abbrev}

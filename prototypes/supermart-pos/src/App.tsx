@@ -7,12 +7,13 @@ import { SalesPoint } from './screens/SalesPoint';
 import { Cart } from './screens/Cart';
 import { SelectCustomer } from './screens/SelectCustomer';
 import { QuantitySheet } from './screens/QuantitySheet';
+import { LineDetails } from './screens/LineDetails';
 import { PRODUCTS, maxCount, unitFor, type Product } from './data/catalogue';
 import { CUSTOMERS, type Customer } from './data/customers';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Toast, type ToastTone } from './components/Toast';
 import { usePresented } from './hooks/usePresented';
-import { addToCart, commitQuantity, removeLine, setCount, type CartLine } from './state/cart';
+import { addToCart, commitDetails, commitQuantity, removeLine, setCount, type CartLine } from './state/cart';
 import './App.css';
 
 type Forced = 'loading' | 'error' | 'empty' | undefined;
@@ -46,6 +47,13 @@ export function App() {
      so every open starts a fresh draft. */
   const [qty, setQty] = useState<{ line: CartLine; opening: number; editing: boolean } | null>(null);
   const [qtyOpen, setQtyOpen] = useState(false);
+  // Same pattern for Item details: a snapshot per opening, kept through the exit.
+  const [details, setDetails] = useState<{ line: CartLine; opening: number } | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const openDetails = (line: CartLine) => {
+    setDetails((d) => ({ line, opening: (d?.opening ?? 0) + 1 }));
+    setDetailsOpen(true);
+  };
   const openQuantity = (line: CartLine, editing = false) => {
     setQty((q) => ({ line, opening: (q?.opening ?? 0) + 1, editing }));
     setQtyOpen(true);
@@ -66,7 +74,7 @@ export function App() {
 
   const resetScreens = () => {
     setForced(undefined); setCartOpen(false); setPickerOpen(false);
-    setCustomer(null); setCustomers(CUSTOMERS); hideToast(); setTotalOpen(false); setQtyOpen(false);
+    setCustomer(null); setCustomers(CUSTOMERS); hideToast(); setTotalOpen(false); setQtyOpen(false); setDetailsOpen(false);
     setResetNonce((n) => n + 1);
   };
 
@@ -118,6 +126,19 @@ export function App() {
         setLines([line, { productId: 'noo-multipack', unitId: 'each', count: 2 }]);
         setCartOpen(true);
         openQuantity(line, editing);
+      },
+    })),
+    ...([
+      ['Item details', undefined],
+      ['Item details: discount applied', { kind: 'percent', percent: 15 }],
+    ] as const).map(([label, discount]): DevToolbarItem => ({
+      label,
+      group: 'States',
+      onSelect: () => {
+        const line: CartLine = { productId: 'bev-cola', unitId: 'each', count: 1, ...(discount ? { discount } : {}) };
+        setLines([line, { productId: 'noo-multipack', unitId: 'each', count: 2 }]);
+        setCartOpen(true);
+        openDetails(line);
       },
     })),
     {
@@ -186,6 +207,7 @@ export function App() {
                 onClose={() => setCartOpen(false)}
                 onQtyChange={(id, count) => setLines((l) => setCount(l, id, count))}
                 onEditQuantity={(id) => openQuantity(lines.find((l) => l.productId === id)!)}
+                onOpenDetails={(id) => openDetails(lines.find((l) => l.productId === id)!)}
                 onRemove={(id) => setLines((l) => removeLine(l, id))}
                 onCheckout={() => setCartOpen(false)}
                 onQueue={() => { setLines([]); setCartOpen(false); }}
@@ -229,6 +251,19 @@ export function App() {
                   onCommit={(unitId, count) => {
                     setLines((l) => commitQuantity(l, qty.line.productId, unitId, count));
                     setQtyOpen(false);
+                  }}
+                />
+              )}
+
+              {details && (
+                <LineDetails
+                  key={details.opening}
+                  open={detailsOpen}
+                  line={details.line}
+                  onClose={() => setDetailsOpen(false)}
+                  onCommit={(edits) => {
+                    setLines((l) => commitDetails(l, details.line.productId, edits));
+                    setDetailsOpen(false);
                   }}
                 />
               )}

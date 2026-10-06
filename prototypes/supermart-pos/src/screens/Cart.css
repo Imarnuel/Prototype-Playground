@@ -212,6 +212,11 @@
 }
 
 .cartLine__name {
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
   font-size: var(--type-Label-Large-size);
   font-weight: var(--type-Label-Large-weight);
   line-height: var(--type-Label-Large-line-height);
