@@ -23,7 +23,7 @@ anything — it records **74** inconsistencies, including that 31 frames share t
 
 | # | Screen | Node | State |
 |---|---|---|---|
-| 1 | Sales Point | `88:8079` | 5 coordinates outside 0.5px: the title's text width (-1.28, #56), and four from deliberate changes — the requested +8px chip gap (header h, grid y, first card y) and the full-bleed filter strip (w +16); 22/22 flow |
+| 1 | Sales Point | `88:8079` | 0 coordinates outside 0.5px after the designer's spacing pass (header gap 8, 8 below the chips, grid 8 below the header); screens start at the frame's y=50, not the platform's 59 (BUILD-PLAN, "Safe-area top inset"); 22/22 flow |
 | 2 | Cart / Order Preview | `88:8164` | 0 outside 0.5px, 19/19 flow |
 | 3 | Select customer (empty + populated) | `88:11845`, `88:12043` | 0 outside tolerance, 17/17 flow |
 | 4 | Customer added (+ toast) | `88:8243`, `88:8322` | 0 outside 0.5px, 11/11 flow and motion |

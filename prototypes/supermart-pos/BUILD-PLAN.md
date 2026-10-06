@@ -360,6 +360,13 @@ status bar is 402pt wide (inconsistency #9) — an iPhone 16 Pro component — s
 `shared/src/device.ts` already holds `SAFE_AREA.top = 59`, so no code changes; screens
 pad with `var(--safe-top)` and must **not** hardcode 50.
 
+**Reversed on review.** At 59 the Sales Point title sat 25px under the island, against
+the design's 16, and read as too much and unlike iOS. The cramped-cutout worry was
+about the header ROW's top edge, which is invisible; the visible content — the title
+text at y=64, the overflow button at 58 — clears the island by 16 and 10. This study
+now sets `--safe-top: 50px` (index.css), so screens sit exactly where the frames put
+them and coordinate diffs carry no `+9`. The shared frame keeps 59 for other studies.
+
 ### Status bar is 393 wide, not the component's 402
 
 Inconsistency #9: 89 of 95 instances are a 402pt (iPhone 16 Pro) status bar on a 393pt

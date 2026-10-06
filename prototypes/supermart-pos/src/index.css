@@ -92,6 +92,14 @@ select {
   background: linear-gradient(0deg, rgb(0 0 0 / 10%) 0%, rgb(0 0 0 / 0%) 100%);
 }
 
+/* The frames start every screen at y=50, where their status bar ends, not at the
+   platform's 59pt safe area. Followed on review (BUILD-PLAN, "Safe-area top inset"):
+   at 59 the title sat 25px under the Dynamic Island against the design's 16, which
+   read as too much. What clears the island is the visible content — the title text
+   at 64, the overflow button at 58 — not the header row's invisible top edge. Scoped
+   to this study; the shared device frame keeps the iOS default. */
+.device__screen { --safe-top: 50px; }
+
 /* --- Continuous corners --------------------------------------------------------
    Apple's corner smoothing — Figma's 60%, the iOS value — on every rounded corner.
    A smoothed corner keeps a plain corner's depth on the diagonal but starts its

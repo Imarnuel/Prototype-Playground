@@ -33,7 +33,7 @@ const SCALAR = [
   ['88:8079 screen',        '.salesPoint',            'backgroundColor', 'rgb(246, 247, 249)'],
 
   // --- header ------------------------------------------------------------
-  ['88:8081 header',        '.salesPoint__header',    'rowGap',          '17px'],
+  ['88:8081 header',        '.salesPoint__header',    'rowGap',          '8px'],
   ['88:8082 header row',    '.salesPoint__headerRow', 'paddingLeft',     '16px'],
   ['88:8082 header row',    '.salesPoint__headerRow', 'paddingRight',    '16px'],
   ['88:8082 header row',    '.salesPoint__headerRow', 'height',          '56px'],

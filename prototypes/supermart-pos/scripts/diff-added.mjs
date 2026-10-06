@@ -1,7 +1,7 @@
 /** Coordinate diff for "Customer added" (88:8243) and its toast (88:8322 / 88:8401). */
 import pw from '/opt/node-tools/node_modules/playwright/index.js';
 const URL = process.argv[2] ?? 'http://127.0.0.1:4402/';
-const SHIFT = 9;   // the agreed safe-area deviation: design status bar 50, device 59
+const SHIFT = 0;   // screens start at the frame's y=50 (index.css), so no shift
 
 // label, selector, x, y, w, h, shift
 const T = [
