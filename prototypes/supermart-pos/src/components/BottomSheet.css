@@ -1,0 +1,84 @@
+/* Sheet chrome shared by every bottom sheet in the study: the blanket, the panel,
+   the board's `.Modal header` (49 uses) and the scrolling body. Extracted unchanged
+   from SelectCustomer.css once a second and third sheet were due — the extraction was
+   proven pure by a computed-style snapshot of every element, both states, before and
+   after. Geometry notes below are the Select customer sheet's, which is the inset
+   variant every sheet so far uses. */
+.blanket {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* The sheet is bottom-docked with a uniform 6px inset: the frame places it at
+     x=6 y=126 w=381 h=720 on an 852 screen, so 6 from left, right and bottom. */
+  justify-content: flex-end;
+  padding: 6px;
+  background: var(--color-container-blanket);
+  backdrop-filter: blur(3px);
+  transition-property: opacity;
+}
+
+.blanket[data-open='off'] { opacity: 0; }
+.blanket[data-open='on'] { opacity: 1; }
+
+.blanket[data-open='off'] .sheetPanel { transform: translateY(100%); }
+.blanket[data-open='on'] .sheetPanel { transform: translateY(0); }
+
+.sheetPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+  /* 720 is the populated sheet's drawn height; beyond that the list scrolls rather
+     than the sheet growing past the status bar. */
+  max-height: 720px;
+  background: var(--color-surface-default);
+  border-radius: var(--radius-650);
+  overflow: clip;
+  transition-property: transform;
+  transition-duration: inherit;
+  transition-timing-function: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blanket,
+  .sheetPanel { transition-duration: 0ms !important; }
+}
+
+/* --- .Modal header (49 uses on the board) --- */
+.modalHeader {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 12px var(--spacing-400);
+  flex: none;
+  overflow: clip;
+}
+
+.modalHeader__title {
+  /* Absolutely centred in the frame, so a wide leading control cannot push it off
+     centre. Heading/H2. */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: var(--type-Heading-H2-size);
+  font-weight: var(--type-Heading-H2-weight);
+  line-height: var(--type-Heading-H2-line-height);
+  letter-spacing: var(--type-Heading-H2-letter-spacing);
+  color: var(--color-text-default);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-400);
+  align-items: flex-start;
+  padding: 0 16px 48px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
