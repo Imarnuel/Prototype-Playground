@@ -6,12 +6,13 @@ import {
 import { SalesPoint } from './screens/SalesPoint';
 import { Cart } from './screens/Cart';
 import { SelectCustomer } from './screens/SelectCustomer';
+import { QuantitySheet } from './screens/QuantitySheet';
 import { PRODUCTS, maxCount, unitFor, type Product } from './data/catalogue';
 import { CUSTOMERS, type Customer } from './data/customers';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Toast, type ToastTone } from './components/Toast';
 import { usePresented } from './hooks/usePresented';
-import { addToCart, removeLine, setCount, type CartLine } from './state/cart';
+import { addToCart, commitQuantity, removeLine, setCount, type CartLine } from './state/cart';
 import './App.css';
 
 type Forced = 'loading' | 'error' | 'empty' | undefined;
@@ -40,6 +41,15 @@ export function App() {
     setToast((t) => ({ open: true, message, tone, shown: t.shown + 1 }));
   const hideToast = useCallback(() => setToast((t) => ({ ...t, open: false })), []);
   const [totalOpen, setTotalOpen] = useState(false);
+  /* The line as it stood when the Quantity sheet opened. Kept after it closes, so the
+     sheet's exit renders the same content it entered with; `opening` re-keys the sheet
+     so every open starts a fresh draft. */
+  const [qty, setQty] = useState<{ line: CartLine; opening: number; editing: boolean } | null>(null);
+  const [qtyOpen, setQtyOpen] = useState(false);
+  const openQuantity = (line: CartLine, editing = false) => {
+    setQty((q) => ({ line, opening: (q?.opening ?? 0) + 1, editing }));
+    setQtyOpen(true);
+  };
   const reducedMotion = useReducedMotion();
 
   /* A tap the shelf can't supply returns the same lines from `addToCart`. Saying why
@@ -56,7 +66,7 @@ export function App() {
 
   const resetScreens = () => {
     setForced(undefined); setCartOpen(false); setPickerOpen(false);
-    setCustomer(null); setCustomers(CUSTOMERS); hideToast(); setTotalOpen(false);
+    setCustomer(null); setCustomers(CUSTOMERS); hideToast(); setTotalOpen(false); setQtyOpen(false);
     setResetNonce((n) => n + 1);
   };
 
@@ -94,6 +104,22 @@ export function App() {
         setCartOpen(true); setTotalOpen(true);
       },
     },
+    ...([
+      ['Quantity sheet', 'bev-cola', 10, false],
+      ['Quantity sheet: editing', 'bev-cola', 10, true],
+      // 2 malt drinks is 2 each but 12 in packs of 6, past the 3 on the shelf.
+      ['Quantity sheet: unit over stock', 'bev-malt', 2, false],
+    ] as const).map(([label, productId, count, editing]): DevToolbarItem => ({
+      label,
+      group: 'States',
+      onSelect: () => {
+        // The frame's own state: 10 single units, every pack size available.
+        const line: CartLine = { productId, unitId: 'each', count };
+        setLines([line, { productId: 'noo-multipack', unitId: 'each', count: 2 }]);
+        setCartOpen(true);
+        openQuantity(line, editing);
+      },
+    })),
     {
       // Through the real path, so it proves the clamp rather than forcing a toast.
       label: 'Sales point: out-of-stock tap',
@@ -159,6 +185,7 @@ export function App() {
                 lines={lines}
                 onClose={() => setCartOpen(false)}
                 onQtyChange={(id, count) => setLines((l) => setCount(l, id, count))}
+                onEditQuantity={(id) => openQuantity(lines.find((l) => l.productId === id)!)}
                 onRemove={(id) => setLines((l) => removeLine(l, id))}
                 onCheckout={() => setCartOpen(false)}
                 onQueue={() => { setLines([]); setCartOpen(false); }}
@@ -191,6 +218,20 @@ export function App() {
                   showToast('Customer has been created');
                 }}
               />
+
+              {qty && (
+                <QuantitySheet
+                  key={qty.opening}
+                  open={qtyOpen}
+                  line={qty.line}
+                  startEditing={qty.editing}
+                  onClose={() => setQtyOpen(false)}
+                  onCommit={(unitId, count) => {
+                    setLines((l) => commitQuantity(l, qty.line.productId, unitId, count));
+                    setQtyOpen(false);
+                  }}
+                />
+              )}
             </div>
           )}
 

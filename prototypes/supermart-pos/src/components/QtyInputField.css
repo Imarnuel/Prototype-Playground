@@ -24,7 +24,11 @@
   flex: none;
   border: 0;
   border-radius: var(--radius-full);
-  background: var(--color-container-neutral-less-bold-default);
+  /* Bare glyphs, no circle: the five-row majority this field follows (#30) draws its
+     minus and plus unfilled; only the sixth row's `.Quantity items` carry #f0f2f5.
+     This once named a misspelt token, which resolved to nothing — right by accident
+     (#75). */
+  background: none;
   cursor: pointer;
   overflow: clip;
 }
@@ -47,4 +51,21 @@
   line-height: var(--type-Body-Base-line-height);
   letter-spacing: var(--type-Body-Base-letter-spacing);
   color: var(--color-text-default);
+}
+
+button.qtyField__value {
+  position: relative;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+/* 60x20 as drawn. The target grows to the field's full 36px height without moving
+   the glyphs; it cannot grow sideways into the minus and plus beside it. */
+button.qtyField__value::after {
+  content: '';
+  position: absolute;
+  inset: -8px 0;
 }

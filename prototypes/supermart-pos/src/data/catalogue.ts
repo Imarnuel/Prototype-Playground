@@ -150,7 +150,8 @@ export const PRODUCTS: readonly Product[] = [
     priceMinor: 50000,
     barcode: '6151000000010',
     taxClass: 'standard',
-    stock: 74,
+    // Enough for the Quantity frame's own state: 10 boxes of 16 is 160.
+    stock: 180,
     units: units(['pack', 4], ['carton', 8], ['box', 16]),
     image: 'cola.webp',
   },

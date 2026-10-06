@@ -60,6 +60,9 @@
   /* Absolutely centred in the frame, so a wide leading control cannot push it off
      centre. Heading/H2. */
   position: absolute;
+  /* 18 from the header's top in all 43 non-draggable `.Modal header` instances — 2px
+     above centre, absolutely placed in the frame. Centring put it at 20. */
+  top: 18px;
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
@@ -70,6 +73,34 @@
   color: var(--color-text-default);
   text-align: center;
   white-space: nowrap;
+}
+
+/* `.Modal header`'s trailing "Button Icon": 40x40, Color/container/brand/default,
+   fully round, 10px padding, the frame's xs shadow, a 20x20 check in
+   Color/icon/brand. Pushed to the trailing edge; the title stays absolutely centred,
+   so a sheet with it and a sheet without it share one header height. */
+.modalHeader__confirm {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
+  padding: 10px;
+  flex: none;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-container-brand-default);
+  box-shadow: var(--shadow-xs);
+  cursor: pointer;
+}
+
+/* 40x40 is under the 44x44 minimum; grown with ::after, as CloseButton is. */
+.modalHeader__confirm::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
 }
 
 .modalBody {

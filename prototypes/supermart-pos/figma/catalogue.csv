@@ -1,5 +1,5 @@
 brand,name,size,fullName,category,price,wasPrice,barcode,stock,status,image,id
-Zivra,Cola,50cl PET,Zivra Cola 50cl PET,Beverages,₦500,,6151000000010,74,In stock,cola.webp,bev-cola
+Zivra,Cola,50cl PET,Zivra Cola 50cl PET,Beverages,₦500,,6151000000010,180,In stock,cola.webp,bev-cola
 Zivra,Lemon-Lime Soda,50cl PET,Zivra Lemon-Lime Soda 50cl PET,Beverages,₦500,,6151000000027,68,In stock,lemonlime.webp,bev-lemonlime
 Zivra,Orange Soda,50cl PET,Zivra Orange Soda 50cl PET,Beverages,₦500,,6151000000034,61,In stock,orangesoda.webp,bev-orangesoda
 Zivra,Iced Tea Lemon,50cl PET,Zivra Iced Tea Lemon 50cl PET,Beverages,₦800,,6151000000041,44,In stock,icedtea.webp,bev-icedtea

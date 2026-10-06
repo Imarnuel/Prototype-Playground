@@ -16,7 +16,9 @@
  */
 import add_one from './add-one.svg';
 import cart from './cart.svg';
+import check from './check.svg';
 import check_circle from './check-circle.svg';
+import check_selected from './check-selected.svg';
 import chevron_down from './chevron-down.svg';
 import chevron_right from './chevron-right.svg';
 import dots_horizontal from './dots-horizontal.svg';
@@ -25,8 +27,10 @@ import filter_lines from './filter-lines.svg';
 import grid_01 from './grid-01.svg';
 import menu_01 from './menu-01.svg';
 import minus from './minus.svg';
+import minus_lg from './minus-lg.svg';
 import plus from './plus.svg';
 import plus_circle from './plus-circle.svg';
+import plus_lg from './plus-lg.svg';
 import search_sm from './search-sm.svg';
 import shopping_cart_01 from './shopping-cart-01.svg';
 import trash_03 from './trash-03.svg';
@@ -39,7 +43,9 @@ import x_close from './x-close.svg';
 export type IconName =
   | 'add-one'
   | 'cart'
+  | 'check'
   | 'check-circle'
+  | 'check-selected'
   | 'chevron-down'
   | 'chevron-right'
   | 'dots-horizontal'
@@ -48,8 +54,10 @@ export type IconName =
   | 'grid-01'
   | 'menu-01'
   | 'minus'
+  | 'minus-lg'
   | 'plus'
   | 'plus-circle'
+  | 'plus-lg'
   | 'search-sm'
   | 'shopping-cart-01'
   | 'trash-03'
@@ -62,7 +70,9 @@ export type IconName =
 export const ICONS: Record<IconName, { src: string; width: number; height: number }> = {
   'add-one': { src: add_one, width: 20, height: 20 },
   'cart': { src: cart, width: 19, height: 18 },
+  'check': { src: check, width: 20, height: 20 },
   'check-circle': { src: check_circle, width: 48, height: 48 },
+  'check-selected': { src: check_selected, width: 20, height: 20 },
   'chevron-down': { src: chevron_down, width: 20, height: 20 },
   'chevron-right': { src: chevron_right, width: 16, height: 16 },
   'dots-horizontal': { src: dots_horizontal, width: 20, height: 20 },
@@ -71,8 +81,10 @@ export const ICONS: Record<IconName, { src: string; width: number; height: numbe
   'grid-01': { src: grid_01, width: 20, height: 20 },
   'menu-01': { src: menu_01, width: 20, height: 20 },
   'minus': { src: minus, width: 16, height: 16 },
+  'minus-lg': { src: minus_lg, width: 32, height: 32 },
   'plus': { src: plus, width: 16, height: 16 },
   'plus-circle': { src: plus_circle, width: 24, height: 24 },
+  'plus-lg': { src: plus_lg, width: 32, height: 32 },
   'search-sm': { src: search_sm, width: 20, height: 20 },
   'shopping-cart-01': { src: shopping_cart_01, width: 16, height: 16 },
   'trash-03': { src: trash_03, width: 20, height: 20 },

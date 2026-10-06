@@ -226,6 +226,9 @@ const CART = [
   ['88:8188 qty field',     '.qtyField',             'padding',         '4px 8px'],
   ['88:8188 qty field',     '.qtyField',             'columnGap',       '4px'],
   ['88:8188 qty field',     '.qtyField',             'height',          '36px'],
+  // The five-row majority draws bare glyphs (#30); the CSS once named a misspelt token
+  // that resolved to nothing, right only by accident (#75).
+  ['88:8188 qty step',      '.qtyField__step',       'backgroundColor', 'rgba(0, 0, 0, 0)'],
   ['I...4383 qty value',    '.qtyField__value',      'fontSize',        '14px'],
   ['I...4383 qty value',    '.qtyField__value',      'fontWeight',      '400'],
   ['I...4383 qty value',    '.qtyField__value',      'lineHeight',      '20px'],
@@ -376,6 +379,75 @@ const TOTAL_DISCOUNT = [
   ['88:9430 discount',      '.orderTotal__deduction', 'color',          'rgb(94, 106, 130)'],
 ];
 
+/* Quantity sheet, `88:11532`. Not asserted, on purpose: the Measurement card's
+   fixed 278 height (#77). */
+const QTY = [
+  ['88:11612 sheet',        '.quantitySheet',          'backgroundColor', 'rgb(246, 247, 249)'],
+  ['88:11612 sheet',        '.quantitySheet',          'borderRadius',    '28px'],
+  ['I...8087 close',        '.quantitySheet .closeButton', 'backgroundColor', 'rgb(255, 255, 255)'],
+  ['I...8149 confirm',      '.modalHeader__confirm',   'backgroundColor', 'rgb(231, 237, 249)'],
+  ['I...8149 confirm',      '.modalHeader__confirm',   'borderRadius',    '9999px'],
+  ['I...8149 confirm',      '.modalHeader__confirm',   'boxShadow',       '0 1px 2px 0 #0a0d120d'],
+  ['I...8149 confirm',      '.modalHeader__confirm',   'padding',         '10px'],
+  ['I...8149 confirm',      '.modalHeader__confirm',   'width',           '40px'],
+  ['I...8088 title',        '.quantitySheet .modalHeader__title', 'fontSize',      '18px'],
+  ['I...8088 title',        '.quantitySheet .modalHeader__title', 'fontWeight',    '600'],
+  ['I...8088 title',        '.quantitySheet .modalHeader__title', 'lineHeight',    '24px'],
+  ['I...8088 title',        '.quantitySheet .modalHeader__title', 'letterSpacing', '-0.32px'],
+  ['I...8088 title',        '.quantitySheet .modalHeader__title', 'color',         'rgb(20, 31, 51)'],
+  ['88:11614 body',         '.quantitySheet .modalBody', 'paddingLeft',   '16px'],
+  ['88:11614 body',         '.quantitySheet .modalBody', 'paddingRight',  '16px'],
+  ['88:11615 body stack',   '.quantitySheet .modalBody', 'rowGap',        '24px'],
+  ['88:11615 body stack',   '.quantitySheet .modalBody', 'paddingBottom', '32px'],
+  ['88:11616 stepper card', '.qtyStepper',             'backgroundColor', 'rgb(255, 255, 255)'],
+  ['88:11616 stepper card', '.qtyStepper',             'borderRadius',    '16px'],
+  ['88:11616 stepper card', '.qtyStepper',             'padding',         '12px'],
+  ['88:11618 step',         '.qtyStepper__step',       'backgroundColor', 'rgba(12, 14, 24, 0.04)'],
+  ['88:11618 step',         '.qtyStepper__step',       'borderRadius',    '1000px'],
+  ['88:11618 step',         '.qtyStepper__step',       'width',           '56px'],
+  ['88:11618 step',         '.qtyStepper__step',       'height',          '56px'],
+  ['88:11620 count',        '.qtyStepper__value',      'fontSize',        '24px'],
+  ['88:11620 count',        '.qtyStepper__value',      'fontWeight',      '600'],
+  ['88:11620 count',        '.qtyStepper__value',      'lineHeight',      '28px'],
+  ['88:11620 count',        '.qtyStepper__value',      'letterSpacing',   '-0.64px'],
+  ['88:11620 count "10"',   '.qtyStepper__count',      'color',           'rgb(20, 31, 51)'],
+  ['88:11620 count "ea"',   '.qtyStepper__unit',       'color',           'rgb(122, 133, 153)'],
+  ['88:11623 measurement',  '.measurement',            'rowGap',          '8px'],
+  ['88:11624 "Measurement"', '.measurement__title',    'fontSize',        '16px'],
+  ['88:11624 "Measurement"', '.measurement__title',    'fontWeight',      '600'],
+  ['88:11624 "Measurement"', '.measurement__title',    'lineHeight',      '20px'],
+  ['88:11624 "Measurement"', '.measurement__title',    'letterSpacing',   '-0.2px'],
+  ['88:11624 "Measurement"', '.measurement__title',    'color',           'rgb(94, 106, 130)'],
+  ['88:11625 list',         '.measurement__list',      'backgroundColor', 'rgb(255, 255, 255)'],
+  ['88:11625 list',         '.measurement__list',      'borderRadius',    '20px'],
+  ['88:11625 list',         '.measurement__list',      'paddingLeft',     '16px'],
+  ['88:11625 list',         '.measurement__list',      'paddingRight',    '16px'],
+  ['88:11626 row',          '.measurement__row',       'height',          '56px'],
+  ['88:11626 row',          '.measurement__row',       'columnGap',       '8px'],
+  ['88:11626 row',          '.measurement__row',       'boxShadow',       'inset 0 -1px 0 0 #252b3714'],
+  ['88:11628 label',        '.measurement__label',     'fontSize',        '16px'],
+  ['88:11628 label',        '.measurement__label',     'fontWeight',      '400'],
+  ['88:11628 label',        '.measurement__label',     'lineHeight',      '24px'],
+  ['88:11628 label',        '.measurement__label',     'letterSpacing',   '-0.24px'],
+  ['88:11628 label',        '.measurement__label',     'color',           'rgb(20, 31, 51)'],
+  ['88:11629 equivalent',   '.measurement__each',      'fontSize',        '14px'],
+  ['88:11629 equivalent',   '.measurement__each',      'fontWeight',      '400'],
+  ['88:11629 equivalent',   '.measurement__each',      'lineHeight',      '20px'],
+  ['88:11629 equivalent',   '.measurement__each',      'letterSpacing',   '-0.2px'],
+  ['88:11629 equivalent',   '.measurement__each',      'color',           'rgb(94, 106, 130)'],
+];
+
+/* Editing, `88:11647`: the caret is Color/icon/brand. */
+const QTY_EDIT = [
+  ['88:11738 caret',        '.qtyStepper__input',      'caretColor',      'rgb(44, 74, 139)'],
+  ['88:11737 count "10"',   '.qtyStepper__input',      'color',           'rgb(20, 31, 51)'],
+  ['88:11737 count "10"',   '.qtyStepper__input',      'fontSize',        '24px'],
+  ['88:11737 count "10"',   '.qtyStepper__input',      'fontWeight',      '600'],
+  ['88:11737 count "10"',   '.qtyStepper__input',      'letterSpacing',   '-0.64px'],
+  ['88:11739 unit "ea"',    '.qtyStepper__unit',       'color',           'rgb(122, 133, 153)'],
+  ['88:11735 group',        '.qtyStepper__value',      'columnGap',       '4px'],
+];
+
 const browser = await pw.chromium.launch({ executablePath: EXE });
 const page = await browser.newPage({ viewport: { width: 1200, height: 1100 } });
 await page.goto(URL + '?dev=1', { waitUntil: 'networkidle' });
@@ -488,9 +560,13 @@ await page.waitForTimeout(700);
 fails += await run('Order total open', TOTAL_OPEN);
 await pick('Cart: total expanded');
 fails += await run('Order total discount', TOTAL_DISCOUNT);
+await pick('Quantity sheet');
+fails += await run('Quantity sheet', QTY);
+await pick('Quantity sheet: editing');
+fails += await run('Quantity sheet editing', QTY_EDIT);
 
 const total = SCALAR.length + COMPOUND.length + CART.length + SHEET.length + EMPTY.length + ADDED.length + TOAST.length
-  + TOTAL.length + TOTAL_OPEN.length + TOTAL_DISCOUNT.length;
+  + TOTAL.length + TOTAL_OPEN.length + TOTAL_DISCOUNT.length + QTY.length + QTY_EDIT.length;
 console.log('-'.repeat(60));
 console.log(`${total} properties checked against Figma nodes, ${fails} differ`);
 await browser.close();

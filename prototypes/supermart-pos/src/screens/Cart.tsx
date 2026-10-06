@@ -20,6 +20,8 @@ type CartProps = {
   lines: readonly CartLine[];
   onClose: () => void;
   onQtyChange: (productId: string, qty: number) => void;
+  /** Opens the Quantity sheet over this line. */
+  onEditQuantity: (productId: string) => void;
   onRemove: (productId: string) => void;
   onCheckout: () => void;
   onQueue: () => void;
@@ -35,7 +37,7 @@ type CartProps = {
 };
 
 export function Cart({
-  lines, onClose, onQtyChange, onRemove, onCheckout, onQueue, onAddCustomer,
+  lines, onClose, onQtyChange, onEditQuantity, onRemove, onCheckout, onQueue, onAddCustomer,
   onMoreOptions, onClearAll, customer, onRemoveCustomer, totalOpen, onToggleTotal,
 }: CartProps) {
   const reducedMotion = useReducedMotion();
@@ -128,6 +130,7 @@ export function Cart({
                         unit={unitFor(product, line.unitId).abbrev}
                         max={maxCount(product, line.unitId)}
                         onChange={(next) => onQtyChange(line.productId, next)}
+                        onValuePress={() => onEditQuantity(line.productId)}
                       />
                     </div>
                   </div>

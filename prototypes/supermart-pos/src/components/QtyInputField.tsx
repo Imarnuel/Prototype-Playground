@@ -10,7 +10,7 @@ import './QtyInputField.css';
  * `Color/border/input` and "each". The five-row majority is built; logged as #30.
  */
 export function QtyInputField({
-  count, unit, onChange, max, min = 0,
+  count, unit, onChange, max, min = 0, onValuePress,
 }: {
   count: number;
   /** The unit's abbreviation — "ea", "pck" — so a line in packs reads as packs. */
@@ -20,7 +20,17 @@ export function QtyInputField({
   /** 0 in the Cart, where stepping to zero removes the line; 1 inside an editing
       sheet, where a draft must never reach zero or below. */
   min?: number;
+  /** Opens the Quantity sheet. The design never says what opens it; the value is the
+      one part of the field that does nothing else, so it is the entry point —
+      interpreted, BUILD-PLAN #76. */
+  onValuePress?: () => void;
 }) {
+  const value = (
+    <>
+      <span>{count}</span>
+      <span>{unit}</span>
+    </>
+  );
   return (
     <div className="qtyField">
       <button
@@ -32,10 +42,18 @@ export function QtyInputField({
       >
         <Icon name="minus" />
       </button>
-      <span className="qtyField__value">
-        <span>{count}</span>
-        <span>{unit}</span>
-      </span>
+      {onValuePress ? (
+        <button
+          type="button"
+          className="qtyField__value"
+          onClick={onValuePress}
+          aria-label={`Quantity ${count} ${unit}. Change quantity or unit`}
+        >
+          {value}
+        </button>
+      ) : (
+        <span className="qtyField__value">{value}</span>
+      )}
       <button
         type="button"
         className="qtyField__step"

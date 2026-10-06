@@ -1,6 +1,7 @@
-import { useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useRef, type KeyboardEvent, type ReactNode, type RefObject } from 'react';
 import { SHEET_SPRING, duration, useReducedMotion } from '@playground/shared';
 import { CloseButton } from './CloseButton';
+import { Icon } from './Icon';
 import { usePresented } from '../hooks/usePresented';
 import './BottomSheet.css';
 
@@ -13,7 +14,7 @@ import './BottomSheet.css';
  * made it the third sheet. Props arrive with their first real user, not ahead of it.
  */
 export function BottomSheet({
-  open, title, onClose, closeLabel, children, dismissOnBlanket = true,
+  open, title, onClose, closeLabel, children, dismissOnBlanket = true, confirm, className, initialFocus,
 }: {
   open: boolean;
   /** Visible heading, and the dialog's accessible name. */
@@ -24,6 +25,16 @@ export function BottomSheet({
   /** Off for sheets that edit a draft: a stray tap on the blanket must not throw the
       edits away. Those sheets close only through their own close and confirm. */
   dismissOnBlanket?: boolean;
+  /** The header's trailing check. Select customer's frame carries it at opacity 0
+      (#43) and passes none; the draft-editing sheets commit through it. */
+  confirm?: { onPress: () => void; label: string };
+  /** Scopes a sheet's own differences — the Quantity sheet's grey panel, its body
+      spacing — without forking the shared chrome. */
+  className?: string;
+  /** Where focus lands on open, when it should not be the panel itself — a sheet that
+      opens straight into typing. Focused HERE, after the opener is recorded: a child
+      focusing itself on mount would run first and be recorded as the opener. */
+  initialFocus?: RefObject<HTMLElement>;
 }) {
   const { mounted, entered } = usePresented(open);
   const reducedMotion = useReducedMotion();
@@ -38,7 +49,7 @@ export function BottomSheet({
   useEffect(() => {
     if (open) {
       opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      panel.current?.focus({ preventScroll: true });
+      (initialFocus?.current ?? panel.current)?.focus({ preventScroll: true });
       return;
     }
     const back = opener.current;
@@ -78,7 +89,7 @@ export function BottomSheet({
       {/* Stops a tap inside the sheet reaching the blanket's dismiss. */}
       <div
         ref={panel}
-        className="sheetPanel"
+        className={className ? `sheetPanel ${className}` : 'sheetPanel'}
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -88,6 +99,11 @@ export function BottomSheet({
         <header className="modalHeader">
           <CloseButton onPress={onClose} label={closeLabel} />
           <h2 className="modalHeader__title">{title}</h2>
+          {confirm && (
+            <button type="button" className="modalHeader__confirm" onClick={confirm.onPress} aria-label={confirm.label}>
+              <Icon name="check" />
+            </button>
+          )}
         </header>
 
         <div className="modalBody">{children}</div>

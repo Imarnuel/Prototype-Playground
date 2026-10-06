@@ -1,0 +1,164 @@
+/* Quantity sheet — `88:11532` / `88:11647`. Chrome comes from BottomSheet; these are
+   only the ways this sheet differs. */
+
+/* Bottom sheet `88:11612`: Color/surface/secondary/default, where Select customer's
+   is Color/surface/default. */
+.sheetPanel.quantitySheet { background: var(--color-surface-secondary-default); }
+
+/* On the grey panel the close circle is white; on Select customer's white panel it
+   is neutral — either way it contrasts. The frame binds it to Color/icon/inverse, an
+   icon token on a container (#80). */
+.quantitySheet .closeButton { background: var(--color-icon-inverse); }
+
+/* Frame 4939: Spacing/600 between blocks, 32 below the last. */
+.quantitySheet .modalBody {
+  gap: var(--spacing-600);
+  align-items: stretch;
+  padding-bottom: 32px;
+}
+
+/* --- Frame 4980: the stepper card ------------------------------------------- */
+.qtyStepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  flex: none;
+  background: var(--color-surface-default);
+  border-radius: var(--radius-400);
+}
+
+/* Frame 4992 / 4993: 56x56, fully round, Color/container/neutral/default, a 32x32
+   glyph at stroke 3. Already past the 44px minimum. */
+.qtyStepper__step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  flex: none;
+  border: 0;
+  border-radius: 1000px;
+  background: var(--color-container-neutral-default);
+  cursor: pointer;
+}
+
+/* Undesigned: the frame never shows the count at 1 or at the shelf's limit. */
+.qtyStepper__step:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+/* Display/D3. The count is Color/text/default and the unit Color/text/subtlest, in
+   both states — `88:11620` styles them as two runs of one text. */
+.qtyStepper__value {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-50);
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  background: none;
+  cursor: text;
+  font-size: var(--type-Display-D3-size);
+  font-weight: var(--type-Display-D3-weight);
+  line-height: var(--type-Display-D3-line-height);
+  letter-spacing: var(--type-Display-D3-letter-spacing);
+  color: var(--color-text-default);
+  white-space: pre;
+}
+
+.qtyStepper__unit { color: var(--color-text-subtlest); }
+
+/* `88:11647`: the caret is a 1.5px Color/icon/brand line, 28 tall. The native caret
+   takes the colour; its width and height are the platform's. */
+.qtyStepper__input {
+  min-width: 1ch;
+  padding: 0;
+  border: 0;
+  background: none;
+  outline: none;
+  color: var(--color-text-default);
+  caret-color: var(--color-icon-brand);
+  text-align: right;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+/* --- Frame 4995: Measurement ----------------------------------------------- */
+.measurement {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-200);
+  flex: none;
+}
+
+.measurement__title {
+  margin: 0;
+  font-size: var(--type-Heading-h5-size);
+  font-weight: var(--type-Heading-h5-weight);
+  line-height: var(--type-Heading-h5-line-height);
+  letter-spacing: var(--type-Heading-h5-letter-spacing);
+  color: var(--color-text-subtle);
+}
+
+/* Frame 4981: white, radius 20, 16px either side. The frame fixes it at 278 tall
+   around 224 of rows; it hugs here (#77). */
+.measurement__list {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-400);
+  background: var(--color-surface-default);
+  border-radius: var(--radius-500);
+}
+
+/* Each row: 56 tall, a 1px Color/border/subtle rule INSIDE its bottom edge, the
+   label and its single-unit equivalent spread apart, then the check. */
+.measurement__row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-200);
+  height: 56px;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: inset 0 -1px 0 0 var(--color-border-subtle);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* The frame rules the last row too, which inside a rounded card reads as a line
+   along its bottom edge. Dropped with the hug (#77). */
+.measurement__row:last-child { box-shadow: none; }
+
+.measurement__label {
+  flex: 1 1 auto;
+  font-size: var(--type-Body-Large-size);
+  font-weight: var(--type-Body-Large-weight);
+  line-height: var(--type-Body-Large-line-height);
+  letter-spacing: var(--type-Body-Large-letter-spacing);
+  color: var(--color-text-default);
+}
+
+.measurement__each {
+  flex: none;
+  font-size: var(--type-Body-Base-size);
+  font-weight: var(--type-Body-Base-weight);
+  line-height: var(--type-Body-Base-line-height);
+  letter-spacing: var(--type-Body-Base-letter-spacing);
+  color: var(--color-text-subtle);
+}
+
+/* Unselected rows hide the check in the frame AND give its 28px back, so the
+   equivalents jump column as the selection moves. Space is kept for it here (#78). */
+.measurement__check { visibility: hidden; }
+.measurement__row[aria-checked='true'] .measurement__check { visibility: visible; }
+
+/* A unit the shelf cannot supply at this count. Undesigned (#79); the disabled text
+   token the file does have. */
+.measurement__row[aria-disabled='true'] { cursor: default; }
+.measurement__row[aria-disabled='true'] .measurement__label,
+.measurement__row[aria-disabled='true'] .measurement__each {
+  color: var(--color-text-ondisabled);
+}
