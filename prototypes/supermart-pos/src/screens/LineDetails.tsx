@@ -14,9 +14,10 @@ import './LineDetails.css';
  * Item details — `88:9439`. A draft over one cart line, like the Quantity sheet:
  * the header check commits, the close discards.
  *
- * The frame titles this sheet "Select customer", copied from the sheet it was built
- * from; it is "Item details" here. Its "Regular" subtitle is shown as the product's
- * size. Validation messages are not designed.
+ * No visible heading: the design has none. The frame's header does carry a
+ * "Select customer" text layer, copied from the sheet it was built from, so the
+ * dialog is named "Item details" for screen readers only. Its "Regular" subtitle is
+ * shown as the product's size. Validation messages are not designed.
  */
 export function LineDetails({
   open, line, onClose, onCommit,
@@ -63,6 +64,7 @@ export function LineDetails({
     <BottomSheet
       open={open}
       title="Item details"
+      showTitle={false}
       onClose={onClose}
       closeLabel="Discard changes"
       dismissOnBlanket={false}

@@ -15,10 +15,13 @@ import './BottomSheet.css';
  */
 export function BottomSheet({
   open, title, onClose, closeLabel, children, dismissOnBlanket = true, confirm, className, initialFocus,
+  showTitle = true,
 }: {
   open: boolean;
-  /** Visible heading, and the dialog's accessible name. */
+  /** The dialog's accessible name, and its visible heading unless `showTitle` is off. */
   title: string;
+  /** Off for a sheet whose design draws no heading: the name is still read out. */
+  showTitle?: boolean;
   onClose: () => void;
   closeLabel: string;
   children: ReactNode;
@@ -98,7 +101,7 @@ export function BottomSheet({
       >
         <header className="modalHeader">
           <CloseButton onPress={onClose} label={closeLabel} />
-          <h2 className="modalHeader__title">{title}</h2>
+          {showTitle && <h2 className="modalHeader__title">{title}</h2>}
           {confirm && (
             <button type="button" className="modalHeader__confirm" onClick={confirm.onPress} aria-label={confirm.label}>
               <Icon name="check" />

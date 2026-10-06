@@ -329,7 +329,7 @@ const TOTAL = [
   ['88:8714 panel',         '.cart__footer',         'borderRadius',    '12px 12px 0px 0px'],
   ['88:8714 panel',         '.cart__footer',         'padding',         '12px 16px 24px 16px'],
   ['88:8714 panel',         '.cart__footer',         'boxShadow',
-    '0 -2px 4px -1px #0a0d120f, 0 -4px 8px -2px #0a0d121a'],
+    '0 -2px 4px -1px #0a0d120f, 0 -4px 20px -2px #0a0d121a'],
   ['88:8715 total row',     '.orderTotal__toggle',   'backgroundColor', 'rgb(255, 255, 255)'],
   ['88:8715 total row',     '.orderTotal__toggle',   'paddingTop',      '12px'],
   ['88:8715 total row',     '.orderTotal__toggle',   'paddingBottom',   '12px'],
