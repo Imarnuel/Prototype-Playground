@@ -92,6 +92,11 @@ select {
    corners, so nothing breaks there. Circles and pills keep `round`: smoothing a full
    radius changes nothing in Figma either.
 
+   The phone frame keeps plain corners too. It is the device mock-up, not the design,
+   and a superellipse on the clipping screen makes Chrome drop the mask on every
+   masked backdrop blur inside it — the bottom scrim's blur then starts at full
+   strength along a hard horizontal edge.
+
    `data-corner-smoothing="off"` on <html> restores the design's literal radii — the
    property audit compares those against the nodes. */
 :root { --corner-scale: 1; }
@@ -118,7 +123,8 @@ select {
   :root:not([data-corner-smoothing='off']) :is(
     .closeButton, .modalHeader__confirm, .qtyStepper__step, .qtyField__step,
     .addCustomer__avatar, .cart__iconButton, .salesPoint__overflow,
-    .filterChip, .tabBar__nav, .tabBar__item, .device__island
+    .filterChip, .tabBar__nav, .tabBar__item,
+    .device, .device__body, .device__screen, .device__island
   ) {
     corner-shape: round;
   }
