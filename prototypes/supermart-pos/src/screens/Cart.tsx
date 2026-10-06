@@ -1,10 +1,10 @@
 import { Icon } from '../components/Icon';
 import { CloseButton } from '../components/CloseButton';
 import { QtyInputField } from '../components/QtyInputField';
-import { formatPrice } from '../data/catalogue';
+import { formatPrice, maxCount, unitFor } from '../data/catalogue';
 import { productImage } from '../data/productImage';
 import type { Customer } from '../data/customers';
-import { cartTotal, lineTotal, productFor, type CartLine } from '../state/cart';
+import { lineGross, productFor, totals, type CartLine } from '../state/cart';
 import { BottomScrim } from '../components/BottomScrim';
 import './Cart.css';
 
@@ -111,8 +111,9 @@ export function Cart({
                     <div className="cartLine__info">
                       <span className="cartLine__name" title={product.name}>{product.name}</span>
                       <QtyInputField
-                        qty={line.qty}
-                        max={product.stock}
+                        count={line.count}
+                        unit={unitFor(product, line.unitId).abbrev}
+                        max={maxCount(product, line.unitId)}
                         onChange={(next) => onQtyChange(line.productId, next)}
                       />
                     </div>
@@ -126,11 +127,11 @@ export function Cart({
                     >
                       <Icon name="x-circle" />
                     </button>
-                    {/* Line total, not unit price: quantity x price, computed from the
-                        catalogue so the lines always sum to the order total. The frame
-                        shows ₦10,000 on one row and ₦1,000 on five others at the same
-                        quantity, which reconciles with nothing. */}
-                    <span className="cartLine__price">{formatPrice(lineTotal(line))}</span>
+                    {/* Line GROSS, not unit price and not net of discount: the lines then
+                        add up to the Subtotal on screen, and discounts show once, in the
+                        footer breakdown. The frame shows ₦10,000 on one row and ₦1,000 on
+                        five others at the same quantity, which reconciles with nothing. */}
+                    <span className="cartLine__price">{formatPrice(lineGross(line))}</span>
                   </div>
                 </li>
               );
@@ -156,7 +157,7 @@ export function Cart({
           missing. Rendered in the footer region as a minimal honest addition rather
           than invented chrome, and flagged as needing design input (#32). */}
       <p className="cart__total" aria-live="polite">
-        Total <strong>{formatPrice(cartTotal(lines))}</strong>
+        Total <strong>{formatPrice(totals(lines).total)}</strong>
       </p>
     </div>
   );

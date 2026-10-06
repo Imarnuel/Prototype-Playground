@@ -9,7 +9,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   PRODUCTS, CATEGORIES, CATEGORY_ORDER, BRANDS, CURRENCY, LOW_STOCK_AT,
-  formatPrice, fullName, lineTotalMinor, findByBarcode, vatRateFor,
+  formatPrice, formatSignedPrice, fullName, lineTotalMinor, findByBarcode,
+  maxCount, unitFor, lineGrossMinor, lineDiscountMinor, lineTaxMinor, orderTotals,
+  parseCount, parseWholeNaira, parsePercent, VAT_STANDARD_RATE,
 } from '../src/data/catalogue.ts';
 
 let fails = 0;
@@ -60,26 +62,148 @@ try { lineTotalMinor(PRODUCTS[0], 1.5); } catch { threw = true; }
 check('a fractional quantity is rejected', threw);
 
 // --- A basket's lines must sum to its own total (CLAUDE.md section 4) ---
+// Computed by the APP's own `orderTotals`, not re-derived here. A verifier with its
+// own arithmetic only proves the verifier agrees with itself.
+const byId = (id) => PRODUCTS.find((p) => p.id === id);
 const basket = [
-  [PRODUCTS.find((p) => p.id === 'bev-cola'), 6],
-  [PRODUCTS.find((p) => p.id === 'noo-multipack'), 1],
-  [PRODUCTS.find((p) => p.id === 'cok-oil'), 1],
-  [PRODUCTS.find((p) => p.id === 'hse-tissue'), 2],
-  [PRODUCTS.find((p) => p.id === 'brk-milkpowder'), 1],
+  { product: byId('bev-cola'), unitId: 'each', count: 6 },
+  { product: byId('noo-multipack'), unitId: 'each', count: 1 },
+  { product: byId('cok-oil'), unitId: 'each', count: 1 },
+  { product: byId('hse-tissue'), unitId: 'each', count: 2 },
+  { product: byId('brk-milkpowder'), unitId: 'each', count: 1 },
 ];
-const lines = basket.map(([p, q]) => lineTotalMinor(p, q));
-const subtotal = lines.reduce((a, b) => a + b, 0);
-const vatPerLine = basket.map(([p], i) => Math.round(lines[i] * vatRateFor(p)));
-const vat = vatPerLine.reduce((a, b) => a + b, 0);
-const total = subtotal + vat;
-check('every line total is an exact integer', lines.every(Number.isInteger), lines.join(', '));
-check('lines sum to the subtotal', lines.reduce((a, b) => a + b, 0) === subtotal, formatPrice(subtotal));
-const standardLines = basket.filter(([p]) => p.taxClass === 'standard').length;
-check('VAT applies only to standard-rated lines',
-  vatPerLine.filter((v) => v > 0).length === standardLines,
-  `${standardLines} of ${basket.length} lines standard-rated, VAT ${formatPrice(vat)}`);
-check('total reconciles: subtotal + VAT', total === subtotal + vat,
-  `${formatPrice(subtotal)} + ${formatPrice(vat)} = ${formatPrice(total)}`);
+const t = orderTotals(basket);
+const grosses = basket.map(lineGrossMinor);
+check('every line total is an exact integer', grosses.every(Number.isInteger), grosses.join(', '));
+check('lines sum to the subtotal', grosses.reduce((a, b) => a + b, 0) === t.subtotal, formatPrice(t.subtotal));
+const taxed = basket.filter((l) => lineTaxMinor(l) > 0).length;
+const standardLines = basket.filter((l) => l.product.taxClass === 'standard').length;
+check('VAT applies only to standard-rated lines', taxed === standardLines,
+  `${standardLines} of ${basket.length} lines standard-rated, VAT ${formatPrice(t.tax)}`);
+check('total reconciles: subtotal - discount + tax', t.total === t.subtotal - t.discount + t.tax,
+  `${formatPrice(t.subtotal)} - ${formatPrice(t.discount)} + ${formatPrice(t.tax)} = ${formatPrice(t.total)}`);
+
+// --- Pack units ---------------------------------------------------------------
+const M = CURRENCY.minorPerUnit;
+check('every product is sold by the single unit first',
+  PRODUCTS.every((p) => p.units[0]?.id === 'each' && p.units[0].each === 1));
+check('pack sizes are whole numbers and strictly increasing',
+  PRODUCTS.every((p) => p.units.every((u, i) => Number.isInteger(u.each) && (i === 0 || u.each > p.units[i - 1].each))));
+check('no product lists a unit twice',
+  PRODUCTS.every((p) => new Set(p.units.map((u) => u.id)).size === p.units.length));
+const multiUnit = PRODUCTS.filter((p) => p.units.length > 1);
+const singleUnit = PRODUCTS.filter((p) => p.units.length === 1);
+check('a multi-unit product exists (Measurement list)', multiUnit.length > 0, `${multiUnit.length} products`);
+check('a single-unit product exists (no Measurement list)', singleUnit.length > 0, singleUnit.map((p) => p.id).join(', '));
+const cola = byId('bev-cola');
+check('Zivra Cola carries the Quantity frame\'s own 1/4/8/16',
+  cola.units.map((u) => u.each).join('/') === '1/4/8/16', cola.units.map((u) => u.each).join('/'));
+check('a unit the shelf cannot supply even once is reachable',
+  PRODUCTS.some((p) => p.stock > 0 && p.units.some((u) => maxCount(p, u.id) === 0)),
+  PRODUCTS.filter((p) => p.stock > 0 && p.units.some((u) => maxCount(p, u.id) === 0)).map((p) => p.id).join(', '));
+
+let unitCases = 0, unitBad = 0;
+for (const p of PRODUCTS) for (const u of p.units) for (let c = 1; c <= maxCount(p, u.id); c++) {
+  unitCases++;
+  const g = lineGrossMinor({ product: p, unitId: u.id, count: c });
+  if (!Number.isInteger(g) || g % M !== 0 || c * u.each > p.stock) unitBad++;
+}
+check('every product x unit x sellable count is whole Naira and within stock', unitBad === 0, `${unitCases} cases`);
+let unknownUnit = false;
+try { unitFor(byId('bby-wipes'), 'carton'); } catch { unknownUnit = true; }
+check('asking for a unit a product is not sold in is refused', unknownUnit);
+
+// --- Discounts ----------------------------------------------------------------
+// The exact integer reference, half-up to whole Naira. The float version
+// Math.round(gross * p / 100) gets 69% of N350 wrong (241.4999... -> N241).
+const refPercent = (grossMinor, pct) => Math.floor(((grossMinor / M) * pct + 50) / 100) * M;
+let pctCases = 0, pctBad = 0, pctFloatWrong = 0;
+for (const p of PRODUCTS) for (const u of p.units) for (const c of [1, 2, 3, 7]) {
+  if (c > maxCount(p, u.id) && p.stock > 0) continue;
+  for (let pct = 0; pct <= 100; pct++) {
+    pctCases++;
+    const line = { product: p, unitId: u.id, count: c, discount: { kind: 'percent', percent: pct } };
+    const gross = lineGrossMinor(line);
+    const got = lineDiscountMinor(line);
+    if (got !== refPercent(gross, pct) || got % M !== 0 || got > gross) pctBad++;
+    if (Math.round(gross * (pct / 100) / M) * M !== refPercent(gross, pct)) pctFloatWrong++;
+  }
+}
+check('every percent discount matches the exact integer reference', pctBad === 0,
+  `${pctCases} cases; a float implementation would have got ${pctFloatWrong} wrong`);
+const n350 = { product: byId('noo-single'), unitId: 'each', count: 1, discount: { kind: 'percent', percent: 69 } };
+check('69% of N350 is N242, the case floats get wrong', lineDiscountMinor(n350) === 242 * M, formatPrice(lineDiscountMinor(n350)));
+const over = { product: cola, unitId: 'each', count: 1, discount: { kind: 'amount', minor: 100_000 } };
+check('an amount discount larger than the line clamps to the line', lineDiscountMinor(over) === lineGrossMinor(over)
+  && lineGrossMinor(over) - lineDiscountMinor(over) === 0, formatPrice(lineDiscountMinor(over)));
+let badOverride = false;
+try { lineGrossMinor({ product: cola, unitId: 'each', count: 1, priceOverrideMinor: 10_050 }); } catch { badOverride = true; }
+check('a price override that is not whole Naira is refused', badOverride);
+
+// --- Tax ----------------------------------------------------------------------
+// The walk's case: standard-rated, odd-Naira net. Cola N500 less 15% = N425 net,
+// 7.5% = 3187.5 kobo -> 3188 kobo on the line -> N32 on the order.
+const colaLine = { product: cola, unitId: 'each', count: 1, discount: { kind: 'percent', percent: 15 } };
+const colaT = orderTotals([colaLine]);
+check('Cola N500 less 15%: discount N75, tax on the NET 3188 kobo, order tax N32, total N457',
+  lineDiscountMinor(colaLine) === 7_500 && lineTaxMinor(colaLine) === 3_188 && colaT.tax === 3_200 && colaT.total === 45_700,
+  `${formatPrice(colaT.subtotal)} - ${formatPrice(colaT.discount)} + ${formatPrice(colaT.tax)} = ${formatPrice(colaT.total)}`);
+let vatDisagree = 0;
+for (let net = 0; net <= 5_000_000; net += M) {
+  if (Math.floor((net * 750 + 5_000) / 10_000) !== Math.round(net * VAT_STANDARD_RATE)) vatDisagree++;
+}
+check('integer VAT agrees with the old float rule on every whole-Naira net to N50,000', vatDisagree === 0);
+
+// --- Displayed totals reconcile, across random baskets -------------------------
+// Seeded so a failure is reproducible. Overrides are odd whole-Naira prices and
+// discounts land on odd-Naira nets, so a rounding rule that only works on round
+// numbers has somewhere to fail.
+let seed = 0x5eed;
+const rand = (n) => { seed = (seed * 1_103_515_245 + 12_345) % 2 ** 31; return seed % n; };
+const naira = (s) => Number(s.replace(/[^\d]/g, '')) * (s.startsWith('−') ? -1 : 1);
+let baskets = 0, basketBad = 0, firstBad = '';
+const sellable = PRODUCTS.filter((p) => p.stock > 0);
+for (let b = 0; b < 500; b++) {
+  const lines = [];
+  for (const p of [...sellable].sort(() => rand(3) - 1).slice(0, 1 + rand(6))) {
+    const units = p.units.filter((u) => maxCount(p, u.id) > 0);
+    const u = units[rand(units.length)];
+    const line = { product: p, unitId: u.id, count: 1 + rand(maxCount(p, u.id)) };
+    if (rand(3) === 0) line.priceOverrideMinor = (1 + rand(9_999)) * M;
+    const d = rand(4);
+    if (d === 1) line.discount = { kind: 'percent', percent: 1 + rand(100) };
+    if (d === 2) line.discount = { kind: 'amount', minor: (1 + rand(5_000)) * M };
+    lines.push(line);
+  }
+  baskets++;
+  const tt = orderTotals(lines);
+  const shown = {
+    lines: lines.map((l) => naira(formatPrice(lineGrossMinor(l)))),
+    subtotal: naira(formatPrice(tt.subtotal)),
+    discount: naira(formatSignedPrice(-tt.discount)),
+    tax: naira(formatPrice(tt.tax)),
+    total: naira(formatPrice(tt.total)),
+  };
+  const ok = shown.lines.reduce((a, x) => a + x, 0) === shown.subtotal
+    && shown.subtotal + shown.discount + shown.tax === shown.total
+    && tt.total % M === 0 && tt.tax % M === 0
+    && lines.every((l) => lineGrossMinor(l) - lineDiscountMinor(l) >= 0);
+  if (!ok) { basketBad++; firstBad ||= JSON.stringify(shown); }
+}
+check('what the screen shows adds up, in 500 random baskets', basketBad === 0,
+  basketBad ? `${basketBad} bad, first: ${firstBad}` : `${baskets} baskets, payable totals all whole Naira`);
+
+// --- Parsing and formatting ---------------------------------------------------
+const rejects = (fn, inputs) => inputs.every((x) => fn(x) === null);
+check('typed counts: digits only, at least 1', rejects(parseCount, ['', '0', '-1', '2.5', '1e2', ' 3', '3 ', '+3', '0x10'])
+  && parseCount('12') === 12);
+check('typed Naira: digits only, stored as whole Naira', rejects(parseWholeNaira, ['', '-1', '2.5', '1e2', '1.15', '100.50'])
+  && parseWholeNaira('1') === 100 && parseWholeNaira('0') === 0);
+check('typed percent: 0 to 100 only', rejects(parsePercent, ['', '-1', '101', '2.5', '1e2', '15%'])
+  && parsePercent('100') === 100 && parsePercent('0') === 0);
+const signed = [formatSignedPrice(-5_300), formatSignedPrice(0), formatSignedPrice(-0), formatSignedPrice(5_300)];
+check('signed prices never print "N-" or a negative zero', signed.every((x) => !x.includes('-')) && signed[0] === '−' + formatPrice(5_300),
+  signed.join('  '));
 
 // --- Demo state coverage (CLAUDE.md sections 4 and 6) ---
 const noPhoto = PRODUCTS.filter((p) => p.image === null);

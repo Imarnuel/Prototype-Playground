@@ -10,29 +10,39 @@ import './QtyInputField.css';
  * `Color/border/input` and "each". The five-row majority is built; logged as #30.
  */
 export function QtyInputField({
-  qty, onChange, max,
-}: { qty: number; onChange: (next: number) => void; max: number }) {
+  count, unit, onChange, max, min = 0,
+}: {
+  count: number;
+  /** The unit's abbreviation — "ea", "pck" — so a line in packs reads as packs. */
+  unit: string;
+  onChange: (next: number) => void;
+  max: number;
+  /** 0 in the Cart, where stepping to zero removes the line; 1 inside an editing
+      sheet, where a draft must never reach zero or below. */
+  min?: number;
+}) {
   return (
     <div className="qtyField">
       <button
         type="button"
         className="qtyField__step"
-        onClick={() => onChange(qty - 1)}
+        onClick={() => onChange(count - 1)}
+        disabled={count <= min}
         aria-label="Decrease quantity"
       >
         <Icon name="minus" />
       </button>
       <span className="qtyField__value">
-        <span>{qty}</span>
-        <span>ea</span>
+        <span>{count}</span>
+        <span>{unit}</span>
       </span>
       <button
         type="button"
         className="qtyField__step"
-        onClick={() => onChange(qty + 1)}
+        onClick={() => onChange(count + 1)}
         // Stock is the real ceiling: a till cannot sell more than the shelf holds,
         // and the catalogue is the only thing that knows the count.
-        disabled={qty >= max}
+        disabled={count >= max}
         aria-label="Increase quantity"
       >
         <Icon name="plus" />

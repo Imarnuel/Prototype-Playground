@@ -281,6 +281,10 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 61 | **The footer and the bottom scrim move between the Cart and Customer added** although nothing between them changes: the footer sits at y=773 in `88:8164` and y=764 in `88:8243` (31px vs 40px from the screen bottom), and the scrim is [0,646,393,206] against [0,613,393,239]. Content height is identical — Frame 5005 is [12,130,361,736] in both | Kept the Cart's 31px and 206. A footer that jumps 9px when a customer is attached is a bug, not a state |
 | 62 | The toast reads **"Customer has been created"**, but band 4 never designs an add-customer form — the sheet's CTA is the only "create" affordance and it has no destination (#47) | Raised only on that CTA path, not on selecting an existing customer, which creates nothing. **Needs design input** once the form exists |
 | 63 | The customer row's trash is **20x20**, under the 44x44 minimum | Expanded with `::after { inset: -12px }` rather than growing the glyph |
+| 64 | **Pack units are designed for one product only.** The Quantity sheet (`88:11532`) lists Each / Pack / Carton / Box at 1 / 4 / 8 / 16, and only "ea" and "pck" ever appear as abbreviations | Zivra Cola carries the frame's own 1/4/8/16. Every other product's pack sizes are **invented**, like its price, and "ctn" / "box" are invented abbreviations. **Needs design input** |
+| 65 | **Nothing in the design limits a sale to stock.** The build let the out-of-stock Bluewell Apple Juice into the cart and stepped past the shelf from the grid (a build bug, not the design's) | Clamped in `addToCart`, in the line's own unit. A refused tap raises the existing toast — "Out of stock" / "Only 3 ea left" — **copy undesigned**, and without the check-circle, since a success glyph beside a refusal says the opposite. There is no warning glyph or warning token to use instead. **Needs design input** |
+| 66 | **The band 4 toast faded out an empty box.** `message={toast ?? ''}` cleared the text the moment the exit began; and its timer restarted on every App render, so a busy screen could hold it up indefinitely | Mine, from band 4. **Fixed**: the message outlives `open`, and the timer restarts on each show (a repeat refusal gets the full 2.6s), not on render. Both A/B'd — the old code fails each check |
+| 67 | **The Cart's Total changes value.** It was the plain sum of lines; it now includes the 7.5% VAT the study's tax assumption always implied — ₦1,500 of lines shows ₦1,613 | Deliberate: one money model, `orderTotals`, replaces the two that disagreed (the Cart's sum vs the verifier's VAT). The Total line itself is still the ad-hoc one from #32 until the footer total is built |
 
 ## Work order
 
@@ -575,6 +579,29 @@ top 257 to 249 — the 8px is entirely this change.
 
 Everything below the header takes it; the bottom-docked View cart (703), tab bar
 (761) and scrim (580) do not, and re-measured unchanged.
+
+### Band `115:8774`, step 1 — one money model, and pack units
+
+No UI. The band adds pack units, price overrides and discounts, and its expanded footer
+shows Subtotal / Discount / Tax / Total — so the two money models that disagreed (the
+Cart summed lines with no VAT; `verify-catalogue.mjs` computed VAT on its own) became
+one, in `catalogue.ts`, before any screen is built on it.
+
+- **Integer throughout.** VAT in basis points (750), per line on the **net**,
+  half-up in kobo; the order's tax rounded **once** to whole Naira, so the payable
+  total is always collectable. Percent discounts `floor((naira x p + 50) / 100)`, exact.
+- **Inputs parsed strictly** (`/^\d+$/`): `"1e2"`, `""`, `"-1"`, `"2.5"` all refused.
+- **The amount-discount clamp is persisted**, so qty 3 -> 1 -> 3 cannot quietly bring
+  back a discount nobody re-entered. A committed unit change drops a price override
+  (it was agreed for that pack size) and keeps a percent discount.
+- **One line per product** is a stated limitation: it cannot sell 2 packs and 2 singles
+  of one item. The design never shows either.
+
+Verified: `catalogue:verify` 57/57, `cart:verify` 22/22. Both A/B'd — the float percent
+rule fails 2 checks (it gets 69% of ₦350 as ₦241, not ₦242: the raw value is
+241.4999...), un-rounded order tax fails 2 (373 of 500 random baskets have a fractional
+payable total), an unpersisted clamp fails 4, a kept override fails 1. Every UI gate
+unchanged on dev and production, except the Cart walk's total check, rewritten for VAT.
 
 ## Screen 1 — verification record
 

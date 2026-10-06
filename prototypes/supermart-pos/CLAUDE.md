@@ -16,14 +16,14 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **63** inconsistencies, including that 31 frames share the name
+anything — it records **67** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
 
 | # | Screen | Node | State |
 |---|---|---|---|
-| 1 | Sales Point | `88:8079` | 1 coordinate outside 0.5px, 21/21 flow, +8px chip gap (requested) |
+| 1 | Sales Point | `88:8079` | 5 coordinates outside 0.5px: the title's text width (-1.28, #56), and four from deliberate changes — the requested +8px chip gap (header h, grid y, first card y) and the full-bleed filter strip (w +16); 22/22 flow |
 | 2 | Cart / Order Preview | `88:8164` | 0 outside 0.5px, 19/19 flow |
 | 3 | Select customer (empty + populated) | `88:11845`, `88:12043` | 0 outside tolerance, 17/17 flow |
 | 4 | Customer added (+ toast) | `88:8243`, `88:8322` | 0 outside 0.5px, 11/11 flow and motion |
@@ -37,7 +37,12 @@ screen: `88:8243` is the Cart's own frame with the customer row's label at Headi
 instead of Label/Base and a trash in place of the plus-circle. `88:8402` is a
 byte-identical duplicate of it; `88:8322` is the same frame plus the toast.
 
-Next: a band to be chosen — see the board map above.
+### In progress — band `115:8774`, "Adjusting qty & product details in cart"
+
+Three features in dependency order: the footer order total, the Quantity sheet, the
+line-details modal. **Step 1, the money model and pack units, is done** (no UI): see
+"Money" below and BUILD-PLAN's step 1 record. Next: the footer total (`88:8639` /
+`88:9338`).
 
 **Hosted preview:** <https://claude.ai/artifact/LnsiYh4uBeTNY1J3XDMJHX> — rebuild and
 republish it with `npm run build:hosted`.
@@ -77,6 +82,22 @@ by retyping** — see `figma/README.md`.
   never baked into the name. A check asserts it never gets duplicated back in.
 - Money is integer minor units (kobo). Never a float: 0.1 + 0.2 arithmetic on prices
   is how demo receipts stop reconciling.
+- Every product lists its **pack units** (`units`), Each first. Prices stay per single
+  unit; a pack's price is derived. Only Zivra Cola's 1/4/8/16 comes from a frame — the
+  rest, and the "ctn" / "box" abbreviations, are invented (BUILD-PLAN #64).
+
+### Money
+
+One model, in `catalogue.ts`; `src/state/cart.ts` only says how a line may change.
+Nothing else does arithmetic on money.
+
+- A Cart line displays its **gross**, so lines add up to the Subtotal on screen.
+- Total = Subtotal - Discount + Tax, exact in kobo. VAT is per line on the net,
+  and the order's tax is rounded once to whole Naira, so the total is collectable.
+- **The Cart's Total includes VAT** (BUILD-PLAN #67).
+- Typed money and counts go through `parseCount` / `parseWholeNaira` /
+  `parsePercent`, never `Number()` or `parseFloat`.
+- **One line per product** — a stated limitation, not an oversight.
 - Barcodes are valid EAN-13, check digits included.
 
 ### ASSUMPTION — currency and tax
@@ -95,6 +116,8 @@ Seeded so every state can be demoed without editing data (root agreement §4, §
 |---|---|
 | No photo (fallback) | Palmrise Sweetcorn 340g Tin — and, until photos exist, all 43 |
 | Out of stock | Bluewell Apple Juice 1L Carton |
+| Stock ceiling (3), and a pack the shelf can't fill once | Koloma Malt Drink — 3 in stock, sold in packs of 6 |
+| Sold singly only (no Measurement list) | Tiny Steps Baby Wipes |
 | Discounted | Palmrise Vegetable Oil 3L, Freshvale Toilet Tissue 4-pack |
 | Long name (truncation) | Unscented Antibacterial Laundry Detergent Powder — 48 chars |
 | Single-item category | Baby |
@@ -108,7 +131,8 @@ Seeded so every state can be demoed without editing data (root agreement §4, §
 npm run dev                # iterate; open with ?dev=1 for the toolbar
 npm run build && npm run preview   # demo from here, not dev
 
-npm run catalogue:verify   # 37 invariants: check digits, money, totals, states, CSV agreement
+npm run catalogue:verify   # 57 invariants: check digits, units, money, totals, states, CSV
+npm run cart:verify        # 22 rules for changing a line: stock, clamps, unit changes
 npm run catalogue:csv      # regenerate figma/catalogue.csv from catalogue.ts
 npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json
 npm run tokens:verify      # the generated tokens still match the Figma dump
@@ -120,7 +144,7 @@ npm run images:optimise -- --box <css-px>   # --box MUST come from a measured fr
 npm run build:hosted       # publish-ready bundle for the hosted preview
 ```
 
-Run `catalogue:verify` after any edit to `catalogue.ts`. An invalid check digit or a
+Run `catalogue:verify` and `cart:verify` after any edit to `catalogue.ts` or `cart.ts`. An invalid check digit or a
 total that stops reconciling shows up live in a demo. Run `motion:sample` after any
 change to a presented surface — checking a transition is "visible" cannot catch an
 entrance that never animates.

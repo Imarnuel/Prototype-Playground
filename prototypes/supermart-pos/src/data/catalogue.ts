@@ -59,7 +59,41 @@ export type Product = {
   stock: number;
   /** Filename under assets/products/, or null where no photo exists. */
   image: string | null;
+  /**
+   * The pack sizes this product is sold in, smallest first. Always starts with the
+   * single unit. INVENTED, like the prices: this is a fictional store, so how many
+   * bottles make a carton is a per-product choice, not a value from the design.
+   * Zivra Cola carries the Quantity frame's own 1/4/8/16 so it can be compared
+   * against that frame exactly.
+   */
+  units: readonly PackUnit[];
 };
+
+export type UnitId = 'each' | 'pack' | 'carton' | 'box';
+
+/** One sellable pack size. `each` is how many single units it holds. */
+export type PackUnit = {
+  readonly id: UnitId;
+  readonly label: string;
+  readonly abbrev: string;
+  readonly each: number;
+};
+
+/* Labels are the Quantity frame's (`88:11532`). Of the abbreviations only "ea" and
+   "pck" appear anywhere in the design; "ctn" and "box" are invented to match. */
+const UNIT_NAMES: Record<UnitId, { label: string; abbrev: string }> = {
+  each: { label: 'Each', abbrev: 'ea' },
+  pack: { label: 'Pack', abbrev: 'pck' },
+  carton: { label: 'Carton', abbrev: 'ctn' },
+  box: { label: 'Box', abbrev: 'box' },
+};
+
+function units(...packs: [UnitId, number][]): readonly PackUnit[] {
+  return [
+    { id: 'each', ...UNIT_NAMES.each, each: 1 },
+    ...packs.map(([id, each]) => ({ id, ...UNIT_NAMES[id], each })),
+  ];
+}
 
 /**
  * ASSUMPTION — Nigerian Naira, 7.5% VAT, basic food zero-rated.
@@ -77,7 +111,9 @@ export const CURRENCY = {
   displayFractionDigits: 0,
 } as const;
 
-export const VAT_STANDARD_RATE = 0.075;
+/* Held in basis points so tax is integer arithmetic; the rate is derived from it. */
+export const VAT_STANDARD_BP = 750;
+export const VAT_STANDARD_RATE = VAT_STANDARD_BP / 10_000;
 
 /**
  * At or below this count a stock figure renders as a warning rather than normal.
@@ -115,6 +151,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6151000000010',
     taxClass: 'standard',
     stock: 74,
+    units: units(['pack', 4], ['carton', 8], ['box', 16]),
     image: 'cola.webp',
   },
   {
@@ -127,6 +164,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6151000000027',
     taxClass: 'standard',
     stock: 68,
+    units: units(['pack', 6], ['carton', 12]),
     image: 'lemonlime.webp',
   },
   {
@@ -139,6 +177,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6151000000034',
     taxClass: 'standard',
     stock: 61,
+    units: units(['pack', 6], ['carton', 12]),
     image: 'orangesoda.webp',
   },
   {
@@ -151,6 +190,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6151000000041',
     taxClass: 'standard',
     stock: 44,
+    units: units(['pack', 6], ['carton', 12]),
     image: 'icedtea.webp',
   },
   {
@@ -163,6 +203,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6151000000058',
     taxClass: 'standard',
     stock: 35,
+    units: units(['pack', 4], ['carton', 24]),
     image: 'energy.webp',
   },
   {
@@ -175,6 +216,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6151000000065',
     taxClass: 'standard',
     stock: 96,
+    units: units(['pack', 12]),
     image: 'water75.webp',
   },
   {
@@ -187,6 +229,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6151000000072',
     taxClass: 'standard',
     stock: 52,
+    units: units(['pack', 6]),
     image: 'water15.webp',
   },
   {
@@ -199,6 +242,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6151000000089',
     taxClass: 'standard',
     stock: 38,
+    units: units(['pack', 6], ['carton', 24]),
     image: 'sparkling.webp',
   },
   {
@@ -211,6 +255,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6151000000096',
     taxClass: 'standard',
     stock: 23,
+    units: units(['pack', 6]),
     image: 'orangejuice.webp',
   },
   {
@@ -223,6 +268,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6151000000102',
     taxClass: 'standard',
     stock: 19,
+    units: units(['pack', 6]),
     image: 'pinejuice.webp',
   },
   {
@@ -235,6 +281,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6151000000119',
     taxClass: 'standard',
     stock: 0,
+    units: units(['pack', 6]),
     image: 'applejuice.webp',
   },
   {
@@ -247,6 +294,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6151000000126',
     taxClass: 'standard',
     stock: 3,
+    units: units(['pack', 6], ['carton', 24]),
     image: 'malt.webp',
   },
   {
@@ -259,6 +307,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6152000000017',
     taxClass: 'standard',
     stock: 82,
+    units: units(['box', 24]),
     image: 'crisps.webp',
   },
   {
@@ -271,6 +320,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6152000000024',
     taxClass: 'standard',
     stock: 67,
+    units: units(['box', 20]),
     image: 'plantain.webp',
   },
   {
@@ -283,6 +333,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6152000000031',
     taxClass: 'standard',
     stock: 1,
+    units: units(['box', 24]),
     image: 'choc.webp',
   },
   {
@@ -295,6 +346,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6152000000048',
     taxClass: 'standard',
     stock: 41,
+    units: units(['carton', 12]),
     image: 'digestive.webp',
   },
   {
@@ -307,6 +359,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6152000000055',
     taxClass: 'standard',
     stock: 56,
+    units: units(['box', 24]),
     image: 'peanuts.webp',
   },
   {
@@ -319,6 +372,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6153000000014',
     taxClass: 'zero',
     stock: 26,
+    units: units(['carton', 12]),
     image: 'cornflakes.webp',
   },
   {
@@ -331,6 +385,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6153000000021',
     taxClass: 'zero',
     stock: 21,
+    units: units(['carton', 12]),
     image: 'oats.webp',
   },
   {
@@ -343,6 +398,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6153000000038',
     taxClass: 'zero',
     stock: 14,
+    units: units(['carton', 12]),
     image: 'milkpowder.webp',
   },
   {
@@ -355,6 +411,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6153000000045',
     taxClass: 'standard',
     stock: 29,
+    units: units(['carton', 12]),
     image: 'maltpowder.webp',
   },
   {
@@ -367,6 +424,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6153000000052',
     taxClass: 'zero',
     stock: 33,
+    units: units(['carton', 24]),
     image: 'teabags.webp',
   },
   {
@@ -379,6 +437,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6154000000011',
     taxClass: 'zero',
     stock: 120,
+    units: units(['pack', 5], ['carton', 40]),
     image: 'single.webp',
   },
   {
@@ -391,6 +450,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6154000000028',
     taxClass: 'zero',
     stock: 37,
+    units: units(['carton', 8]),
     image: 'multipack.webp',
   },
   {
@@ -403,6 +463,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6154000000035',
     taxClass: 'zero',
     stock: 52,
+    units: units(['carton', 20]),
     image: 'spaghetti.webp',
   },
   {
@@ -415,6 +476,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6154000000042',
     taxClass: 'zero',
     stock: 44,
+    units: units(['carton', 20]),
     image: 'macaroni.webp',
   },
   {
@@ -428,6 +490,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6155000000018',
     taxClass: 'zero',
     stock: 17,
+    units: units(['carton', 4]),
     image: 'oil.webp',
   },
   {
@@ -440,6 +503,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6155000000025',
     taxClass: 'zero',
     stock: 64,
+    units: units(['carton', 24]),
     image: 'paste.webp',
   },
   {
@@ -452,6 +516,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6155000000032',
     taxClass: 'zero',
     stock: 29,
+    units: units(['carton', 10]),
     image: 'flour.webp',
   },
   {
@@ -464,6 +529,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6155000000049',
     taxClass: 'zero',
     stock: 31,
+    units: units(['carton', 10]),
     image: 'sugar.webp',
   },
   {
@@ -476,6 +542,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6155000000056',
     taxClass: 'zero',
     stock: 48,
+    units: units(['carton', 20]),
     image: 'salt.webp',
   },
   {
@@ -488,6 +555,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6156000000015',
     taxClass: 'zero',
     stock: 38,
+    units: units(['carton', 24]),
     image: 'beans.webp',
   },
   {
@@ -500,6 +568,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6156000000022',
     taxClass: 'zero',
     stock: 72,
+    units: units(['carton', 50]),
     image: 'sardines.webp',
   },
   {
@@ -512,6 +581,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6156000000039',
     taxClass: 'zero',
     stock: 26,
+    units: units(['carton', 24]),
     image: null,
   },
   {
@@ -524,6 +594,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6156000000046',
     taxClass: 'standard',
     stock: 23,
+    units: units(['carton', 12]),
     image: 'mayo.webp',
   },
   {
@@ -536,6 +607,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6157000000012',
     taxClass: 'standard',
     stock: 25,
+    units: units(['carton', 12]),
     image: 'detergent.webp',
   },
   {
@@ -548,6 +620,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6157000000029',
     taxClass: 'standard',
     stock: 39,
+    units: units(['carton', 12]),
     image: 'dishliquid.webp',
   },
   {
@@ -561,6 +634,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6157000000036',
     taxClass: 'standard',
     stock: 58,
+    units: units(['carton', 6]),
     image: 'tissue.webp',
   },
   {
@@ -573,6 +647,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6157000000043',
     taxClass: 'standard',
     stock: 44,
+    units: units(['carton', 12]),
     image: 'bleach.webp',
   },
   {
@@ -585,6 +660,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6158000000019',
     taxClass: 'standard',
     stock: 51,
+    units: units(['pack', 3], ['carton', 36]),
     image: 'toothpaste.webp',
   },
   {
@@ -597,6 +673,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6158000000026',
     taxClass: 'standard',
     stock: 88,
+    units: units(['pack', 6], ['carton', 48]),
     image: 'soap.webp',
   },
   {
@@ -609,6 +686,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6158000000033',
     taxClass: 'standard',
     stock: 18,
+    units: units(['carton', 12]),
     image: 'shampoo.webp',
   },
   {
@@ -621,6 +699,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6159000000016',
     taxClass: 'standard',
     stock: 31,
+    units: units(),
     image: 'wipes.webp',
   },
 ];
@@ -648,10 +727,6 @@ export function fullName(product: Product): string {
   return `${product.brand} ${product.name} ${product.size}`;
 }
 
-export function vatRateFor(product: Product): number {
-  return product.taxClass === 'standard' ? VAT_STANDARD_RATE : 0;
-}
-
 /**
  * Line total in minor units for `quantity` units of `product`.
  *
@@ -664,6 +739,148 @@ export function lineTotalMinor(product: Product, quantity: number): number {
     throw new Error(`quantity must be a whole number of units, got ${quantity}`);
   }
   return product.priceMinor * quantity;
+}
+
+/* ---------------------------------------------------------------------------
+ * Order money. Lives here, beside `lineTotalMinor` and `formatPrice`, because this
+ * module is the one both the app and `scripts/verify-catalogue.mjs` can import —
+ * Node's type stripping cannot resolve an extensionless relative import, so a
+ * separate money module that needed these constants could not be verified. One
+ * implementation, two callers: the verifier checks the app's own arithmetic.
+ *
+ * Every amount is integer kobo, and every amount a person sees or pays is a WHOLE
+ * Naira, because CURRENCY displays no fraction digits. That rules out floats
+ * everywhere below: a float percent discount returns ₦241 for 69% of ₦350, where
+ * the answer is ₦242.
+ * ------------------------------------------------------------------------- */
+
+const MINOR = CURRENCY.minorPerUnit;
+
+export function vatBpFor(product: Product): number {
+  return product.taxClass === 'standard' ? VAT_STANDARD_BP : 0;
+}
+
+export function unitFor(product: Product, unitId: UnitId): PackUnit {
+  const unit = product.units.find((u) => u.id === unitId);
+  if (!unit) throw new Error(`${product.id} is not sold by the ${unitId}`);
+  return unit;
+}
+
+/** The most of `unitId` the shelf can supply. Stock is held in single units. */
+export function maxCount(product: Product, unitId: UnitId): number {
+  return Math.floor(product.stock / unitFor(product, unitId).each);
+}
+
+export type Discount =
+  | { kind: 'percent'; percent: number }
+  | { kind: 'amount'; minor: number };
+
+/** A cart line with its product resolved — what every money function takes. */
+export type PricedLine = {
+  product: Product;
+  unitId: UnitId;
+  count: number;
+  /** Price per unit, in the line's own unit. */
+  priceOverrideMinor?: number;
+  discount?: Discount;
+};
+
+function requireWholeNaira(minor: number, what: string): void {
+  if (!Number.isInteger(minor) || minor % MINOR !== 0) {
+    throw new Error(`${what} must be a whole number of Naira, got ${minor} kobo`);
+  }
+}
+
+/** Price of one of the line's units: the override if set, else catalogue x pack size. */
+export function unitPriceMinor(line: Pick<PricedLine, 'product' | 'unitId' | 'priceOverrideMinor'>): number {
+  return line.priceOverrideMinor ?? line.product.priceMinor * unitFor(line.product, line.unitId).each;
+}
+
+export function lineGrossMinor(line: PricedLine): number {
+  if (line.priceOverrideMinor === undefined) {
+    return lineTotalMinor(line.product, line.count * unitFor(line.product, line.unitId).each);
+  }
+  requireWholeNaira(line.priceOverrideMinor, 'a price override');
+  if (!Number.isInteger(line.count)) {
+    throw new Error(`count must be a whole number of units, got ${line.count}`);
+  }
+  return line.priceOverrideMinor * line.count;
+}
+
+/**
+ * Discount on one line, whole Naira. A percent rounds half-up using integers only:
+ * floor((naira x p + 50) / 100). An amount is clamped to the line so a line can
+ * never go below zero.
+ */
+export function lineDiscountMinor(line: PricedLine): number {
+  const d = line.discount;
+  if (!d) return 0;
+  const gross = lineGrossMinor(line);
+  if (d.kind === 'amount') {
+    requireWholeNaira(d.minor, 'a discount');
+    return Math.min(d.minor, gross);
+  }
+  if (!Number.isInteger(d.percent) || d.percent < 0 || d.percent > 100) {
+    throw new Error(`a percent discount must be a whole number from 0 to 100, got ${d.percent}`);
+  }
+  return Math.floor(((gross / MINOR) * d.percent + 50) / 100) * MINOR;
+}
+
+/** VAT on the line AFTER its discount, in kobo, rounded half-up per line. */
+export function lineTaxMinor(line: PricedLine): number {
+  const net = lineGrossMinor(line) - lineDiscountMinor(line);
+  return Math.floor((net * vatBpFor(line.product) + 5_000) / 10_000);
+}
+
+export type OrderTotals = { subtotal: number; discount: number; tax: number; total: number };
+
+/**
+ * Subtotal is the sum of line GROSS, which is what each Cart line displays, so the
+ * lines visibly add up to it. Tax is summed per line in kobo and then rounded ONCE to
+ * a whole Naira for the order: without that the payable total is fractional (Cola
+ * ₦500 carries 3750 kobo of VAT, a total of ₦537.50 shown as "₦538", and paying ₦538
+ * leaves 50 kobo of change shown as "₦1"). With it, subtotal - discount + tax = total
+ * holds exactly, in kobo and on screen.
+ */
+export function orderTotals(lines: readonly PricedLine[]): OrderTotals {
+  let subtotal = 0;
+  let discount = 0;
+  let taxKobo = 0;
+  for (const line of lines) {
+    subtotal += lineGrossMinor(line);
+    discount += lineDiscountMinor(line);
+    taxKobo += lineTaxMinor(line);
+  }
+  const tax = Math.floor((taxKobo + MINOR / 2) / MINOR) * MINOR;
+  return { subtotal, discount, tax, total: subtotal - discount + tax };
+}
+
+/** For amounts that can be negative, like a discount: "−₦53", never "₦-53" or "₦-0". */
+export function formatSignedPrice(minor: number): string {
+  if (minor === 0) return formatPrice(0);
+  return minor < 0 ? `\u2212${formatPrice(-minor)}` : formatPrice(minor);
+}
+
+/*
+ * Parsers for what a person types. Digits only, matched as text: `Number("1e2")` is
+ * 100 and passes an integer check, `parseFloat("1.15") * 100` is 114.99999999999999.
+ * Each returns null for anything it will not accept, and the caller shows why.
+ */
+export function parseCount(text: string): number | null {
+  if (!/^\d{1,6}$/.test(text)) return null;
+  const n = Number(text);
+  return n >= 1 ? n : null;
+}
+
+export function parseWholeNaira(text: string): number | null {
+  if (!/^\d{1,9}$/.test(text)) return null;
+  return Number(text) * MINOR;
+}
+
+export function parsePercent(text: string): number | null {
+  if (!/^\d{1,3}$/.test(text)) return null;
+  const n = Number(text);
+  return n <= 100 ? n : null;
 }
 
 export function findByBarcode(barcode: string): Product | undefined {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   DeviceFrame, DevToolbar, SHEET_SPRING, devFlagEnabled, duration, useReducedMotion,
   type DevToolbarItem,
@@ -6,12 +6,12 @@ import {
 import { SalesPoint } from './screens/SalesPoint';
 import { Cart } from './screens/Cart';
 import { SelectCustomer } from './screens/SelectCustomer';
-import { PRODUCTS } from './data/catalogue';
+import { PRODUCTS, maxCount, unitFor, type Product } from './data/catalogue';
 import { CUSTOMERS, type Customer } from './data/customers';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { Toast } from './components/Toast';
+import { Toast, type ToastTone } from './components/Toast';
 import { usePresented } from './hooks/usePresented';
-import { addToCart, removeLine, setQty, type CartLine } from './state/cart';
+import { addToCart, removeLine, setCount, type CartLine } from './state/cart';
 import './App.css';
 
 type Forced = 'loading' | 'error' | 'empty' | undefined;
@@ -31,12 +31,31 @@ export function App() {
   const [customer, setCustomer] = useState<Customer | null>(null);
   /* `88:8322` is `88:8243` plus one toast, so the toast is state on the Cart rather
      than a screen of its own. Its copy is the frame's. */
-  const [toast, setToast] = useState<string | null>(null);
+  /* The message outlives `open` on purpose: the exit fades the toast out, and clearing
+     the text with it would fade an empty box. */
+  const [toast, setToast] = useState<{ open: boolean; message: string; tone: ToastTone; shown: number }>(
+    { open: false, message: '', tone: 'success', shown: 0 },
+  );
+  const showToast = (message: string, tone: ToastTone = 'success') =>
+    setToast((t) => ({ open: true, message, tone, shown: t.shown + 1 }));
+  const hideToast = useCallback(() => setToast((t) => ({ ...t, open: false })), []);
   const reducedMotion = useReducedMotion();
+
+  /* A tap the shelf can't supply returns the same lines from `addToCart`. Saying why
+     beats a tap that silently does nothing. The copy is not from the design, which
+     draws no stock-limit message. */
+  const addProduct = (product: Product) => {
+    const next = addToCart(lines, product);
+    if (next !== lines) { setLines(next); return; }
+    const line = lines.find((l) => l.productId === product.id);
+    if (!line) { showToast('Out of stock', 'notice'); return; }
+    // In the line's own unit, written the way the stepper writes it: "18 pck".
+    showToast(`Only ${maxCount(product, line.unitId)} ${unitFor(product, line.unitId).abbrev} left`, 'notice');
+  };
 
   const resetScreens = () => {
     setForced(undefined); setCartOpen(false); setPickerOpen(false);
-    setCustomer(null); setCustomers(CUSTOMERS); setToast(null);
+    setCustomer(null); setCustomers(CUSTOMERS); hideToast();
     setResetNonce((n) => n + 1);
   };
 
@@ -63,6 +82,12 @@ export function App() {
       },
     },
     {
+      // Through the real path, so it proves the clamp rather than forcing a toast.
+      label: 'Sales point: out-of-stock tap',
+      group: 'States',
+      onSelect: () => { resetScreens(); addProduct(PRODUCTS.find((p) => p.stock === 0)!); },
+    },
+    {
       label: 'Select customer',
       group: 'Screens',
       onSelect: () => { setCustomers(CUSTOMERS); setCartOpen(true); setPickerOpen(true); },
@@ -77,7 +102,7 @@ export function App() {
       group: 'Screens',
       onSelect: () => {
         setCustomers(CUSTOMERS); setCustomer(CUSTOMERS[0]);
-        setPickerOpen(false); setCartOpen(true); setToast(null);
+        setPickerOpen(false); setCartOpen(true); hideToast();
       },
     },
     {
@@ -86,7 +111,7 @@ export function App() {
       onSelect: () => {
         setCustomers(CUSTOMERS); setCustomer(CUSTOMERS[0]);
         setPickerOpen(false); setCartOpen(true);
-        setToast('Customer has been created');
+        showToast('Customer has been created');
       },
     },
   ];
@@ -104,7 +129,7 @@ export function App() {
             key={resetNonce}
             forceState={forced}
             cartCount={lines.length}
-            onAddProduct={(p) => setLines((l) => addToCart(l, p))}
+            onAddProduct={addProduct}
             onViewCart={() => setCartOpen(true)}
           />
 
@@ -120,7 +145,7 @@ export function App() {
               <Cart
                 lines={lines}
                 onClose={() => setCartOpen(false)}
-                onQtyChange={(id, qty) => setLines((l) => setQty(l, id, qty))}
+                onQtyChange={(id, count) => setLines((l) => setCount(l, id, count))}
                 onRemove={(id) => setLines((l) => removeLine(l, id))}
                 onCheckout={() => setCartOpen(false)}
                 onQueue={() => { setLines([]); setCartOpen(false); }}
@@ -148,16 +173,22 @@ export function App() {
                      no toast, because nothing was created. */
                   setCustomer(CUSTOMERS[0]);
                   setPickerOpen(false);
-                  setToast('Customer has been created');
+                  showToast('Customer has been created');
                 }}
-              />
-              <Toast
-                open={toast !== null}
-                message={toast ?? ''}
-                onDismiss={() => setToast(null)}
               />
             </div>
           )}
+
+          {/* Outside the Cart sheet, so it can confirm or refuse something on any
+              screen — a product tapped on the Sales Point grid included. Last in the
+              DOM so it paints above whatever is presented. */}
+          <Toast
+            open={toast.open}
+            message={toast.message}
+            tone={toast.tone}
+            shown={toast.shown}
+            onDismiss={hideToast}
+          />
         </ErrorBoundary>
       </DeviceFrame>
 

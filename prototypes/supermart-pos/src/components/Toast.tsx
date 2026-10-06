@@ -4,6 +4,14 @@ import { Icon } from './Icon';
 import './Toast.css';
 
 /**
+ * `notice` is for a tap the app refused, such as a product the shelf can't supply. The
+ * design draws only the success toast, and a check-circle beside "Out of stock" says
+ * the opposite of the message, so a notice drops the icon. There is no warning glyph
+ * or warning token in the file to use instead — needs design input.
+ */
+export type ToastTone = 'success' | 'notice';
+
+/**
  * Confirmation toast — Figma `88:8401`, the only thing that separates "Customer
  * added" `88:8322` from `88:8243`.
  *
@@ -12,14 +20,18 @@ import './Toast.css';
  * the project's own constants, documented as a baseline rather than design-derived —
  * `get_motion_context` returns {"nodes":[]} for every frame in this file.
  *
- * `role="status"` rather than `alert`: it confirms something the user just did, so it
+ * `role="status"` rather than `alert`: it reports on something the user just did, so it
  * should not interrupt a screen reader mid-sentence.
  */
 export function Toast({
-  open, message, onDismiss, autoDismissMs = 2600,
+  open, message, tone = 'success', shown, onDismiss, autoDismissMs = 2600,
 }: {
   open: boolean;
   message: string;
+  tone?: ToastTone;
+  /** Changes on every show. A repeat of the same message while the toast is up — a
+      second tap past the shelf — gets the full time again, not what was left. */
+  shown: number;
   onDismiss: () => void;
   autoDismissMs?: number;
 }) {
@@ -29,7 +41,7 @@ export function Toast({
     if (!open) return undefined;
     const t = setTimeout(onDismiss, autoDismissMs);
     return () => clearTimeout(t);
-  }, [open, onDismiss, autoDismissMs, message]);
+  }, [open, onDismiss, autoDismissMs, shown]);
 
   return (
     <div
@@ -42,7 +54,7 @@ export function Toast({
         transitionTimingFunction: open ? EASING.out : EASING.in,
       }}
     >
-      <Icon name="check-circle" />
+      {tone === 'success' && <Icon name="check-circle" />}
       <p className="toast__message">{message}</p>
     </div>
   );
