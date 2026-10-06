@@ -448,10 +448,46 @@ const QTY_EDIT = [
   ['88:11735 group',        '.qtyStepper__value',      'columnGap',       '4px'],
 ];
 
+/* Item details, `88:9439`: the text fields and the %/₦ switch. */
+const DETAILS = [
+  ['88:9556 text field',    '.detailField',            'height',          '60px'],
+  ['88:9556 text field',    '.detailField',            'borderRadius',    '12px'],
+  ['88:9556 text field',    '.detailField',            'backgroundColor', 'rgb(255, 255, 255)'],
+  ['88:9556 text field',    '.detailField',            'paddingLeft',     '16px'],
+  ['88:9556 text field',    '.detailField',            'boxShadow',       'inset 0 0 0 1px #252b3724'],
+  ['88:9556 grad stroke',   '.detailField',            '::after background',
+    'linear-gradient(0deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%)'],
+  ['I...9589 label',        '.detailField__label',     'fontSize',        '12px'],
+  ['I...9589 label',        '.detailField__label',     'fontWeight',      '500'],
+  ['I...9589 label',        '.detailField__label',     'lineHeight',      '16px'],
+  ['I...9589 label',        '.detailField__label',     'color',           'rgb(122, 133, 153)'],
+  ['I...9590 value',        '.detailField input',      'fontSize',        '16px'],
+  ['I...9590 value',        '.detailField input',      'lineHeight',      '24px'],
+  ['I...9590 value',        '.detailField input',      'color',           'rgb(20, 31, 51)'],
+  ['88:9565 description',   '.detailField--tall',      'height',          '120px'],
+  ['88:9559 switch',        '.segmented',              'height',          '60px'],
+  ['88:9559 switch',        '.segmented',              'width',           '128px'],
+  ['88:9559 switch',        '.segmented',              'borderRadius',    '12px'],
+  ['88:9559 switch',        '.segmented',              'padding',         '4px'],
+  ['88:9559 grad stroke',   '.segmented',              '::after background',
+    'linear-gradient(0deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%)'],
+  ['88:9561 "%" chosen',    ".segmented__option[aria-checked='true']", 'height', '52px'],
+  ['88:9561 "%" chosen',    ".segmented__option[aria-checked='true']", 'borderRadius', '8px'],
+  ['88:9561 "%" chosen',    ".segmented__option[aria-checked='true']", 'backgroundColor', 'rgb(248, 249, 252)'],
+  ['88:9562 "%"',           ".segmented__option[aria-checked='true']", 'color', 'rgb(44, 74, 139)'],
+  ['88:9562 "%"',           ".segmented__option[aria-checked='true']", 'fontWeight', '600'],
+  ['88:9562 "%"',           ".segmented__option[aria-checked='true']", 'lineHeight', '20px'],
+  ['88:9564 "₦"',           ".segmented__option[aria-checked='false']", 'color', 'rgb(122, 133, 153)'],
+  ['88:9564 "₦"',           ".segmented__option[aria-checked='false']", 'lineHeight', '24px'],
+];
+
 const browser = await pw.chromium.launch({ executablePath: EXE });
 const page = await browser.newPage({ viewport: { width: 1200, height: 1100 } });
 await page.goto(URL + '?dev=1', { waitUntil: 'networkidle' });
 await page.waitForSelector('.productCard');
+/* Corner smoothing renders each radius x1.6 under a superellipse (index.css). The
+   nodes hold the literal radius, so compare against that with smoothing off. */
+await page.evaluate(() => document.documentElement.setAttribute('data-corner-smoothing', 'off'));
 
 const pick = async (label) => {
   await page.evaluate(() => { if (!document.querySelector('.devbar__panel')) document.querySelector('.devbar__handle').click(); });
@@ -564,9 +600,11 @@ await pick('Quantity sheet');
 fails += await run('Quantity sheet', QTY);
 await pick('Quantity sheet: editing');
 fails += await run('Quantity sheet editing', QTY_EDIT);
+await pick('Item details: discount applied');
+fails += await run('Item details', DETAILS);
 
 const total = SCALAR.length + COMPOUND.length + CART.length + SHEET.length + EMPTY.length + ADDED.length + TOAST.length
-  + TOTAL.length + TOTAL_OPEN.length + TOTAL_DISCOUNT.length + QTY.length + QTY_EDIT.length;
+  + TOTAL.length + TOTAL_OPEN.length + TOTAL_DISCOUNT.length + QTY.length + QTY_EDIT.length + DETAILS.length;
 console.log('-'.repeat(60));
 console.log(`${total} properties checked against Figma nodes, ${fails} differ`);
 await browser.close();

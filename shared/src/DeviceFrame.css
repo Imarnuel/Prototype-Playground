@@ -10,7 +10,7 @@
   position: relative;
   width: var(--device-body-w);
   height: var(--device-body-h);
-  border-radius: var(--device-body-radius);
+  border-radius: calc(var(--device-body-radius) * var(--corner-scale, 1));
   padding: var(--device-bezel);
   box-sizing: border-box;
   background: #1c1c1e;
@@ -25,7 +25,7 @@
   padding: 0;
   width: var(--device-screen-w);
   height: var(--device-screen-h);
-  border-radius: var(--device-screen-radius);
+  border-radius: calc(var(--device-screen-radius) * var(--corner-scale, 1));
   background: none;
   box-shadow: none;
 }
@@ -34,7 +34,7 @@
   position: relative;
   width: var(--device-screen-w);
   height: var(--device-screen-h);
-  border-radius: var(--device-screen-radius);
+  border-radius: calc(var(--device-screen-radius) * var(--corner-scale, 1));
   background: #fff;
 
   /* `clip`, not `hidden`. An overflow:hidden box is still programmatically

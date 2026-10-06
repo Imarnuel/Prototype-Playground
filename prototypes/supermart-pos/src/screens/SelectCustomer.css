@@ -19,13 +19,13 @@
    them; the innermost uses Color/border/default. Kept as drawn and logged as #45. */
 .customerEmpty__rings {
   padding: 20px;
-  border-radius: 56px;
+  border-radius: calc(56px * var(--corner-scale));
   box-shadow: inset 0 0 0 var(--border-width-sm) #f2f2f3;
 }
 
 .customerEmpty__ring2 {
   padding: 20px;
-  border-radius: 40px;
+  border-radius: calc(40px * var(--corner-scale));
   box-shadow: inset 0 0 0 var(--border-width-sm) #dfe0e2;
   overflow: clip;
 }

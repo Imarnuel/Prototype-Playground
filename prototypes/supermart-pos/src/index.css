@@ -54,7 +54,9 @@ select {
    literally instead. */
 .textField::after,
 .filterButton::after,
-.qtyField::after {
+.qtyField::after,
+.detailField::after,
+.segmented::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -72,8 +74,54 @@ select {
   background: linear-gradient(0deg, rgb(0 0 0 / 15%) 0%, rgb(0 0 0 / 0%) 19.71%);
 }
 
-.filterButton::after {
+/* Item details' text fields and %/₦ switch (`88:9556`-`88:9565`) carry the filter
+   button's paint: bottom to top over the full height, at 10% layer opacity. */
+.filterButton::after,
+.detailField::after,
+.segmented::after {
   background: linear-gradient(0deg, rgb(0 0 0 / 10%) 0%, rgb(0 0 0 / 0%) 100%);
+}
+
+/* --- Continuous corners --------------------------------------------------------
+   Apple's corner smoothing — Figma's 60%, the iOS value — on every rounded corner.
+   A smoothed corner keeps a plain corner's depth on the diagonal but starts its
+   curve 1.6x further along each edge. CSS draws that as the radius x1.6 with a
+   superellipse whose exponent matches the diagonal depth: 2^K = 3.43, K = 1.78.
+
+   `corner-shape` is Chrome 139+. Safari ignores this block and keeps plain rounded
+   corners, so nothing breaks there. Circles and pills keep `round`: smoothing a full
+   radius changes nothing in Figma either.
+
+   `data-corner-smoothing="off"` on <html> restores the design's literal radii — the
+   property audit compares those against the nodes. */
+:root { --corner-scale: 1; }
+
+@supports (corner-shape: superellipse(2)) {
+  :root:not([data-corner-smoothing='off']) {
+    --corner-scale: 1.6;
+    /* tokens.css's radius scale x1.6 (generated, so not edited there). */
+    --radius-50: calc(4px * 1.6);
+    --radius-100: calc(6px * 1.6);
+    --radius-200: calc(8px * 1.6);
+    --radius-300: calc(12px * 1.6);
+    --radius-400: calc(16px * 1.6);
+    --radius-500: calc(20px * 1.6);
+    --radius-650: calc(28px * 1.6);
+  }
+
+  :root:not([data-corner-smoothing='off']) *,
+  :root:not([data-corner-smoothing='off']) *::before,
+  :root:not([data-corner-smoothing='off']) *::after {
+    corner-shape: superellipse(1.78);
+  }
+
+  :root:not([data-corner-smoothing='off']) :is(
+    .closeButton, .modalHeader__confirm, .qtyStepper__step, .qtyField__step,
+    .addCustomer__avatar, .cart__iconButton, .salesPoint__overflow,
+    .filterChip, .tabBar__nav, .tabBar__item, .device__island
+  ) {
+    corner-shape: round;
+  }
 }
 
 /* Read by assistive tech, not drawn — for copy a design does not show but a screen
