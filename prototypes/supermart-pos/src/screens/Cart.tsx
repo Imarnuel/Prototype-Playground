@@ -1,3 +1,4 @@
+import { DURATION, EASING, duration, useReducedMotion } from '@playground/shared';
 import { Icon } from '../components/Icon';
 import { CloseButton } from '../components/CloseButton';
 import { QtyInputField } from '../components/QtyInputField';
@@ -6,6 +7,7 @@ import { productImage } from '../data/productImage';
 import type { Customer } from '../data/customers';
 import { lineGross, productFor, totals, type CartLine } from '../state/cart';
 import { BottomScrim } from '../components/BottomScrim';
+import { OrderTotal } from '../components/OrderTotal';
 import './Cart.css';
 
 /**
@@ -27,14 +29,25 @@ type CartProps = {
   /** Set once a customer is picked in the Select customer sheet. */
   customer: Customer | null;
   onRemoveCustomer: () => void;
+  /** Lifted to the App so the dev toolbar can present the expanded state. */
+  totalOpen: boolean;
+  onToggleTotal: () => void;
 };
 
 export function Cart({
   lines, onClose, onQtyChange, onRemove, onCheckout, onQueue, onAddCustomer,
-  onMoreOptions, onClearAll, customer, onRemoveCustomer,
+  onMoreOptions, onClearAll, customer, onRemoveCustomer, totalOpen, onToggleTotal,
 }: CartProps) {
+  const reducedMotion = useReducedMotion();
   return (
-    <div className="cart">
+    <div
+      className="cart"
+      data-total={totalOpen ? 'on' : 'off'}
+      style={{
+        '--order-total-ms': `${duration(DURATION.base, reducedMotion)}ms`,
+        '--order-total-easing': totalOpen ? EASING.out : EASING.in,
+      } as React.CSSProperties}
+    >
       <header className="cart__titleBar">
         <div className="cart__titleLeft">
           <CloseButton onPress={onClose} label="Close order preview" />
@@ -140,25 +153,22 @@ export function Cart({
         )}
       </div>
 
-      <BottomScrim height={206} />
+      {/* `88:8713`: the same scrim as the Cart's, at this band's 239 rather than 206 —
+          same gradient transform, so only the height changes. */}
+      <BottomScrim height={239} />
 
       <div className="cart__footer">
-        <button type="button" className="cart__checkout" onClick={onCheckout} disabled={lines.length === 0}>
-          <span className="cart__checkoutLabel">Checkout ({lines.length})</span>
-          <Icon name="chevron-right" />
-        </button>
-        <button type="button" className="cart__queue" onClick={onQueue} disabled={lines.length === 0}>
-          <span className="cart__queueLabel">Queue order</span>
-        </button>
+        <OrderTotal totals={totals(lines)} open={totalOpen} onToggle={onToggleTotal} />
+        <div className="cart__actions">
+          <button type="button" className="cart__checkout" onClick={onCheckout} disabled={lines.length === 0}>
+            <span className="cart__checkoutLabel">Checkout ({lines.length})</span>
+            <Icon name="chevron-right" />
+          </button>
+          <button type="button" className="cart__queue" onClick={onQueue} disabled={lines.length === 0}>
+            <span className="cart__queueLabel">Queue order</span>
+          </button>
+        </div>
       </div>
-
-      {/* Not in the frame. The design shows six priced lines and a "Checkout (5)"
-          button with no order total anywhere, so the one number a till must show is
-          missing. Rendered in the footer region as a minimal honest addition rather
-          than invented chrome, and flagged as needing design input (#32). */}
-      <p className="cart__total" aria-live="polite">
-        Total <strong>{formatPrice(totals(lines).total)}</strong>
-      </p>
     </div>
   );
 }

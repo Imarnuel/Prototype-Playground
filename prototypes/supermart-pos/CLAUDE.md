@@ -16,7 +16,7 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **67** inconsistencies, including that 31 frames share the name
+anything — it records **74** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
@@ -28,7 +28,7 @@ anything — it records **67** inconsistencies, including that 31 frames share t
 | 3 | Select customer (empty + populated) | `88:11845`, `88:12043` | 0 outside tolerance, 17/17 flow |
 | 4 | Customer added (+ toast) | `88:8243`, `88:8322` | 0 outside 0.5px, 11/11 flow and motion |
 
-All four pass `npm run figma:audit`: **231 properties read off the Figma nodes**
+All of it passes `npm run figma:audit`: **274 properties read off the Figma nodes**
 (fills, strokes and their weight and alignment, radii, effects, auto-layout padding and
 spacing, full type spec) against computed style, **0 differing**.
 
@@ -40,9 +40,16 @@ byte-identical duplicate of it; `88:8322` is the same frame plus the toast.
 ### In progress — band `115:8774`, "Adjusting qty & product details in cart"
 
 Three features in dependency order: the footer order total, the Quantity sheet, the
-line-details modal. **Step 1, the money model and pack units, is done** (no UI): see
-"Money" below and BUILD-PLAN's step 1 record. Next: the footer total (`88:8639` /
-`88:9338`).
+line-details modal.
+
+| Step | What | Node | State |
+|---|---|---|---|
+| 1 | Money model and pack units (no UI) | — | `catalogue:verify` 57/57, `cart:verify` 22/22 |
+| 2 | Order total, collapsed and expanded | `88:8639`, `88:9338` | 0 outside 0.5px over 77 measurements, 19/19 flow and motion |
+| 3 | Quantity sheet | `88:11532`, `88:11647` | next |
+| 4 | Line-details modal | `88:9439` | — |
+
+`88:8481` and `88:11766` are byte-identical to `88:8243` and need nothing built.
 
 **Hosted preview:** <https://claude.ai/artifact/LnsiYh4uBeTNY1J3XDMJHX> — rebuild and
 republish it with `npm run build:hosted`.
@@ -94,7 +101,8 @@ Nothing else does arithmetic on money.
 - A Cart line displays its **gross**, so lines add up to the Subtotal on screen.
 - Total = Subtotal - Discount + Tax, exact in kobo. VAT is per line on the net,
   and the order's tax is rounded once to whole Naira, so the total is collectable.
-- **The Cart's Total includes VAT** (BUILD-PLAN #67).
+- **The Cart's Total includes VAT** (BUILD-PLAN #67). Its breakdown shows Discount
+  only when there is one — the design draws that row hidden (#71).
 - Typed money and counts go through `parseCount` / `parseWholeNaira` /
   `parsePercent`, never `Number()` or `parseFloat`.
 - **One line per product** — a stated limitation, not an oversight.
@@ -137,11 +145,18 @@ npm run catalogue:csv      # regenerate figma/catalogue.csv from catalogue.ts
 npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json
 npm run tokens:verify      # the generated tokens still match the Figma dump
 npm run motion:sample      # transitions animate in BOTH directions (needs a server)
-npm run figma:audit        # 231 properties read off the Figma NODES vs computed style
+npm run figma:audit        # 274 properties read off the Figma NODES vs computed style
 npm run images:manifest    # which photos are missing, and packshot coverage
 npm run images:packshots   # regenerate the placeholder packshots from catalogue.ts
 npm run images:optimise -- --box <css-px>   # --box MUST come from a measured frame
 npm run build:hosted       # publish-ready bundle for the hosted preview
+
+# Browser walks and diffs — pass a server's base URL (default the dev server, :4251)
+node scripts/walk-total.mjs      [url]   # order total: reconciles, motion both ways
+node scripts/diff-total.mjs      [url]   # order total vs 88:8639 / 88:9338
+node scripts/walk-stock.mjs      [url]   # stock clamp and its toast
+node scripts/walk-sheet-keys.mjs [url]   # sheet focus, Escape, Tab trap
+node scripts/diff-added.mjs      [url]   # Customer added vs 88:8243
 ```
 
 Run `catalogue:verify` and `cart:verify` after any edit to `catalogue.ts` or `cart.ts`. An invalid check digit or a
@@ -163,8 +178,6 @@ entrance that never animates.
   destination (BUILD-PLAN #50, #51).
 - **The Cart's title-bar trash clears the whole order in one tap** — no confirmation
   or undo, and none is designed in this band (BUILD-PLAN #35).
-- **The Cart shows no order total** in the frame; one was added as a minimal honest
-  addition and needs design input (BUILD-PLAN #32).
 - The sheet **exit curve** is heavily back-loaded and is deferred to `better-ui`,
   which owns motion and is not installed (BUILD-PLAN #37).
 - **No motion is authored anywhere in the Figma file** — `get_motion_context` returns

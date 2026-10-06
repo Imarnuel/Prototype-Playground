@@ -39,6 +39,7 @@ export function App() {
   const showToast = (message: string, tone: ToastTone = 'success') =>
     setToast((t) => ({ open: true, message, tone, shown: t.shown + 1 }));
   const hideToast = useCallback(() => setToast((t) => ({ ...t, open: false })), []);
+  const [totalOpen, setTotalOpen] = useState(false);
   const reducedMotion = useReducedMotion();
 
   /* A tap the shelf can't supply returns the same lines from `addToCart`. Saying why
@@ -55,7 +56,7 @@ export function App() {
 
   const resetScreens = () => {
     setForced(undefined); setCartOpen(false); setPickerOpen(false);
-    setCustomer(null); setCustomers(CUSTOMERS); hideToast();
+    setCustomer(null); setCustomers(CUSTOMERS); hideToast(); setTotalOpen(false);
     setResetNonce((n) => n + 1);
   };
 
@@ -79,6 +80,18 @@ export function App() {
           .map((id) => PRODUCTS.find((p) => p.id === id)!);
         setLines(picks.reduce<readonly CartLine[]>((acc, p) => addToCart(acc, p), []));
         setCartOpen(true);
+      },
+    },
+    {
+      label: 'Cart: total expanded',
+      group: 'States',
+      onSelect: () => {
+        // A discounted line, so the breakdown's Discount row is on show too.
+        setLines([
+          { productId: 'bev-cola', unitId: 'each', count: 1, discount: { kind: 'percent', percent: 15 } },
+          { productId: 'noo-multipack', unitId: 'each', count: 2 },
+        ]);
+        setCartOpen(true); setTotalOpen(true);
       },
     },
     {
@@ -155,6 +168,8 @@ export function App() {
                 onClearAll={() => setLines([])}
                 customer={customer}
                 onRemoveCustomer={() => setCustomer(null)}
+                totalOpen={totalOpen}
+                onToggleTotal={() => setTotalOpen((o) => !o)}
               />
 
               <SelectCustomer

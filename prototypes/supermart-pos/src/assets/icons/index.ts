@@ -17,6 +17,7 @@
 import add_one from './add-one.svg';
 import cart from './cart.svg';
 import check_circle from './check-circle.svg';
+import chevron_down from './chevron-down.svg';
 import chevron_right from './chevron-right.svg';
 import dots_horizontal from './dots-horizontal.svg';
 import ellipse_79 from './ellipse-79.svg';
@@ -39,6 +40,7 @@ export type IconName =
   | 'add-one'
   | 'cart'
   | 'check-circle'
+  | 'chevron-down'
   | 'chevron-right'
   | 'dots-horizontal'
   | 'ellipse-79'
@@ -61,6 +63,7 @@ export const ICONS: Record<IconName, { src: string; width: number; height: numbe
   'add-one': { src: add_one, width: 20, height: 20 },
   'cart': { src: cart, width: 19, height: 18 },
   'check-circle': { src: check_circle, width: 48, height: 48 },
+  'chevron-down': { src: chevron_down, width: 20, height: 20 },
   'chevron-right': { src: chevron_right, width: 16, height: 16 },
   'dots-horizontal': { src: dots_horizontal, width: 20, height: 20 },
   'ellipse-79': { src: ellipse_79, width: 3, height: 3 },

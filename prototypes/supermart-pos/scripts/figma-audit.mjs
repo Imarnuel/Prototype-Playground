@@ -240,7 +240,7 @@ const CART = [
   ['88:8191 price',         '.cartLine__price',      'color',           'rgb(20, 31, 51)'],
   ['88:8191 price',         '.cartLine__price',      'textAlign',       'center'],
   // Footer 88:8239
-  ['88:8239 footer',        '.cart__footer',         'columnGap',       '8px'],
+  ['88:8239 footer',        '.cart__actions',        'columnGap',       '8px'],
   ['88:8241 checkout',      '.cart__checkout',       'backgroundColor', 'rgb(44, 74, 139)'],
   ['88:8241 checkout',      '.cart__checkout',       'borderRadius',    '12px'],
   ['88:8241 checkout',      '.cart__checkout',       'boxShadow',       '0 1px 2px 0 rgba(10, 13, 18, 0.05)'],
@@ -317,6 +317,63 @@ const TOAST = [
   ['I...12156 message',     '.toast__message',       'color',           'rgb(255, 255, 255)'],
   ['I...12156 message',     '.toast__message',       'textAlign',       'center'],
   ['I...12156 message',     '.toast__message',       'width',           '168px'],
+];
+
+/* The order total, band `115:8774`. Collapsed `88:8639`. Not asserted, on purpose
+   (BUILD-PLAN #68-#70): the expanded frame's 20px side padding and its H2 header. */
+const TOTAL = [
+  ['88:8714 panel',         '.cart__footer',         'backgroundColor', 'rgb(255, 255, 255)'],
+  ['88:8714 panel',         '.cart__footer',         'borderRadius',    '12px 12px 0px 0px'],
+  ['88:8714 panel',         '.cart__footer',         'padding',         '12px 16px 24px 16px'],
+  ['88:8714 panel',         '.cart__footer',         'boxShadow',
+    '0 -2px 4px -1px #0a0d120f, 0 -4px 8px -2px #0a0d121a'],
+  ['88:8715 total row',     '.orderTotal__toggle',   'backgroundColor', 'rgb(255, 255, 255)'],
+  ['88:8715 total row',     '.orderTotal__toggle',   'paddingTop',      '12px'],
+  ['88:8715 total row',     '.orderTotal__toggle',   'paddingBottom',   '12px'],
+  ['88:8715 total row',     '.orderTotal__toggle',   'height',          '48px'],
+  ['88:8716 label group',   '.orderTotal__label',    'columnGap',       '8px'],
+  ['88:8717 "Total"',       '.orderTotal__label',    'fontSize',        '16px'],
+  ['88:8717 "Total"',       '.orderTotal__label',    'fontWeight',      '600'],
+  ['88:8717 "Total"',       '.orderTotal__label',    'lineHeight',      '24px'],
+  ['88:8717 "Total"',       '.orderTotal__label',    'letterSpacing',   '-0.32px'],
+  ['88:8717 "Total"',       '.orderTotal__label',    'color',           'rgb(20, 31, 51)'],
+  ['88:8719 value',         '.orderTotal__value',    'fontSize',        '16px'],
+  ['88:8719 value',         '.orderTotal__value',    'fontWeight',      '600'],
+  ['88:8719 value',         '.orderTotal__value',    'lineHeight',      '24px'],
+  ['88:8719 value',         '.orderTotal__value',    'letterSpacing',   '-0.32px'],
+  ['88:8719 value',         '.orderTotal__value',    'color',           'rgb(20, 31, 51)'],
+  ['88:8718 chevron',       '.orderTotal__chevron',  'width',           '20px'],
+  ['88:8718 chevron',       '.orderTotal__chevron',  'height',          '20px'],
+  ['88:8720 buttons',       '.cart__actions',        'columnGap',       '8px'],
+];
+
+/* Expanded, `88:9338`. */
+const TOTAL_OPEN = [
+  ['88:9420 breakdown',     '.orderTotal__breakdown', 'boxShadow',      'inset 0 1px 0 0 #252b3714'],
+  ['88:9420 breakdown',     '.orderTotal__breakdown', 'paddingTop',     '8px'],
+  ['88:9420 breakdown',     '.orderTotal__breakdown', 'paddingBottom',  '8px'],
+  ['88:9421 row',           '.orderTotal__row',      'paddingTop',      '8px'],
+  ['88:9421 row',           '.orderTotal__row',      'paddingBottom',   '8px'],
+  ['88:9421 row',           '.orderTotal__row',      'height',          '36px'],
+  ['88:9423 "Subtotal"',    '.orderTotal__row dt',   'fontSize',        '14px'],
+  ['88:9423 "Subtotal"',    '.orderTotal__row dt',   'fontWeight',      '500'],
+  ['88:9423 "Subtotal"',    '.orderTotal__row dt',   'lineHeight',      '20px'],
+  ['88:9423 "Subtotal"',    '.orderTotal__row dt',   'letterSpacing',   '-0.16px'],
+  ['88:9423 "Subtotal"',    '.orderTotal__row dt',   'color',           'rgb(94, 106, 130)'],
+  ['88:9425 value',         '.orderTotal__amount',   'fontSize',        '14px'],
+  ['88:9425 value',         '.orderTotal__amount',   'fontWeight',      '600'],
+  ['88:9425 value',         '.orderTotal__amount',   'lineHeight',      '20px'],
+  ['88:9425 value',         '.orderTotal__amount',   'letterSpacing',   '-0.2px'],
+  ['88:9425 value',         '.orderTotal__amount',   'color',           'rgb(20, 31, 51)'],
+];
+
+/* The hidden Discount row, `88:9426`, styled as the design styles it. */
+const TOTAL_DISCOUNT = [
+  ['88:9430 discount',      '.orderTotal__deduction', 'fontSize',       '14px'],
+  ['88:9430 discount',      '.orderTotal__deduction', 'fontWeight',     '500'],
+  ['88:9430 discount',      '.orderTotal__deduction', 'lineHeight',     '20px'],
+  ['88:9430 discount',      '.orderTotal__deduction', 'letterSpacing',  '-0.16px'],
+  ['88:9430 discount',      '.orderTotal__deduction', 'color',          'rgb(94, 106, 130)'],
 ];
 
 const browser = await pw.chromium.launch({ executablePath: EXE });
@@ -420,8 +477,20 @@ await pick('Customer added');
 fails += await run('Customer added', ADDED);
 await pick('Customer added: toast');
 fails += await run('Customer added toast', TOAST);
+await pick('Cart: fill with 4 lines');
+if (await page.evaluate(() => document.querySelector('.orderTotal__toggle').getAttribute('aria-expanded')) === 'true') {
+  await page.evaluate(() => document.querySelector('.orderTotal__toggle').click());
+  await page.waitForTimeout(700);
+}
+fails += await run('Order total', TOTAL);
+await page.evaluate(() => document.querySelector('.orderTotal__toggle').click());
+await page.waitForTimeout(700);
+fails += await run('Order total open', TOTAL_OPEN);
+await pick('Cart: total expanded');
+fails += await run('Order total discount', TOTAL_DISCOUNT);
 
-const total = SCALAR.length + COMPOUND.length + CART.length + SHEET.length + EMPTY.length + ADDED.length + TOAST.length;
+const total = SCALAR.length + COMPOUND.length + CART.length + SHEET.length + EMPTY.length + ADDED.length + TOAST.length
+  + TOTAL.length + TOTAL_OPEN.length + TOTAL_DISCOUNT.length;
 console.log('-'.repeat(60));
 console.log(`${total} properties checked against Figma nodes, ${fails} differ`);
 await browser.close();

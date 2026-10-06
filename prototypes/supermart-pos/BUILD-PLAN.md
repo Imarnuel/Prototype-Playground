@@ -249,7 +249,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 29 | Cart content sits at left 12 with width 361, so its right margin is 20 against the 16 used by the title bar and footer | Followed as drawn |
 | 30 | **The Cart's six rows disagree with each other.** Five use gap 4, `Color/border/default` and "ea"; the sixth uses gap 8, `Color/border/input` and "each". Row 5 name is 18/22, row 6 is 15/22 — neither is a token | Five-row majority built |
 | 31 | The Add-customer card's border uses `Color/container/neutral/subtle/hover` — a **hover** token on a static border | Followed (same value), flagged |
-| 32 | **The Cart shows no order total**, and its button reads "Checkout (5)" over **six** priced rows whose line prices reconcile with nothing (₦10,000 on one row, ₦1,000 on five at the same quantity) | Total added as a minimal honest addition; **needs design input** |
+| 32 | **The Cart shows no order total**, and its button reads "Checkout (5)" over **six** priced rows whose line prices reconcile with nothing (₦10,000 on one row, ₦1,000 on five at the same quantity) | Total added as a minimal honest addition. **Resolved** by band `115:8774`, which designs one (`88:8639` / `88:9338`) — the ad-hoc line is gone |
 | 33 | **No motion is authored anywhere in the file.** `get_motion_context` returns `{"nodes":[]}` for the Cart, the Sales Point, and all 90 frames in the section | Transitions use the project's own documented baseline, explicitly not design-derived |
 | 34 | Product names clamp to two lines in a 172px card and the longest real name still overflows. The design sets `nowrap`, which only holds for its own short placeholder names | `title` added as the minimum way to reach the full value; **a designed affordance is still needed** |
 | 35 | **The Cart's title-bar trash clears the whole order in one tap** — no confirmation, no undo, no distinct treatment. Measured: 4 lines to 0 with no dialog | **Open — needs design input.** Not invented here; the board's unbuilt "More options" frame (`88:15458`) may hold the intended pattern |
@@ -285,6 +285,13 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 65 | **Nothing in the design limits a sale to stock.** The build let the out-of-stock Bluewell Apple Juice into the cart and stepped past the shelf from the grid (a build bug, not the design's) | Clamped in `addToCart`, in the line's own unit. A refused tap raises the existing toast — "Out of stock" / "Only 3 ea left" — **copy undesigned**, and without the check-circle, since a success glyph beside a refusal says the opposite. There is no warning glyph or warning token to use instead. **Needs design input** |
 | 66 | **The band 4 toast faded out an empty box.** `message={toast ?? ''}` cleared the text the moment the exit began; and its timer restarted on every App render, so a busy screen could hold it up indefinitely | Mine, from band 4. **Fixed**: the message outlives `open`, and the timer restarts on each show (a repeat refusal gets the full 2.6s), not on render. Both A/B'd — the old code fails each check |
 | 67 | **The Cart's Total changes value.** It was the plain sum of lines; it now includes the 7.5% VAT the study's tax assumption always implied — ₦1,500 of lines shows ₦1,613 | Deliberate: one money model, `orderTotals`, replaces the two that disagreed (the Cart's sum vs the verifier's VAT). The Total line itself is still the ad-hoc one from #32 until the footer total is built |
+| 68 | **The total's header changes type between states**: Heading/H3 16px collapsed (`88:8717`), Heading/H2 18px expanded (`88:9416`) — and the expanded "Total" label is an unbound `#000000` where its value is Color/text/default | H3 and the token in both. A disclosure whose header grows when tapped moves the thing just tapped, and the label and value would reflow mid-animation |
+| 69 | **The footer's buttons sit at y=780** in both new frames (24px above the bottom), against 773 in the band 4 Cart (`88:8164`) and 764 in Customer added (`88:8243`). At 780 their bottom edge (828) sits 10px inside the 34pt home-indicator inset | **780**, superseding #61: the total panel is now permanent, so the frame that draws it defines the footer, and the Cart and Customer added can no longer drift. The safe-area overlap is the design's — **needs design input** |
+| 70 | **Side padding differs between states**: 16px collapsed (`88:8714`), 20px expanded (`88:9413`), so Checkout is 233 wide closed and 225 open | 16 in both. Otherwise the buttons resize while the panel animates |
+| 71 | **The Discount row is drawn but hidden** (`88:9426`, `visible: false`), at a 36px inset where Subtotal and Tax sit at 20, and with its value in Label/Base Color/text/subtle where theirs are Heading/H4 Color/text/default | Shown **only when the order has a discount**, which is the reading "drawn but hidden" supports; at its siblings' inset; with its own styling, since that is the design's value for it. Amount signed: "−₦75". **Needs design input** |
+| 72 | **The chevron never changes** between collapsed and expanded, so nothing says the row is open or that tapping again closes it. The sub-rows' chevrons are hidden | Turns 180° with the panel, over the same duration and curve; `aria-expanded` carries the state for assistive tech. Hidden sub-row chevrons are not built — they would be dead affordances (§9) |
+| 73 | **The frames' numbers do not reconcile**: Subtotal ₦10,000 = Total ₦10,000 over six ₦1,000 lines, and Tax ₦0 contradicts the study's 7.5% VAT | Every figure is computed by `orderTotals`. A standard-rated basket shows its real VAT |
+| 74 | **The footer panel's fill and shadow are unbound**: `#ffffff` with no variable (its child row binds Color/surface/default, same value), and a shadow pair with no effect style — Untitled UI's shadow-md cast upward | Fill from the token holding the same value; the shadow as a literal with a comment — no token was invented for it |
 
 ## Work order
 
@@ -602,6 +609,26 @@ rule fails 2 checks (it gets 69% of ₦350 as ₦241, not ₦242: the raw value 
 241.4999...), un-rounded order tax fails 2 (373 of 500 random baskets have a fractional
 payable total), an unpersisted clamp fails 4, a kept override fails 1. Every UI gate
 unchanged on dev and production, except the Cart walk's total check, rewritten for VAT.
+
+### Band `115:8774`, step 2 — the order total
+
+`88:8639` / `88:9338` built as one `OrderTotal` disclosure inside a docked footer
+panel, replacing the ad-hoc Total line (#32). Every figure is `orderTotals`.
+
+- **Motion**: `grid-template-rows` 0fr -> 1fr on `DURATION.base`, `EASING.out` open /
+  `EASING.in` close; the chevron turns on the same values. One custom property drives
+  every duration and the visibility delay, so stretching it for debugging stretches
+  all of them — stretching only the durations made the panel vanish mid-close at
+  82px, which was the test's fault, and is why it is built this way.
+- **The buttons never move**: sampled over 20 frames of a stretched open and close,
+  one y (836.59 in the test viewport).
+- **The list keeps 10px of clearance** under either panel height; A/B with the open
+  rule removed, the last line ends 31px under the panel.
+
+Verified: `diff-total` 0 outside 0.5px over 77 measurements (collapsed, expanded,
+collapsed again; the chevron's x replaced by the designed 8px gap, #56);
+`walk-total` 19/19; `figma:audit` 274 properties, 0 differ (+43); every earlier gate
+green on dev and production — the Cart diff retargeted to the new footer (#69).
 
 ## Screen 1 — verification record
 

@@ -79,7 +79,12 @@
      frame's own asymmetry against the 16px margins used by the title bar and
      footer. Followed rather than normalised. Logged #29. */
   padding: 16px 20px 150px 12px;
+  transition: padding-bottom var(--order-total-ms, 0ms) var(--order-total-easing, linear);
 }
+
+/* The footer is 140 tall collapsed and 228 open; the list keeps the same 10px of
+   clearance in both, so its last line can always be scrolled clear of the panel. */
+.cart[data-total='on'] .cart__scroll { padding-bottom: 238px; }
 
 .addCustomer {
   display: flex;
@@ -277,13 +282,30 @@
 
 /* Bottom-docked, so no +9 shift: design 773..821 on an 852 screen leaves 31. */
 .cart__footer {
+  /* Frame 5031 `88:8714` / `88:9413`: docked to the screen bottom, 12px above and 24px
+     below, top corners Border radius/300. Its fill is an unbound #ffffff;
+     Color/surface/default holds the same value. The buttons sit at y=780 in both
+     frames — the panel grows UPWARD, so they never move while it opens. */
   position: absolute;
-  left: 16px;
-  bottom: 31px;
-  width: 361px;
+  left: 0;
+  bottom: 0;
+  width: 393px;
+  box-sizing: border-box;
+  padding: 12px 16px 24px;
+  background: var(--color-surface-default);
+  border-radius: var(--radius-300) var(--radius-300) 0 0;
+  /* The frame's own pair, unbound and with no token: Untitled UI's shadow-md turned
+     to cast upward (0,-2 blur 4 spread -1 at 6%; 0,-4 blur 8 spread -2 at 10%). */
+  box-shadow: 0 -2px 4px -1px #0a0d120f, 0 -4px 8px -2px #0a0d121a;
+}
+
+/* Frame 5032: the buttons, Spacing/200 apart. The 8px above them is the collapsed
+   frame's gap and the expanded frame's breakdown padding — the same 8 in both. */
+.cart__actions {
   display: flex;
   gap: var(--spacing-200);
   align-items: center;
+  padding-top: 8px;
 }
 
 .cart__checkout,
@@ -336,30 +358,6 @@
 .cart__checkout:disabled .cart__checkoutLabel,
 .cart__queue:disabled .cart__queueLabel {
   color: var(--color-text-on-disabled);
-}
-
-/* Not in the frame — see the comment at its call site. Sits above the footer. */
-.cart__total {
-  position: absolute;
-  left: 16px;
-  bottom: 87px;
-  width: 361px;
-  margin: 0;
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--type-Label-Base-size);
-  font-weight: var(--type-Label-Base-weight);
-  line-height: var(--type-Label-Base-line-height);
-  letter-spacing: var(--type-Label-Base-letter-spacing);
-  color: var(--color-text-subtle);
-}
-
-.cart__total strong {
-  font-size: var(--type-Heading-H2-size);
-  font-weight: var(--type-Heading-H2-weight);
-  line-height: var(--type-Heading-H2-line-height);
-  letter-spacing: var(--type-Heading-H2-letter-spacing);
-  color: var(--color-text-default);
 }
 
 /* The trailing control, which is the whole difference between the Cart's row and
