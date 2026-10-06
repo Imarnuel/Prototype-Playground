@@ -1,3 +1,5 @@
+import { useRef, useState } from 'react';
+import { AnimatedText } from '../components/AnimatedText';
 import { DURATION, EASING, duration, useReducedMotion } from '@playground/shared';
 import { Icon } from '../components/Icon';
 import { CloseButton } from '../components/CloseButton';
@@ -43,6 +45,15 @@ export function Cart({
   onMoreOptions, onClearAll, customer, onRemoveCustomer, totalOpen, onToggleTotal,
 }: CartProps) {
   const reducedMotion = useReducedMotion();
+  /* A removed line collapses before it leaves the state, so nothing cuts. Its
+     product id is held here for the length of the exit, then the removal lands. */
+  const [leaving, setLeaving] = useState<readonly string[]>([]);
+  const leave = (ids: readonly string[], then: () => void) => {
+    setLeaving((l) => [...l, ...ids]);
+    setTimeout(() => { then(); setLeaving((l) => l.filter((x) => !ids.includes(x))); },
+      duration(DURATION.base, reducedMotion));
+  };
+  const lineRefs = useRef(new Map<string, HTMLLIElement>());
   return (
     <div
       className="cart"
@@ -61,7 +72,7 @@ export function Cart({
           <button type="button" className="cart__iconButton" onClick={onMoreOptions} aria-label="More options">
             <Icon name="dots-horizontal" />
           </button>
-          <button type="button" className="cart__iconButton" onClick={onClearAll} aria-label="Clear order">
+          <button type="button" className="cart__iconButton" onClick={() => leave(lines.map((l) => l.productId), onClearAll)} aria-label="Clear order">
             <Icon name="trash-03" />
           </button>
         </div>
@@ -83,7 +94,7 @@ export function Cart({
             <span className="addCustomer__avatar">
               <Icon name="user-02" />
             </span>
-            <span className="addCustomer__label">{customer ? customer.name : 'Add customer'}</span>
+            <span key={customer?.id ?? 'empty'} className="addCustomer__label">{customer ? customer.name : 'Add customer'}</span>
 
             {/* With no customer the plus lives INSIDE the pick button, so the whole
                 row stays one target as the frame draws it. Only the added state
@@ -117,7 +128,14 @@ export function Cart({
             {lines.map((line) => {
               const product = productFor(line);
               return (
-                <li key={line.productId} className="cartLine">
+                <li
+                  key={line.productId}
+                  className="cartLine"
+                  ref={(el) => { if (el) lineRefs.current.set(line.productId, el); else lineRefs.current.delete(line.productId); }}
+                  data-leaving={leaving.includes(line.productId) || undefined}
+                  // The collapse starts from the row's real height.
+                  style={{ '--line-h': `${lineRefs.current.get(line.productId)?.offsetHeight ?? 110}px` } as React.CSSProperties}
+                >
                   <div className="cartLine__main">
                     <span className="cartLine__image">
                       {productImage(product) ? (
@@ -132,7 +150,9 @@ export function Cart({
                         count={line.count}
                         unit={unitFor(product, line.unitId).abbrev}
                         max={maxCount(product, line.unitId)}
-                        onChange={(next) => onQtyChange(line.productId, next)}
+                        onChange={(next) => (next <= 0
+                          ? leave([line.productId], () => onQtyChange(line.productId, next))
+                          : onQtyChange(line.productId, next))}
                         onValuePress={() => onEditQuantity(line.productId)}
                       />
                     </div>
@@ -141,7 +161,7 @@ export function Cart({
                     <button
                       type="button"
                       className="cartLine__remove"
-                      onClick={() => onRemove(line.productId)}
+                      onClick={() => leave([line.productId], () => onRemove(line.productId))}
                       aria-label={`Remove ${product.name}`}
                     >
                       <Icon name="x-circle" />
@@ -150,7 +170,7 @@ export function Cart({
                         add up to the Subtotal on screen, and discounts show once, in the
                         footer breakdown. The frame shows ₦10,000 on one row and ₦1,000 on
                         five others at the same quantity, which reconciles with nothing. */}
-                    <span className="cartLine__price">{formatPrice(lineGross(line))}</span>
+                    <span className="cartLine__price"><AnimatedText value={formatPrice(lineGross(line))} /></span>
                   </div>
                 </li>
               );
@@ -167,7 +187,7 @@ export function Cart({
         <OrderTotal totals={totals(lines)} open={totalOpen} onToggle={onToggleTotal} />
         <div className="cart__actions">
           <button type="button" className="cart__checkout" onClick={onCheckout} disabled={lines.length === 0}>
-            <span className="cart__checkoutLabel">Checkout ({lines.length})</span>
+            <span className="cart__checkoutLabel">Checkout (<AnimatedText value={String(lines.length)} />)</span>
             <Icon name="chevron-right" />
           </button>
           <button type="button" className="cart__queue" onClick={onQueue} disabled={lines.length === 0}>

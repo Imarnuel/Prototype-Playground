@@ -1,22 +1,18 @@
 /**
  * Coordinate diff of the Quantity sheet against `88:11532`. Targets are each node's
- * own absolute box, read with use_figma.
- *
- * The sheet is bottom-docked and its Measurement card hugs its four rows (224) where
- * the frame fixes it at 278 (BUILD-PLAN #77), so the whole sheet sits 54px lower:
- * every target in it takes SHIFT. Two other declared departures, each in BUILD-PLAN:
- * the card's height (#77), and the unselected rows' equivalents ending at 327 like the
- * selected one, not at 355 (#78). Text widths are not asserted (#56).
+ * own absolute box, read with use_figma. Built as drawn: the Measurement card at its
+ * fixed 278, and only the chosen row's check taking room, so its equivalent ends at
+ * 327 and the others' at 355. Text widths are not asserted (#56).
  *
  *   node scripts/diff-quantity.mjs [base-url]
  */
 import pw from '/opt/node-tools/node_modules/playwright/index.js';
 
 const BASE = process.argv[2] ?? 'http://127.0.0.1:4251/';
-const SHIFT = 54;
+const SHIFT = 0;
 // label, selector, x, y (frame), w, h — null skips; y takes SHIFT
 const T = [
-  ['sheet',          '.quantitySheet',                     6, 335, 381, 511 - SHIFT],
+  ['sheet',          '.quantitySheet',                     6, 335, 381, 511],
   ['header',         '.quantitySheet .modalHeader',        6, 335, 381,  64],
   ['close',          '.quantitySheet .closeButton',       22, 347,  40,  40],
   ['confirm',        '.modalHeader__confirm',            331, 347,  40,  40],
@@ -25,7 +21,7 @@ const T = [
   ['minus',          '.qtyStepper__step:first-child',     34, 416,  56,  56],
   ['plus',           '.qtyStepper__step:last-child',     303, 416,  56,  56],
   ['"Measurement"',  '.measurement__title',               22, 508, null, 20],
-  ['list card',      '.measurement__list',                22, 536, 349, 278 - SHIFT],
+  ['list card',      '.measurement__list',                22, 536, 349, 278],
   ['row Each',       '.measurement__row:nth-child(1)',    38, 536, 317,  56],
   ['row Pack',       '.measurement__row:nth-child(2)',    38, 592, 317,  56],
   ['row Carton',     '.measurement__row:nth-child(3)',    38, 648, 317,  56],
@@ -58,7 +54,7 @@ const line = (label, axis, target, actual) => {
   if (off) fails++;
   console.log(`  ${label.padEnd(15)} ${axis.padEnd(7)} ${String(target).padStart(6)}  ${actual.toFixed(2).padStart(8)}  ${diff.toFixed(2).padStart(6)}${off ? '  <-- OFF' : ''}`);
 };
-console.log(`88:11532, sheet internals +${SHIFT}`);
+console.log('88:11532');
 T.forEach(([label, sel, x, y, w, h], i) => {
   const m = res.rows[i];
   if (!m) { fails++; console.log(`  ${label.padEnd(15)} MISSING ${sel}`); return; }
@@ -71,7 +67,8 @@ T.forEach(([label, sel, x, y, w, h], i) => {
 line('title', 'centre', 196.5, res.titleCentre);
 line('count "10 ea"', 'centre', 196.5, res.countCentre);
 line('count "10 ea"', 'y', 430 + SHIFT, res.countY);
-res.each.forEach((r, i) => line(`equivalent ${i + 1}`, 'right', 327, r));
+// "10 ea" 292+35 on the chosen row; "40 ea" 318+37, "80 ea" 318+37, "160 ea" 312+43.
+res.each.forEach((r, i) => line(`equivalent ${i + 1}`, 'right', i === 0 ? 327 : 355, r));
 
 await browser.close();
 console.log(`\n${fails} measurement(s) outside 0.5px`);

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { AnimatedText } from '../components/AnimatedText';
+import { useRef, useState } from 'react';
 import { BottomSheet } from '../components/BottomSheet';
 import { QtyInputField } from '../components/QtyInputField';
 import {
@@ -78,7 +79,7 @@ export function LineDetails({
             <span className="lineDetails__sub">
               <span>{product.size}</span>
               {/* What the line will cost once saved: the draft's net. */}
-              <strong>{formatPrice(net)}</strong>
+              <strong><AnimatedText value={formatPrice(net)} /></strong>
             </span>
           </div>
         </div>
@@ -101,7 +102,7 @@ export function LineDetails({
               onChange={(e) => setPrice(e.target.value)} aria-invalid={!!priceError} />
           </span>
         </label>
-        {priceError && <p className="detailField__error" role="alert">{priceError}</p>}
+        <FieldError message={priceError} />
 
         <div className="lineDetails__discount">
           <label className="detailField">
@@ -113,7 +114,9 @@ export function LineDetails({
               {kind === 'percent' && <span aria-hidden="true">%</span>}
             </span>
           </label>
-          <div className="segmented" role="radiogroup" aria-label="Discount type">
+          <div className="segmented" role="radiogroup" aria-label="Discount type" data-kind={kind}>
+            {/* The chosen option's fill, as one element that slides between them. */}
+            <span className="segmented__indicator" aria-hidden="true" />
             {(['percent', 'amount'] as const).map((k) => (
               <button key={k} type="button" role="radio" aria-checked={kind === k}
                 aria-label={k === 'percent' ? 'Percent' : 'Naira amount'}
@@ -125,7 +128,7 @@ export function LineDetails({
             ))}
           </div>
         </div>
-        {discountError && <p className="detailField__error" role="alert">{discountError}</p>}
+        <FieldError message={discountError} />
 
         <label className="detailField detailField--tall">
           <span className="detailField__label">Description</span>
@@ -133,5 +136,19 @@ export function LineDetails({
         </label>
       </div>
     </BottomSheet>
+  );
+}
+
+/** A validation message that opens and closes rather than popping. It stays mounted,
+    holding its last text through the close, and takes no space while shut. */
+function FieldError({ message }: { message: string | null }) {
+  const last = useRef(message);
+  if (message) last.current = message;
+  return (
+    <div className="fieldError" data-open={message ? 'on' : 'off'}>
+      <div className="fieldError__clip">
+        <p className="detailField__error" role={message ? 'alert' : undefined}>{last.current}</p>
+      </div>
+    </div>
   );
 }

@@ -161,7 +161,26 @@
   padding: 20px 0;
   /* Inset, so the divider does not add 1px to every row's height. */
   box-shadow: inset 0 -1px 0 0 var(--color-border-subtle);
+  animation: motion-rise var(--motion-base) var(--ease-out) backwards;
 }
+
+/* Removal: the row fades and closes up from its own height, then leaves the state. */
+@keyframes cartLine-out {
+  from { height: var(--line-h); opacity: 1; }
+  to { height: 0; padding-block: 0; opacity: 0; }
+}
+
+.cartLine[data-leaving] {
+  box-sizing: border-box;
+  overflow: hidden;
+  pointer-events: none;
+  animation: cartLine-out var(--motion-base) var(--ease-in) forwards;
+}
+
+.cart__empty { animation: motion-fade var(--motion-base) var(--ease-out) backwards; }
+
+/* The customer row's two states cross-fade rather than swap. */
+.addCustomer__pick > *, .addCustomer__remove { animation: motion-fade var(--motion-fast) var(--ease-out) backwards; }
 
 .cartLine__main {
   display: flex;

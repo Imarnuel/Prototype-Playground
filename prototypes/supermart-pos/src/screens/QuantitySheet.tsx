@@ -1,3 +1,4 @@
+import { AnimatedText } from '../components/AnimatedText';
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { BottomSheet } from '../components/BottomSheet';
 import { Icon } from '../components/Icon';
@@ -144,7 +145,7 @@ export function QuantitySheet({
             {/* One inline run, so the space between count and unit is a real space —
                 inside the flex button two spans would drop it. */}
             <span>
-              <span className="qtyStepper__count">{count}</span>{' '}
+              <AnimatedText className="qtyStepper__count" value={String(count)} />{' '}
               <span className="qtyStepper__unit">{unit.abbrev}</span>
             </span>
           </button>
@@ -179,7 +180,9 @@ export function QuantitySheet({
                 >
                   <span className="measurement__label">{count} {u.label}</span>
                   <span className="measurement__each">{count * u.each} {each.abbrev}</span>
-                  <Icon name="check-selected" className="measurement__check" />
+                  <span className="measurement__checkSlot" aria-hidden="true">
+                    <Icon name="check-selected" className="measurement__check" />
+                  </span>
                 </button>
               );
             })}

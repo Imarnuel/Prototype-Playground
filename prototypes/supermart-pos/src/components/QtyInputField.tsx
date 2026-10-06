@@ -1,3 +1,4 @@
+import { AnimatedText } from './AnimatedText';
 import { Icon } from './Icon';
 import './QtyInputField.css';
 
@@ -27,7 +28,7 @@ export function QtyInputField({
 }) {
   const value = (
     <>
-      <span>{count}</span>
+      <AnimatedText value={String(count)} />
       <span>{unit}</span>
     </>
   );

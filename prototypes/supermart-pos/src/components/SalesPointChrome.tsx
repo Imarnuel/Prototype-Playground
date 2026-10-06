@@ -1,3 +1,4 @@
+import { AnimatedText } from './AnimatedText';
 import { DURATION, EASING, duration, useReducedMotion } from '@playground/shared';
 import { Icon } from './Icon';
 import type { ProductFilter } from '../api/pos';
@@ -98,7 +99,7 @@ export function ViewCartButton({ count, onPress }: { count: number; onPress: () 
     <button type="button" className="viewCart" onClick={onPress}>
       {/* Node is named `plus` upstream but renders shopping-cart-01. */}
       <Icon name="shopping-cart-01" />
-      <span className="viewCart__label">View cart{count > 0 ? ` (${count})` : ''}</span>
+      <span className="viewCart__label">View cart{count > 0 && <> (<AnimatedText value={String(count)} />)</>}</span>
     </button>
   );
 }

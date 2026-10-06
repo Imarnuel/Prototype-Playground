@@ -1,3 +1,4 @@
+import { AnimatedText } from './AnimatedText';
 import { useId } from 'react';
 import { DURATION, EASING, duration, useReducedMotion } from '@playground/shared';
 import { formatPrice, formatSignedPrice, type OrderTotals } from '../data/catalogue';
@@ -52,7 +53,7 @@ export function OrderTotal({
             <Icon name="chevron-down" />
           </span>
         </span>
-        <span className="orderTotal__value">{formatPrice(totals.total)}</span>
+        <span className="orderTotal__value"><AnimatedText value={formatPrice(totals.total)} /></span>
       </button>
 
       <div id={panelId} className="orderTotal__panel">
@@ -60,17 +61,17 @@ export function OrderTotal({
           <dl className="orderTotal__breakdown">
             <div className="orderTotal__row">
               <dt>Subtotal</dt>
-              <dd className="orderTotal__amount">{formatPrice(totals.subtotal)}</dd>
+              <dd className="orderTotal__amount"><AnimatedText value={formatPrice(totals.subtotal)} /></dd>
             </div>
             {totals.discount > 0 && (
               <div className="orderTotal__row">
                 <dt>Discount</dt>
-                <dd className="orderTotal__deduction">{formatSignedPrice(-totals.discount)}</dd>
+                <dd className="orderTotal__deduction"><AnimatedText value={formatSignedPrice(-totals.discount)} /></dd>
               </div>
             )}
             <div className="orderTotal__row">
               <dt>Tax</dt>
-              <dd className="orderTotal__amount">{formatPrice(totals.tax)}</dd>
+              <dd className="orderTotal__amount"><AnimatedText value={formatPrice(totals.tax)} /></dd>
             </div>
           </dl>
         </div>

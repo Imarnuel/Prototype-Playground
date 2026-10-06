@@ -1,0 +1,89 @@
+/* App-wide motion. Every value is the project's own (shared/src/motion.ts), handed to
+   CSS as custom properties in main.tsx — nothing here is a second set. The design
+   authors no motion (`get_motion_context` returns nothing for any frame), so all of
+   this is the baseline, not design-derived.
+
+   Rule of thumb, as on iOS: discrete controls scale slightly when pressed; full-width
+   rows take a pressed highlight instead, since a whole row shrinking reads as broken.
+   Colour, border and shadow changes fade rather than snap. */
+
+/* --- State changes fade ------------------------------------------------------- */
+button,
+input,
+textarea,
+.detailField,
+.qtyField,
+.textField {
+  transition:
+    background-color var(--motion-fast) var(--ease-inOut),
+    color var(--motion-fast) var(--ease-inOut),
+    box-shadow var(--motion-fast) var(--ease-inOut),
+    opacity var(--motion-fast) var(--ease-inOut),
+    transform var(--motion-instant) var(--ease-inOut);
+}
+
+/* --- Press feedback: discrete controls ------------------------------------------ */
+button:active:not(:disabled):not([aria-disabled='true']):not(
+  .orderTotal__toggle, .measurement__row, .customerRow__button, .addCustomer__pick,
+  .cartLine__name, .qtyField__value, .qtyStepper__value, .segmented__option
+) {
+  transform: scale(var(--press-scale));
+}
+
+/* --- Press feedback: rows -------------------------------------------------------- */
+:is(.orderTotal__toggle, .measurement__row, .customerRow__button, .addCustomer__pick):active:not([aria-disabled='true']) {
+  background-color: var(--color-container-neutral-subtle-hover);
+}
+
+.cartLine__name:active,
+.qtyField__value:active,
+.qtyStepper__value:active { opacity: 0.6; }
+
+/* --- Things that arrive ------------------------------------------------------------ */
+@keyframes motion-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes motion-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* A number that changes ticks into place (AnimatedText re-keys it on each value). */
+@keyframes motion-tick {
+  from { opacity: 0; transform: translateY(35%); }
+  to { opacity: 1; transform: none; }
+}
+
+.animatedText {
+  display: inline-block;
+  animation: motion-tick var(--motion-fast) var(--ease-out) both;
+}
+
+/* The first paint is not a change — nothing ticks on mount. */
+.animatedText[data-first='true'] { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-instant: 0ms !important;
+    --motion-fast: 0ms !important;
+    --motion-base: 0ms !important;
+    --motion-slow: 0ms !important;
+  }
+  *, *::before, *::after { animation: none !important; }
+  button:active { transform: none !important; }
+}
+
+/* --- Lists arrive in a short stagger (index capped at 8, so a long list is never
+   slow to settle). `backwards`, not `both`: a finished animation must not keep
+   holding transform, or it would override the press scale. --------------------- */
+.productCard,
+.customerRow {
+  animation: motion-rise var(--motion-base) var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 25ms);
+}
+
+.customerEmpty,
+.customerList__none,
+.salesPoint__message { animation: motion-fade var(--motion-base) var(--ease-out) backwards; }

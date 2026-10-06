@@ -103,22 +103,21 @@
   color: var(--color-text-subtle);
 }
 
-/* Frame 4981: white, radius 20, 16px either side. The frame fixes it at 278 tall
-   around 224 of rows; it hugs here (#77). */
+/* Frame 4981: white, radius 20, 16px either side, a fixed 278 around four 56px rows
+   — 54 of open card below the last rule, as drawn. */
 .measurement__list {
   display: flex;
   flex-direction: column;
-  padding: 0 var(--spacing-400);
+  padding: 0 var(--spacing-400) 54px;
   background: var(--color-surface-default);
   border-radius: var(--radius-500);
 }
 
-/* Each row: 56 tall, a 1px Color/border/subtle rule INSIDE its bottom edge, the
-   label and its single-unit equivalent spread apart, then the check. */
+/* Each row: 56 tall, a 1px Color/border/subtle rule INSIDE its bottom edge — the last
+   row's too — the label and its single-unit equivalent spread apart. */
 .measurement__row {
   display: flex;
   align-items: center;
-  gap: var(--spacing-200);
   height: 56px;
   padding: 0;
   border: 0;
@@ -127,10 +126,6 @@
   text-align: left;
   cursor: pointer;
 }
-
-/* The frame rules the last row too, which inside a rounded card reads as a line
-   along its bottom edge. Dropped with the hug (#77). */
-.measurement__row:last-child { box-shadow: none; }
 
 .measurement__label {
   flex: 1 1 auto;
@@ -150,10 +145,34 @@
   color: var(--color-text-subtle);
 }
 
-/* Unselected rows hide the check in the frame AND give its 28px back, so the
-   equivalents jump column as the selection moves. Space is kept for it here (#78). */
-.measurement__check { visibility: hidden; }
-.measurement__row[aria-checked='true'] .measurement__check { visibility: visible; }
+/* Only the chosen row has a check, and it takes room: 8px (Spacing/200) then the
+   20px glyph, so that row's equivalent sits 28px in from the others'. The check's
+   slot grows and shrinks, so the equivalent slides over as the choice moves rather
+   than jumping. */
+.measurement__checkSlot {
+  display: flex;
+  justify-content: flex-end;
+  flex: none;
+  width: 0;
+  overflow: hidden;
+  transition: width var(--motion-fast) var(--ease-inOut);
+}
+
+.measurement__row[aria-checked='true'] .measurement__checkSlot { width: 28px; }
+
+.measurement__check {
+  flex: none;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out);
+}
+
+.measurement__row[aria-checked='true'] .measurement__check {
+  opacity: 1;
+  transform: scale(1);
+}
 
 /* A unit the shelf cannot supply at this count. Undesigned (#79); the disabled text
    token the file does have. */

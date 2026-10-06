@@ -423,7 +423,10 @@ const QTY = [
   ['88:11625 list',         '.measurement__list',      'paddingLeft',     '16px'],
   ['88:11625 list',         '.measurement__list',      'paddingRight',    '16px'],
   ['88:11626 row',          '.measurement__row',       'height',          '56px'],
-  ['88:11626 row',          '.measurement__row',       'columnGap',       '8px'],
+  // The 8px gap only exists beside a VISIBLE check (hidden ones drop out of the
+  // auto layout), so it lives in the check's slot: 8 + 20 on the chosen row, 0 else.
+  ['88:11626 gap + check',  ".measurement__row[aria-checked='true'] .measurement__checkSlot", 'width', '28px'],
+  ['88:11631 no check',     ".measurement__row[aria-checked='false'] .measurement__checkSlot", 'width', '0px'],
   ['88:11626 row',          '.measurement__row',       'boxShadow',       'inset 0 -1px 0 0 #252b3714'],
   ['88:11628 label',        '.measurement__label',     'fontSize',        '16px'],
   ['88:11628 label',        '.measurement__label',     'fontWeight',      '400'],
@@ -471,9 +474,11 @@ const DETAILS = [
   ['88:9559 switch',        '.segmented',              'padding',         '4px'],
   ['88:9559 grad stroke',   '.segmented',              '::after background',
     'linear-gradient(0deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%)'],
-  ['88:9561 "%" chosen',    ".segmented__option[aria-checked='true']", 'height', '52px'],
-  ['88:9561 "%" chosen',    ".segmented__option[aria-checked='true']", 'borderRadius', '8px'],
-  ['88:9561 "%" chosen',    ".segmented__option[aria-checked='true']", 'backgroundColor', 'rgb(248, 249, 252)'],
+  // The chosen fill is one indicator that slides under the chosen option.
+  ['88:9561 "%" chosen',    '.segmented__indicator',   'height',          '52px'],
+  ['88:9561 "%" chosen',    '.segmented__indicator',   'width',           '60px'],
+  ['88:9561 "%" chosen',    '.segmented__indicator',   'borderRadius',    '8px'],
+  ['88:9561 "%" chosen',    '.segmented__indicator',   'backgroundColor', 'rgb(248, 249, 252)'],
   ['88:9562 "%"',           ".segmented__option[aria-checked='true']", 'color', 'rgb(44, 74, 139)'],
   ['88:9562 "%"',           ".segmented__option[aria-checked='true']", 'fontWeight', '600'],
   ['88:9562 "%"',           ".segmented__option[aria-checked='true']", 'lineHeight', '20px'],

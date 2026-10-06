@@ -21,7 +21,12 @@ function stockColor(stock: number): string {
   return 'var(--color-text-secondary)';
 }
 
-export function ProductCard({ product, onPress }: { product: Product; onPress: (p: Product) => void }) {
+export function ProductCard({ product, onPress, index = 0 }: {
+  product: Product;
+  onPress: (p: Product) => void;
+  /** Position in the grid, for a short staggered entrance (capped). */
+  index?: number;
+}) {
   const reducedMotion = useReducedMotion();
 
   const photo = productImage(product);
@@ -31,7 +36,7 @@ export function ProductCard({ product, onPress }: { product: Product; onPress: (
       type="button"
       className="productCard"
       onClick={() => onPress(product)}
-      style={{ ['--press-duration' as string]: `${duration(DURATION.instant, reducedMotion)}ms`, ['--press-scale' as string]: String(PRESS_SCALE) }}
+      style={{ ['--press-duration' as string]: `${duration(DURATION.instant, reducedMotion)}ms`, ['--press-scale' as string]: String(PRESS_SCALE), ['--i' as string]: Math.min(index, 8) }}
     >
       <span className="productCard__image">
         {photo ? (

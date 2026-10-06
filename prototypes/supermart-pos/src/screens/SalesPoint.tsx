@@ -104,8 +104,8 @@ export function SalesPoint({ forceState, cartCount, onAddProduct, onViewCart }: 
 
         {state.status === 'ready' && visible.length > 0 && (
           <div className="productGrid">
-            {visible.map((p) => (
-              <ProductCard key={p.id} product={p} onPress={onAddProduct} />
+            {visible.map((p, i) => (
+              <ProductCard key={p.id} product={p} onPress={onAddProduct} index={i} />
             ))}
           </div>
         )}

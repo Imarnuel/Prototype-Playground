@@ -78,8 +78,8 @@ export function SelectCustomer({ open, customers, onClose, onSelect, onAddCustom
             <p className="customerList__none">No customer matches &ldquo;{query.trim()}&rdquo;.</p>
           ) : (
             <ul className="customerList">
-              {visible.map((c) => (
-                <li key={c.id} className="customerRow">
+              {visible.map((c, i) => (
+                <li key={c.id} className="customerRow" style={{ '--i': Math.min(i, 8) } as React.CSSProperties}>
                   <button type="button" className="customerRow__button" onClick={() => onSelect(c)}>
                     <span className="customerRow__name">{c.name}</span>
                     {/* The frame has a trailing "All" label on every row at

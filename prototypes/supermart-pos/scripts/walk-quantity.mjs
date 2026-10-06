@@ -194,8 +194,8 @@ const sample = (act) => page.evaluate((a) => new Promise((done) => {
 const entering = await sample('open');
 await page.waitForTimeout(300);
 const leaving = await sample('close');
-const travel = (a) => new Set(a.filter((v) => v !== null && v > 389 && v < 846)).size;
-check('the sheet travels in over several frames', travel(entering) > 4 && entering.at(-1) === 389,
+const travel = (a) => new Set(a.filter((v) => v !== null && v > 335 && v < 846)).size;
+check('the sheet travels in over several frames', travel(entering) > 4 && entering.at(-1) === 335,
   `${travel(entering)} in-between frames, ends at ${entering.at(-1)}`);
 const gone = leaving.indexOf(null);
 // The shared exit curve is back-loaded (BUILD-PLAN #37): its last frame or two cover
@@ -208,7 +208,7 @@ page = await open({ reducedMotion: 'reduce' });
 await pick(page, 'Cart: fill with 4 lines');
 await page.evaluate(() => document.querySelector('button.qtyField__value').click());
 await page.waitForTimeout(100);
-check('reduced motion: in place at once', Math.round((await sheet(page)).top) === 389, String((await sheet(page)).top));
+check('reduced motion: in place at once', Math.round((await sheet(page)).top) === 335, String((await sheet(page)).top));
 await page.close();
 
 await browser.close();
