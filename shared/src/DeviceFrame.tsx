@@ -62,6 +62,10 @@ export function DeviceFrame({ children, scale = 1, showBody = true }: DeviceFram
               itself. Painting order is DOM order, so it sits above `children` and
               the status bar without an inline z-index (CLAUDE.md:117). */}
           {showBody && <div className="device__island" data-testid="device-island" aria-hidden="true" />}
+          {/* The display's corner, drawn as a bezel-coloured mask over the app rather
+              than as the screen's own clip — see DeviceFrame.css. Last, so it paints
+              above everything. */}
+          {showBody && <div className="device__screenEdge" aria-hidden="true" />}
         </div>
       </div>
     </div>

@@ -110,10 +110,12 @@ select {
    corners, so nothing breaks there. Circles and pills keep `round`: smoothing a full
    radius changes nothing in Figma either.
 
-   The phone frame keeps plain corners too. It is the device mock-up, not the design,
-   and a superellipse on the clipping screen makes Chrome drop the mask on every
-   masked backdrop blur inside it — the bottom scrim's blur then starts at full
-   strength along a hard horizontal edge.
+   The phone frame is continuous too, as an iPhone's is — but not through the screen's
+   clip: a superellipse on the clipping screen makes Chrome drop the mask on every
+   masked backdrop blur inside it, and the bottom scrim's blur then starts at full
+   strength along a hard horizontal edge. The display's corner is drawn by a mask
+   layer over the app instead (shared DeviceFrame), and the body follows it,
+   concentric.
 
    `data-corner-smoothing="off"` on <html> restores the design's literal radii — the
    property audit compares those against the nodes. */
@@ -142,9 +144,18 @@ select {
     .closeButton, .modalHeader__confirm, .qtyStepper__step, .qtyField__step,
     .addCustomer__avatar, .cart__iconButton, .salesPoint__overflow,
     .filterChip, .tabBar__nav, .tabBar__item,
-    .device, .device__body, .device__screen, .device__island
+    .device, .device__screen, .device__island
   ) {
     corner-shape: round;
+  }
+
+  /* The display and the body, continuous and concentric: 55pt display corner, body
+     = display + bezel, both on the same smoothing. */
+  :root:not([data-corner-smoothing='off']) .device__screen > .device__screenEdge {
+    border-radius: calc(var(--device-screen-radius) * 1.6);
+  }
+  :root:not([data-corner-smoothing='off']) .device__body {
+    border-radius: calc(var(--device-body-radius) * 1.6);
   }
 }
 

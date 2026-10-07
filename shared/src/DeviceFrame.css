@@ -13,13 +13,19 @@
   border-radius: var(--device-body-radius);
   padding: var(--device-bezel);
   box-sizing: border-box;
-  background: #1c1c1e;
-  /* A Figma stroke draws inside the frame, so an inset shadow keeps the body at
-     exactly BODY.width. A 1px border would grow it to 428.2 (CLAUDE.md:116). */
+  /* The black glass around the display, inside a thin titanium band at the edge —
+     a highlight, the band, and its inner shadow. Inset shadows, so the body stays
+     exactly BODY.width (CLAUDE.md:116). Not design values: the device is chrome. */
+  background: #000;
   box-shadow:
-    inset 0 0 0 1px #3a3a3c,
+    inset 0 0 0 1px #8e8e93,
+    inset 0 0 0 3px #48484a,
+    inset 0 0 0 4px #1c1c1e,
     0 24px 60px rgb(0 0 0 / 28%);
 }
+
+/* No body, no corner mask: the screen's own clip is the corner again. */
+.device[data-body='off'] .device__screen { border-radius: var(--device-screen-radius); }
 
 .device[data-body='off'] .device__body {
   padding: 0;
@@ -34,7 +40,10 @@
   position: relative;
   width: var(--device-screen-w);
   height: var(--device-screen-h);
-  border-radius: var(--device-screen-radius);
+  /* A clip SMALLER than the display's corner, so it never shows: the corner itself
+     is drawn by .device__screenEdge. A rounded clip here that is anything but a
+     plain arc makes Chrome drop the mask on every masked backdrop blur inside it. */
+  border-radius: calc(var(--device-screen-radius) * 0.7);
   background: #fff;
 
   /* `clip`, not `hidden`. An overflow:hidden box is still programmatically
@@ -54,6 +63,17 @@
   height: var(--device-island-h);
   border-radius: var(--device-island-radius);
   background: #000;
+}
+
+/* The display's corner: a box the size of the screen, rounded as the display is,
+   whose shadow paints the bezel colour everywhere outside that rounding. A study
+   can reshape it (continuous corners); the clip under it stays a plain arc. */
+.device__screen > .device__screenEdge {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--device-screen-radius);
+  box-shadow: 0 0 0 40px #000;
+  pointer-events: none;
 }
 
 /* Safe-area insets, exposed so screens can pad without re-deriving them. */
