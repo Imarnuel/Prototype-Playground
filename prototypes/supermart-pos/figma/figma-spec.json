@@ -1,0 +1,214 @@
+{
+ "products": {
+  "tops-tee": {
+   "name": "Organic Cotton Tee",
+   "price": "₦8,500",
+   "stock": "40 ea",
+   "image": "tee.webp",
+   "initials": "Or"
+  },
+  "tops-oxford": {
+   "name": "Oxford Shirt",
+   "price": "₦18,500",
+   "stock": "22 ea",
+   "image": "oxford.webp",
+   "initials": "Ox"
+  },
+  "tops-hoodie": {
+   "name": "Fleece Hoodie",
+   "price": "₦26,000",
+   "stock": "14 ea",
+   "image": "hoodie.webp",
+   "initials": "Fl"
+  },
+  "tops-rainjacket": {
+   "name": "Water-Repellent Lightweight Packable Rain Jacket",
+   "price": "₦39,500",
+   "stock": "9 ea",
+   "image": "rainjacket.webp",
+   "initials": "Wa"
+  },
+  "btm-jeans": {
+   "name": "Slim Denim Jeans",
+   "price": "₦24,000",
+   "stock": "18 ea",
+   "image": "jeans.webp",
+   "initials": "Sl"
+  },
+  "ftw-sneakers": {
+   "name": "Leather Sneakers",
+   "price": "₦45,000",
+   "stock": "12 ea",
+   "image": "sneakers.webp",
+   "initials": "Le"
+  },
+  "acc-socks": {
+   "name": "Crew Socks",
+   "price": "₦950",
+   "stock": "180 ea",
+   "image": "socks.webp",
+   "initials": "Cr"
+  },
+  "acc-cap": {
+   "name": "Baseball Cap",
+   "price": "₦7,500",
+   "stock": "30 ea",
+   "image": "cap.webp",
+   "initials": "Ba"
+  },
+  "acc-beanie": {
+   "name": "Wool Beanie",
+   "price": "₦6,000",
+   "stock": "3 ea",
+   "image": "beanie.webp",
+   "initials": "Wo"
+  },
+  "bag-tote": {
+   "name": "Canvas Tote",
+   "price": "₦5,500",
+   "stock": "25 ea",
+   "image": "tote.webp",
+   "initials": "Ca"
+  }
+ },
+ "grid": [
+  "tops-tee",
+  "btm-jeans",
+  "ftw-sneakers",
+  "acc-socks",
+  "bag-tote",
+  "tops-oxford",
+  "acc-cap",
+  "tops-hoodie",
+  "acc-beanie",
+  "tops-rainjacket"
+ ],
+ "cart": [
+  {
+   "id": "acc-socks",
+   "qty": "1",
+   "unit": "ea",
+   "gross": "₦950"
+  },
+  {
+   "id": "tops-tee",
+   "qty": "1",
+   "unit": "ea",
+   "gross": "₦8,500"
+  },
+  {
+   "id": "btm-jeans",
+   "qty": "1",
+   "unit": "ea",
+   "gross": "₦24,000"
+  },
+  {
+   "id": "acc-beanie",
+   "qty": "1",
+   "unit": "ea",
+   "gross": "₦6,000"
+  },
+  {
+   "id": "acc-cap",
+   "qty": "1",
+   "unit": "ea",
+   "gross": "₦7,500"
+  },
+  {
+   "id": "bag-tote",
+   "qty": "1",
+   "unit": "ea",
+   "gross": "₦5,500"
+  }
+ ],
+ "money": {
+  "subtotal": "₦52,450",
+  "discount": "₦0",
+  "tax": "₦3,934",
+  "total": "₦56,384"
+ },
+ "totalMinor": 5638400,
+ "receipt": {
+  "lines": [
+   {
+    "title": "1 Crew Socks",
+    "unitPrice": "₦950",
+    "amount": "₦950"
+   },
+   {
+    "title": "1 Organic Cotton Tee",
+    "unitPrice": "₦8,500",
+    "amount": "₦8,500"
+   },
+   {
+    "title": "1 Slim Denim Jeans",
+    "unitPrice": "₦24,000",
+    "amount": "₦24,000"
+   },
+   {
+    "title": "1 Wool Beanie",
+    "unitPrice": "₦6,000",
+    "amount": "₦6,000"
+   },
+   {
+    "title": "1 Baseball Cap",
+    "unitPrice": "₦7,500",
+    "amount": "₦7,500"
+   },
+   {
+    "title": "1 Canvas Tote",
+    "unitPrice": "₦5,500",
+    "amount": "₦5,500"
+   }
+  ],
+  "salesValue": "₦52,450",
+  "vat": "₦3,934",
+  "discount": "₦0",
+  "total": "₦56,384",
+  "tendered": "₦56,384",
+  "balance": "₦0"
+ },
+ "queue": [
+  {
+   "name": "Afolabi Adeyemi",
+   "items": [
+    "Organic Cotton Tee",
+    "Slim Denim Jeans"
+   ],
+   "total": "₦44,075",
+   "at": "13:51, 08-10-2026"
+  },
+  {
+   "name": "Walk-in customer",
+   "items": [
+    "Crew Socks",
+    "Baseball Cap",
+    "Wool Beanie"
+   ],
+   "total": "₦17,576",
+   "at": "13:34, 08-10-2026"
+  },
+  {
+   "name": "Nneoma Okoro",
+   "items": [
+    "Fleece Hoodie",
+    "Water-Repellent Lightweight Packable Rain Jacket",
+    "Canvas Tote",
+    "Leather Sneakers"
+   ],
+   "total": "₦112,230",
+   "at": "12:49, 08-10-2026"
+  },
+  {
+   "name": "Walk-in customer",
+   "items": [
+    "Oxford Shirt"
+   ],
+   "total": "₦39,775",
+   "at": "11:22, 08-10-2026"
+  }
+ ],
+ "socks": {
+  "price": "₦950"
+ }
+}

@@ -186,6 +186,7 @@ npm run build && npm run preview   # demo from here, not dev
 npm run catalogue:verify   # 66 invariants: check digits, units, money, totals, states, CSV
 npm run cart:verify        # 34 rules: stock, clamps, unit changes, the receipt, the queue
 npm run catalogue:csv      # regenerate figma/catalogue.csv from catalogue.ts
+npm run figma:spec         # every figure the Figma screens were synced to (figma/README.md)
 npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json
 npm run tokens:verify      # the generated tokens still match the Figma dump
 npm run motion:sample      # transitions animate in BOTH directions (needs a server)
