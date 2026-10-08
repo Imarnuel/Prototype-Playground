@@ -31,6 +31,15 @@
 .scanStage {
   position: absolute;
   inset: 0;
-  transition: opacity var(--motion-slow) var(--ease-out);
+  /* The stage stays opaque black: fading IT let the Sales Point show through above
+     the tray for the first frames of the expand. The camera image dims and recedes
+     on it instead, in step with the tray growing over it (Cart.css, docked), so the
+     Cart reads as coming forward over the camera. */
+  background: #000;
 }
-.scanStage[data-open='off'] { opacity: 0; }
+.scanStage > .scanner {
+  transition:
+    opacity var(--motion-base) var(--ease-out),
+    transform var(--motion-base) var(--ease-out);
+}
+.scanStage[data-open='off'] > .scanner { opacity: 0; transform: scale(0.96); }

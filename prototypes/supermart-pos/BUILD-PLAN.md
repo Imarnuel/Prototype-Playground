@@ -819,8 +819,16 @@ in front of it is **drawn from the data** (#115).
 - **The scanner is the Cart, docked.** `Cart` takes `mode="docked"`: at 340 under a
   camera, expand where the close was, no order total, the 96 footer. The same
   component, so the lines, the customer and every sheet it opens are the Cart's own;
-  expand grows it to the full Cart as one motion (`top` 340 → 0, the camera fading
-  out), and the empty Cart's scan button docks it back. The scanner's X returns to
+  expand grows it to the full Cart as one surface, and the empty Cart's scan button
+  docks it back. The tray is the full Cart clipped to 340 and down, its title bar and
+  list carried down 290 and 294 to where the frame draws them; expanding opens the
+  clip to the screen while those ride up, on `base` (the designer: "snappier and
+  sleeker") — transforms and a clip, no layout. The camera dims and recedes behind it
+  on an opaque black stage (fading the stage itself let the Sales Point show through
+  above the tray). Measured against the first build, which animated `top`, paddings
+  and heights: settles in 317-327ms rather than 411, 11-12 layouts rather than 19,
+  and the title row keeps 16 below the tray's edge, opening to the status bar's 50
+  only as the tray reaches the top. The scanner's X returns to
   whatever opened it: the Sales Point, or the Cart it undocked from.
 - **Model** (`state/scan.ts`): a scan target is a barcode or a tag. The EAN-13 encoder
   is checked in `cart:verify` against properties of the symbology rather than its own
@@ -835,6 +843,10 @@ in front of it is **drawn from the data** (#115).
   through the grid's own add rule (`tryAdd`, one rule for a tap and a scan, stock
   limits included) with the frame's banner; a beat later it leaves the lens. Text
   with several matches opens "Which product?"; one match is added at once.
+- **Round shapes stay round**: the scan button, the camera's close, the match sheet's
+  two pill badges and the tag's hole are on index.css's `corner-shape: round` list —
+  the continuous-corner rule had made the 60 button a squircle where the frame binds
+  Border radius/full.
 - **Reused**: the Cart and its line exit, BottomSheet (with a new titled header —
   title over subtitle, close trailing), EmptyState (title now optional), the Toast
   (a third variant, `banner`), the press and fade rules, `usePresented`. **New**: the
@@ -849,9 +861,10 @@ every step by its consequence (a barcode lands as Crew Socks at ₦950, the thir
 of "Which product?" lands as Baseball Cap, refusals and a failed read add nothing,
 one tap is one line, Queue order from the scanner leaves no camera behind). Every
 earlier walk and diff unchanged; `figma:audit` 509, 0 differ; `cart:verify` +7.
-Sampled per frame: expand and dock move through 15-16 positions with the camera
-fading over 11-13 steps, the item enters and leaves over 13; under reduced motion
-each lands at once.
+Sampled per frame: the expand's edge 340 → 0 with the title row 356 → 66, the camera
+fading over 9-12 steps both ways, the item entering and leaving over 13; filmed at
+6x, nothing but the black stage shows above the tray at any frame; under reduced
+motion each lands at once.
 
 ## Screen 1 — verification record
 

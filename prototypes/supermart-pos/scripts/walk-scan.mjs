@@ -66,9 +66,10 @@ check('the scan button: 60x60 at [317,631], 12 above View cart (88:19369)',
 await click('.salesPoint__scan');
 await wait(1000);
 check('it opens the scanner: the camera, and the Cart docked under it', await mode() === 'docked' && !!(await box('.scanner')));
-check('the docked Order Preview starts at 340, full width (88:19584)', near(await box('.cart'), { x: 0, y: 340, w: 393, h: 512 }), JSON.stringify(await box('.cart')));
-check('its title bar is 68 tall, with expand where the close was',
-  (await box('.cart__titleBar')).h === 68 && await page.evaluate(() => document.querySelector('.cart__lead').getAttribute('aria-label') === 'Expand order preview'));
+check('the docked Order Preview starts at 340, full width (88:19584)', await page.evaluate(() => getComputedStyle(document.querySelector('.cart')).clipPath.startsWith('inset(340px 0px 0px')), await page.evaluate(() => getComputedStyle(document.querySelector('.cart')).clipPath));
+check('...its list 68 into the tray, 16 from the edge (the customer row at [16,424])', near(await box('.addCustomer'), { x: 16, y: 424, w: 361, h: 56 }) || (await page.evaluate(() => !document.querySelector('.addCustomer'))), JSON.stringify(await box('.addCustomer')));
+check('its title row 16 into the tray (the lead at 356), with expand where the close was',
+  (await box('.cart__lead')).y === 356 && await page.evaluate(() => document.querySelector('.cart__lead').getAttribute('aria-label') === 'Expand order preview'), JSON.stringify(await box('.cart__lead')));
 check('empty, it says how to scan, centred in the 348 body (88:19506)',
   await page.evaluate(() => document.querySelector('.cart__empty .emptyState__title')?.textContent === 'Scan barcode or text')
   && Math.abs(((await box('.cart__empty')).y + (await box('.cart__empty')).h / 2) - 582) <= 1, JSON.stringify(await box('.cart__empty')));
@@ -96,6 +97,7 @@ check('the banner: 357x52 at [20,54] (88:20033)', near(await box('.toast[data-op
 check('the docked Cart shows the customer row and the buttons, no total',
   await page.evaluate(() => !!document.querySelector('.addCustomer') && getComputedStyle(document.querySelector('.cart__footer')).visibility === 'visible'
     && getComputedStyle(document.querySelector('.cart__totalSlot')).visibility === 'hidden'));
+check('the docked list: the customer row at [16,424], 68 into the tray, 16 from the edge (88:19601)', near(await box('.addCustomer'), { x: 16, y: 424, w: 361, h: 56 }), JSON.stringify(await box('.addCustomer')));
 check('the docked footer: 96 tall, the buttons at the bottom (88:19664)', near(await box('.cart__footer'), { x: 0, y: 756, w: 393, h: 96 }), JSON.stringify(await box('.cart__footer')));
 await lensClear();
 check('the item leaves the lens: the camera is dark again (88:19584)', !(await page.evaluate(() => document.querySelector('.scanScene'))));
@@ -122,7 +124,8 @@ await lensClear();
 // --- Expand, close, and back ------------------------------------------------------
 await click('.cart__lead');
 await wait(900);
-check('expand grows it into the full Cart; the camera fades and goes', await mode() === 'full' && near(await box('.cart'), { x: 0, y: 0, w: 393, h: 852 }) && !(await box('.scanner')));
+check('expand grows it into the full Cart; the camera fades and goes', await mode() === 'full'
+  && await page.evaluate(() => getComputedStyle(document.querySelector('.cart')).clipPath.startsWith('inset(0px')) && near(await box('.addCustomer'), { x: 12, y: 130, w: 361, h: 56 }) && !(await box('.scanner')), JSON.stringify(await box('.addCustomer')));
 check('...with the close back in the title bar and the order total in the footer', await page.evaluate(() =>
   document.querySelector('.cart__lead').getAttribute('aria-label') === 'Close order preview' && getComputedStyle(document.querySelector('.cart__totalSlot')).visibility === 'visible'));
 check('the status bar is dark again', await page.evaluate(() => getComputedStyle(document.querySelector('.statusBar__time')).color !== 'rgb(255, 255, 255)'));

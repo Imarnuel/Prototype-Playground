@@ -1,16 +1,14 @@
 .cart {
-  /* Absolute rather than in flow, so the scanner can dock it at 340 and the expand
-     can grow it back to the full screen as one motion (`top`, below). */
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   background: var(--color-surface-default);
   overflow: clip;
-  transition:
-    top var(--motion-slow) var(--ease-out),
-    padding-top var(--motion-slow) var(--ease-out),
-    border-radius var(--motion-slow) var(--ease-out);
+  /* The tray's edge (docked, below): a clip, so expanding never re-lays-out the Cart.
+     It is always the full Cart underneath; only what shows of it moves. */
+  clip-path: inset(0 0 0 0 round 0 0 0 0);
+  transition: clip-path var(--motion-base) var(--ease-out);
   /* See SalesPoint.css — the status bar is device chrome, so this reserves the inset
      instead of rendering one. On a real device a sheet slides UNDER the status bar;
      rendering one per screen put two clocks on screen at once mid-transition. */
@@ -34,10 +32,7 @@
   background: var(--color-surface-default);
   overflow: clip;
   box-sizing: border-box;
-  transition:
-    margin-top var(--motion-slow) var(--ease-out),
-    height var(--motion-slow) var(--ease-out),
-    padding var(--motion-slow) var(--ease-out);
+  transition: transform var(--motion-base) var(--ease-out);
 }
 
 /* Expand (docked) and close (full) share the title bar's leading slot. */
@@ -315,23 +310,21 @@
    glyph and two lines of Body/large, no title, 16 below the rings, the group centred
    on the SCREEN (its frame centres it at y 426), not on the list area. No customer
    row and no footer: an empty sale has nothing to check out or queue. */
-.cart__empty { gap: 16px; }
-.cart[data-mode='full'] .cart__empty {
+/* Placed against the list (relative, below), which starts at 114: centred at 426 is
+   312 into it. */
+.cart__empty {
   position: absolute;
   left: 16px;
-  top: 50%;
+  top: 312px;
   width: 361px;
+  gap: 16px;
   translate: 0 -50%;
 }
 
 /* Docked and empty, `88:19506`: the same rings over "Scan barcode or text", centred
-   in the 348 body, the text block 291 wide. */
-.cart[data-mode='docked'][data-empty='on'] .cart__scroll {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 16px 96px;
-}
+   in the 348 body (582 on the screen), the text block 291 wide. The list rides down
+   294 and right 4 when docked, so that is 174 into it, 12 from its edge. */
+.cart[data-mode='docked'] .cart__empty { left: 12px; top: 174px; }
 .cart[data-mode='docked'] .cart__empty .emptyState__text { width: 291px; }
 
 /* `88:19466`: 16 from the right, 32 from the bottom. */
@@ -356,9 +349,9 @@
      spread -1 at 6%, and 0,-4 blur 20 spread -2 at 10%. */
   box-shadow: 0 -2px 4px -1px #0a0d120f, 0 -4px 20px -2px #0a0d121a;
   transition:
-    padding var(--motion-slow) var(--ease-out),
-    border-radius var(--motion-slow) var(--ease-out),
-    box-shadow var(--motion-slow) var(--ease-out),
+    padding var(--motion-base) var(--ease-out),
+    border-radius var(--motion-base) var(--ease-out),
+    box-shadow var(--motion-base) var(--ease-out),
     opacity var(--motion-base) var(--ease-out),
     visibility 0ms linear 0ms;
 }
@@ -376,24 +369,36 @@
   display: grid;
   grid-template-rows: 1fr;
   transition:
-    grid-template-rows var(--motion-slow) var(--ease-out),
+    grid-template-rows var(--motion-base) var(--ease-out),
     opacity var(--motion-base) var(--ease-out),
     visibility 0ms linear 0ms;
 }
 .cart__totalClip { min-height: 0; overflow: clip; }
 
 /* --- Docked under the scanner: `88:19584` ----------------------------------------
-   The panel starts at 340 (five of the eight frames; three draw 346, #116), top
-   corners rounded as every sheet's are (the designer's 32, not the frame's 28). Its
-   title bar is 16/12 padded, 68 tall; the footer is the two buttons alone, 16/16/32
-   padded, square, under the frame's own 0,-4 blur 8 shadow at 5% (no token). */
+   The tray starts at 340 (five of the eight frames; three draw 346, #116), top
+   corners rounded as every sheet's are (the designer's 32, not the frame's 28); the
+   footer is the two buttons alone, 16/16/32 padded, square, under the frame's own
+   0,-4 blur 8 shadow at 5% (no token).
+   The tray IS the full Cart, clipped to 340 and down, with its title bar and list
+   carried down to where the frame draws them: the title row's controls at 356 (16
+   into the tray; 290 below the full Cart's 66), the list at 408 (68 into it), 16 in
+   from each side. Expanding is
+   that clip opening to the screen while the two ride up — transforms and a clip,
+   no layout — so the tray grows into the Cart as one surface. */
 .cart[data-mode='docked'] {
-  top: 340px;
-  padding-top: 0;
-  border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
+  clip-path: inset(340px 0 0 0 round var(--sheet-radius) var(--sheet-radius) 0 0);
 }
-.cart[data-mode='docked'] .cart__titleBar { margin-top: 0; height: 68px; padding: 16px 16px 12px; }
-.cart[data-mode='docked'] .cart__scroll { padding: 16px 16px 106px; }
+.cart__scroll {
+  position: relative;
+  transition:
+    transform var(--motion-base) var(--ease-out),
+    padding-bottom var(--order-total-ms, 0ms) var(--order-total-easing, linear);
+}
+.cart[data-mode='docked'] .cart__titleBar { transform: translateY(290px); }
+/* The list keeps its full height under the clip, so its last line must still scroll
+   clear of the 96 footer from 294 lower down. */
+.cart[data-mode='docked'] .cart__scroll { transform: translate(4px, 294px); padding-bottom: 400px; }
 .cart .bottomScrim { transition: opacity var(--motion-base) var(--ease-out); }
 .cart[data-mode='docked'] .bottomScrim { opacity: 0; }
 .cart[data-mode='docked'] .cart__footer {
@@ -405,7 +410,7 @@
   grid-template-rows: 0fr;
   opacity: 0;
   visibility: hidden;
-  transition-delay: 0ms, 0ms, var(--motion-slow);
+  transition-delay: 0ms, 0ms, var(--motion-base);
 }
 .cart[data-mode='docked'] .cart__actions { padding-top: 0; }
 
@@ -416,7 +421,7 @@
   gap: var(--spacing-200);
   align-items: center;
   padding-top: 8px;
-  transition: padding-top var(--motion-slow) var(--ease-out);
+  transition: padding-top var(--motion-base) var(--ease-out);
 }
 
 .cart__checkout,
