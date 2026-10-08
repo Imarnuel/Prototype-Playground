@@ -151,8 +151,9 @@
    12 x 12, Label/Large in white; disabled as `88:12595` draws it. The same button as
    the Cart's Checkout, sized by its footer. */
 .payButton {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: 1 1 auto;
   padding: 12px var(--spacing-300);
   border: 0;
@@ -176,30 +177,12 @@
   cursor: default;
 }
 
-.payButton[aria-busy='true'] { cursor: progress; }
 
-/* --- Pay, through the payment ------------------------------------------------------
-   The label and the spinner share one cell, so the button never changes size. */
-.payButton > * { grid-area: 1 / 1; }
-
-.payButton__label,
-.payButton__spinner {
-  transition:
-    opacity var(--motion-fast) var(--ease-out),
-    transform var(--motion-fast) var(--ease-out);
-}
-
-.payButton[data-paying='on'] .payButton__label { opacity: 0; transform: translateY(-6px); }
-
-/* While paying the button keeps its brand fill: it is working, not disabled. */
+/* Under the confirmation screen while the payment runs, it keeps its brand fill: if
+   the payment fails, the screen draws back into a button that has not turned grey. */
 .payButton[data-paying='on']:disabled {
   background: var(--color-container-brand-bold-default);
   color: var(--color-text-inverse);
   box-shadow: var(--shadow-xs);
 }
 
-.payButton__spinner {
-  opacity: 0;
-  transform: scale(0.6);
-}
-.payButton[data-paying='on'] .payButton__spinner { opacity: 1; transform: none; }

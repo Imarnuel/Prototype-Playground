@@ -98,11 +98,12 @@ export function App() {
   const [queueForce, setQueueForce] = useState<'loading' | 'error'>();
   // Bumped on New sale: the grid replays its entrance, a fresh start for the next customer.
   const [freshSale, setFreshSale] = useState(0);
-  // Once paid: the success screen, then the receipt. `hold` keeps the success screen
-  // up for a presenter instead of moving on by itself.
-  // `closed` keeps the record through the receipt's exit, so it fades rather than cuts.
+  // From Pay: the wait on the confirmation screen, success, then the receipt. `hold`
+  // keeps the screen up for a presenter instead of moving on by itself. `closed` keeps
+  // the record through the receipt's exit, so it fades rather than cuts; `failed`
+  // through the screen's retreat into the Pay button.
   const [sale, setSale] = useState<{
-    receipt: ReceiptRecord; stage: 'success' | 'receipt' | 'closed'; hold: boolean;
+    receipt?: ReceiptRecord; stage: 'processing' | 'success' | 'receipt' | 'closed' | 'failed'; hold: boolean;
     /** Where Transaction success grows from: the Pay button, on the screen. */
     origin?: { x: number; y: number };
   } | null>(null);
@@ -171,11 +172,23 @@ export function App() {
     window.clearTimeout(handoffTimer.current);
     handoffTimer.current = window.setTimeout(() => setHandoff(false), exitMs + 50);
   };
-  /* After Pay (none of it designed; the frames are stills): the button spins while
-     the payment runs, and Transaction success opens from the button the moment it
-     lands. The Checkout and Cart close under it, already covered. */
+  /* After Pay (none of it designed; the frames are stills). The designer's call: the
+     confirmation screen takes over at once, from the Pay button, and the wait happens
+     there — its loader becomes the success mark. Checkout and the Cart stay under it
+     until the payment lands, so a failure can draw the screen back into the button
+     and leave the draft exactly where it was. The loader is held for at least the
+     reveal plus `slow`, so a fast answer still reads as a wait that resolved. */
   const pay = () => {
     setPaying(true);
+    const button = document.querySelector('.payButton')?.getBoundingClientRect();
+    const screen = document.querySelector('.device__screen')?.getBoundingClientRect();
+    const origin = button && screen
+      ? { x: button.left - screen.left + button.width / 2, y: button.top - screen.top + button.height / 2 }
+      : undefined;
+    setSale({ stage: 'processing', hold: false, origin });
+    const started = performance.now();
+    const settle = (then: () => void) => window.setTimeout(then,
+      Math.max(0, duration(DURATION.base + DURATION.slow, reducedMotion) - (performance.now() - started)));
     const tenderedMinor = parseWholeNaira(checkout.amount)!;
     submitPayment({
       lines, orderDiscount, customer, at: new Date(), sequence: sequence.current + 1,
@@ -184,19 +197,16 @@ export function App() {
         : { method: checkout.method, bankId: checkout.bankId, tenderedMinor },
     }).then((receipt) => {
       sequence.current += 1;
-      const button = document.querySelector('.payButton')?.getBoundingClientRect();
-      const screen = document.querySelector('.device__screen')?.getBoundingClientRect();
-      const origin = button && screen
-        ? { x: button.left - screen.left + button.width / 2, y: button.top - screen.top + button.height / 2 }
-        : undefined;
-      setSale({ receipt, stage: 'success', hold: false, origin });
-      // Once the reveal (base) has covered them.
-      setTimeout(() => { setCheckoutOpen(false); setCartOpen(false); }, duration(DURATION.base, reducedMotion));
-    }).catch(() => {
+      settle(() => {
+        setSale((s) => (s ? { ...s, receipt, stage: 'success' } : s));
+        setCheckoutOpen(false); setCartOpen(false);
+      });
+    }).catch(() => settle(() => {
+      setSale((s) => (s ? { ...s, stage: 'failed' } : s));
       setPaying(false);
       // Not designed: the payment did not go through, and the draft is kept.
       showToast('Payment failed. Try again.', 'notice');
-    });
+    }));
   };
   // The success screen gives way to the receipt on its own, unless held.
   useEffect(() => {
@@ -429,6 +439,12 @@ export function App() {
         setPaymentPicker(which);
       },
     })),
+    {
+      label: 'Processing payment',
+      group: 'States',
+      // The confirmation screen's wait, held: the payment never lands.
+      onSelect: () => { setLines(fourLines()); setCartOpen(false); setSale({ stage: 'processing', hold: true }); },
+    },
     ...([
       ['Transaction success', 'success', 'cash'],
       ['Receipt: cash', 'receipt', 'cash'],
@@ -646,17 +662,19 @@ export function App() {
           {sale && (
             <>
               <TransactionSuccess
-                open={sale.stage === 'success'}
+                open={sale.stage === 'processing' || sale.stage === 'success'}
+                status={sale.stage === 'processing' ? 'processing' : 'success'}
+                retract={sale.stage === 'failed'}
                 origin={sale.origin}
                 onContinue={() => setSale((s) => (s ? { ...s, stage: 'receipt' } : s))}
               />
-              <Receipt
+              {sale.receipt && <Receipt
                 open={sale.stage === 'receipt'}
                 receipt={sale.receipt}
                 onNewSale={newSale}
-                onShare={() => shareReceipt(sale.receipt)}
+                onShare={() => shareReceipt(sale.receipt!)}
                 onPrint={() => window.print()}
-              />
+              />}
             </>
           )}
 

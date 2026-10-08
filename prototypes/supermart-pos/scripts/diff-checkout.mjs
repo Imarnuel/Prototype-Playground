@@ -85,7 +85,7 @@ await run('88:14794 Select bank', [
 await pick('Transaction success');
 await run('88:8723 Transaction success', [
   ['icon', '.saleSuccess__icon', 0, [160.5, 368, 72, 72], 'F'],
-  ['line', '.saleSuccess__text', 0, [33, 460, 327, 24], 'F'],
+  ['line', '.saleSuccess__text--done', 0, [33, 460, 327, 24], 'F'],
 ]);
 await pick('Receipt: cash');
 await run('88:8735 Receipt', [

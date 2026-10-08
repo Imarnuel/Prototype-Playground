@@ -122,28 +122,33 @@ s = await sheet();
 check('the chosen bank is on the Checkout', s.bank === 'Moniepoint - 8027715063' && !s.payDisabled, s.bank);
 
 // --- Pay ------------------------------------------------------------------------------
-// Record, in the page, what the button was doing when the success screen mounted.
+// The designer's call: the confirmation screen takes over at once and the wait happens
+// there; its loader becomes the success mark. Recorded in the page, frame by frame.
 await page.evaluate(() => {
-  const t = (window.__payTimes = {}); const t0 = performance.now();
-  new MutationObserver(() => {
-    if (t.success || !document.querySelector('.saleSuccess')) return;
-    t.success = performance.now() - t0;
-    t.buttonThen = document.querySelector('.payButton')?.dataset.paying;
-  }).observe(document.body, { subtree: true, childList: true });
+  const t = (window.__pay = { states: [] }); const t0 = performance.now();
+  const tick = () => {
+    const s = document.querySelector('.saleSuccess');
+    const st = s?.dataset.status ?? null;
+    if (st !== t.states.at(-1)?.status) t.states.push({ at: performance.now() - t0, status: st,
+      checkoutUnder: !!document.querySelector('[role="dialog"][aria-label="Checkout"]'),
+      waiting: document.querySelector('.saleSuccess__text--waiting')?.textContent ?? null });
+    if (performance.now() - t0 < 2500) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
 });
 await page.evaluate(() => document.querySelector('.payButton').click());
 await wait(60);
-// The label cross-fades to a spinner in place; the words are for assistive tech.
-check('Pay shows it is working, and cannot be pressed twice', (await page.evaluate(() => {
+check('Pay cannot be pressed twice, and shows no spinner of its own', await page.evaluate(() => {
   const b = document.querySelector('.payButton');
-  return b.disabled && b.dataset.paying === 'on' && b.getAttribute('aria-busy') === 'true'
-    && b.querySelector('.visuallyHidden')?.textContent === 'Processing…';
-})));
-await page.waitForSelector('.saleSuccess[data-open="on"]', { timeout: 3000 });
-const times = await page.evaluate(() => window.__payTimes);
-check('...and success grows straight out of the spinning button, no paid step', times.buttonThen === 'on'
-  && !(await page.evaluate(() => document.querySelector('[data-phase], .payButton__check'))),
-  `success at ${Math.round(times.success)}ms, button ${times.buttonThen}`);
+  return b.disabled && !b.querySelector('.buttonSpinner') && b.textContent.startsWith('Pay ₦');
+}));
+await page.waitForSelector('.saleSuccess[data-status="success"]', { timeout: 3000 });
+const states = await page.evaluate(() => window.__pay.states);
+const waitState = states.find((x) => x.status === 'processing'), paid = states.find((x) => x.status === 'success');
+check('the confirmation screen takes over at once, waiting, with Checkout kept under it',
+  waitState && waitState.at < 100 && waitState.checkoutUnder && waitState.waiting === 'Processing payment…', JSON.stringify(waitState));
+check('...and turns to success once paid, held at least the reveal plus `slow`', paid && paid.at >= 700,
+  `waiting at ${Math.round(waitState?.at)}ms, paid at ${Math.round(paid?.at)}ms`);
 check('then Transaction success', true);
 await page.waitForSelector('.receiptScreen[data-open="on"]', { timeout: 4000 });
 const r = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('.receipt__row')]
@@ -182,9 +187,12 @@ check('cash: Tendered is what was typed, Balance the change', naira(rc.Tendered)
 // --- A failed payment keeps the sale ---------------------------------------------------
 await pick('Checkout: payment fails');
 const before = await sheet();
-await click('.payButton', 1500);
-check('a failed payment says so and keeps the Checkout and its draft', (await toast()) === 'Payment failed. Try again.'
-  && (await open('Checkout')) === 'on' && (await sheet()).amount === before.amount && !(await page.$('.saleSuccess')));
+await click('.payButton', 300);
+check('a failing payment still waits on the confirmation screen', !!(await page.$('.saleSuccess[data-status="processing"]')));
+await wait(1300);
+check('...then the screen draws back: Checkout and its draft as they were, and it says so', (await toast()) === 'Payment failed. Try again.'
+  && (await open('Checkout')) === 'on' && (await sheet()).amount === before.amount && !(await page.$('.saleSuccess'))
+  && await page.evaluate(() => !document.querySelector('.payButton').disabled));
 await click('.payButton', 1200);
 check('...and paying again goes through', !!(await page.$('.saleSuccess, .receiptScreen')));
 

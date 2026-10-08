@@ -11,13 +11,12 @@
 .saleScreen[data-open='off'] { opacity: 0; }
 .saleScreen[data-open='on'] { opacity: 1; }
 
-/* --- Transaction success ----------------------------------------------------------
+/* --- Transaction success, and the wait before it -----------------------------------
    Not designed; choreographed. Every delay is built from the duration tokens, so
-   reduced motion (which zeroes them) lands everything at once, settled. */
+   reduced motion (which zeroes them) lands each state at once, settled. */
 .saleSuccess {
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   /* Opens as a circle from the Pay button. 1000px clears the far corner from any
      origin on a 393x852 screen. */
   clip-path: circle(0 at var(--ox) var(--oy));
@@ -25,6 +24,7 @@
     clip-path var(--motion-base) var(--ease-out),
     opacity var(--motion-base) var(--ease-inOut);
 }
+.saleSuccess[data-status='success'] { cursor: pointer; }
 .saleSuccess[data-open='off'][data-leaving='off'] { opacity: 1; }
 .saleSuccess[data-open='on'],
 .saleSuccess[data-leaving='on'] { clip-path: circle(1000px at var(--ox) var(--oy)); }
@@ -39,6 +39,13 @@
     opacity var(--motion-fast) var(--ease-in),
     transform var(--motion-base) var(--ease-in);
 }
+/* Leaving because the payment failed: the reveal runs backwards into the Pay button,
+   uncovering the Checkout it came from, content and all. */
+.saleSuccess[data-retract='on'] {
+  clip-path: circle(0 at var(--ox) var(--oy));
+  transition: clip-path var(--motion-base) var(--ease-in);
+}
+.saleSuccess[data-retract='on'] .saleSuccess__content { opacity: 1; transform: none; }
 
 /* Frame 4905: 327 wide, Spacing/500 between the icon and the line. */
 .saleSuccess__content {
@@ -49,19 +56,43 @@
   width: 327px;
 }
 
+/* The mark comes into focus as the screen opens — from 60% and an 8px blur to sharp,
+   on the decelerating curve, no overshoot. It arrives as the loader; it stays. */
 .saleSuccess__mark {
   position: relative;
   display: grid;
   place-items: center;
   width: 72px;
   height: 72px;
+  animation: success-focus var(--motion-base) var(--ease-out) var(--motion-instant) both;
 }
 .saleSuccess__mark > * { grid-area: 1 / 1; }
 
-/* Featured icon: 72 round in Color/container/success/bold, a 40 check centred.
-   It comes into focus rather than bouncing in: from 60% and an 8px blur to sharp, on
-   the decelerating curve, no overshoot (the designer: the pop and ripples "look
-   dated"). It starts while the reveal is still opening; the moment settles in ~0.5s. */
+/* --- Waiting: a brand ring, a quarter drawn, spinning ------------------------------- */
+.saleSuccess__ring {
+  overflow: visible;
+  animation: success-spin 900ms linear infinite;
+}
+.saleSuccess__ring circle {
+  stroke: var(--color-container-brand-bold-default);
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0.75;
+  transition:
+    stroke-dashoffset var(--motion-fast) var(--ease-out),
+    stroke var(--motion-fast) var(--ease-out),
+    opacity var(--motion-fast) var(--ease-out) calc(var(--motion-instant) + var(--motion-fast));
+}
+
+/* --- Paid: the ring stops where it is and sweeps closed in success green, then fills
+   into the disc; the check draws; one soft bloom breathes out. ------------------------ */
+.saleSuccess[data-status='success'] .saleSuccess__ring { animation-play-state: paused; }
+.saleSuccess[data-status='success'] .saleSuccess__ring circle {
+  stroke: var(--color-container-success-bold-default);
+  stroke-dashoffset: 0;
+  opacity: 0;
+}
+
+/* Featured icon: 72 round in Color/container/success/bold, a 40 check centred. */
 .saleSuccess__icon {
   display: flex;
   align-items: center;
@@ -70,18 +101,22 @@
   height: 72px;
   border-radius: var(--radius-full);
   background: var(--color-container-success-bold-default);
-  animation: success-focus var(--motion-base) var(--ease-out) var(--motion-instant) both;
+  opacity: 0;
+  transform: scale(0.86);
+  transition:
+    opacity var(--motion-fast) var(--ease-out) var(--motion-instant),
+    transform var(--motion-fast) var(--ease-out) var(--motion-instant);
 }
+.saleSuccess[data-status='success'] .saleSuccess__icon { opacity: 1; transform: none; }
 
-/* The check strokes on as the disc sharpens. */
 .saleSuccess__icon path {
   stroke-dasharray: 1;
-  animation: success-draw var(--motion-fast) var(--ease-out) calc(var(--motion-instant) + var(--motion-fast)) both;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset var(--motion-fast) var(--ease-out) calc(var(--motion-instant) + var(--motion-fast));
 }
+.saleSuccess[data-status='success'] .saleSuccess__icon path { stroke-dashoffset: 0; }
 
-/* One soft bloom of the same green — light, not a ring: a radial falloff with no edge,
-   breathing out once behind the disc as it lands. It replaced two hard-edged ripple
-   rings. */
+/* A radial falloff with no edge — light, not a ring. */
 .saleSuccess__halo {
   width: 72px;
   height: 72px;
@@ -90,13 +125,62 @@
     color-mix(in srgb, var(--color-container-success-bold-default) 32%, transparent),
     transparent);
   opacity: 0;
+}
+.saleSuccess[data-status='success'] .saleSuccess__halo {
   animation: success-bloom calc(var(--motion-slow) + var(--motion-base)) var(--ease-out) var(--motion-instant) both;
 }
 
-/* Heading/h4, its box the column's full 327 with the line centred in it. It rises
-   just behind the mark, so the eye goes mark, then words. */
-.saleSuccess__text {
+/* The check ends in a small particle burst (the designer: "just a subtle particle
+   burst"): 8 dots start just outside the disc's edge (r 40) and fly 12-18 out as they
+   shrink and fade, on `base` ease-out — fired as the check's stroke completes, with
+   the haptic. Two sizes and two greens: Color/container/success/bold, and the same
+   mixed half-way to white. Reduced motion never shows them. */
+.saleSuccess__burst {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  pointer-events: none;
+}
+.saleSuccess__burst > i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: var(--radius-full);
+  background: var(--color-container-success-bold-default);
+  opacity: 0;
+  --from: -40px;
+  --to: -58px;
+}
+.saleSuccess__burst > i:nth-child(even) {
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  background: color-mix(in srgb, var(--color-container-success-bold-default) 50%, white);
+  --to: -52px;
+}
+.saleSuccess[data-status='success'] .saleSuccess__burst > i {
+  animation: success-burst var(--motion-base) var(--ease-out)
+    calc(var(--motion-instant) + var(--motion-fast) * 2) both;
+}
+@keyframes success-burst {
+  0% { transform: rotate(var(--a)) translateY(var(--from)) scale(1); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: rotate(var(--a)) translateY(var(--to)) scale(0.3); opacity: 0; }
+}
+
+/* The two lines share one cell: "Processing payment…" lets go as "Transaction
+   success!" de-blurs in over it, so the words change where they stand. */
+.saleSuccess__lines {
+  display: grid;
   align-self: stretch;
+}
+.saleSuccess__lines > * { grid-area: 1 / 1; }
+
+/* Heading/h4, its box the column's full 327 with the line centred in it. */
+.saleSuccess__text {
   margin: 0;
   font-size: var(--type-Heading-h4-size);
   font-weight: var(--type-Heading-h4-weight);
@@ -104,21 +188,35 @@
   letter-spacing: var(--type-Heading-h4-letter-spacing);
   color: var(--color-text-default);
   text-align: center;
-  animation: success-text var(--motion-base) var(--ease-out) var(--motion-fast) both;
+  transition:
+    opacity var(--motion-fast) var(--ease-out),
+    transform var(--motion-base) var(--ease-out),
+    filter var(--motion-base) var(--ease-out);
+}
+/* Undesigned copy, quieter than the result: Color/text/subtle. It rises in only while
+   waiting — a screen that opens already paid never shows it. `backwards`, not `both`:
+   a fill that held the end state would outrank the transition that lets it go. */
+.saleSuccess__text--waiting { color: var(--color-text-subtle); }
+.saleSuccess[data-status='processing'] .saleSuccess__text--waiting {
+  animation: success-text var(--motion-base) var(--ease-out) var(--motion-fast) backwards;
+}
+.saleSuccess__text--done { opacity: 0; transform: translateY(6px); filter: blur(6px); }
+.saleSuccess[data-status='success'] .saleSuccess__text--waiting {
+  opacity: 0; transform: translateY(-6px); filter: blur(6px);
+}
+.saleSuccess[data-status='success'] .saleSuccess__text--done {
+  opacity: 1; transform: none; filter: blur(0);
+  transition-delay: var(--motion-instant);
 }
 
+@keyframes success-spin { to { rotate: 360deg; } }
 @keyframes success-focus {
   from { transform: scale(0.6); opacity: 0; filter: blur(8px); }
   to { transform: none; opacity: 1; filter: blur(0); }
 }
-/* The line de-blurs as it rises, so the words arrive the way the mark did. */
 @keyframes success-text {
   from { transform: translateY(6px); opacity: 0; filter: blur(6px); }
   to { transform: none; opacity: 1; filter: blur(0); }
-}
-@keyframes success-draw {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
 }
 @keyframes success-bloom {
   0% { transform: scale(0.6); opacity: 0; }
@@ -364,7 +462,8 @@
 @keyframes receipt-actions { from { transform: translateY(100%); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .saleScreen, .saleSuccess__content, .receipt, .receiptScreen__footer { transition-duration: 0ms !important; }
+  .saleScreen, .saleSuccess__content, .saleSuccess__ring circle, .saleSuccess__icon, .saleSuccess__icon path,
+  .saleSuccess__text, .receipt, .receiptScreen__footer { transition-duration: 0ms !important; transition-delay: 0ms !important; }
 }
 
 /* Print receipt: the receipt alone, at paper width, without the phone around it. */

@@ -590,9 +590,9 @@ const BANKS = [
 const SUCCESS = [
   ['88:8726 icon',          '.saleSuccess__icon',      'backgroundColor', 'rgb(3, 140, 78)'],
   ['88:8726 icon',          '.saleSuccess__icon',      'width',           '72px'],
-  ['88:8728 line',          '.saleSuccess__text',      'fontSize',        '20px'],
-  ['88:8728 line',          '.saleSuccess__text',      'fontWeight',      '600'],
-  ['88:8728 line',          '.saleSuccess__text',      'letterSpacing',   '-0.48px'],
+  ['88:8728 line',          '.saleSuccess__text--done', 'fontSize',        '20px'],
+  ['88:8728 line',          '.saleSuccess__text--done', 'fontWeight',      '600'],
+  ['88:8728 line',          '.saleSuccess__text--done', 'letterSpacing',   '-0.48px'],
 ];
 const RECEIPT = [
   ['88:8742 card',          '.receipt',                'borderRadius',    '4px'],

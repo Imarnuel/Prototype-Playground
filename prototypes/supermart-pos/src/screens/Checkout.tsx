@@ -63,17 +63,12 @@ export function Checkout({
       dismissOnBlanket={false}
       className="checkout"
       footer={
-        /* Not designed: the label gives way to a spinner while the payment runs, and
-           the success screen grows out of the button from there. No separate paid
-           state on the button (the designer's call): the success screen is the
-           confirmation. */
+        /* The confirmation screen grows out of this button the moment it is pressed,
+           and the wait happens there (the designer's call), so the button itself shows
+           no working state: it only refuses a second press. */
         <button type="button" className="payButton" data-paying={paying ? 'on' : 'off'} disabled={!canPay}
-          onClick={onPay} aria-busy={paying}>
-          <span className="payButton__label" aria-hidden={paying}>
-            {canPay || paying ? `Pay ${formatPrice(totals.total)}` : 'Pay'}
-          </span>
-          <span className="buttonSpinner payButton__spinner" aria-hidden="true" />
-          {paying && <span className="visuallyHidden">Processing…</span>}
+          onClick={onPay}>
+          {canPay || paying ? `Pay ${formatPrice(totals.total)}` : 'Pay'}
         </button>
       }
     >

@@ -8,16 +8,25 @@ import type { Receipt as ReceiptRecord } from '../state/sale';
 import './SaleComplete.css';
 
 /**
- * Transaction success — `88:8723`. Full screen; the caller moves on to the receipt.
+ * Transaction success — `88:8723` — and the wait before it. Full screen; the caller
+ * moves on to the receipt.
  *
- * Not designed — the frame is a still. The moment is choreographed: the screen opens
- * as a circle from the Pay button (`origin`), the green mark comes into focus, its
- * check draws, a soft bloom breathes out behind it and the line rises. A light haptic
- * tick lands with the check on phones that have one. Reduced motion shows it settled.
- * The check is the frame's own export (`check-success.svg`), inlined so it can draw.
+ * Not designed — the frame is a still. The designer's call: confirming Pay goes
+ * straight here, and the waiting happens here, not in the button. The screen opens as
+ * a circle from the Pay button (`origin`) on a brand ring that spins while the payment
+ * runs. When it lands, the ring stops where it is, sweeps closed in success green and
+ * fills into the disc, the check draws and ends in a small burst of dots, a soft bloom
+ * breathes out and the line changes — loading and success are one mark. A light
+ * haptic tick lands with the burst. If the
+ * payment fails, the circle draws back into the Pay button (`retract`). Reduced motion
+ * shows each state settled. The check is the frame's own export (`check-success.svg`),
+ * inlined so it can draw.
  */
-export function TransactionSuccess({ open, origin, onContinue }: {
+export function TransactionSuccess({ open, status, retract = false, origin, onContinue }: {
   open: boolean;
+  status: 'processing' | 'success';
+  /** Leaving because the payment failed: the reveal runs backwards, into the button. */
+  retract?: boolean;
   /** Where the screen grows from, on the 393x852 screen: the Pay button's centre. */
   origin?: { x: number; y: number };
   onContinue: () => void;
@@ -25,34 +34,52 @@ export function TransactionSuccess({ open, origin, onContinue }: {
   const { mounted, entered } = usePresented(open);
   const reducedMotion = useReducedMotion();
   useEffect(() => {
-    if (!open) return undefined;
+    if (!open || status !== 'success') return undefined;
     // As the check's stroke completes (its delay plus its duration, from the CSS).
     const t = setTimeout(() => navigator.vibrate?.(12), duration(DURATION.instant + DURATION.fast + DURATION.fast, reducedMotion));
     return () => clearTimeout(t);
-  }, [open, reducedMotion]);
+  }, [open, status, reducedMotion]);
   if (!mounted) return null;
   const o = origin ?? { x: 196.5, y: 782 };
   return (
-    // A tap anywhere moves on, so nobody waits on the timer.
+    // Once paid, a tap anywhere moves on, so nobody waits on the timer.
     <div
       className="saleScreen saleSuccess"
       data-open={entered ? 'on' : 'off'}
       data-leaving={!open ? 'on' : 'off'}
+      data-retract={retract ? 'on' : 'off'}
+      data-status={status}
       style={{ '--ox': `${o.x}px`, '--oy': `${o.y}px` } as React.CSSProperties}
-      onClick={onContinue}
+      onClick={status === 'success' ? onContinue : undefined}
       role="status"
+      aria-busy={status === 'processing'}
     >
       <div className="saleSuccess__content">
         <span className="saleSuccess__mark">
           <span className="saleSuccess__halo" aria-hidden="true" />
+          {/* The burst as the check lands: 8 dots, every 45° from 22.5°, alternating a
+              long and a short throw. */}
+          <span className="saleSuccess__burst" aria-hidden="true">
+            {Array.from({ length: 8 }, (_, i) => (
+              <i key={i} style={{ '--a': `${22.5 + i * 45}deg` } as React.CSSProperties} />
+            ))}
+          </span>
           <span className="saleSuccess__icon">
             <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
               <path d="M33.3332 10L14.9998 28.3333L6.6665 20" pathLength={1} stroke="white" strokeWidth="2.97658"
                 strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </span>
+          {/* The loader, 72 like the disc it becomes: a 4 stroke on r 34, so its outer
+              edge is the disc's edge. Not designed; its stroke has no token. */}
+          <svg className="saleSuccess__ring" width="72" height="72" viewBox="0 0 72 72" fill="none" aria-hidden="true">
+            <circle cx="36" cy="36" r="34" pathLength={1} strokeWidth="4" strokeLinecap="round" />
+          </svg>
         </span>
-        <p className="saleSuccess__text">Transaction success!</p>
+        <span className="saleSuccess__lines">
+          <p className="saleSuccess__text saleSuccess__text--waiting" aria-hidden={status !== 'processing'}>Processing payment…</p>
+          <p className="saleSuccess__text saleSuccess__text--done" aria-hidden={status !== 'success'}>Transaction success!</p>
+        </span>
       </div>
     </div>
   );
