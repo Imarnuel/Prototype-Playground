@@ -66,7 +66,14 @@ check('the scan button: 60x60 at [317,631], 12 above View cart (88:19369)',
 await click('.salesPoint__scan');
 await wait(1000);
 check('it opens the scanner: the camera, and the Cart docked under it', await mode() === 'docked' && !!(await box('.scanner')));
-check('the docked Order Preview starts at 340, full width (88:19584)', await page.evaluate(() => getComputedStyle(document.querySelector('.cart')).clipPath.startsWith('inset(340px 0px 0px')), await page.evaluate(() => getComputedStyle(document.querySelector('.cart')).clipPath));
+check('the docked Order Preview starts at 340, full width (88:19584)', near(await box('.cart'), { x: 0, y: 340, w: 393, h: 852 }), JSON.stringify(await box('.cart')));
+check('...its top corners exactly a sheet\'s: --sheet-radius, under the same corner shape', await page.evaluate(() => {
+  const c = getComputedStyle(document.querySelector('.cart')), root = getComputedStyle(document.documentElement);
+  const want = parseFloat(root.getPropertyValue('--sheet-radius')) || null;
+  return c.borderTopLeftRadius === c.borderTopRightRadius && c.borderBottomLeftRadius === '0px'
+    && (want === null || Math.abs(parseFloat(c.borderTopLeftRadius) - want) < 0.5 || c.borderTopLeftRadius.startsWith('calc'))
+    && c.cornerShape === getComputedStyle(document.body).cornerShape;
+}), await page.evaluate(() => { const c = getComputedStyle(document.querySelector('.cart')); return `${c.borderTopLeftRadius} ${c.cornerShape}`; }));
 check('...its list 68 into the tray, 16 from the edge (the customer row at [16,424])', near(await box('.addCustomer'), { x: 16, y: 424, w: 361, h: 56 }) || (await page.evaluate(() => !document.querySelector('.addCustomer'))), JSON.stringify(await box('.addCustomer')));
 check('its title row 16 into the tray (the lead at 356), with expand where the close was',
   (await box('.cart__lead')).y === 356 && await page.evaluate(() => document.querySelector('.cart__lead').getAttribute('aria-label') === 'Expand order preview'), JSON.stringify(await box('.cart__lead')));
@@ -125,7 +132,7 @@ await lensClear();
 await click('.cart__lead');
 await wait(900);
 check('expand grows it into the full Cart; the camera fades and goes', await mode() === 'full'
-  && await page.evaluate(() => getComputedStyle(document.querySelector('.cart')).clipPath.startsWith('inset(0px')) && near(await box('.addCustomer'), { x: 12, y: 130, w: 361, h: 56 }) && !(await box('.scanner')), JSON.stringify(await box('.addCustomer')));
+  && near(await box('.cart'), { x: 0, y: 0, w: 393, h: 852 }) && near(await box('.addCustomer'), { x: 12, y: 130, w: 361, h: 56 }) && !(await box('.scanner')), JSON.stringify(await box('.addCustomer')));
 check('...with the close back in the title bar and the order total in the footer', await page.evaluate(() =>
   document.querySelector('.cart__lead').getAttribute('aria-label') === 'Close order preview' && getComputedStyle(document.querySelector('.cart__totalSlot')).visibility === 'visible'));
 check('the status bar is dark again', await page.evaluate(() => getComputedStyle(document.querySelector('.statusBar__time')).color !== 'rgb(255, 255, 255)'));

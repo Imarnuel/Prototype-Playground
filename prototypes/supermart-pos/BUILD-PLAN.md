@@ -820,10 +820,14 @@ in front of it is **drawn from the data** (#115).
   camera, expand where the close was, no order total, the 96 footer. The same
   component, so the lines, the customer and every sheet it opens are the Cart's own;
   expand grows it to the full Cart as one surface, and the empty Cart's scan button
-  docks it back. The tray is the full Cart clipped to 340 and down, its title bar and
-  list carried down 290 and 294 to where the frame draws them; expanding opens the
-  clip to the screen while those ride up, on `base` (the designer: "snappier and
-  sleeker") — transforms and a clip, no layout. The camera dims and recedes behind it
+  docks it back. The tray is the full Cart moved down 340, its top corners rounded
+  exactly as a sheet panel's (`--sheet-radius` under the continuous corner shape),
+  its title bar, list and footer counter-moved to where the frame draws them;
+  expanding is all of it settling back, on `base` (the designer: "snappier and
+  sleeker") — transforms only, no layout. A first version cut the tray's edge with a
+  `clip-path`, whose arc cannot take the corner shape: its corner read up to 14.5px
+  rounder than every sheet's (the designer caught it); measured row by row against
+  More options' panel, it now matches within 0.5px below the anti-aliased top row. The camera dims and recedes behind it
   on an opaque black stage (fading the stage itself let the Sales Point show through
   above the tray). Measured against the first build, which animated `top`, paddings
   and heights: settles in 317-327ms rather than 411, 11-12 layouts rather than 19,

@@ -5,10 +5,11 @@
   flex-direction: column;
   background: var(--color-surface-default);
   overflow: clip;
-  /* The tray's edge (docked, below): a clip, so expanding never re-lays-out the Cart.
-     It is always the full Cart underneath; only what shows of it moves. */
-  clip-path: inset(0 0 0 0 round 0 0 0 0);
-  transition: clip-path var(--motion-base) var(--ease-out);
+  /* The tray (docked, below) is this whole Cart moved down, so expanding never
+     re-lays-out anything: it is always the full Cart; only where it sits moves. */
+  transition:
+    transform var(--motion-base) var(--ease-out),
+    border-radius var(--motion-base) var(--ease-out);
   /* See SalesPoint.css — the status bar is device chrome, so this reserves the inset
      instead of rendering one. On a real device a sheet slides UNDER the status bar;
      rendering one per screen put two clocks on screen at once mid-transition. */
@@ -352,6 +353,7 @@
     padding var(--motion-base) var(--ease-out),
     border-radius var(--motion-base) var(--ease-out),
     box-shadow var(--motion-base) var(--ease-out),
+    transform var(--motion-base) var(--ease-out),
     opacity var(--motion-base) var(--ease-out),
     visibility 0ms linear 0ms;
 }
@@ -362,7 +364,7 @@
 .cart[data-empty='on'] .cart__footer {
   opacity: 0;
   visibility: hidden;
-  transition-delay: 0ms, 0ms, 0ms, 0ms, var(--motion-base);
+  transition-delay: 0ms, 0ms, 0ms, 0ms, 0ms, var(--motion-base);
 }
 
 .cart__totalSlot {
@@ -380,14 +382,17 @@
    corners rounded as every sheet's are (the designer's 32, not the frame's 28); the
    footer is the two buttons alone, 16/16/32 padded, square, under the frame's own
    0,-4 blur 8 shadow at 5% (no token).
-   The tray IS the full Cart, clipped to 340 and down, with its title bar and list
-   carried down to where the frame draws them: the title row's controls at 356 (16
-   into the tray; 290 below the full Cart's 66), the list at 408 (68 into it), 16 in
-   from each side. Expanding is
-   that clip opening to the screen while the two ride up — transforms and a clip,
-   no layout — so the tray grows into the Cart as one surface. */
+   The tray IS the full Cart, moved down 340, its top corners rounded exactly as a
+   sheet's panel is (`--sheet-radius` under the app's continuous corners — a
+   `clip-path` arc cannot take the corner shape and read 14px rounder). Inside, the
+   title bar rides up 50 and the list 46 (and right 4) to land where the frame draws
+   them — controls at 356, 16 into the tray; the list at 408, 68 in, 16 from each
+   side — and the footer rides up the whole 340 to stay on the screen's bottom.
+   Expanding is all of it settling back: transforms only, so the tray grows into
+   the Cart as one surface. */
 .cart[data-mode='docked'] {
-  clip-path: inset(340px 0 0 0 round var(--sheet-radius) var(--sheet-radius) 0 0);
+  transform: translateY(340px);
+  border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
 }
 .cart__scroll {
   position: relative;
@@ -395,13 +400,14 @@
     transform var(--motion-base) var(--ease-out),
     padding-bottom var(--order-total-ms, 0ms) var(--order-total-easing, linear);
 }
-.cart[data-mode='docked'] .cart__titleBar { transform: translateY(290px); }
-/* The list keeps its full height under the clip, so its last line must still scroll
-   clear of the 96 footer from 294 lower down. */
-.cart[data-mode='docked'] .cart__scroll { transform: translate(4px, 294px); padding-bottom: 400px; }
+.cart[data-mode='docked'] .cart__titleBar { transform: translateY(-50px); }
+/* The list keeps its full height below the screen's edge, so its last line must
+   still scroll clear of the 96 footer from 294 lower down. */
+.cart[data-mode='docked'] .cart__scroll { transform: translate(4px, -46px); padding-bottom: 400px; }
 .cart .bottomScrim { transition: opacity var(--motion-base) var(--ease-out); }
 .cart[data-mode='docked'] .bottomScrim { opacity: 0; }
 .cart[data-mode='docked'] .cart__footer {
+  transform: translateY(-340px);
   padding: 16px 16px 32px;
   border-radius: 0;
   box-shadow: 0 -4px 8px 0 #0000000d;
