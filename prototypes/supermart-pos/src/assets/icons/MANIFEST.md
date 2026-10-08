@@ -1,6 +1,13 @@
 # Icons
 
-All 48 are present, 45 here and 3 in `shared/src/assets/`. `chevron-down` joined with
+All 53 are present, 50 here and 3 in `shared/src/assets/`. Band `170:8988` (queueing
+and recalling an order) added five, each from its own instance: `layout-alt-02`
+(`88:16257`, 40, the empty Queued orders), `clock` (`88:16298`, 16), `dots-horizontal-24`
+(`88:16301` — the order card's 24 instance, not the 20 export beside it) and
+`trash-03-danger` (from the Dropdown menu `88:16379`, 16, stroked `#C2261A`: one step
+off Color/text/danger `#C1261A`, which its label uses) and `toast-success` (the pill
+toast's 20 icon in `88:16028`: a filled `#0A9645` disc — the primitive Green/600, not a
+semantic token — unlike the card toast's outlined `check-circle`). `chevron-down` joined with
 the order total (band `115:8774`), exported from its instance `88:8718`. They are the screens' own
 Figma exports — nothing here was substituted, redrawn, or traced.
 

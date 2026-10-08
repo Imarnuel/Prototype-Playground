@@ -194,19 +194,12 @@
 /* While paying the button keeps its brand fill: it is working, not disabled. */
 .payButton[data-paying='on']:disabled {
   background: var(--color-container-brand-bold-default);
+  color: var(--color-text-inverse);
   box-shadow: var(--shadow-xs);
 }
 
 .payButton__spinner {
-  width: 20px;
-  height: 20px;
-  border-radius: var(--radius-full);
-  border: 2px solid rgb(255 255 255 / 30%);
-  border-top-color: var(--color-text-inverse);
   opacity: 0;
   transform: scale(0.6);
-  animation: pay-spin 700ms linear infinite;
 }
 .payButton[data-paying='on'] .payButton__spinner { opacity: 1; transform: none; }
-
-@keyframes pay-spin { to { transform: rotate(360deg); } }

@@ -26,15 +26,18 @@ import check_success from './check-success.svg';
 import chevron_down from './chevron-down.svg';
 import chevron_right from './chevron-right.svg';
 import chevron_right_subtle from './chevron-right-subtle.svg';
+import clock from './clock.svg';
 import credit_card_02 from './credit-card-02.svg';
 import dot_2 from './dot-2.svg';
 import dots_horizontal from './dots-horizontal.svg';
+import dots_horizontal_24 from './dots-horizontal-24.svg';
 import ellipse_79 from './ellipse-79.svg';
 import facebook from './facebook.svg';
 import filter_lines from './filter-lines.svg';
 import gift_02 from './gift-02.svg';
 import grid_01 from './grid-01.svg';
 import instagram from './instagram.svg';
+import layout_alt_02 from './layout-alt-02.svg';
 import list from './list.svg';
 import menu_01 from './menu-01.svg';
 import minus from './minus.svg';
@@ -49,8 +52,10 @@ import search_sm from './search-sm.svg';
 import share_01 from './share-01.svg';
 import shopping_cart_01 from './shopping-cart-01.svg';
 import tiktok from './tiktok.svg';
+import toast_success from './toast-success.svg';
 import trash_01 from './trash-01.svg';
 import trash_03 from './trash-03.svg';
+import trash_03_danger from './trash-03-danger.svg';
 import trash_03_subtle from './trash-03-subtle.svg';
 import twitter from './twitter.svg';
 import user_02 from './user-02.svg';
@@ -73,15 +78,18 @@ export type IconName =
   | 'chevron-down'
   | 'chevron-right'
   | 'chevron-right-subtle'
+  | 'clock'
   | 'credit-card-02'
   | 'dot-2'
   | 'dots-horizontal'
+  | 'dots-horizontal-24'
   | 'ellipse-79'
   | 'facebook'
   | 'filter-lines'
   | 'gift-02'
   | 'grid-01'
   | 'instagram'
+  | 'layout-alt-02'
   | 'list'
   | 'menu-01'
   | 'minus'
@@ -96,8 +104,10 @@ export type IconName =
   | 'share-01'
   | 'shopping-cart-01'
   | 'tiktok'
+  | 'toast-success'
   | 'trash-01'
   | 'trash-03'
+  | 'trash-03-danger'
   | 'trash-03-subtle'
   | 'twitter'
   | 'user-02'
@@ -120,15 +130,18 @@ export const ICONS: Record<IconName, { src: string; width: number; height: numbe
   'chevron-down': { src: chevron_down, width: 20, height: 20 },
   'chevron-right': { src: chevron_right, width: 16, height: 16 },
   'chevron-right-subtle': { src: chevron_right_subtle, width: 20, height: 20 },
+  'clock': { src: clock, width: 16, height: 16 },
   'credit-card-02': { src: credit_card_02, width: 20, height: 20 },
   'dot-2': { src: dot_2, width: 2, height: 2 },
   'dots-horizontal': { src: dots_horizontal, width: 20, height: 20 },
+  'dots-horizontal-24': { src: dots_horizontal_24, width: 24, height: 24 },
   'ellipse-79': { src: ellipse_79, width: 3, height: 3 },
   'facebook': { src: facebook, width: 15.316, height: 15.316 },
   'filter-lines': { src: filter_lines, width: 16, height: 16 },
   'gift-02': { src: gift_02, width: 20, height: 20 },
   'grid-01': { src: grid_01, width: 20, height: 20 },
   'instagram': { src: instagram, width: 15.316, height: 15.316 },
+  'layout-alt-02': { src: layout_alt_02, width: 40, height: 40 },
   'list': { src: list, width: 20, height: 20 },
   'menu-01': { src: menu_01, width: 20, height: 20 },
   'minus': { src: minus, width: 16, height: 16 },
@@ -143,8 +156,10 @@ export const ICONS: Record<IconName, { src: string; width: number; height: numbe
   'share-01': { src: share_01, width: 16, height: 16 },
   'shopping-cart-01': { src: shopping_cart_01, width: 16, height: 16 },
   'tiktok': { src: tiktok, width: 15.316, height: 15.316 },
+  'toast-success': { src: toast_success, width: 20, height: 20 },
   'trash-01': { src: trash_01, width: 20, height: 20 },
   'trash-03': { src: trash_03, width: 20, height: 20 },
+  'trash-03-danger': { src: trash_03_danger, width: 16, height: 16 },
   'trash-03-subtle': { src: trash_03_subtle, width: 20, height: 20 },
   'twitter': { src: twitter, width: 13.08, height: 13.08 },
   'user-02': { src: user_02, width: 16, height: 16 },

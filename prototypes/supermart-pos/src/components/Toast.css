@@ -65,6 +65,39 @@
   cursor: pointer;
 }
 
+/* --- Pill: the board's Toast notification, `88:16028` -------------------------------
+   219x48 on the Sales Point: hugging its line, centred, 4px gap, 14 by 12 padding,
+   fully round, Color/container/neutral/bolder, the label in an 8px-padded box. Its
+   two-layer shadow is the component's own and has no token.
+   DELIBERATE DEVIATION: the frame (`88:15953`) puts it at y 697 — View cart's own
+   slot (703..751), because that frame leaves View cart out. The Sales Point always has
+   it, so the pill sits above it instead, 10 clear: the gap View cart keeps above the
+   tab bar. */
+.toast[data-variant='pill'] {
+  top: 645px;
+  left: 50%;
+  margin-left: 0;
+  width: auto;
+  min-height: 0;
+  flex-direction: row;
+  padding: 14px var(--spacing-300);
+  border-radius: var(--radius-full);
+  background: var(--color-container-neutral-bolder-default);
+  box-shadow: 0 4px 8px -2px #0a0d124d, 0 2px 4px -1px #0a0d1229;
+  white-space: nowrap;
+}
+.toast[data-variant='pill'][data-open='off'] { transform: translateX(-50%) translateY(8px) scale(0.98); }
+.toast[data-variant='pill'][data-open='on'] { transform: translateX(-50%); }
+
+.toast[data-variant='pill'] .toast__message {
+  width: auto;
+  padding: 0 var(--spacing-200);
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .toast {
     transition-duration: 0ms !important;

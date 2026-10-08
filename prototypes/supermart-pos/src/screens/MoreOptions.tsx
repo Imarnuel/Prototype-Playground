@@ -16,6 +16,9 @@ export type MoreOption = 'customer' | 'discount' | 'clear' | 'queued';
  * - The groups are drawn 345 wide in a 349 body, 16 from the left and 20 from the
  *   right. They fill the body, 16 each side.
  * - "Add a customer" keeps its label when one is attached, and swaps them.
+ *
+ * Over an empty Cart (`88:16526`, band `170:8988`) the frame hides every group but
+ * Queued orders: there is no order to add a customer or a discount to, or to clear.
  */
 const GROUPS: readonly (readonly { id: MoreOption; icon: IconName; label: string }[])[] = [
   [
@@ -27,9 +30,10 @@ const GROUPS: readonly (readonly { id: MoreOption; icon: IconName; label: string
 ];
 
 export function MoreOptions({
-  open, onClose, onChoose, handoff = false,
+  open, onClose, onChoose, cartEmpty = false, handoff = false,
 }: {
   open: boolean;
+  cartEmpty?: boolean;
   onClose: () => void;
   /** Swapping with another sheet: see BottomSheet `handoff`. */
   handoff?: boolean;
@@ -37,7 +41,7 @@ export function MoreOptions({
 }) {
   return (
     <BottomSheet handoff={handoff} open={open} title="More options" onClose={onClose} closeLabel="Close more options" className="moreOptions">
-      {GROUPS.map((group, g) => (
+      {(cartEmpty ? GROUPS.filter((g) => g.some((r) => r.id === 'queued')) : GROUPS).map((group, g) => (
         <div key={g} className="moreOptions__group">
           {group.map((row) => (
             <button key={row.id} type="button" className="moreOptions__row" data-option={row.id}

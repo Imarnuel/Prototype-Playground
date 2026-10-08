@@ -70,7 +70,7 @@ export function Checkout({
           <span className="payButton__label" aria-hidden={paying}>
             {canPay || paying ? `Pay ${formatPrice(totals.total)}` : 'Pay'}
           </span>
-          <span className="payButton__spinner" aria-hidden="true" />
+          <span className="buttonSpinner payButton__spinner" aria-hidden="true" />
           {paying && <span className="visuallyHidden">Processing…</span>}
         </button>
       }

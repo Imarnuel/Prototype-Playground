@@ -359,10 +359,31 @@
 
 .cart__queue {
   flex: none;
+  /* The label and the spinner share one cell, so the button never changes size. */
+  display: grid;
+  place-items: center;
+  color: var(--color-text-brand);
   /* The frame's 120: Figma lays a hug-width button out on its label's width rounded
      UP (96), so the real 95.4px label would make it 0.6px narrower than drawn. */
   width: 120px;
   background: var(--color-container-brand-default);
+}
+
+.cart__queue > * { grid-area: 1 / 1; }
+.cart__queueLabel,
+.cart__queueSpinner {
+  transition:
+    opacity var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out);
+}
+.cart__queueSpinner { opacity: 0; transform: scale(0.6); }
+.cart__queue[data-busy='on'] .cart__queueLabel { opacity: 0; transform: translateY(-6px); }
+.cart__queue[data-busy='on'] .cart__queueSpinner { opacity: 1; transform: none; }
+/* Working, it keeps its fill: it is busy, not unavailable. */
+.cart__queue[data-busy='on']:disabled {
+  background: var(--color-container-brand-default);
+  box-shadow: var(--shadow-xs);
+  cursor: progress;
 }
 
 .cart__checkout:disabled,

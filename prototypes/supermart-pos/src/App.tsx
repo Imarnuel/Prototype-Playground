@@ -10,16 +10,17 @@ import { QuantitySheet } from './screens/QuantitySheet';
 import { LineDetails } from './screens/LineDetails';
 import { MoreOptions, type MoreOption } from './screens/MoreOptions';
 import { ApplyDiscount } from './screens/ApplyDiscount';
+import { QueuedOrders, type RecallResult } from './screens/QueuedOrders';
 import { Checkout, type CheckoutDraft } from './screens/Checkout';
 import { SelectBank, SelectPaymentMethod } from './screens/PaymentPickers';
 import { Receipt, TransactionSuccess } from './screens/SaleComplete';
 import { METHODS, methodLabel } from './data/payments';
-import { submitPayment } from './api/pos';
+import { queueOrder, setQueueForDemo, submitPayment } from './api/pos';
 import { receiptText, type Receipt as ReceiptRecord } from './state/sale';
 import { PRODUCTS, maxCount, parseWholeNaira, unitFor, type Discount, type Product } from './data/catalogue';
 import { CUSTOMERS, type Customer } from './data/customers';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { Toast, type ToastTone } from './components/Toast';
+import { Toast, type ToastAction, type ToastTone, type ToastVariant } from './components/Toast';
 import { usePresented } from './hooks/usePresented';
 import { addToCart, commitDetails, commitQuantity, removeLine, setCount, totals, type CartLine } from './state/cart';
 import './App.css';
@@ -45,12 +46,11 @@ export function App() {
      than a screen of its own. Its copy is the frame's. */
   /* The message outlives `open` on purpose: the exit fades the toast out, and clearing
      the text with it would fade an empty box. */
-  type ToastAction = { label: string; onPress: () => void };
-  const [toast, setToast] = useState<{ open: boolean; message: string; tone: ToastTone; shown: number; action?: ToastAction }>(
+  const [toast, setToast] = useState<{ open: boolean; message: string; tone: ToastTone; variant?: ToastVariant; shown: number; action?: ToastAction }>(
     { open: false, message: '', tone: 'success', shown: 0 },
   );
-  const showToast = (message: string, tone: ToastTone = 'success', action?: ToastAction) =>
-    setToast((t) => ({ open: true, message, tone, shown: t.shown + 1, action }));
+  const showToast = (message: string, tone: ToastTone = 'success', action?: ToastAction, variant?: ToastVariant) =>
+    setToast((t) => ({ open: true, message, tone, variant, shown: t.shown + 1, action }));
   const hideToast = useCallback(() => setToast((t) => ({ ...t, open: false })), []);
   const [totalOpen, setTotalOpen] = useState(false);
   /* The line as it stood when the Quantity sheet opened. Kept after it closes, so the
@@ -85,6 +85,13 @@ export function App() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [paymentPicker, setPaymentPicker] = useState<'method' | 'bank' | null>(null);
   const [paying, setPaying] = useState(false);
+  /* Queued orders (band `170:8988`). The queue itself lives behind the mock API; the
+     App only knows whether its sheet is up, and whether the Cart is being queued. */
+  const [queuedOpen, setQueuedOpen] = useState(false);
+  const [queuedOpening, setQueuedOpening] = useState(0);
+  const openQueued = () => { setQueuedOpen(true); setQueuedOpening((n) => n + 1); };
+  const [queueing, setQueueing] = useState(false);
+  const [queueForce, setQueueForce] = useState<'loading' | 'error'>();
   // Bumped on New sale: the grid replays its entrance, a fresh start for the next customer.
   const [freshSale, setFreshSale] = useState(0);
   // Once paid: the success screen, then the receipt. `hold` keeps the success screen
@@ -116,6 +123,29 @@ export function App() {
   };
 
   const orderTotal = () => totals(lines, orderDiscount).total;
+  /* Queue order, `88:16031` → `88:15953`: the sale is parked, the Cart closes on the
+     Sales Point and the pill toast confirms. The Cart empties only once it has gone,
+     so it never shows its empty state on the way out. A failure keeps the sale. */
+  const queueCurrent = () => {
+    setQueueing(true);
+    queueOrder({ lines, customer, orderDiscount }).then(() => {
+      setCartOpen(false);
+      showToast('Order has been queued', 'success', undefined, 'pill');
+      window.setTimeout(() => {
+        setLines([]); setOrderDiscount(undefined); setCustomer(null); setQueueing(false);
+      }, exitMs);
+    }).catch(() => {
+      setQueueing(false);
+      showToast('Couldn’t queue the order. Try again.', 'notice');
+    });
+  };
+  /* Recall, `88:16427` → `88:16115`: the order comes back into the Cart underneath. */
+  const recalled = ({ recalled: order, parked }: RecallResult) => {
+    setLines(order.lines); setCustomer(order.customer); setOrderDiscount(order.orderDiscount);
+    setQueuedOpen(false);
+    setCartOpen(true);
+    if (parked) showToast('Your previous order was queued', 'success', undefined, 'pill');
+  };
   const openCheckout = (draft?: Partial<CheckoutDraft>) => {
     setCheckout((c) => ({
       method: 'cash', bankId: 'access', amount: String(orderTotal() / 100), ...draft, opening: c.opening + 1,
@@ -215,6 +245,7 @@ export function App() {
     setCustomer(null); setCustomers(CUSTOMERS); hideToast(); setTotalOpen(false); setQtyOpen(false); setDetailsOpen(false);
     setMenuOpen(false); setDiscountOpen(false); setOrderDiscount(undefined);
     setCheckoutOpen(false); setPaymentPicker(null); setSale(null);
+    setQueuedOpen(false); setQueueForce(undefined); setQueueForDemo('seeded');
     setResetNonce((n) => n + 1);
   };
 
@@ -337,6 +368,48 @@ export function App() {
         openCheckout({ ...('method' in draft ? { method: draft.method } : {}), amount });
       },
     })),
+    /* Queueing & recalling an order, band `170:8988`. Each opens the sheet over the
+       Cart, as More options would; the queue is reseeded unless the entry says empty. */
+    ...([
+      ['Queued orders', 'Screens', 'seeded', undefined],
+      ['Queued orders: empty', 'States', 'empty', undefined],
+      ['Queued orders: loading', 'States', 'seeded', 'loading'],
+    ] as const).map(([label, group, queue, force]): DevToolbarItem => ({
+      label, group,
+      onSelect: () => {
+        setQueueForDemo(queue); setQueueForce(force);
+        setCartOpen(true); setMenuOpen(false); openQueued();
+      },
+    })),
+    {
+      label: 'Queued orders: load fails',
+      group: 'States',
+      // The real path: the next request is the sheet's own fetch. Try again recovers.
+      onSelect: () => {
+        setQueueForDemo('seeded'); setQueueForce(undefined); failNextRequest();
+        setCartOpen(true); setMenuOpen(false); openQueued();
+      },
+    },
+    {
+      label: 'More options: empty cart',
+      group: 'States',
+      onSelect: () => { setLines([]); setOrderDiscount(undefined); setCartOpen(true); setMenuOpen(true); },
+    },
+    {
+      label: 'Queue order: fails',
+      group: 'States',
+      // A full Cart, the mock API armed: the next Queue order keeps the sale.
+      onSelect: () => { setLines(fourLines()); setCartOpen(true); failNextRequest(); },
+    },
+    {
+      label: 'Order has been queued: toast',
+      group: 'States',
+      // As `88:15953` draws it: the sale has gone, so the Sales Point has no cart bar.
+      onSelect: () => {
+        setLines([]); setOrderDiscount(undefined); setCustomer(null); setCartOpen(false);
+        showToast('Order has been queued', 'success', undefined, 'pill');
+      },
+    },
     {
       label: 'Checkout: payment fails',
       group: 'States',
@@ -379,6 +452,7 @@ export function App() {
     onSelect: () => {
       setMenuOpen(false); setDiscountOpen(false); setPickerOpen(false); setQtyOpen(false); setDetailsOpen(false);
       setTotalOpen(false); hideToast(); setCheckoutOpen(false); setPaymentPicker(null); setSale(null);
+      setQueuedOpen(false);
       entry.onSelect();
     },
   }));
@@ -417,7 +491,8 @@ export function App() {
                 onOpenDetails={(id) => openDetails(lines.find((l) => l.productId === id)!)}
                 onRemove={(id) => setLines((l) => removeLine(l, id))}
                 onCheckout={() => openCheckout()}
-                onQueue={() => { setLines([]); setOrderDiscount(undefined); setCartOpen(false); }}
+                onQueue={queueCurrent}
+                queueing={queueing}
                 onAddCustomer={() => setPickerOpen(true)}
                 onMoreOptions={() => setMenuOpen(true)}
                 onClearAll={clearCart}
@@ -465,16 +540,27 @@ export function App() {
               <MoreOptions
                 handoff={handoff}
                 open={menuOpen}
+                cartEmpty={lines.length === 0}
                 onClose={() => setMenuOpen(false)}
                 onChoose={(option: MoreOption) => {
                   // A row that opens another sheet hands over to it; the others just close.
                   if (option === 'customer') { swapSheets(() => setMenuOpen(false), () => setPickerOpen(true)); return; }
                   if (option === 'discount') { swapSheets(() => setMenuOpen(false), () => openDiscount(orderDiscount)); return; }
+                  if (option === 'queued') { swapSheets(() => setMenuOpen(false), openQueued); return; }
                   setMenuOpen(false);
-                  if (option === 'clear') setClearRequest((n) => n + 1);
-                  // The user's call: Queued orders is designed later.
-                  else showToast('Queued orders is not designed yet', 'notice');
+                  setClearRequest((n) => n + 1);
                 }}
+              />
+
+              <QueuedOrders
+                handoff={handoff}
+                open={queuedOpen}
+                opening={queuedOpening}
+                onClose={() => setQueuedOpen(false)}
+                current={lines.length > 0 ? { lines, customer, orderDiscount } : undefined}
+                onRecalled={recalled}
+                onToast={showToast}
+                forceState={queueForce}
               />
 
               {discountSheet && (
@@ -568,6 +654,7 @@ export function App() {
             open={toast.open}
             message={toast.message}
             tone={toast.tone}
+            variant={toast.variant}
             shown={toast.shown}
             action={toast.action}
             onDismiss={hideToast}

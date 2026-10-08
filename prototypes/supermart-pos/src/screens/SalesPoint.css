@@ -97,50 +97,10 @@
   height: 188px;
   border-radius: var(--radius-300);
   background: var(--color-container-neutral-default);
-  animation: productCardPulse 1.2s ease-in-out infinite;
+  animation: skeleton-pulse 1.2s ease-in-out infinite;
 }
 
-@keyframes productCardPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .productCardSkeleton { animation: none; }
-}
-
-.salesPoint__message {
-  padding: 48px 8px;
-  text-align: center;
-}
-
-.salesPoint__messageTitle {
-  margin: 0 0 4px;
-  font-size: var(--type-Label-Large-size);
-  font-weight: var(--type-Label-Large-weight);
-  line-height: var(--type-Label-Large-line-height);
-  color: var(--color-text-default);
-}
-
-.salesPoint__messageBody {
-  margin: 0;
-  font-size: var(--type-Body-Base-size);
-  line-height: var(--type-Body-Base-line-height);
-  letter-spacing: var(--type-Body-Base-letter-spacing);
-  color: var(--color-text-subtle);
-}
-
-.salesPoint__retry {
-  margin-top: 16px;
-  padding: 8px 12px;
-  border: 0;
-  border-radius: var(--radius-200);
-  background: var(--color-container-brand-bold-default);
-  color: var(--color-text-inverse);
-  font-size: var(--type-Label-Base-size);
-  font-weight: var(--type-Label-Base-weight);
-  cursor: pointer;
-}
 
 
 /* Bottom-docked, so it does NOT take the +9 safe-area shift.

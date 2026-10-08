@@ -148,5 +148,25 @@ let shortSale = false;
 try { buildReceipt({ lines: sold, customer: null, tender: { method: 'cash', tenderedMinor: 100 }, at, sequence: 1 }); } catch { shortSale = true; }
 check('a short tender never produces a receipt', shortSale);
 
+// --- Queued orders (band 170:8988) ------------------------------------------------
+const queueFile = path.join(outdir, 'queue.mjs');
+await build({
+  entryPoints: [path.join(root, 'src/state/queue.ts')],
+  bundle: true, format: 'esm', platform: 'node', outfile: queueFile, logLevel: 'error',
+});
+const { seedQueue, queuedItemNames, queuedTotal, formatQueuedAt } = await import(pathToFileURL(queueFile).href);
+const seeded = seedQueue(new Date(2026, 9, 8, 14, 0));
+check('the demo queue: distinct ids, newest first',
+  new Set(seeded.map((q) => q.id)).size === seeded.length
+  && seeded.every((q, i) => i === 0 || seeded[i - 1].queuedAt > q.queuedAt));
+check('every queued order resolves its products and totals as its Cart would',
+  seeded.every((q) => queuedItemNames(q).length === q.lines.length && queuedTotal(q) === totals(q.lines, q.orderDiscount).total && queuedTotal(q) > 0),
+  seeded.map((q) => queuedTotal(q)).join(', '));
+check('...covering a walk-in, a named customer and an order discount',
+  seeded.some((q) => !q.customer) && seeded.some((q) => q.customer) && seeded.some((q) => q.orderDiscount));
+check('every queued line is within its shelf',
+  seeded.every((q) => q.lines.every((l) => l.count >= 1 && l.count <= maxCount(byId(l.productId), l.unitId))));
+check('the frame\'s time form, "13:24, 06-03-2026"', formatQueuedAt(new Date(2026, 2, 6, 13, 24)) === '13:24, 06-03-2026');
+
 console.log(`\n${fails} failing`);
 process.exit(fails ? 1 : 0);

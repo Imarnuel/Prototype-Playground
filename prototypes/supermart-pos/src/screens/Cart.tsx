@@ -31,6 +31,8 @@ type CartProps = {
   onRemove: (productId: string) => void;
   onCheckout: () => void;
   onQueue: () => void;
+  /** Queue order is with the mock API: the button spins in place. */
+  queueing?: boolean;
   onAddCustomer: () => void;
   onMoreOptions: () => void;
   onClearAll: () => void;
@@ -46,7 +48,7 @@ type CartProps = {
 };
 
 export function Cart({
-  lines, orderDiscount, onClose, onQtyChange, onEditQuantity, onOpenDetails, onRemove, onCheckout, onQueue, onAddCustomer,
+  lines, orderDiscount, onClose, onQtyChange, onEditQuantity, onOpenDetails, onRemove, onCheckout, onQueue, queueing = false, onAddCustomer,
   onMoreOptions, onClearAll, clearRequest = 0, customer, onRemoveCustomer, totalOpen, onToggleTotal,
 }: CartProps) {
   const reducedMotion = useReducedMotion();
@@ -202,8 +204,11 @@ export function Cart({
             <span className="cart__checkoutLabel">Checkout (<AnimatedText value={String(lines.length)} />)</span>
             <Icon name="chevron-right" />
           </button>
-          <button type="button" className="cart__queue" onClick={onQueue} disabled={lines.length === 0}>
-            <span className="cart__queueLabel">Queue order</span>
+          <button type="button" className="cart__queue" onClick={onQueue} disabled={lines.length === 0 || queueing}
+            data-busy={queueing ? 'on' : 'off'} aria-busy={queueing}>
+            <span className="cart__queueLabel" aria-hidden={queueing}>Queue order</span>
+            <span className="buttonSpinner cart__queueSpinner" aria-hidden="true" />
+            {queueing && <span className="visuallyHidden">Queueing…</span>}
           </button>
         </div>
       </div>

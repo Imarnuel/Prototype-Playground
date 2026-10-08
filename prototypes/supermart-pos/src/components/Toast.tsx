@@ -10,6 +10,10 @@ import './Toast.css';
  * or warning token in the file to use instead — needs design input.
  */
 export type ToastTone = 'success' | 'notice';
+export type ToastAction = { label: string; onPress: () => void };
+/** `card`: `88:8401`, centred. `pill`: the board's Toast notification `88:16028`,
+    low on the screen, used where a flow's frames draw that one ("Order has been queued"). */
+export type ToastVariant = 'card' | 'pill';
 
 /**
  * Confirmation toast — Figma `88:8401`, the only thing that separates "Customer
@@ -24,18 +28,19 @@ export type ToastTone = 'success' | 'notice';
  * should not interrupt a screen reader mid-sentence.
  */
 export function Toast({
-  open, message, tone = 'success', shown, onDismiss, action, autoDismissMs = action ? 5000 : 2600,
+  open, message, tone = 'success', variant = 'card', shown, onDismiss, action, autoDismissMs = action ? 5000 : 2600,
 }: {
   open: boolean;
   message: string;
   tone?: ToastTone;
+  variant?: ToastVariant;
   /** Changes on every show. A repeat of the same message while the toast is up — a
       second tap past the shelf — gets the full time again, not what was left. */
   shown: number;
   onDismiss: () => void;
   /** Not designed: a way back from something that cannot otherwise be undone, such as
       clearing the cart. It stays up longer, long enough to reach. */
-  action?: { label: string; onPress: () => void };
+  action?: ToastAction;
   autoDismissMs?: number;
 }) {
   const reducedMotion = useReducedMotion();
@@ -51,6 +56,7 @@ export function Toast({
       className="toast"
       data-open={open ? 'on' : 'off'}
       data-action={action ? 'on' : 'off'}
+      data-variant={variant}
       role="status"
       aria-live="polite"
       style={{
@@ -58,7 +64,7 @@ export function Toast({
         transitionTimingFunction: open ? EASING.out : EASING.in,
       }}
     >
-      {tone === 'success' && <Icon name="check-circle" />}
+      {tone === 'success' && <Icon name={variant === 'pill' ? 'toast-success' : 'check-circle'} />}
       <p className="toast__message">{message}</p>
       {action && (
         <button type="button" className="toast__action" onClick={action.onPress} tabIndex={open ? 0 : -1}>

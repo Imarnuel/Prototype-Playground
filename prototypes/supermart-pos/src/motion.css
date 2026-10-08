@@ -97,4 +97,25 @@ button:active:not(:disabled):not([aria-disabled='true']):not(
 
 .customerEmpty,
 .customerList__none,
-.salesPoint__message { animation: motion-fade var(--motion-base) var(--ease-out) backwards; }
+.listMessage { animation: motion-fade var(--motion-base) var(--ease-out) backwards; }
+
+/* The skeleton pulse: every list's loading placeholder. Moved from SalesPoint.css when
+   Queued orders became the second list to load. Reduced motion stills it (the global
+   rule above), leaving the placeholder in place. */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* A button working: a 20 ring in the button's own text colour, its track at 30%. Pay,
+   Queue order and Recall order (each cross-fades its label to it in place, so the
+   button never changes size). */
+.buttonSpinner {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  border: 2px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  animation: button-spin 700ms linear infinite;
+}
+@keyframes button-spin { to { rotate: 360deg; } }

@@ -6,6 +6,7 @@
 import { request } from '@playground/shared';
 import { CATEGORY_ORDER, PRODUCTS, type Category, type Product } from '../data/catalogue';
 import { buildReceipt, type Receipt } from '../state/sale';
+import { seedQueue, type QueuedOrder } from '../state/queue';
 
 export type ProductFilter = Category | 'All';
 
@@ -36,4 +37,60 @@ export function fetchProducts(filter: ProductFilter): Promise<readonly Product[]
  */
 export function submitPayment(sale: Parameters<typeof buildReceipt>[0]): Promise<Receipt> {
   return request('pay', () => buildReceipt(sale));
+}
+
+/* --- Queued orders (band `170:8988`) ----------------------------------------------
+   The store's parked sales. Module state stands in for the server: every read and
+   write goes through `request`, so the list has latency, a forced failure, and a
+   failed write never lands (`produce` only runs on success). */
+let queue: QueuedOrder[] = seedQueue();
+let queueSeq = queue.length;
+
+export type NewQueuedOrder = Omit<QueuedOrder, 'id' | 'queuedAt'>;
+
+const park = (order: NewQueuedOrder, at: Date): QueuedOrder => {
+  queueSeq += 1;
+  const q = { ...order, id: `q-${queueSeq}`, queuedAt: at };
+  queue = [q, ...queue];
+  return q;
+};
+
+/** Newest first. */
+export function fetchQueue(): Promise<readonly QueuedOrder[]> {
+  return request('queue', () => [...queue]);
+}
+
+export function queueOrder(order: NewQueuedOrder): Promise<QueuedOrder> {
+  return request('queue/add', () => park(order, new Date()));
+}
+
+/**
+ * Takes an order out of the queue to finish it. With `current` — the cart already
+ * holds a sale — that sale is queued in the same request (the designer's call), so a
+ * failure leaves both exactly where they were.
+ */
+export function recallQueued(id: string, current?: NewQueuedOrder): Promise<{ recalled: QueuedOrder; parked?: QueuedOrder }> {
+  return request('queue/recall', () => {
+    const recalled = queue.find((q) => q.id === id);
+    if (!recalled) throw new Error(`no queued order ${id}`);
+    queue = queue.filter((q) => q.id !== id);
+    return { recalled, parked: current ? park(current, new Date()) : undefined };
+  });
+}
+
+export function deleteQueued(id: string): Promise<void> {
+  return request('queue/delete', () => { queue = queue.filter((q) => q.id !== id); });
+}
+
+/** Undo for a delete: back in its own place, which is its time. */
+export function restoreQueued(order: QueuedOrder): Promise<void> {
+  return request('queue/restore', () => {
+    queue = [...queue.filter((q) => q.id !== order.id), order]
+      .sort((a, b) => b.queuedAt.getTime() - a.queuedAt.getTime());
+  });
+}
+
+/** Dev toolbar only: put the queue in a demo state without waiting on anything. */
+export function setQueueForDemo(state: 'seeded' | 'empty'): void {
+  queue = state === 'seeded' ? seedQueue() : [];
 }

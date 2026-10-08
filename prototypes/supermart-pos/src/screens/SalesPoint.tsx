@@ -5,6 +5,7 @@ import { FilterBar, SearchBar, TabBar, ViewCartButton } from '../components/Sale
 import { BottomScrim } from '../components/BottomScrim';
 import { fetchProducts, type ProductFilter } from '../api/pos';
 import { CATEGORY_ORDER, fullName, type Product } from '../data/catalogue';
+import { ListMessage } from '../components/ListMessage';
 import './SalesPoint.css';
 
 /**
@@ -88,20 +89,12 @@ export function SalesPoint({ forceState, cartCount, freshSale = 0, onAddProduct,
         )}
 
         {state.status === 'error' && (
-          <div className="salesPoint__message">
-            <p className="salesPoint__messageTitle">Couldn&rsquo;t load products</p>
-            <p className="salesPoint__messageBody">{state.error.message}</p>
-            <button type="button" className="salesPoint__retry" onClick={run}>Try again</button>
-          </div>
+          <ListMessage title="Couldn’t load products" body={state.error.message} onRetry={run} />
         )}
 
         {state.status === 'ready' && visible.length === 0 && (
-          <div className="salesPoint__message">
-            <p className="salesPoint__messageTitle">No products</p>
-            <p className="salesPoint__messageBody">
-              {query.trim() ? `Nothing matches “${query.trim()}”.` : 'This category is empty.'}
-            </p>
-          </div>
+          <ListMessage title="No products"
+            body={query.trim() ? `Nothing matches “${query.trim()}”.` : 'This category is empty.'} />
         )}
 
         {state.status === 'ready' && visible.length > 0 && (

@@ -281,12 +281,12 @@ const SHEET = [
 ];
 
 const EMPTY = [
-  ['88:11935 ring outer', '.customerEmpty__rings', 'boxShadow',       'inset 0 0 0 1px rgb(242, 242, 243)'],
-  ['88:11935 ring outer', '.customerEmpty__rings', 'borderRadius',    '56px'],
-  ['88:11936 ring mid',   '.customerEmpty__ring2', 'boxShadow',       'inset 0 0 0 1px rgb(223, 224, 226)'],
-  ['88:11936 ring mid',   '.customerEmpty__ring2', 'borderRadius',    '40px'],
-  ['88:11937 ring inner', '.customerEmpty__ring3', 'boxShadow',       'inset 0 0 0 1px rgba(37, 43, 55, 0.14)'],
-  ['88:11937 ring inner', '.customerEmpty__ring3', 'borderRadius',    '16px'],
+  ['88:11935 ring outer', '.emptyState__rings', 'boxShadow',       'inset 0 0 0 1px rgb(242, 242, 243)'],
+  ['88:11935 ring outer', '.emptyState__rings', 'borderRadius',    '56px'],
+  ['88:11936 ring mid',   '.emptyState__ring2', 'boxShadow',       'inset 0 0 0 1px rgb(223, 224, 226)'],
+  ['88:11936 ring mid',   '.emptyState__ring2', 'borderRadius',    '40px'],
+  ['88:11937 ring inner', '.emptyState__ring3', 'boxShadow',       'inset 0 0 0 1px rgba(37, 43, 55, 0.14)'],
+  ['88:11937 ring inner', '.emptyState__ring3', 'borderRadius',    '16px'],
   ['88:11942 cta',        '.customerEmpty__cta',   'backgroundColor', 'rgb(44, 74, 139)'],
   ['88:11942 cta',        '.customerEmpty__cta',   'borderRadius',    '12px'],
 ];
@@ -646,6 +646,76 @@ const pixelDelta = async (a, c) => {
   return { max, samples: ra.length };
 };
 
+/* Queued orders, band `170:8988`: the list `88:16280` (card `88:16283`, Recall disabled
+   `88:16378`), a chosen card `88:16430` with Recall enabled `88:16525`, the row menu
+   `88:16379`, the empty sheet `88:16251`, the queued toast `88:16028`. */
+const QUEUE = [
+  ['88:16280 sheet',        '.queuedOrders',           'backgroundColor', 'rgb(246, 247, 249)'],
+  ['88:16283 card',         '.queueCard',              'borderRadius',    '16px'],
+  ['88:16283 card stroke',  '.queueCard',              '::after boxShadow', 'inset 0 0 0 0.66px rgba(37, 43, 55, 0.08)'],
+  ['88:16284 top',          '.queueCard__top',         'backgroundColor', 'rgb(255, 255, 255)'],
+  ['88:16285 top',          '.queueCard__top',         'padding',         '12px'],
+  ['88:16285 rule',         '.queueCard__top',         '::after backgroundColor', 'rgba(37, 43, 55, 0.08)'],
+  ['88:16286 summary',      '.queueCard__summary',     'rowGap',          '4px'],
+  ['88:16287 name',         '.queueCard__name',        'fontSize',        '16px'],
+  ['88:16287 name',         '.queueCard__name',        'fontWeight',      '500'],
+  ['88:16287 name',         '.queueCard__name',        'letterSpacing',   '-0.24px'],
+  ['88:16287 name',         '.queueCard__name',        'color',           'rgb(20, 31, 51)'],
+  ['88:16289 items',        '.queueCard__items',       'fontSize',        '14px'],
+  ['88:16289 items',        '.queueCard__items',       'lineHeight',      '20px'],
+  ['88:16289 items',        '.queueCard__items',       'letterSpacing',   '-0.2px'],
+  ['88:16289 items',        '.queueCard__items',       'color',           'rgb(94, 106, 130)'],
+  ['88:16290 dot',          '.queueCard__dot',         'backgroundColor', 'rgb(94, 106, 130)'],
+  ['88:16290 dot',          '.queueCard__dot',         'width',           '2px'],
+  ['88:16295 total',        '.queueCard__total',       'fontWeight',      '600'],
+  ['88:16295 total',        '.queueCard__total',       'letterSpacing',   '-0.32px'],
+  ['88:16296 bottom',       '.queueCard__time',        'padding',         '12px'],
+  ['88:16297 time row',     '.queueCard__time',        'columnGap',       '6px'],
+  ['88:16299 time',         '.queueCard__timeText',    'color',           'rgb(94, 106, 130)'],
+  ['88:16299 time',         '.queueCard__timeText',    'letterSpacing',   '-0.2px'],
+  ['88:16378 Recall off',   '.recallButton',           'backgroundColor', 'rgb(207, 211, 216)'],
+  ['88:16378 Recall off',   '.recallButton',           'color',           'rgb(158, 164, 179)'],
+  ['88:16378 Recall',       '.recallButton',           'borderRadius',    '12px'],
+  ['88:16378 Recall',       '.recallButton',           'padding',         '12px 32px'],
+  ['88:16378 footer',       '.queuedOrders .modalFooter', 'padding',      '16px 16px 40px 16px'],
+];
+const QUEUE_CHOSEN = [
+  ['88:16430 card stroke',  '.queueCard[data-chosen="on"]', '::after boxShadow', 'inset 0 0 0 1px rgb(44, 74, 139)'],
+  ['88:16430 card',         '.queueCard[data-chosen="on"]', 'backgroundColor', 'rgb(240, 242, 245)'],
+  ['88:16525 Recall',       '.recallButton',           'backgroundColor', 'rgb(44, 74, 139)'],
+  ['88:16525 Recall',       '.recallButton',           'color',           'rgb(255, 255, 255)'],
+  ['88:16525 Recall',       '.recallButton',           'boxShadow',       '0 1px 2px 0 #0a0d120d'],
+];
+const QUEUE_MENU = [
+  ['88:16379 menu',         '.rowMenu',                'backgroundColor', 'rgb(255, 255, 255)'],
+  ['88:16379 menu',         '.rowMenu',                'borderRadius',    '8px'],
+  ['88:16379 menu',         '.rowMenu',                'padding',         '8px 0px'],
+  ['88:16379 menu stroke',  '.rowMenu',                'boxShadow',       'inset 0 0 0 1px rgba(37, 43, 55, 0.14), 0px 4px 6px 0px #0a0d1208, 0px 12px 16px -2px #0a0d1214, 0px 0px 1px 0.5px #00000008'],
+  ['I806:2043 item',        '.rowMenu__item',          'padding',         '10px 12px'],
+  ['I806:2043 item',        '.rowMenu__item',          'columnGap',       '12px'],
+  ['I899:2997 Delete',      '.rowMenu__label',         'color',           'rgb(193, 38, 26)'],
+  ['I899:2997 Delete',      '.rowMenu__label',         'fontSize',        '14px'],
+];
+const QUEUE_EMPTY = [
+  ['88:16253 body',         '.queuedOrders .modalBody', 'padding',        '16px 16px 48px 16px'],
+  ['88:16253 body',         '.queueEmpty',             'rowGap',          '16px'],
+  ['88:16254 ring outer',   '.queueEmpty .emptyState__rings', 'boxShadow', 'inset 0 0 0 1px rgb(242, 242, 243)'],
+  ['88:16259 title',        '.queueEmpty .emptyState__title', 'fontSize', '18px'],
+  ['88:16259 title',        '.queueEmpty .emptyState__title', 'fontWeight', '600'],
+  ['88:16260 body text',    '.queueEmpty .emptyState__body', 'width',     '322px'],
+];
+const QUEUE_TOAST = [
+  ['88:16028 pill',         '.toast',                  'backgroundColor', 'rgb(20, 31, 51)'],
+  ['88:16028 pill',         '.toast',                  'borderRadius',    '9999px'],
+  ['88:16028 pill',         '.toast',                  'padding',         '14px 12px'],
+  ['88:16028 pill',         '.toast',                  'columnGap',       '4px'],
+  ['88:16028 pill',         '.toast',                  'boxShadow',       '0px 4px 8px -2px rgba(10, 13, 18, 0.3), 0px 2px 4px -1px rgba(10, 13, 18, 0.16)'],
+  ['I4381:26900 label',     '.toast__message',         'fontSize',        '14px'],
+  ['I4381:26900 label',     '.toast__message',         'fontWeight',      '500'],
+  ['I4381:26900 label',     '.toast__message',         'letterSpacing',   '-0.16px'],
+  ['I4381:26899 label box', '.toast__message',         'padding',         '0px 8px'],
+];
+
 const run = async (name, checks) => {
   const rows = await page.evaluate((checks) => {
     const probe = document.createElement('div');
@@ -655,6 +725,10 @@ const run = async (name, checks) => {
     return checks.map(([label, sel, prop, want]) => {
       const el = document.querySelector(sel);
       if (!el) return { label, sel, prop, want, got: 'NO SUCH ELEMENT' };
+      if (prop.startsWith('::after ') && prop !== '::after background') {
+        const p = prop.slice(8); const cs = getComputedStyle(el, '::after');
+        return { label, sel, prop, want: COMPOUND.includes(p) || p.endsWith('Color') ? norm(p, want) : want, got: cs.content === 'none' ? 'NO ::after' : cs[p] };
+      }
       if (prop === '::after background') {
         const cs = getComputedStyle(el, '::after');
         return { label, sel, prop, want: norm('backgroundImage', want), got: cs.content === 'none' ? 'NO ::after' : cs.backgroundImage };
@@ -743,11 +817,25 @@ await pick('Transaction success');
 fails += await run('Transaction success', SUCCESS);
 await pick('Receipt: cash');
 fails += await run('Receipt', RECEIPT);
+await pick('Queued orders');
+fails += await run('Queued orders', QUEUE);
+await page.evaluate(() => document.querySelector('.queueCard__choose').click());
+await page.waitForTimeout(400);
+fails += await run('Queued orders: chosen', QUEUE_CHOSEN);
+await page.evaluate(() => document.querySelector('.queueCard__more').click());
+await page.waitForTimeout(450);
+fails += await run('Row menu', QUEUE_MENU);
+await page.keyboard.press('Escape');
+await pick('Queued orders: empty');
+fails += await run('Queued orders: empty', QUEUE_EMPTY);
+await pick('Order has been queued: toast');
+fails += await run('Queued toast', QUEUE_TOAST);
 
 const total = SCALAR.length + COMPOUND.length + CART.length + SHEET.length + EMPTY.length + ADDED.length + TOAST.length
   + TOTAL.length + TOTAL_OPEN.length + TOTAL_DISCOUNT.length + QTY.length + QTY_EDIT.length + DETAILS.length
   + MENU.length + APPLY.length + CHECKOUT.length + CHECKOUT_OFF.length + PICKERS.length + BANKS.length
-  + SUCCESS.length + RECEIPT.length;
+  + SUCCESS.length + RECEIPT.length + QUEUE.length + QUEUE_CHOSEN.length + QUEUE_MENU.length + QUEUE_EMPTY.length
+  + QUEUE_TOAST.length;
 console.log('-'.repeat(60));
 console.log(`${total} properties checked against Figma nodes, ${fails} differ`);
 await browser.close();

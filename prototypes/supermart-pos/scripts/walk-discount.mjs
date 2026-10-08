@@ -139,7 +139,9 @@ await wait(800);
 
 // --- The other two rows ---------------------------------------------------------------
 await openMenu(); await choose('queued');
-check('Queued orders says it is not designed yet', (await page.evaluate(() => document.querySelector('.toast[data-open="on"] .toast__message')?.textContent)) === 'Queued orders is not designed yet');
+// Designed since, in band `170:8988` (walk-queue covers it): it opens its own sheet.
+check('Queued orders opens the Queued orders sheet', (await dialog('Queued orders')) === 'on');
+await page.keyboard.press('Escape'); await wait(600);
 await openMenu(); await choose('customer');
 check('Add a customer opens the customer picker', (await dialog('Select customer')) === 'on');
 await page.keyboard.press('Escape'); await wait(600);

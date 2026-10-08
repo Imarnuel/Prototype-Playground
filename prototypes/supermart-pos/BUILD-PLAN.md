@@ -320,6 +320,16 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 100 | **Not designed**: Pay's working state, a failed payment, change due, and the amount's validation | A spinner on Pay, in its brand fill ("Processing…" for screen readers), then straight to success; a notice toast that keeps the draft; change under the field in Color/text/success; the field's own error line |
 | 101 | **Mine, from band 4: the empty Cart's disabled Checkout label read a token that does not exist** (`--color-text-on-disabled`), so it inherited a colour instead of Color/text/ondisabled | Fixed |
 | 102 | **The Measurement card is a fixed 278 around four 56px rows** (`88:11532`, Frame 4981), leaving 54px of open card under the last rule — it read as an empty row (the designer: "remove the empty row") | Removed: the card ends at its last row, which drops its rule; the sheet is 54 shorter and docks 54 lower. `diff-quantity` and `walk-quantity` move their targets by the 54, not the frame's numbers |
+| 103 | **Two frames are dark mode** — `88:16216` (empty Cart) and `88:16380` (empty Queued orders) are the same layers as their light twins under a dark variable mode; nothing else in the file is drawn dark | Not built, by the designer's call: dark mode for two screens alone would switch themes mid-flow. Light only |
+| 104 | **The Queued orders sheet is drawn full-bleed** (`88:16251`, `88:16280`: x 0, 393 wide) where every other sheet is inset | Inset like the rest (8, 377 wide), so its cards are 345, not 361. `diff-queue` measures against the frame relative to the sheet and card |
+| 105 | **The five queued orders are one placeholder** — Peter Obi, Seun Akindele, John Doe and two "Walk-in-customer", each "Fanta orange · Cocacola · Mirinda", ₦10,000, 13:24 06-03-2026; beverages from before the store became clothing | The store's real queue (`state/queue.ts`): four distinct orders from this catalogue and these customers, every total derived, times earlier today |
+| 106 | **Every card carries a hidden receipt number** (`#S132435346575866`) | Not built: a queued order has not been paid, so it has no receipt yet |
+| 107 | **The Cart frame's Total (`88:16031`) does not reconcile** — ₦10,000 under lines that add to ₦14,000 | Computed, as everywhere else |
+| 108 | **The queued toast sits in View cart's slot** — `88:15953` leaves View cart out of the Sales Point and draws the toast at y 697, where View cart is (703..751) | The Sales Point always has View cart; the pill sits 10 above it (645) |
+| 109 | **Two disabled buttons, two fills** — Recall order disabled (`88:16378`) binds Color/icon/disabled (#cfd3d8); Checkout's disabled Pay (`88:12595`) binds Color/container/disabled (2% black) | Each follows its own frame |
+| 110 | **The row menu's trash is #C2261A**, one step off Color/text/danger (#C1261A), which its own "Delete" uses | The export kept as is |
+| 111 | **This sheet's body starts flush under the header** (y 64), where the other sheets' frames leave 5 (y 69) | Followed: `gap: 0` on this sheet only |
+| 112 | **Not designed**: the queue's loading and failure, a failed Queue order, a failed recall, Recall order working, a recall over a Cart that already holds a sale, the delete's confirmation | Skeleton cards and the Sales Point's message; notice toasts that keep everything as it was; a spinner in place; the designer's calls — a recall over a sale queues that sale first, a delete is immediate with Undo |
 
 ## Work order
 
@@ -731,6 +741,49 @@ and Print do the real thing.
 Verified: `walk-checkout` 27/27; `diff-checkout` 0 outside 0.5px over 27 boxes;
 `figma:audit` 453 properties, 0 differ (+54); `catalogue:verify` +3 tender checks,
 `cart:verify` +7 receipt checks; every earlier gate green.
+
+### Band `170:8988` — "Queueing & recalling an order"
+
+Ten frames: the Cart with Queue order (`88:16031`), the Sales Point with the queued
+toast (`88:15953`), the empty Cart and More options over it (`88:16199`, `88:16526`),
+Queued orders empty (`88:16233`), the list with a row's menu open (`88:16262`), an
+order chosen (`88:16409`), the recalled Cart (`88:16115`) and two dark-mode twins. The
+designer's calls, asked before building: the dark frames are not built (#103); a
+recall over a Cart that holds a sale queues that sale first; a delete is immediate,
+with Undo.
+
+- **Model**: a queued order is the Cart as it stood — lines by product id, customer,
+  order discount — plus when it was queued (`state/queue.ts`). Its items and total are
+  derived, never stored. The queue lives behind the mock API (`api/pos.ts`: fetch,
+  queue, recall, delete, restore), so the list loads, fails and empties like every
+  other list, and a failed write never lands. A recall over a full Cart is ONE request
+  that parks the Cart's sale and returns the recalled one.
+- **Flow**: Queue order spins in place, then the Cart closes and the pill toast says
+  "Order has been queued"; the Cart empties after its exit, so it never shows its empty
+  state on the way out. More options over an empty Cart offers only Queued orders. The
+  sheet reads the queue afresh on every opening. A card chooses the order; Recall order
+  brings it back into the Cart. ••• opens the row menu (Escape closes it, not the
+  sheet, and hands focus back); Delete collapses the card and offers Undo, which puts
+  it back in its own place.
+- **Reused**: BottomSheet and its hand-off, the Toast (now with the board's pill
+  variant, `88:16028`), Pay's spinner, the Cart's line-exit pattern. **Extracted** when
+  the second user arrived, each proved pure by a computed-style snapshot before and
+  after (18 elements, 0 differ): `EmptyState` from Select customer's empty state,
+  `ListMessage` from the Sales Point's, the skeleton pulse into `motion.css`, the
+  spinner into a `currentColor` `.buttonSpinner` (Pay, Queue order, Recall order). The
+  spinner's rotation moved to the `rotate` property: on `transform` it overrode the
+  spinner's own scale-in, which therefore never ran. **New**: the sheet, the card, the
+  row menu, 5 icons from their instances.
+
+Verified, dev and production: `walk-queue` 30/30, proving each step by its consequence
+(the queued sale appears in the queue with the Cart's total; a recalled order appears
+in the Cart with the card's; a recall over a sale puts that sale first in the queue;
+Undo restores a deleted order to its place); `diff-queue` 0 outside 0.5px over 26
+boxes; `figma:audit` 509 properties, 0 differ (+56); `cart:verify` +5 queue checks.
+Sampled per frame: the row menu fades in over 6-7 frames and out over 6-7, a deleted
+row collapses 136 → 0 over 7-8, More options hands over to Queued orders through 7-8
+positions with the backdrop at full strength throughout; under reduced motion each
+lands at once.
 
 ## Screen 1 — verification record
 

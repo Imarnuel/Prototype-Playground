@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BottomSheet } from '../components/BottomSheet';
+import { EmptyState } from '../components/EmptyState';
 import { Icon } from '../components/Icon';
 import { CUSTOMERS, type Customer } from '../data/customers';
 import './SelectCustomer.css';
@@ -35,25 +36,13 @@ export function SelectCustomer({ open, customers, onClose, onSelect, onAddCustom
        reviving it would invent a confirm step this flow never shows. Logged as #43. */
     <BottomSheet handoff={handoff} open={open} title="Select customer" onClose={onClose} closeLabel="Close customer picker">
       {customers.length === 0 ? (
-        <div className="customerEmpty">
-          <div className="customerEmpty__rings">
-            <div className="customerEmpty__ring2">
-              <div className="customerEmpty__ring3">
-                <Icon name="users-02" />
-              </div>
-            </div>
-          </div>
-          <div className="customerEmpty__text">
-            <p className="customerEmpty__title">No customers yet</p>
-            <p className="customerEmpty__body">
-              Start by adding your first customer. We&rsquo;ll list them here.
-            </p>
-          </div>
+        <EmptyState className="customerEmpty" icon="users-02" title="No customers yet"
+          body={<>Start by adding your first customer. We&rsquo;ll list them here.</>}>
           <button type="button" className="customerEmpty__cta" onClick={onAddCustomer}>
             <Icon name="plus" />
             <span className="customerEmpty__ctaLabel">Add customer</span>
           </button>
-        </div>
+        </EmptyState>
       ) : (
         <>
           <div className="customerSearch">

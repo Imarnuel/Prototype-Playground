@@ -16,7 +16,7 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **101** inconsistencies, including that 31 frames share the name
+anything — it records **112** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
@@ -80,6 +80,19 @@ republish it with `npm run build:hosted`.
 `walk-checkout` 27/27. Cash takes change, a transfer must be the total; POS, Customer
 balance, Complimentary and Payment split are not designed and say so. **Open:** the
 receipt's logo is a placeholder (#97). See BUILD-PLAN, band `162:8987`.
+
+### Built — band `170:8988`, queueing and recalling an order
+
+| Screen | Node | State |
+|---|---|---|
+| Cart → Queue order → queued toast | `88:16031`, `88:15953` | toast at 645, above View cart (#108) |
+| More options over an empty Cart | `88:16526` | 0 outside 0.5px |
+| Queued orders — list, row menu, chosen, empty | `88:16280`, `88:16379`, `88:16427`, `88:16251` | 0 outside 0.5px; `figma:audit` 56 properties |
+| Recalled Cart | `88:16115` | the Cart, with the recalled order |
+
+`walk-queue` 30/30. The queue lives behind the mock API; a recall over a full Cart
+queues that sale first; delete has Undo. The dark-mode frames are not built (#103).
+See BUILD-PLAN, band `170:8988`.
 
 ## The store
 
@@ -168,12 +181,12 @@ npm run dev                # iterate; open with ?dev=1 for the toolbar
 npm run build && npm run preview   # demo from here, not dev
 
 npm run catalogue:verify   # 66 invariants: check digits, units, money, totals, states, CSV
-npm run cart:verify        # 29 rules: stock, clamps, unit changes, and the receipt
+npm run cart:verify        # 34 rules: stock, clamps, unit changes, the receipt, the queue
 npm run catalogue:csv      # regenerate figma/catalogue.csv from catalogue.ts
 npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json
 npm run tokens:verify      # the generated tokens still match the Figma dump
 npm run motion:sample      # transitions animate in BOTH directions (needs a server)
-npm run figma:audit        # 453 properties read off the Figma NODES vs computed style
+npm run figma:audit        # 509 properties read off the Figma NODES vs computed style
 npm run images:manifest    # which photos are missing
 npm run images:optimise -- --box <css-px>   # --box MUST come from a measured frame
 npm run build:hosted       # publish-ready bundle for the hosted preview
@@ -182,6 +195,8 @@ npm run build:hosted       # publish-ready bundle for the hosted preview
 node scripts/walk-total.mjs      [url]   # order total: reconciles, motion both ways
 node scripts/walk-discount.mjs   [url]   # More options, order discount, Clear cart + Undo
 node scripts/walk-checkout.mjs   [url]   # both checkout flows, failure, receipt, new sale
+node scripts/walk-queue.mjs      [url]   # queue, recall (and over a full Cart), delete + Undo, failures
+node scripts/diff-queue.mjs      [url]   # Queued orders, row menu, empty, toast vs their frames
 node scripts/diff-checkout.mjs   [url]   # checkout, pickers, success, receipt vs their frames
 node scripts/diff-total.mjs      [url]   # order total vs 88:8639 / 88:9338
 node scripts/walk-stock.mjs      [url]   # stock clamp and its toast
@@ -200,7 +215,8 @@ entrance that never animates.
   destination (BUILD-PLAN #50, #51).
 - **The order discount's breakdown**: `88:15652` restyles the total's breakdown and
   puts Discount after Tax; the built one keeps `88:9338`'s (BUILD-PLAN #82).
-- **Queued orders** and the **Undo** toast's action are not designed (#80, #86).
+- The **Undo** toast's action is not designed (#86). Queued orders is built (band
+  `170:8988`); its two dark-mode frames are not (#103).
 - **The receipt's logo** is a placeholder: Freshvale has none (#97).
 - The sheet **exit curve** is heavily back-loaded and is deferred to `better-ui`,
   which owns motion and is not installed (BUILD-PLAN #37).
