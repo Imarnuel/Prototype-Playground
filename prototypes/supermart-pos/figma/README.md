@@ -84,9 +84,30 @@ new total.
 were copied to the page "Backup — before product sync (drinks)" (text, frame and
 instance counts verified identical). Delete that page once the sync is accepted.
 
-**Photos: pending.** The product layers still show the drinks. This environment's
-network policy blocks `mcp.figma.com`, where `upload_assets` posts image bytes, and the
-plugin sandbox has no `fetch`. With that host allowed, the 10 photos go into the
-staging frame "Product photos — from code (staging)" on the Sella page (one square per
-product id), and from there onto every product image layer by mapping; the camera
-backdrop of the scan sheet also needs a clothing shot.
+**Photos.** 354 product image layers now carry the code's photos: every layer whose
+card or row names exactly one code product took that product's photo (Cart rows, the
+grids, the scan sheet's three matches, Item details), plus `88:19708`, a Sprite cut-out
+laid over the Crew Socks row in `88:19678`. Hoodie is the only photo no drawn screen
+shows.
+
+- **How they got in.** `upload_assets` posts to `mcp.figma.com`, and this environment's
+  network policy blocks that host. The plugin sandbox has no `fetch`, and
+  `createImageAsync` is unsupported. So each photo was
+  re-encoded as a 256px JPEG (q82, under 0.6% mean pixel error against the WebP;
+  `createImage` rejects WebP) and passed to `figma.createImage` as base64.
+- **How each was checked.** Every photo was sent as Adler-32-checksummed chunks, and
+  the fill was set only when Figma's image hash equalled the file's SHA-1. Figma's image
+  hash *is* the SHA-1 of the bytes, so every photo is byte-identical to its JPEG.
+- **The scrim follows the code.** Grid and Cart photos carry the softened scrim (clear
+  at 40%, 6% at 70%, 20% at the edge), including the four grid cards the design left
+  without one (BUILD-PLAN #22). Item details' photo has none, as in the code. The scan
+  sheet's 48px thumbnails keep the design's scrim: the code doesn't build that sheet.
+
+**Still drinks, deliberately:**
+- **Two newer frames** on the page: `197:18477` ("Frame 5165", Onboarding section)
+  and `197:22556` ("Sella onboarding & dash"). Both were added after this sync and still
+  name the drinks, so they were left alone.
+- **The scan screens' camera shot.** `image 6` is a 568px photo of a hand holding
+  Sprite, behind `88:19678`, `88:19817` and `88:19858`. It needs a camera-style
+  clothing shot at that size, and none exists: a 256px packshot stretched to 568
+  would be visibly soft. The barcode shot (`image 4`) holds no product and stays.
