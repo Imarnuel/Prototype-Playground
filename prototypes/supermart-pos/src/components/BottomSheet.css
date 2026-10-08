@@ -51,6 +51,42 @@
   transition-timing-function: inherit;
 }
 
+/* --- Hand-off between two sheets ------------------------------------------------
+   Two sheets each with a blanket would dim, undim and dim again across a swap, and
+   running exit-then-entrance back to back cost ~720ms. In a hand-off the backdrop
+   stays at full strength throughout: the incoming blanket is there from its first
+   frame, and the outgoing one gives up its fill and sits on top so its sheet can
+   fade where it stands. One motion, as long as the entrance. Both sheets are
+   siblings in the Cart's sheet container, which the rule below relies on. */
+.blanket[data-handoff='on'] {
+  opacity: 1;
+  transition-duration: 0ms !important;
+}
+
+.blanket[data-handoff='on'][data-intent='closed'] {
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* The outgoing blanket gives up its fill only once the incoming one is in the tree:
+   the incoming sheet mounts a render later, and dropping the fill on the same frame
+   as the swap left one frame with no backdrop at all. */
+:has(> .blanket[data-handoff='on'][data-intent='open']) > .blanket[data-handoff='on'][data-intent='closed'] {
+  background: none;
+  backdrop-filter: none;
+}
+
+.blanket[data-handoff='on'][data-intent='closed'] .sheetPanel {
+  opacity: 0;
+  transform: translateY(0);
+  transition: opacity var(--motion-fast) var(--ease-out);
+}
+
+.blanket[data-handoff='on'][data-intent='open'] .sheetPanel {
+  transition-duration: var(--motion-base);
+  transition-timing-function: var(--ease-out);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .blanket,
   .sheetPanel { transition-duration: 0ms !important; }

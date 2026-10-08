@@ -15,12 +15,14 @@ import './ApplyDiscount.css';
  * discount is taken from — so an amount past it is refused here, not clamped silently.
  */
 export function ApplyDiscount({
-  open, current, baseMinor, onClose, onCommit,
+  open, current, baseMinor, onClose, onCommit, handoff = false,
 }: {
   open: boolean;
   current?: Discount;
   baseMinor: number;
   onClose: () => void;
+  /** Swapping with another sheet: see BottomSheet `handoff`. */
+  handoff?: boolean;
   onCommit: (discount: Discount | undefined) => void;
 }) {
   const [kind, setKind] = useState<Discount['kind']>(current?.kind ?? 'percent');
@@ -35,7 +37,7 @@ export function ApplyDiscount({
     : discount?.kind === 'amount' && discount.minor > baseMinor ? `More than the order's ${formatPrice(baseMinor)}` : null;
 
   return (
-    <BottomSheet
+    <BottomSheet handoff={handoff}
       open={open}
       title="Apply discount"
       onClose={onClose}

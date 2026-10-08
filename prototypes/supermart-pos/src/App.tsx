@@ -117,9 +117,19 @@ export function App() {
     setPaymentPicker(null);
     setCheckoutOpen(true);
   };
-  /* One sheet at a time, as with More options: the checkout leaves, the picker
-     arrives; and back again. */
-  const swapSheets = (closeNow: () => void, openNext: () => void) => { closeNow(); setTimeout(openNext, exitMs); };
+  /* One sheet hands over to the next — Checkout to a picker and back, More options to
+     what it opens — as one motion over a backdrop that holds still (BottomSheet
+     `handoff`). The flag outlives the outgoing sheet's exit, then clears so a plain
+     close of the sheet left behind dims the screen back as usual. */
+  const [handoff, setHandoff] = useState(false);
+  const handoffTimer = useRef<number>();
+  const swapSheets = (closeNow: () => void, openNext: () => void) => {
+    setHandoff(true);
+    closeNow();
+    openNext();
+    window.clearTimeout(handoffTimer.current);
+    handoffTimer.current = window.setTimeout(() => setHandoff(false), exitMs + 50);
+  };
   const pay = () => {
     setPaying(true);
     const tenderedMinor = parseWholeNaira(checkout.amount)!;
@@ -398,6 +408,7 @@ export function App() {
               />
 
               <SelectCustomer
+                handoff={handoff}
                 open={pickerOpen}
                 customers={customers}
                 onClose={() => setPickerOpen(false)}
@@ -432,25 +443,23 @@ export function App() {
               )}
 
               <MoreOptions
+                handoff={handoff}
                 open={menuOpen}
                 onClose={() => setMenuOpen(false)}
                 onChoose={(option: MoreOption) => {
-                  /* One sheet at a time: the menu leaves first, then the next thing
-                     arrives, rather than two sheets crossing on screen. */
+                  // A row that opens another sheet hands over to it; the others just close.
+                  if (option === 'customer') { swapSheets(() => setMenuOpen(false), () => setPickerOpen(true)); return; }
+                  if (option === 'discount') { swapSheets(() => setMenuOpen(false), () => openDiscount(orderDiscount)); return; }
                   setMenuOpen(false);
-                  const next = {
-                    customer: () => setPickerOpen(true),
-                    discount: () => openDiscount(orderDiscount),
-                    clear: () => setClearRequest((n) => n + 1),
-                    // The user's call: Queued orders is designed later.
-                    queued: () => showToast('Queued orders is not designed yet', 'notice'),
-                  }[option];
-                  setTimeout(next, exitMs);
+                  if (option === 'clear') setClearRequest((n) => n + 1);
+                  // The user's call: Queued orders is designed later.
+                  else showToast('Queued orders is not designed yet', 'notice');
                 }}
               />
 
               {discountSheet && (
                 <ApplyDiscount
+                  handoff={handoff}
                   key={discountSheet.opening}
                   open={discountOpen}
                   current={discountSheet.current}
@@ -461,6 +470,7 @@ export function App() {
               )}
 
               <Checkout
+                handoff={handoff}
                 key={`checkout-${checkout.opening}`}
                 open={checkoutOpen}
                 totals={totals(lines, orderDiscount)}
@@ -474,6 +484,7 @@ export function App() {
               />
 
               <SelectPaymentMethod
+                handoff={handoff}
                 open={paymentPicker === 'method'}
                 current={checkout.method}
                 onClose={() => swapSheets(() => setPaymentPicker(null), () => setCheckoutOpen(true))}
@@ -487,6 +498,7 @@ export function App() {
               />
 
               <SelectBank
+                handoff={handoff}
                 key={`bank-${checkout.opening}`}
                 open={paymentPicker === 'bank'}
                 current={checkout.bankId}

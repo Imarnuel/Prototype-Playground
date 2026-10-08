@@ -15,7 +15,7 @@ import './BottomSheet.css';
  */
 export function BottomSheet({
   open, title, onClose, closeLabel, children, dismissOnBlanket = true, confirm, className, initialFocus,
-  showTitle = true, footer,
+  showTitle = true, footer, handoff = false,
 }: {
   open: boolean;
   /** The dialog's accessible name, and its visible heading unless `showTitle` is off. */
@@ -40,6 +40,10 @@ export function BottomSheet({
   initialFocus?: RefObject<HTMLElement>;
   /** The board's `.Modal footer`: the sheet's main action, pinned under the body. */
   footer?: ReactNode;
+  /** This sheet is swapping with another — More options to Apply discount, Checkout
+      to a picker and back. The dimmed backdrop holds still; the outgoing sheet fades
+      where it stands while the incoming one rises, at once rather than in turn. */
+  handoff?: boolean;
 }) {
   const { mounted, entered } = usePresented(open);
   const reducedMotion = useReducedMotion();
@@ -84,6 +88,8 @@ export function BottomSheet({
     <div
       className="blanket"
       data-open={entered ? 'on' : 'off'}
+      data-intent={open ? 'open' : 'closed'}
+      data-handoff={handoff ? 'on' : 'off'}
       style={{
         transitionDuration: `${duration(open ? SHEET_SPRING.duration : SHEET_SPRING.exitDuration, reducedMotion)}ms`,
         transitionTimingFunction: open ? SHEET_SPRING.easing : SHEET_SPRING.exitEasing,

@@ -9,15 +9,17 @@ import './PaymentPickers.css';
  * design raise a notice in the caller and leave the method as it was.
  */
 export function SelectPaymentMethod({
-  open, current, onClose, onChoose,
+  open, current, onClose, onChoose, handoff = false,
 }: {
   open: boolean;
   current: MethodId;
   onClose: () => void;
+  /** Swapping with another sheet: see BottomSheet `handoff`. */
+  handoff?: boolean;
   onChoose: (id: MethodId) => void;
 }) {
   return (
-    <BottomSheet open={open} title="Select payment method" onClose={onClose} closeLabel="Back to checkout" className="methodPicker">
+    <BottomSheet handoff={handoff} open={open} title="Select payment method" onClose={onClose} closeLabel="Back to checkout" className="methodPicker">
       <div className="pickList" role="radiogroup" aria-label="Payment method">
         {METHODS.map((m) => (
           <button key={m.id} type="button" role="radio" aria-checked={m.id === current} className="pickList__row methodPicker__row"
@@ -42,18 +44,20 @@ export function SelectPaymentMethod({
  * the board's Text field at radius Border radius/200, where Select customer's is 300.
  */
 export function SelectBank({
-  open, current, onClose, onChoose,
+  open, current, onClose, onChoose, handoff = false,
 }: {
   open: boolean;
   current: string;
   onClose: () => void;
+  /** Swapping with another sheet: see BottomSheet `handoff`. */
+  handoff?: boolean;
   onChoose: (id: string) => void;
 }) {
   const [query, setQuery] = useState('');
   const q = query.trim().toLowerCase();
   const visible = BANK_ACCOUNTS.filter((a) => !q || `${a.bank} ${a.number} ${a.holder}`.toLowerCase().includes(q));
   return (
-    <BottomSheet open={open} title="Select bank" onClose={onClose} closeLabel="Back to checkout" className="bankPicker">
+    <BottomSheet handoff={handoff} open={open} title="Select bank" onClose={onClose} closeLabel="Back to checkout" className="bankPicker">
       <label className="customerSearch bankPicker__search">
         <Icon name="search-sm" />
         <input className="customerSearch__input" placeholder="Search" value={query}

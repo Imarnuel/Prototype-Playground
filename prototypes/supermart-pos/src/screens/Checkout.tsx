@@ -23,7 +23,7 @@ export type CheckoutDraft = { method: 'cash' | 'bank'; bankId: string; amount: s
  * - Change due and the validation messages are not designed.
  */
 export function Checkout({
-  open, totals, draft, onAmountChange, onPickMethod, onPickBank, onClose, onPay, paying,
+  open, totals, draft, onAmountChange, onPickMethod, onPickBank, onClose, onPay, paying, handoff = false,
 }: {
   open: boolean;
   totals: OrderTotals;
@@ -32,6 +32,8 @@ export function Checkout({
   onPickMethod: () => void;
   onPickBank: () => void;
   onClose: () => void;
+  /** Swapping with another sheet: see BottomSheet `handoff`. */
+  handoff?: boolean;
   onPay: () => void;
   paying: boolean;
 }) {
@@ -49,7 +51,7 @@ export function Checkout({
   const shown = /^\d+$/.test(draft.amount) ? Number(draft.amount).toLocaleString('en-NG') : draft.amount;
 
   return (
-    <BottomSheet
+    <BottomSheet handoff={handoff}
       open={open}
       title="Checkout"
       onClose={onClose}

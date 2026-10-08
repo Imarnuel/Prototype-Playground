@@ -27,14 +27,16 @@ const GROUPS: readonly (readonly { id: MoreOption; icon: IconName; label: string
 ];
 
 export function MoreOptions({
-  open, onClose, onChoose,
+  open, onClose, onChoose, handoff = false,
 }: {
   open: boolean;
   onClose: () => void;
+  /** Swapping with another sheet: see BottomSheet `handoff`. */
+  handoff?: boolean;
   onChoose: (option: MoreOption) => void;
 }) {
   return (
-    <BottomSheet open={open} title="More options" onClose={onClose} closeLabel="Close more options" className="moreOptions">
+    <BottomSheet handoff={handoff} open={open} title="More options" onClose={onClose} closeLabel="Close more options" className="moreOptions">
       {GROUPS.map((group, g) => (
         <div key={g} className="moreOptions__group">
           {group.map((row) => (

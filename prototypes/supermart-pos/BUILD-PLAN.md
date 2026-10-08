@@ -766,6 +766,17 @@ static frame cannot express: press feedback, the presented-sheet transition and 
 exit, and the skeleton pulse. If motion is later authored in Figma, replace the values
 in that module rather than adding a second set beside it.
 
+**Sheet to sheet is one motion, not two** (the designer: "slow, doesn't feel snappy").
+Swapping trays — Checkout to a picker and back, More options to what it opens — ran
+the outgoing exit (300ms, accelerating) and only then the incoming entrance (420ms),
+with the backdrop fading out and back between: ~720ms and a flicker. Now
+(`BottomSheet` `handoff`) the backdrop holds, the old tray fades where it stands in
+`DURATION.fast` and the new one rises in `DURATION.base`, at once. Sampled per frame:
+the new tray rests at 345–374ms, the old one is gone by ~190ms, and the backdrop's
+combined dim is 0.500 on every frame (a first version dropped to 0 for one frame —
+the incoming sheet mounts a render later — fixed by holding the old fill until the
+new blanket exists). Opening from the Cart and closing with the X are unchanged.
+
 ## Resolved: `Frame 4908` is `CloseButton` (#15)
 
 77 uses, always 40x40 at the leading edge of a title bar, always wrapping a 20x20

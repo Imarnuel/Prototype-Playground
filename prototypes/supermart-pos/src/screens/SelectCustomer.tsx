@@ -17,11 +17,13 @@ type SelectCustomerProps = {
   /** Empty when the shop has no customers on file — the design's empty state. */
   customers: readonly Customer[];
   onClose: () => void;
+  /** Swapping with another sheet: see BottomSheet `handoff`. */
+  handoff?: boolean;
   onSelect: (c: Customer) => void;
   onAddCustomer: () => void;
 };
 
-export function SelectCustomer({ open, customers, onClose, onSelect, onAddCustomer }: SelectCustomerProps) {
+export function SelectCustomer({ open, customers, onClose, onSelect, onAddCustomer, handoff = false }: SelectCustomerProps) {
   const [query, setQuery] = useState('');
 
   const visible = customers.filter((c) =>
@@ -31,7 +33,7 @@ export function SelectCustomer({ open, customers, onClose, onSelect, onAddCustom
     /* The frame's header also holds a check Button Icon at opacity 0 — an invisible
        control. Not built: an affordance nobody can see is not an affordance, and
        reviving it would invent a confirm step this flow never shows. Logged as #43. */
-    <BottomSheet open={open} title="Select customer" onClose={onClose} closeLabel="Close customer picker">
+    <BottomSheet handoff={handoff} open={open} title="Select customer" onClose={onClose} closeLabel="Close customer picker">
       {customers.length === 0 ? (
         <div className="customerEmpty">
           <div className="customerEmpty__rings">
