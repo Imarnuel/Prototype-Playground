@@ -4,14 +4,15 @@ import { BottomSheet } from '../components/BottomSheet';
 import { FieldError } from '../components/FieldError';
 import { Icon } from '../components/Icon';
 import { formatPrice, parseWholeNaira, tenderFor, type OrderTotals } from '../data/catalogue';
-import { METHODS, bankAccount, methodLabel } from '../data/payments';
+import { METHODS, bankAccount, methodLabel, paysIntoAccount, type PayMethod } from '../data/payments';
 import '../components/DetailField.css';
 import './Checkout.css';
 
-export type CheckoutDraft = { method: 'cash' | 'bank'; bankId: string; amount: string };
+export type CheckoutDraft = { method: PayMethod; bankId: string; amount: string };
 
 /**
- * Checkout — `88:12450` (cash) and `88:13497` (bank transfer), with Pay disabled as
+ * Checkout — `88:12450` (cash) and `88:13497` (bank transfer; POS is drawn the same,
+ * see `paysIntoAccount`), with Pay disabled as
  * `88:12595` draws it. The draft lives in the App, not here: the method and bank
  * pickers replace this sheet on screen (the frames show them alone over the Cart),
  * and the draft has to survive that round trip.
@@ -44,7 +45,8 @@ export function Checkout({
   const error = draft.amount === '' ? null
     : amountMinor === null ? 'Enter a whole Naira amount'
       : tender && !tender.ok
-        ? (tender.reason === 'short' ? `Less than the total, ${formatPrice(totals.total)}` : `A transfer must be the total, ${formatPrice(totals.total)}`)
+        ? (tender.reason === 'short' ? `Less than the total, ${formatPrice(totals.total)}`
+          : `${draft.method === 'pos' ? 'A POS payment' : 'A transfer'} must be the total, ${formatPrice(totals.total)}`)
         : null;
   const change = tender?.ok && tender.changeMinor > 0 ? tender.changeMinor : 0;
   const canPay = !!tender?.ok && !paying;
@@ -98,7 +100,7 @@ export function Checkout({
               <Icon name="chevron-right-subtle" />
             </span>
           </button>
-          {draft.method === 'bank' && (
+          {paysIntoAccount(draft.method) && (
             <button type="button" className="checkout__methodRow checkout__methodRow--bank" onClick={onPickBank}>
               <span className="checkout__methodLabel">Bank</span>
               <span className="checkout__methodValue">

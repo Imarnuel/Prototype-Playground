@@ -14,7 +14,7 @@ import { QueuedOrders, type RecallResult } from './screens/QueuedOrders';
 import { Checkout, type CheckoutDraft } from './screens/Checkout';
 import { SelectBank, SelectPaymentMethod } from './screens/PaymentPickers';
 import { Receipt, TransactionSuccess } from './screens/SaleComplete';
-import { METHODS, methodLabel } from './data/payments';
+import { METHODS, methodLabel, paysIntoAccount, type AccountMethod } from './data/payments';
 import { queueOrder, setQueueForDemo, submitPayment } from './api/pos';
 import { receiptText, type Receipt as ReceiptRecord } from './state/sale';
 import { PRODUCTS, maxCount, parseWholeNaira, unitFor, type Discount, type Product } from './data/catalogue';
@@ -84,6 +84,10 @@ export function App() {
   );
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [paymentPicker, setPaymentPicker] = useState<'method' | 'bank' | null>(null);
+  /* Bank transfer or POS, picked but not yet given an account: Select bank follows at
+     once (the designer's call), and the method only lands with the bank. Closing Select
+     bank cancels, leaving Checkout as it was. */
+  const [pendingMethod, setPendingMethod] = useState<AccountMethod | null>(null);
   const [paying, setPaying] = useState(false);
   /* Queued orders (band `170:8988`). The queue itself lives behind the mock API; the
      App only knows whether its sheet is up, and whether the Cart is being queued. */
@@ -150,7 +154,7 @@ export function App() {
     setCheckout((c) => ({
       method: 'cash', bankId: 'access', amount: String(orderTotal() / 100), ...draft, opening: c.opening + 1,
     }));
-    setPaymentPicker(null);
+    setPaymentPicker(null); setPendingMethod(null);
     setPaying(false);
     setCheckoutOpen(true);
   };
@@ -177,7 +181,7 @@ export function App() {
       lines, orderDiscount, customer, at: new Date(), sequence: sequence.current + 1,
       tender: checkout.method === 'cash'
         ? { method: 'cash', tenderedMinor }
-        : { method: 'bank', bankId: checkout.bankId, tenderedMinor },
+        : { method: checkout.method, bankId: checkout.bankId, tenderedMinor },
     }).then((receipt) => {
       sequence.current += 1;
       const button = document.querySelector('.payButton')?.getBoundingClientRect();
@@ -206,7 +210,7 @@ export function App() {
      is nothing to go back to. The Sales Point is underneath, ready. */
   const newSale = () => {
     setLines([]); setOrderDiscount(undefined); setCustomer(null);
-    setCartOpen(false); setTotalOpen(false); setCheckoutOpen(false); setPaymentPicker(null);
+    setCartOpen(false); setTotalOpen(false); setCheckoutOpen(false); setPaymentPicker(null); setPendingMethod(null);
     setSale((s) => (s ? { ...s, stage: 'closed' } : s));
     setPaying(false);
     setFreshSale((n) => n + 1);
@@ -244,7 +248,7 @@ export function App() {
     setForced(undefined); setCartOpen(false); setPickerOpen(false);
     setCustomer(null); setCustomers(CUSTOMERS); hideToast(); setTotalOpen(false); setQtyOpen(false); setDetailsOpen(false);
     setMenuOpen(false); setDiscountOpen(false); setOrderDiscount(undefined);
-    setCheckoutOpen(false); setPaymentPicker(null); setSale(null);
+    setCheckoutOpen(false); setPaymentPicker(null); setPendingMethod(null); setSale(null);
     setQueuedOpen(false); setQueueForce(undefined); setQueueForDemo('seeded');
     setResetNonce((n) => n + 1);
   };
@@ -359,6 +363,7 @@ export function App() {
       ['Checkout: cash with change', 'States', { amount: 'change' }],
       ['Checkout: Pay disabled', 'States', { amount: '' }],
       ['Checkout: bank transfer', 'States', { method: 'bank' }],
+      ['Checkout: POS', 'States', { method: 'pos' }],
     ] as const).map(([label, group, draft]): DevToolbarItem => ({
       label, group,
       onSelect: () => {
@@ -428,6 +433,7 @@ export function App() {
       ['Transaction success', 'success', 'cash'],
       ['Receipt: cash', 'receipt', 'cash'],
       ['Receipt: bank transfer', 'receipt', 'bank'],
+      ['Receipt: POS', 'receipt', 'pos'],
     ] as const).map(([label, stage, method]): DevToolbarItem => ({
       label, group: 'Screens',
       onSelect: async () => {
@@ -451,7 +457,7 @@ export function App() {
     ...entry,
     onSelect: () => {
       setMenuOpen(false); setDiscountOpen(false); setPickerOpen(false); setQtyOpen(false); setDetailsOpen(false);
-      setTotalOpen(false); hideToast(); setCheckoutOpen(false); setPaymentPicker(null); setSale(null);
+      setTotalOpen(false); hideToast(); setCheckoutOpen(false); setPaymentPicker(null); setPendingMethod(null); setSale(null);
       setQueuedOpen(false);
       entry.onSelect();
     },
@@ -596,8 +602,14 @@ export function App() {
                 onClose={() => swapSheets(() => setPaymentPicker(null), () => setCheckoutOpen(true))}
                 onChoose={(id) => {
                   const m = METHODS.find((x) => x.id === id)!;
-                  // The designer's call: the four undesigned methods say so and change nothing.
+                  // The designer's call: the three undesigned methods say so and change nothing.
                   if (!m.designed) { showToast(`${methodLabel(id)} is not designed yet`, 'notice'); return; }
+                  // A method that pays into an account needs the account next: straight to Select bank.
+                  if (paysIntoAccount(id)) {
+                    setPendingMethod(id);
+                    swapSheets(() => setPaymentPicker(null), () => setPaymentPicker('bank'));
+                    return;
+                  }
                   setCheckout((c) => ({ ...c, method: id as CheckoutDraft['method'] }));
                   swapSheets(() => setPaymentPicker(null), () => setCheckoutOpen(true));
                 }}
@@ -608,9 +620,10 @@ export function App() {
                 key={`bank-${checkout.opening}`}
                 open={paymentPicker === 'bank'}
                 current={checkout.bankId}
-                onClose={() => swapSheets(() => setPaymentPicker(null), () => setCheckoutOpen(true))}
+                onClose={() => { setPendingMethod(null); swapSheets(() => setPaymentPicker(null), () => setCheckoutOpen(true)); }}
                 onChoose={(bankId) => {
-                  setCheckout((c) => ({ ...c, bankId }));
+                  setCheckout((c) => ({ ...c, method: pendingMethod ?? c.method, bankId }));
+                  setPendingMethod(null);
                   swapSheets(() => setPaymentPicker(null), () => setCheckoutOpen(true));
                 }}
               />

@@ -453,18 +453,18 @@ export function orderTotals(lines: readonly PricedLine[], orderDiscount?: Discou
 
 /**
  * What a typed Amount means at checkout. Cash may be more than the total, and the
- * difference is change; less is refused. A bank transfer must be the total exactly:
- * there is no change to give on a transfer, and a short one is not a sale. (The
- * designer's call; part-payment is not designed.)
+ * difference is change; less is refused. A bank transfer or a POS payment must be the
+ * total exactly: there is no change to give on either, and a short one is not a sale.
+ * (The designer's call; part-payment is not designed.)
  */
 export type TenderResult =
   | { ok: true; changeMinor: number }
   | { ok: false; reason: 'short' | 'not-exact' };
 
-export function tenderFor(kind: 'cash' | 'bank', totalMinor: number, tenderedMinor: number): TenderResult {
+export function tenderFor(kind: 'cash' | 'bank' | 'pos', totalMinor: number, tenderedMinor: number): TenderResult {
   requireWholeNaira(totalMinor, 'a total');
   requireWholeNaira(tenderedMinor, 'an amount tendered');
-  if (kind === 'bank') return tenderedMinor === totalMinor ? { ok: true, changeMinor: 0 } : { ok: false, reason: 'not-exact' };
+  if (kind !== 'cash') return tenderedMinor === totalMinor ? { ok: true, changeMinor: 0 } : { ok: false, reason: 'not-exact' };
   return tenderedMinor >= totalMinor ? { ok: true, changeMinor: tenderedMinor - totalMinor } : { ok: false, reason: 'short' };
 }
 

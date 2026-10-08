@@ -16,7 +16,7 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **112** inconsistencies, including that 31 frames share the name
+anything — it records **113** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
@@ -77,8 +77,11 @@ republish it with `npm run build:hosted`.
 | Transaction success | `88:8723` | 0 outside 0.5px; 5 properties |
 | Receipt | `88:8735` | 0 outside 0.5px; 9 properties; figures computed (#94) |
 
-`walk-checkout` 27/27. Cash takes change, a transfer must be the total; POS, Customer
-balance, Complimentary and Payment split are not designed and say so. **Open:** the
+`walk-checkout` 36/36. Cash takes change; a transfer must be the total. **POS works
+exactly as Bank transfer** (the designer: "POS basically means bank"): both go straight
+on to Select bank when picked, name the account on Checkout and the receipt, and must
+be the total (#113). Customer balance, Complimentary and Payment split are not designed
+and say so. **Open:** the
 receipt's logo is a placeholder (#97). See BUILD-PLAN, band `162:8987`.
 
 ### Built — band `170:8988`, queueing and recalling an order

@@ -8,14 +8,14 @@ import {
   formatPrice, lineDiscountMinor, tenderFor, unitFor, unitPriceMinor,
   type Discount,
 } from '../data/catalogue';
-import { bankAccount, methodLabel } from '../data/payments';
+import { bankAccount, methodLabel, type AccountMethod } from '../data/payments';
 import { STORE } from '../data/store';
 import type { Customer } from '../data/customers';
 import { lineGross, priced, productFor, totals, type CartLine } from './cart';
 
 export type Tender =
   | { method: 'cash'; tenderedMinor: number }
-  | { method: 'bank'; bankId: string; tenderedMinor: number };
+  | { method: AccountMethod; bankId: string; tenderedMinor: number };
 
 export type ReceiptLine = { title: string; unitPrice: string; amount: string; note?: string; discount?: string };
 
@@ -84,7 +84,7 @@ export function buildReceipt(args: {
     vat: formatPrice(t.tax),
     discount: formatPrice(t.discount),
     total: formatPrice(t.total),
-    paidBy: tender.method === 'cash' ? methodLabel('cash') : `${methodLabel('bank')} · ${bankAccount(tender.bankId).short}`,
+    paidBy: tender.method === 'cash' ? methodLabel('cash') : `${methodLabel(tender.method)} · ${bankAccount(tender.bankId).short}`,
     tendered: formatPrice(tender.tenderedMinor),
     balance: formatPrice(result.changeMinor),
   };

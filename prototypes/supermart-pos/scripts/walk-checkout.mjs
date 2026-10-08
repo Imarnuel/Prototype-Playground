@@ -77,13 +77,33 @@ await type('50000');
 // --- The method picker replaces the sheet, and hands back ------------------------------
 await click('.checkout__methodRow');
 check('Payment method: Checkout leaves, the picker arrives alone', (await open('Select payment method')) === 'on' && (await open('Checkout')) !== 'on');
-await click('[data-method="pos"]', 500);
-check('POS is not designed: it says so and nothing changes', (await toast()) === 'POS is not designed yet'
+await click('[data-method="balance"]', 500);
+check('Customer balance is not designed: it says so and nothing changes', (await toast()) === 'Customer balance is not designed yet'
   && (await open('Select payment method')) === 'on'
   && (await page.evaluate(() => document.querySelector('[data-method="cash"]').getAttribute('aria-checked'))) === 'true');
-await click('[data-method="bank"]');
+
+// The designer's call: a method paid into an account goes straight on to Select bank.
+const closeBank = () => click('[role="dialog"][aria-label="Select bank"] .closeButton');
+await click('[data-method="pos"]');
+check('POS: Select bank follows at once, alone', (await open('Select bank')) === 'on'
+  && (await open('Select payment method')) !== 'on' && (await open('Checkout')) !== 'on');
+await closeBank();
 s = await sheet();
-check('Bank transfer: back to Checkout, the bank row in, the draft kept', (await open('Checkout')) === 'on' && s.method === 'Bank transfer'
+check('...closing it cancels: Checkout as it was, still cash, no bank row', (await open('Checkout')) === 'on'
+  && s.method === 'Cash' && s.bank === null && naira(s.amount) === 50000, JSON.stringify(s));
+await click('.checkout__methodRow');
+await click('[data-method="pos"]');
+await click('[data-bank="palmpay"]');
+s = await sheet();
+check('POS works as bank: the method and its account on Checkout', (await open('Checkout')) === 'on' && s.method === 'POS'
+  && s.bank === 'Palmpay - 8018826172', JSON.stringify(s));
+check('...and it must be the total', s.payDisabled && /^A POS payment must be the total/.test(s.error ?? ''), s.error);
+await click('.checkout__methodRow');
+await click('[data-method="bank"]');
+check('Bank transfer: Select bank follows at once too', (await open('Select bank')) === 'on' && (await open('Checkout')) !== 'on');
+await click('[data-bank="access"]');
+s = await sheet();
+check('...then Checkout, the bank row in, the draft kept', (await open('Checkout')) === 'on' && s.method === 'Bank transfer'
   && s.bank === 'Access bank - 0676430810' && naira(s.amount) === 50000, JSON.stringify(s));
 check('a transfer must be the total', s.payDisabled && /must be the total/.test(s.error ?? ''), s.error);
 await type(String(naira(cartTotal)));
@@ -167,6 +187,14 @@ check('a failed payment says so and keeps the Checkout and its draft', (await to
   && (await open('Checkout')) === 'on' && (await sheet()).amount === before.amount && !(await page.$('.saleSuccess')));
 await click('.payButton', 1200);
 check('...and paying again goes through', !!(await page.$('.saleSuccess, .receiptScreen')));
+
+// --- POS through to the receipt ------------------------------------------------------
+await pick('Receipt: POS');
+await page.waitForSelector('.receiptScreen[data-open="on"]', { timeout: 4000 });
+const rp = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('.receipt__row')]
+  .filter((x) => x.querySelector('dt')).map((x) => [x.querySelector('dt').textContent, x.querySelector('dd').textContent])));
+check('a POS receipt names the account, as a transfer does, paid exactly', rp['POS · Access bank'] === rp.Total
+  && rp.Tendered === rp.Total && rp.Balance === '₦0', JSON.stringify(rp));
 
 check('no page errors', errors.length === 0, errors.join('; '));
 await browser.close();

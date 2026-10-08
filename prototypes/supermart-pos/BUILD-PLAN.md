@@ -330,6 +330,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 110 | **The row menu's trash is #C2261A**, one step off Color/text/danger (#C1261A), which its own "Delete" uses | The export kept as is |
 | 111 | **This sheet's body starts flush under the header** (y 64), where the other sheets' frames leave 5 (y 69) | Followed: `gap: 0` on this sheet only |
 | 112 | **Not designed**: the queue's loading and failure, a failed Queue order, a failed recall, Recall order working, a recall over a Cart that already holds a sale, the delete's confirmation | Skeleton cards and the Sales Point's message; notice toasts that keep everything as it was; a spinner in place; the designer's calls — a recall over a sale queues that sale first, a delete is immediate with Undo |
+| 113 | **POS has no frames, and Bank transfer returns to Checkout before a bank is chosen** — `88:14105` lists POS among the undesigned methods; the frames show the method picker handing back to Checkout, the bank picked separately from its row | At the designer's request: POS works exactly as Bank transfer (`paysIntoAccount`: Select bank, the account on Checkout and the receipt as "POS · {bank}", the total exactly), and picking either goes straight on to Select bank. The method lands with the bank; closing Select bank cancels, leaving Checkout as it was |
 
 ## Work order
 
@@ -737,6 +738,14 @@ and Print do the real thing.
   picked. **Open:** the account number does not fit the row's value column. It was
   already cut for three of the four accounts (Access needs 204px of 160), and with
   the logo all four are (128px). Left as the frame's layout; needs design input.
+
+- **Then, at the designer's request: POS is bank, and the bank follows the method.**
+  One rule, `paysIntoAccount` (`data/payments.ts`), covers Bank transfer and POS: the
+  Bank row on Checkout, the exact-total tender (`tenderFor`), the receipt's "{method} ·
+  {bank}" line and the Select bank step. Picking either in Select payment method hands
+  straight on to Select bank (one hand-off, the backdrop at full strength throughout —
+  sampled, 7-8 positions); the method lands only with the bank, so Select bank's X
+  cancels to Checkout unchanged (#113). `walk-checkout` 36/36, `catalogue:verify` +1.
 
 Verified: `walk-checkout` 27/27; `diff-checkout` 0 outside 0.5px over 27 boxes;
 `figma:audit` 453 properties, 0 differ (+54); `catalogue:verify` +3 tender checks,

@@ -6,16 +6,28 @@ import palmpay from '../assets/banks/palmpay.png';
 import { STORE } from './store';
 
 /**
- * Payment methods, in the order of Select payment method (`88:14105`). Only Cash and
- * Bank transfer are designed; the other four are listed as drawn and raise a "not
+ * Payment methods, in the order of Select payment method (`88:14105`). Cash, Bank
+ * transfer and POS are built; the other three are listed as drawn and raise a "not
  * designed yet" notice when picked (the designer's call).
  */
 export type MethodId = 'cash' | 'bank' | 'pos' | 'balance' | 'complimentary' | 'split';
 
+/**
+ * Paid into one of the shop's accounts. POS has no frames of its own; it works exactly
+ * as Bank transfer does (the designer: "POS basically means bank" — a card terminal
+ * settles into the shop's bank account). Both name the account, both go through
+ * Select bank, and both must be the total exactly.
+ */
+export type AccountMethod = 'bank' | 'pos';
+export type PayMethod = 'cash' | AccountMethod;
+export function paysIntoAccount(method: MethodId): method is AccountMethod {
+  return method === 'bank' || method === 'pos';
+}
+
 export const METHODS: readonly { id: MethodId; label: string; icon: IconName; designed: boolean }[] = [
   { id: 'cash', label: 'Cash', icon: 'bank-note-02', designed: true },
   { id: 'bank', label: 'Bank transfer', icon: 'bank', designed: true },
-  { id: 'pos', label: 'POS', icon: 'credit-card-02', designed: false },
+  { id: 'pos', label: 'POS', icon: 'credit-card-02', designed: true },
   { id: 'balance', label: 'Customer balance', icon: 'wallet-04', designed: false },
   { id: 'complimentary', label: 'Complimentary', icon: 'gift-02', designed: false },
   { id: 'split', label: 'Payment split', icon: 'rows-03', designed: false },

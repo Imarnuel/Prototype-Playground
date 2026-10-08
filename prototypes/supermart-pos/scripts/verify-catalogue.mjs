@@ -194,6 +194,8 @@ check('cash: N20,000 on N17,367 gives N2,633 change; exact gives none; N1 short 
 const bankExact = tenderFor('bank', T, T), bankOver = tenderFor('bank', T, T + M), bankShort = tenderFor('bank', T, T - M);
 check('bank: the total exactly, nothing over or under', bankExact.ok && bankExact.changeMinor === 0
   && !bankOver.ok && bankOver.reason === 'not-exact' && !bankShort.ok);
+const posTenders = [tenderFor('pos', T, T), tenderFor('pos', T, T + M), tenderFor('pos', T, T - M)];
+check('POS: exactly as bank', JSON.stringify(posTenders) === JSON.stringify([bankExact, bankOver, bankShort]));
 let fracTender = false;
 try { tenderFor('cash', T, 2_000_050); } catch { fracTender = true; }
 check('a tender that is not whole Naira is refused', fracTender);
