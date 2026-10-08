@@ -26,8 +26,8 @@ export function TransactionSuccess({ open, origin, onContinue }: {
   const reducedMotion = useReducedMotion();
   useEffect(() => {
     if (!open) return undefined;
-    // With the check: the reveal and the pop, then the stroke.
-    const t = setTimeout(() => navigator.vibrate?.(12), duration(DURATION.fast + DURATION.base + DURATION.base, reducedMotion));
+    // As the check's stroke completes (its delay plus its duration, from the CSS).
+    const t = setTimeout(() => navigator.vibrate?.(12), duration(DURATION.instant + DURATION.fast + DURATION.fast, reducedMotion));
     return () => clearTimeout(t);
   }, [open, reducedMotion]);
   if (!mounted) return null;

@@ -22,7 +22,7 @@
      origin on a 393x852 screen. */
   clip-path: circle(0 at var(--ox) var(--oy));
   transition:
-    clip-path var(--motion-slow) var(--ease-inOut),
+    clip-path var(--motion-base) var(--ease-out),
     opacity var(--motion-base) var(--ease-inOut);
 }
 .saleSuccess[data-open='off'][data-leaving='off'] { opacity: 1; }
@@ -59,7 +59,7 @@
 .saleSuccess__mark > * { grid-area: 1 / 1; }
 
 /* Featured icon: 72 round in Color/container/success/bold, a 40 check centred. It
-   pops in once the reveal has mostly opened. */
+   pops in while the reveal is still opening — the whole moment settles in ~0.5s. */
 .saleSuccess__icon {
   display: flex;
   align-items: center;
@@ -68,13 +68,13 @@
   height: 72px;
   border-radius: var(--radius-full);
   background: var(--color-container-success-bold-default);
-  animation: success-pop var(--motion-slow) var(--ease-overshoot) var(--motion-fast) both;
+  animation: success-pop var(--motion-base) var(--ease-overshoot) var(--motion-instant) both;
 }
 
 /* The check draws as the pop settles. */
 .saleSuccess__icon path {
   stroke-dasharray: 1;
-  animation: success-draw var(--motion-base) var(--ease-out) calc(var(--motion-fast) + var(--motion-base)) both;
+  animation: success-draw var(--motion-fast) var(--ease-out) calc(var(--motion-instant) + var(--motion-fast)) both;
 }
 
 /* Two rings of the same green ripple out from the mark as the check lands. */
@@ -84,12 +84,12 @@
   border-radius: var(--radius-full);
   background: var(--color-container-success-bold-default);
   opacity: 0;
-  animation: success-ripple calc(var(--motion-slow) * 2) var(--ease-out) calc(var(--motion-fast) + var(--motion-base) * 1.5) both;
+  animation: success-ripple calc(var(--motion-slow) + var(--motion-fast)) var(--ease-out) calc(var(--motion-instant) + var(--motion-fast)) both;
 }
-.saleSuccess__ring--late { animation-delay: calc(var(--motion-fast) * 2 + var(--motion-base) * 1.5); }
+.saleSuccess__ring--late { animation-delay: calc(var(--motion-instant) * 2 + var(--motion-fast)); }
 
 /* Heading/h4, its box the column's full 327 with the line centred in it. It rises
-   last, so the eye goes mark, then words. */
+   just behind the mark, so the eye goes mark, then words. */
 .saleSuccess__text {
   align-self: stretch;
   margin: 0;
@@ -99,7 +99,7 @@
   letter-spacing: var(--type-Heading-h4-letter-spacing);
   color: var(--color-text-default);
   text-align: center;
-  animation: motion-rise var(--motion-base) var(--ease-out) calc(var(--motion-slow) + var(--motion-fast)) both;
+  animation: motion-rise var(--motion-base) var(--ease-out) var(--motion-fast) both;
 }
 
 @keyframes success-pop {

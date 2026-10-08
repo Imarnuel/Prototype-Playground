@@ -168,31 +168,20 @@
 .payButton[aria-busy='true'] { cursor: progress; }
 
 /* --- Pay, through the payment ------------------------------------------------------
-   The label and the status share one cell, so the button never changes size. */
+   The label and the spinner share one cell, so the button never changes size. */
 .payButton > * { grid-area: 1 / 1; }
 
 .payButton__label,
-.payButton__status {
+.payButton__spinner {
   transition:
     opacity var(--motion-fast) var(--ease-out),
     transform var(--motion-fast) var(--ease-out);
 }
 
-.payButton__status {
-  display: grid;
-  place-items: center;
-  opacity: 0;
-  transform: scale(0.6);
-}
-.payButton__status > * { grid-area: 1 / 1; }
-
-.payButton[data-phase='paying'] .payButton__label,
-.payButton[data-phase='paid'] .payButton__label { opacity: 0; transform: translateY(-6px); }
-.payButton[data-phase='paying'] .payButton__status,
-.payButton[data-phase='paid'] .payButton__status { opacity: 1; transform: none; }
+.payButton[data-paying='on'] .payButton__label { opacity: 0; transform: translateY(-6px); }
 
 /* While paying the button keeps its brand fill: it is working, not disabled. */
-.payButton[data-phase='paying']:disabled {
+.payButton[data-paying='on']:disabled {
   background: var(--color-container-brand-bold-default);
   box-shadow: var(--shadow-xs);
 }
@@ -203,24 +192,10 @@
   border-radius: var(--radius-full);
   border: 2px solid rgb(255 255 255 / 30%);
   border-top-color: var(--color-text-inverse);
+  opacity: 0;
+  transform: scale(0.6);
   animation: pay-spin 700ms linear infinite;
-  transition: opacity var(--motion-fast) var(--ease-out);
 }
-.payButton[data-phase='paid'] .payButton__spinner { opacity: 0; }
+.payButton[data-paying='on'] .payButton__spinner { opacity: 1; transform: none; }
 
 @keyframes pay-spin { to { transform: rotate(360deg); } }
-
-/* Paid: Color/container/success/bold, and the check draws itself. */
-.payButton[data-phase='paid']:disabled {
-  background: var(--color-container-success-bold-default);
-  box-shadow: var(--shadow-xs);
-}
-
-.payButton__check path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-}
-.payButton[data-phase='paid'] .payButton__check path {
-  transition: stroke-dashoffset var(--motion-base) var(--ease-out) var(--motion-instant);
-  stroke-dashoffset: 0;
-}

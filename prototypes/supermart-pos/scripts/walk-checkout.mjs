@@ -102,27 +102,28 @@ s = await sheet();
 check('the chosen bank is on the Checkout', s.bank === 'Moniepoint - 8027715063' && !s.payDisabled, s.bank);
 
 // --- Pay ------------------------------------------------------------------------------
-// Timestamp, in the page, when the button says Paid and when the success screen mounts.
+// Record, in the page, what the button was doing when the success screen mounted.
 await page.evaluate(() => {
   const t = (window.__payTimes = {}); const t0 = performance.now();
   new MutationObserver(() => {
-    const b = document.querySelector('.payButton');
-    if (!t.paid && b?.dataset.phase === 'paid' && b.querySelector('.visuallyHidden')?.textContent === 'Paid') t.paid = performance.now() - t0;
-    if (!t.success && document.querySelector('.saleSuccess')) t.success = performance.now() - t0;
-  }).observe(document.body, { subtree: true, childList: true, attributes: true, characterData: true });
+    if (t.success || !document.querySelector('.saleSuccess')) return;
+    t.success = performance.now() - t0;
+    t.buttonThen = document.querySelector('.payButton')?.dataset.paying;
+  }).observe(document.body, { subtree: true, childList: true });
 });
 await page.evaluate(() => document.querySelector('.payButton').click());
 await wait(60);
 // The label cross-fades to a spinner in place; the words are for assistive tech.
 check('Pay shows it is working, and cannot be pressed twice', (await page.evaluate(() => {
   const b = document.querySelector('.payButton');
-  return b.disabled && b.dataset.phase === 'paying' && b.getAttribute('aria-busy') === 'true'
+  return b.disabled && b.dataset.paying === 'on' && b.getAttribute('aria-busy') === 'true'
     && b.querySelector('.visuallyHidden')?.textContent === 'Processing…';
 })));
 await page.waitForSelector('.saleSuccess[data-open="on"]', { timeout: 3000 });
 const times = await page.evaluate(() => window.__payTimes);
-check('...then says Paid, and holds it before the success screen grows', times.paid > 0 && times.success - times.paid >= 400,
-  `paid ${Math.round(times.paid)}ms, success ${Math.round(times.success)}ms`);
+check('...and success grows straight out of the spinning button, no paid step', times.buttonThen === 'on'
+  && !(await page.evaluate(() => document.querySelector('[data-phase], .payButton__check'))),
+  `success at ${Math.round(times.success)}ms, button ${times.buttonThen}`);
 check('then Transaction success', true);
 await page.waitForSelector('.receiptScreen[data-open="on"]', { timeout: 4000 });
 const r = await page.evaluate(() => Object.fromEntries([...document.querySelectorAll('.receipt__row')]

@@ -84,7 +84,7 @@ export function App() {
   );
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [paymentPicker, setPaymentPicker] = useState<'method' | 'bank' | null>(null);
-  const [payPhase, setPayPhase] = useState<'idle' | 'paying' | 'paid'>('idle');
+  const [paying, setPaying] = useState(false);
   // Bumped on New sale: the grid replays its entrance, a fresh start for the next customer.
   const [freshSale, setFreshSale] = useState(0);
   // Once paid: the success screen, then the receipt. `hold` keeps the success screen
@@ -121,7 +121,7 @@ export function App() {
       method: 'cash', bankId: 'access', amount: String(orderTotal() / 100), ...draft, opening: c.opening + 1,
     }));
     setPaymentPicker(null);
-    setPayPhase('idle');
+    setPaying(false);
     setCheckoutOpen(true);
   };
   /* One sheet hands over to the next — Checkout to a picker and back, More options to
@@ -137,12 +137,11 @@ export function App() {
     window.clearTimeout(handoffTimer.current);
     handoffTimer.current = window.setTimeout(() => setHandoff(false), exitMs + 50);
   };
-  /* After Pay, one sequence (none of it designed; the frames are stills): the button
-     spins while the payment runs, turns green and draws its check, then — a beat
-     later, once the check has landed — Transaction success opens from the button.
-     The Checkout and Cart close under it, already covered. */
+  /* After Pay (none of it designed; the frames are stills): the button spins while
+     the payment runs, and Transaction success opens from the button the moment it
+     lands. The Checkout and Cart close under it, already covered. */
   const pay = () => {
-    setPayPhase('paying');
+    setPaying(true);
     const tenderedMinor = parseWholeNaira(checkout.amount)!;
     submitPayment({
       lines, orderDiscount, customer, at: new Date(), sequence: sequence.current + 1,
@@ -151,18 +150,16 @@ export function App() {
         : { method: 'bank', bankId: checkout.bankId, tenderedMinor },
     }).then((receipt) => {
       sequence.current += 1;
-      setPayPhase('paid');
       const button = document.querySelector('.payButton')?.getBoundingClientRect();
       const screen = document.querySelector('.device__screen')?.getBoundingClientRect();
       const origin = button && screen
         ? { x: button.left - screen.left + button.width / 2, y: button.top - screen.top + button.height / 2 }
         : undefined;
-      setTimeout(() => {
-        setSale({ receipt, stage: 'success', hold: false, origin });
-        setTimeout(() => { setCheckoutOpen(false); setCartOpen(false); }, duration(DURATION.slow, reducedMotion));
-      }, duration(DURATION.slow, reducedMotion));
+      setSale({ receipt, stage: 'success', hold: false, origin });
+      // Once the reveal (base) has covered them.
+      setTimeout(() => { setCheckoutOpen(false); setCartOpen(false); }, duration(DURATION.base, reducedMotion));
     }).catch(() => {
-      setPayPhase('idle');
+      setPaying(false);
       // Not designed: the payment did not go through, and the draft is kept.
       showToast('Payment failed. Try again.', 'notice');
     });
@@ -170,8 +167,9 @@ export function App() {
   // The success screen gives way to the receipt on its own, unless held.
   useEffect(() => {
     if (!sale || sale.stage !== 'success' || sale.hold) return undefined;
-    // Long enough for the success moment to play out (it settles ~0.9s after mount) and be read.
-    const t = setTimeout(() => setSale((s) => (s ? { ...s, stage: 'receipt' } : s)), 2000);
+    // A beat, not a wait (the designer: "too long"): the moment settles ~0.5s after
+    // mount, and this leaves it on screen long enough to read.
+    const t = setTimeout(() => setSale((s) => (s ? { ...s, stage: 'receipt' } : s)), 1200);
     return () => clearTimeout(t);
   }, [sale]);
   /* New sale and the receipt's close both end the sale: the order is paid, so there
@@ -180,7 +178,7 @@ export function App() {
     setLines([]); setOrderDiscount(undefined); setCustomer(null);
     setCartOpen(false); setTotalOpen(false); setCheckoutOpen(false); setPaymentPicker(null);
     setSale((s) => (s ? { ...s, stage: 'closed' } : s));
-    setPayPhase('idle');
+    setPaying(false);
     setFreshSale((n) => n + 1);
   };
   const shareReceipt = async (receipt: ReceiptRecord) => {
@@ -502,7 +500,7 @@ export function App() {
                 onPickBank={() => swapSheets(() => setCheckoutOpen(false), () => setPaymentPicker('bank'))}
                 onClose={() => setCheckoutOpen(false)}
                 onPay={pay}
-                phase={payPhase}
+                paying={paying}
               />
 
               <SelectPaymentMethod

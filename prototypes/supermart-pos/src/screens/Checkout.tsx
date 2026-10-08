@@ -23,7 +23,7 @@ export type CheckoutDraft = { method: 'cash' | 'bank'; bankId: string; amount: s
  * - Change due and the validation messages are not designed.
  */
 export function Checkout({
-  open, totals, draft, onAmountChange, onPickMethod, onPickBank, onClose, onPay, phase, handoff = false,
+  open, totals, draft, onAmountChange, onPickMethod, onPickBank, onClose, onPay, paying, handoff = false,
 }: {
   open: boolean;
   totals: OrderTotals;
@@ -37,7 +37,7 @@ export function Checkout({
   onPay: () => void;
   /** idle → paying (waiting on the payment) → paid (confirmed, about to hand over to
       Transaction success). */
-  phase: 'idle' | 'paying' | 'paid';
+  paying: boolean;
 }) {
   const amountMinor = parseWholeNaira(draft.amount);
   const tender = amountMinor === null ? null : tenderFor(draft.method, totals.total, amountMinor);
@@ -47,7 +47,7 @@ export function Checkout({
         ? (tender.reason === 'short' ? `Less than the total, ${formatPrice(totals.total)}` : `A transfer must be the total, ${formatPrice(totals.total)}`)
         : null;
   const change = tender?.ok && tender.changeMinor > 0 ? tender.changeMinor : 0;
-  const canPay = !!tender?.ok && phase === 'idle';
+  const canPay = !!tender?.ok && !paying;
   const input = useRef<HTMLInputElement>(null);
   // Shown grouped, as the frame writes it ("₦10,000"); the draft keeps the digits.
   const shown = /^\d+$/.test(draft.amount) ? Number(draft.amount).toLocaleString('en-NG') : draft.amount;
@@ -61,23 +61,17 @@ export function Checkout({
       dismissOnBlanket={false}
       className="checkout"
       footer={
-        /* Not designed: the button holds the whole moment — its label gives way to a
-           spinner while the payment runs, then it turns green and draws a check, so
-           the confirmation starts where the finger is before the screen takes over. */
-        <button type="button" className="payButton" data-phase={phase} disabled={!canPay}
-          onClick={onPay} aria-busy={phase === 'paying'}>
-          <span className="payButton__label" aria-hidden={phase !== 'idle'}>
-            {canPay || phase !== 'idle' ? `Pay ${formatPrice(totals.total)}` : 'Pay'}
+        /* Not designed: the label gives way to a spinner while the payment runs, and
+           the success screen grows out of the button from there. No separate paid
+           state on the button (the designer's call): the success screen is the
+           confirmation. */
+        <button type="button" className="payButton" data-paying={paying ? 'on' : 'off'} disabled={!canPay}
+          onClick={onPay} aria-busy={paying}>
+          <span className="payButton__label" aria-hidden={paying}>
+            {canPay || paying ? `Pay ${formatPrice(totals.total)}` : 'Pay'}
           </span>
-          <span className="payButton__status" aria-hidden="true">
-            <span className="payButton__spinner" />
-            <svg className="payButton__check" width="20" height="20" viewBox="0 0 40 40" fill="none">
-              <path d="M33.3332 10L14.9998 28.3333L6.6665 20" pathLength={1} stroke="white" strokeWidth="4"
-                strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </span>
-          {phase === 'paying' && <span className="visuallyHidden">Processing…</span>}
-          {phase === 'paid' && <span className="visuallyHidden">Paid</span>}
+          <span className="payButton__spinner" aria-hidden="true" />
+          {paying && <span className="visuallyHidden">Processing…</span>}
         </button>
       }
     >
