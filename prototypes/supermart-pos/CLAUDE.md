@@ -198,6 +198,17 @@ library matches — same backdrop, light, angle and margin:
 > seamless warm light-grey backdrop, soft diffused top light, subtle contact shadow,
 > no text, no logos, no labels, no model, square composition with generous margin
 > around the product.
+>
+> The garment is freshly steamed and pressed, wrinkle-free, smooth fine {fabric} with
+> a clean even surface, crisp seams, premium quality, sharp focus, high detail.
+
+The second paragraph is the finish pass: the first set looked rough (creased, a
+speckled weave on the hoodie and jacket), and the designer wanted it smoother and finer
+with the composition unchanged. Folded or restyled shots were tried and rejected —
+the composition is the part to keep.
+
+The grid's "All" view takes one product from each category in turn
+(`src/api/pos.ts`), so it opens on a mix rather than four tops.
 
 They are **generated, not photographed**, and must not be presented as photography of
 real stock. The originals land in `assets/products-src/` (gitignored) and go through:
