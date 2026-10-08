@@ -221,7 +221,7 @@ entrance that never animates.
 - The sheet **exit curve** is heavily back-loaded and is deferred to `better-ui`,
   which owns motion and is not installed (BUILD-PLAN #37).
 - **The post-Pay sequence is not designed** — the spinner on Pay, the
-  circular reveal, the mark's pop and ripples, the receipt's print feed and the
+  circular reveal, the mark's focus-in and bloom, the receipt's print feed and the
   grid's re-rise are choreographed from the motion tokens (BUILD-PLAN, Motion).
   Any later Figma motion replaces it.
 - **No motion is authored anywhere in the Figma file** — `get_motion_context` returns

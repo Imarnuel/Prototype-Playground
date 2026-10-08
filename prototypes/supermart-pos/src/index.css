@@ -145,7 +145,7 @@ select {
     .addCustomer__avatar, .cart__iconButton, .salesPoint__overflow,
     .filterChip, .tabBar__nav, .tabBar__item,
     .device, .device__screen, .device__island,
-    .saleSuccess__icon, .saleSuccess__ring, .buttonSpinner,
+    .saleSuccess__icon, .saleSuccess__halo, .buttonSpinner,
     .receipt__logo, .bankPicker__logo, .checkout__bankLogo, .toast__action,
     .toast[data-variant='pill'], .queueCard__dot
   ) {

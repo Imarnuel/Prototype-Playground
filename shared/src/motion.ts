@@ -28,8 +28,6 @@ export const EASING = {
   in: 'cubic-bezier(0.7, 0, 0.84, 0)',
   /** Moving between two on-screen positions. */
   inOut: 'cubic-bezier(0.65, 0, 0.35, 1)',
-  /** A small, settling overshoot — for a moment of confirmation, never for travel. */
-  overshoot: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
 } as const;
 
 /** iOS-style sheet spring. Used for bottom sheets and modal presentation. */

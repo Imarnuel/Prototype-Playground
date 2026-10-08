@@ -11,8 +11,8 @@ import './SaleComplete.css';
  * Transaction success — `88:8723`. Full screen; the caller moves on to the receipt.
  *
  * Not designed — the frame is a still. The moment is choreographed: the screen opens
- * as a circle from the Pay button (`origin`), the green mark pops in with a small
- * overshoot, its check draws, two rings ripple out and the line rises. A light haptic
+ * as a circle from the Pay button (`origin`), the green mark comes into focus, its
+ * check draws, a soft bloom breathes out behind it and the line rises. A light haptic
  * tick lands with the check on phones that have one. Reduced motion shows it settled.
  * The check is the frame's own export (`check-success.svg`), inlined so it can draw.
  */
@@ -44,8 +44,7 @@ export function TransactionSuccess({ open, origin, onContinue }: {
     >
       <div className="saleSuccess__content">
         <span className="saleSuccess__mark">
-          <span className="saleSuccess__ring" aria-hidden="true" />
-          <span className="saleSuccess__ring saleSuccess__ring--late" aria-hidden="true" />
+          <span className="saleSuccess__halo" aria-hidden="true" />
           <span className="saleSuccess__icon">
             <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
               <path d="M33.3332 10L14.9998 28.3333L6.6665 20" pathLength={1} stroke="white" strokeWidth="2.97658"

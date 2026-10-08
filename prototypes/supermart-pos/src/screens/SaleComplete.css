@@ -58,8 +58,10 @@
 }
 .saleSuccess__mark > * { grid-area: 1 / 1; }
 
-/* Featured icon: 72 round in Color/container/success/bold, a 40 check centred. It
-   pops in while the reveal is still opening — the whole moment settles in ~0.5s. */
+/* Featured icon: 72 round in Color/container/success/bold, a 40 check centred.
+   It comes into focus rather than bouncing in: from 60% and an 8px blur to sharp, on
+   the decelerating curve, no overshoot (the designer: the pop and ripples "look
+   dated"). It starts while the reveal is still opening; the moment settles in ~0.5s. */
 .saleSuccess__icon {
   display: flex;
   align-items: center;
@@ -68,25 +70,28 @@
   height: 72px;
   border-radius: var(--radius-full);
   background: var(--color-container-success-bold-default);
-  animation: success-pop var(--motion-base) var(--ease-overshoot) var(--motion-instant) both;
+  animation: success-focus var(--motion-base) var(--ease-out) var(--motion-instant) both;
 }
 
-/* The check draws as the pop settles. */
+/* The check strokes on as the disc sharpens. */
 .saleSuccess__icon path {
   stroke-dasharray: 1;
   animation: success-draw var(--motion-fast) var(--ease-out) calc(var(--motion-instant) + var(--motion-fast)) both;
 }
 
-/* Two rings of the same green ripple out from the mark as the check lands. */
-.saleSuccess__ring {
+/* One soft bloom of the same green — light, not a ring: a radial falloff with no edge,
+   breathing out once behind the disc as it lands. It replaced two hard-edged ripple
+   rings. */
+.saleSuccess__halo {
   width: 72px;
   height: 72px;
   border-radius: var(--radius-full);
-  background: var(--color-container-success-bold-default);
+  background: radial-gradient(closest-side,
+    color-mix(in srgb, var(--color-container-success-bold-default) 32%, transparent),
+    transparent);
   opacity: 0;
-  animation: success-ripple calc(var(--motion-slow) + var(--motion-fast)) var(--ease-out) calc(var(--motion-instant) + var(--motion-fast)) both;
+  animation: success-bloom calc(var(--motion-slow) + var(--motion-base)) var(--ease-out) var(--motion-instant) both;
 }
-.saleSuccess__ring--late { animation-delay: calc(var(--motion-instant) * 2 + var(--motion-fast)); }
 
 /* Heading/h4, its box the column's full 327 with the line centred in it. It rises
    just behind the mark, so the eye goes mark, then words. */
@@ -99,20 +104,26 @@
   letter-spacing: var(--type-Heading-h4-letter-spacing);
   color: var(--color-text-default);
   text-align: center;
-  animation: motion-rise var(--motion-base) var(--ease-out) var(--motion-fast) both;
+  animation: success-text var(--motion-base) var(--ease-out) var(--motion-fast) both;
 }
 
-@keyframes success-pop {
-  from { transform: scale(0.3); opacity: 0; }
-  to { transform: none; opacity: 1; }
+@keyframes success-focus {
+  from { transform: scale(0.6); opacity: 0; filter: blur(8px); }
+  to { transform: none; opacity: 1; filter: blur(0); }
+}
+/* The line de-blurs as it rises, so the words arrive the way the mark did. */
+@keyframes success-text {
+  from { transform: translateY(6px); opacity: 0; filter: blur(6px); }
+  to { transform: none; opacity: 1; filter: blur(0); }
 }
 @keyframes success-draw {
   from { stroke-dashoffset: 1; }
   to { stroke-dashoffset: 0; }
 }
-@keyframes success-ripple {
-  from { transform: scale(1); opacity: 0.28; }
-  to { transform: scale(2.6); opacity: 0; }
+@keyframes success-bloom {
+  0% { transform: scale(0.6); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: scale(2.4); opacity: 0; }
 }
 
 /* --- Receipt screen ----------------------------------------------------------------- */

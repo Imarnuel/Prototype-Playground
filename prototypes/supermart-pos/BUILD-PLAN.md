@@ -862,8 +862,8 @@ on a device each is lower; the before/after are the same rig.)
 **After Pay: one quick moment** (the designer, first: "sick motion after the
 checkout"; then: "the success screen feels too long… the button turning green is not
 necessary"). Nothing here is designed — the frames are the static success screen and
-the receipt — so it is built only from the existing tokens, plus one new easing,
-`EASING.overshoot` (a small settle, for confirmation only, never for travel).
+the receipt — so it is built only from the existing tokens. (A first version added
+`EASING.overshoot` for a bouncing pop; it went with the pop, below.)
 
 1. **Pay works in place.** The label cross-fades up and out (fast) and a spinner
    scales in on the same grid cell, so the button never changes width. There is no
@@ -872,11 +872,14 @@ the receipt — so it is built only from the existing tokens, plus one new easin
 2. **Success grows out of the button** the moment the payment lands: a
    `clip-path: circle()` reveal centred on the Pay button's measured centre
    (`origin`), over `base` ease-out. Checkout and the Cart close under it once covered.
-3. **The mark lands, fast.** The disc pops on the overshoot (peaks at 1.067) from
-   `instant`, the check strokes on over `fast`, two rings ripple out, the text rises
-   just behind the mark, and the device ticks (`navigator.vibrate(12)`) as the stroke
-   completes. Sampled per frame from mount: reveal done 353–383ms, mark settled
-   ~430–450ms, text and check in ~530ms. (The first version settled ~900ms.)
+3. **The mark comes into focus** (the designer: the bouncing pop and the ripple
+   rings "look dated"). The disc goes from 60% and an 8px blur to sharp on `base`
+   ease-out — no overshoot — from `instant`; one soft bloom of the same green, a
+   radial falloff with no edge, breathes out behind it; the check strokes on over
+   `fast`; the line de-blurs as it rises; the device ticks (`navigator.vibrate(12)`)
+   as the stroke completes. Sampled per frame from mount: max scale exactly 1 (16
+   scale steps, 20 blur steps), disc sharp at ~440ms, line clear at ~507ms, check
+   drawn at ~540ms. (The very first version settled ~900ms.)
 4. **The receipt prints at 1.2s** (was 2s), or on a tap. It feeds down from under the
    title bar (`slow + base`) while the actions rise from the bottom edge. The success
    screen stays opaque and only its content lets go: two half-faded whites would let
@@ -888,7 +891,7 @@ the receipt — so it is built only from the existing tokens, plus one new easin
 
 Every delay is a `calc()` of the `--motion-*` vars, so reduced motion lands the whole
 run settled (sampled: 0 running animations; receipt at 122, footer at 748 — the same
-resting boxes). The circles drawn here (rings, spinner) join the `corner-shape: round`
+resting boxes). The circles drawn here (bloom, spinner) join the `corner-shape: round`
 list — on the global superellipse they rendered as squircles.
 
 `walk-checkout` checks in-page that success mounts while the button is still
