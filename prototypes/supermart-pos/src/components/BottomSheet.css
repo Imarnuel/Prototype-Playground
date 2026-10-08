@@ -56,7 +56,7 @@
    running exit-then-entrance back to back cost ~720ms. In a hand-off the backdrop
    stays at full strength throughout: the incoming blanket is there from its first
    frame, and the outgoing one gives up its fill and sits on top so its sheet can
-   fade where it stands. One motion, as long as the entrance. Both sheets are
+   fade where it stands while the new one lifts in. Both sheets are
    siblings in the Cart's sheet container, which the rule below relies on. */
 .blanket[data-handoff='on'] {
   opacity: 1;
@@ -82,9 +82,21 @@
   transition: opacity var(--motion-fast) var(--ease-out);
 }
 
+/* The incoming tray lifts a short way and fades in, rather than rising the device's
+   full height (425–614px) as a fresh presentation does: between trays the backdrop
+   and the context stay put, so only the surface changes (the designer: "still feels
+   slow"). It is a keyframe animation, not a transition, so it starts on the mount
+   frame — a transition has to wait usePresented's two frames for a starting state,
+   and that wait read as a stall before every swap. 48px — no distance token exists;
+   about a tenth of a tray, enough to read as arriving from below. */
 .blanket[data-handoff='on'][data-intent='open'] .sheetPanel {
-  transition-duration: var(--motion-base);
-  transition-timing-function: var(--ease-out);
+  animation: tray-in var(--motion-base) var(--ease-out) both;
+  transition: none;
+}
+
+@keyframes tray-in {
+  from { opacity: 0; transform: translateY(48px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {

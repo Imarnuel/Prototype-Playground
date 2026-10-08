@@ -4,7 +4,7 @@ import { BottomSheet } from '../components/BottomSheet';
 import { FieldError } from '../components/FieldError';
 import { Icon } from '../components/Icon';
 import { formatPrice, parseWholeNaira, tenderFor, type OrderTotals } from '../data/catalogue';
-import { bankAccount, methodLabel } from '../data/payments';
+import { METHODS, bankAccount, methodLabel } from '../data/payments';
 import '../components/DetailField.css';
 import './Checkout.css';
 
@@ -91,6 +91,9 @@ export function Checkout({
           <button type="button" className="checkout__methodRow" onClick={onPickMethod}>
             <span className="checkout__methodLabel">Payment method</span>
             <span className="checkout__methodValue">
+              {/* Not in `88:12450`/`88:13497`; added at the designer's request. The method
+                  picker's own glyph for it, at its own 20. */}
+              <Icon name={METHODS.find((m) => m.id === draft.method)!.icon} />
               <span className="checkout__valueText">{methodLabel(draft.method)}</span>
               <Icon name="chevron-right-subtle" />
             </span>

@@ -714,6 +714,11 @@ and Print do the real thing.
   four screens, 21 icons and four bank logos, all exported from their instances or
   — for the four socials Figma would not export — built from their own path data.
 
+- **The method's icon on Checkout's Payment method row** — not in `88:12450` /
+  `88:13497`, added at the designer's request: the method picker's own glyph for the
+  chosen method (`bank-note-02`, `bank`), at its export's 20px, on the row's 8px gap.
+  Measured: 20×20, centred on the row to 0px, 8px from the label, row still 56; it
+  is the same file the picker row draws.
 - **The bank's logo on Checkout's Bank row** — not in `88:13497`, added at the
   designer's request: the picker's own logo, round, 24px (the value text's line
   height, so the 56px row and its baseline hold), on the row's 8px gap. Measured:
@@ -784,6 +789,21 @@ the new tray rests at 345–374ms, the old one is gone by ~190ms, and the backdr
 combined dim is 0.500 on every frame (a first version dropped to 0 for one frame —
 the incoming sheet mounts a render later — fixed by holding the old fill until the
 new blanket exists). Opening from the Cart and closing with the X are unchanged.
+
+**Then: a lift, not a rise** (the designer, again: "still feels slow… are you using
+the standard timing?"). It was: `fast` out and `base` in, ease-out — inside the
+design-engineer skill's bands (150–350ms feedback, ≤600ms screen transitions,
+"eased tween for reveals"). The timing was not the problem; the choreography was.
+Sampled per frame, the incoming tray **sat still for ~140ms after mounting** (a
+transition needs usePresented's two frames to get a starting state) and then rose
+the device's full height, 425–614px, as if presenting a fresh modal. Now it is a
+`tray-in` keyframe animation that starts on the mount frame: a 48px lift and a fade
+on `base` ease-out, while the outgoing tray still fades in place on `fast` and the
+backdrop holds. 48px has no token (none for distance exists); about a tenth of a
+tray. Production build, four swaps (Checkout ⇄ method, Checkout ⇄ bank), before →
+after: visibly moving 158–189 → 52–77ms, 90% there 242–249 → 113–161ms, at rest
+384–399 → 248–283ms; backdrop 1.0 on every frame. (Headless runs at ~25fps here, so
+on a device each is lower; the before/after are the same rig.)
 
 **After Pay: one quick moment** (the designer, first: "sick motion after the
 checkout"; then: "the success screen feels too long… the button turning green is not
