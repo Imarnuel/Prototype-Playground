@@ -29,7 +29,7 @@ const T = [
   ['list card',      '.measurement__list',                'S',  22, 536, 349, 278],
   ['row Each',       '.measurement__row:nth-child(1)',    'S',  38, 536, 317,  56],
   ['row Pack',       '.measurement__row:nth-child(2)',    'S',  38, 592, 317,  56],
-  ['row Carton',     '.measurement__row:nth-child(3)',    'S',  38, 648, 317,  56],
+  ['row Bundle',     '.measurement__row:nth-child(3)',    'S',  38, 648, 317,  56],
   ['row Box',        '.measurement__row:nth-child(4)',    'S',  38, 704, 317,  56],
   ['label Each',     '.measurement__row:nth-child(1) .measurement__label', 'L', 38, 552, null, 24],
   ['check',          '.measurement__row:nth-child(1) .measurement__check', 'R', 335, 554, 20, 20],

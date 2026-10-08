@@ -51,7 +51,7 @@ export type Product = {
   units: readonly PackUnit[];
 };
 
-export type UnitId = 'each' | 'pack' | 'carton' | 'box';
+export type UnitId = 'each' | 'pack' | 'bundle' | 'box';
 
 /** One sellable pack size. `each` is how many single units it holds. */
 export type PackUnit = {
@@ -61,12 +61,13 @@ export type PackUnit = {
   readonly each: number;
 };
 
-/* Labels are the Quantity frame's (`88:11532`). Of the abbreviations only "ea" and
-   "pck" appear anywhere in the design; "ctn" and "box" are invented to match. */
+/* Labels are the Quantity frame's (`88:11532`), except Bundle: the frame says Carton,
+   renamed at the designer's request. Of the abbreviations only "ea" and "pck" appear
+   anywhere in the design; "bdl" and "box" are invented to match. */
 const UNIT_NAMES: Record<UnitId, { label: string; abbrev: string }> = {
   each: { label: 'Each', abbrev: 'ea' },
   pack: { label: 'Pack', abbrev: 'pck' },
-  carton: { label: 'Carton', abbrev: 'ctn' },
+  bundle: { label: 'Bundle', abbrev: 'bdl' },
   box: { label: 'Box', abbrev: 'box' },
 };
 
@@ -206,7 +207,7 @@ export const PRODUCTS: readonly Product[] = [
     barcode: '6153000000076',
     taxClass: 'standard',
     stock: 180,
-    units: units(['pack', 4], ['carton', 8], ['box', 16]),
+    units: units(['pack', 4], ['bundle', 8], ['box', 16]),
     image: 'socks.webp',
   },
   {

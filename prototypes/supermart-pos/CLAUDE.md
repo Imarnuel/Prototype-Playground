@@ -100,7 +100,8 @@ by retyping** — see `figma/README.md`.
   is how demo receipts stop reconciling.
 - Every product lists its **pack units** (`units`), Each first. Prices stay per single
   unit; a pack's price is derived. Only Crew Socks' 1/4/8/16 comes from a frame — the
-  rest, and the "ctn" / "box" abbreviations, are invented (BUILD-PLAN #64).
+  rest, and the "bdl" / "box" abbreviations, are invented (BUILD-PLAN #64). The
+  frame's third unit, Carton, is **Bundle** at the designer's request.
 
 ### Money
 

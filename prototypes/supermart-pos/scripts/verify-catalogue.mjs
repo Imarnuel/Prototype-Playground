@@ -110,7 +110,7 @@ for (const p of PRODUCTS) for (const u of p.units) for (let c = 1; c <= maxCount
 }
 check('every product x unit x sellable count is whole Naira and within stock', unitBad === 0, `${unitCases} cases`);
 let unknownUnit = false;
-try { unitFor(byId('bag-tote'), 'carton'); } catch { unknownUnit = true; }
+try { unitFor(byId('bag-tote'), 'bundle'); } catch { unknownUnit = true; }
 check('asking for a unit a product is not sold in is refused', unknownUnit);
 
 // --- Discounts ----------------------------------------------------------------
