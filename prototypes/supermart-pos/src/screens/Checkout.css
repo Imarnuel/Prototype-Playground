@@ -1,0 +1,163 @@
+/* Checkout — `88:12450` / `88:13497`. Chrome comes from BottomSheet; these are only
+   the ways this sheet differs. */
+
+/* `.Modal body`: 16 above and below, Spacing/400 between the two blocks, each block
+   padding itself. */
+.checkout .modalBody {
+  gap: var(--spacing-400);
+  align-items: stretch;
+  padding: var(--spacing-400) 0;
+}
+
+/* Frame 5051: the total, then the breakdown 32 below. */
+.checkout__summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-700);
+}
+
+/* 40/36 Semi Bold at -0.72 — no text style or token carries this size. */
+.checkout__total {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 36px;
+  letter-spacing: -0.72px;
+  color: var(--color-text-default);
+  text-align: center;
+}
+
+/* Frame 5050 > 5049: Spacing/400 either side and 16 below the box. */
+.checkout__breakdownWrap { padding: 0 var(--spacing-400) 16px; }
+
+/* Radius Border radius/300, a 1px Color/border/subtle stroke inside, 16 x 4. */
+.checkout__breakdown {
+  margin: 0;
+  padding: 4px 16px;
+  border-radius: var(--radius-300);
+  box-shadow: inset 0 0 0 1px var(--color-border-subtle);
+}
+
+.checkout__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+/* Label/Base in Color/text/secondary, both sides. */
+.checkout__row dt,
+.checkout__row dd {
+  margin: 0;
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  color: var(--color-text-secondary);
+}
+
+/* Frame 5052 / 5029: Spacing/400 either side and between. */
+.checkout__payment {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-400);
+  padding: 0 var(--spacing-400);
+}
+
+/* Color/surface/secondary/default, radius Border radius/400, 16 either side. */
+.checkout__methodCard {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+  background: var(--color-surface-secondary-default);
+  border-radius: var(--radius-400);
+  overflow: clip;
+}
+
+.checkout__methodRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-600);
+  height: 56px;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* In the bank state the method row carries the divider (`88:13542`). */
+.checkout__methodRow:not(:last-child) { box-shadow: inset 0 -1px 0 0 var(--color-border-subtle); }
+
+/* Label/Large. The bank state fixes the label column at 101. */
+.checkout__methodLabel {
+  flex: none;
+  min-width: 101px;
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  letter-spacing: var(--type-Label-Large-letter-spacing);
+  color: var(--color-text-default);
+}
+
+.checkout__methodValue {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.checkout__methodRow--bank .checkout__methodValue { flex: 1 1 0; }
+
+/* Regular 16/24 at -0.2: Body/large. */
+.checkout__valueText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--type-Body-large-size);
+  font-weight: var(--type-Body-large-weight);
+  line-height: var(--type-Body-large-line-height);
+  letter-spacing: var(--type-Body-large-letter-spacing);
+  color: var(--color-text-default);
+}
+
+.checkout__methodRow--bank .checkout__valueText { flex: 1 1 0; }
+
+/* The opening lines sit directly under the field. */
+.checkout .fieldError { margin-top: 0; }
+
+.checkout__changeText {
+  margin: 0;
+  padding-top: 8px;
+  font-size: var(--type-Label-Small-size);
+  line-height: var(--type-Label-Small-line-height);
+  color: var(--color-text-success);
+}
+
+/* The `.Modal footer` Button: Color/container/brand/bold, radius Border radius/300,
+   12 x 12, Label/Large in white; disabled as `88:12595` draws it. The same button as
+   the Cart's Checkout, sized by its footer. */
+.payButton {
+  flex: 1 1 auto;
+  padding: 12px var(--spacing-300);
+  border: 0;
+  border-radius: var(--radius-300);
+  background: var(--color-container-brand-bold-default);
+  box-shadow: var(--shadow-xs);
+  color: var(--color-text-inverse);
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  cursor: pointer;
+}
+
+.payButton:disabled {
+  background: var(--color-container-disabled);
+  color: var(--color-text-ondisabled);
+  box-shadow: none;
+  cursor: default;
+}
+
+.payButton[aria-busy='true'] { cursor: progress; }

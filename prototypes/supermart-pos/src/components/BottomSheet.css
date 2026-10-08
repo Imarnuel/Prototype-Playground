@@ -124,6 +124,13 @@
   overflow-y: auto;
 }
 
+/* `.Modal footer`: 16 above, 40 below, 16 either side. */
+.modalFooter {
+  display: flex;
+  padding: 16px var(--spacing-400) 40px;
+  flex: none;
+}
+
 /* The panel takes focus on open so a keyboard or screen-reader user lands inside the
    dialog. It is a container, not a control, so it shows no ring of its own; the
    controls inside keep the platform's. */

@@ -21,6 +21,14 @@ await build({
   bundle: true, format: 'esm', platform: 'node', outfile, logLevel: 'error',
 });
 const cart = await import(pathToFileURL(outfile).href);
+// The receipt builder too: it imports the bank logos, which load as data URLs here.
+const saleFile = path.join(outdir, 'sale.mjs');
+await build({
+  entryPoints: [path.join(root, 'src/state/sale.ts')],
+  bundle: true, format: 'esm', platform: 'node', outfile: saleFile, logLevel: 'error',
+  loader: { '.svg': 'dataurl', '.png': 'dataurl' },
+});
+const sale = await import(pathToFileURL(saleFile).href);
 fs.rmSync(outdir, { recursive: true, force: true });
 
 const { addToCart, setCount, commitQuantity, commitDetails, removeLine, lineGross, totals, productFor } = cart;
@@ -111,6 +119,34 @@ check('removing a line leaves the others untouched', removeLine(mixed, 'acc-sock
 let unknown = false;
 try { productFor({ productId: 'no-such-thing' }); } catch { unknown = true; }
 check('a line for an unknown product throws instead of rendering a blank', unknown);
+
+// --- The receipt ----------------------------------------------------------------
+const { buildReceipt, receiptNumber, formatReceiptDate } = sale;
+const naira = (s) => Number(String(s).replace(/[^\d]/g, ''));
+const at = new Date(2026, 9, 8, 9, 5, 7);
+const sold = [
+  { productId: 'acc-socks', unitId: 'pack', count: 2, note: 'Gift wrap' },
+  { productId: 'tops-tee', unitId: 'each', count: 1, discount: { kind: 'percent', percent: 10 } },
+];
+const cashSale = buildReceipt({ lines: sold, orderDiscount: { kind: 'amount', minor: 50_000 }, customer: null,
+  tender: { method: 'cash', tenderedMinor: 2_000_000 }, at, sequence: 7 });
+check('the receipt reconciles: Sales Value - Discount + VAT = Total',
+  naira(cashSale.salesValue) - naira(cashSale.discount) + naira(cashSale.vat) === naira(cashSale.total),
+  `${cashSale.salesValue} - ${cashSale.discount} + ${cashSale.vat} = ${cashSale.total}`);
+check('...and Balance is Tendered less Total', naira(cashSale.tendered) - naira(cashSale.total) === naira(cashSale.balance),
+  `${cashSale.tendered} - ${cashSale.total} = ${cashSale.balance}`);
+check('...and its Total is the Checkout total', cashSale.totalMinor === totals(sold, { kind: 'amount', minor: 50_000 }).total);
+check('a pack line names its unit, a note and a line discount carry over',
+  cashSale.lines[0].title === '2 pck Crew Socks' && cashSale.lines[0].note === 'Gift wrap' && !cashSale.lines[0].discount
+  && cashSale.lines[1].discount === formatPrice(85_000), JSON.stringify(cashSale.lines.map((l) => l.title)));
+check('no customer is a Walk-in Customer; an attached one is named',
+  cashSale.customer === 'Walk-in Customer'
+  && buildReceipt({ lines: sold, customer: { id: 'x', name: 'Ngozi Eze' }, tender: { method: 'bank', bankId: 'access', tenderedMinor: totals(sold).total }, at, sequence: 1 }).customer === 'Ngozi Eze');
+check('the frame\'s date form and a receipt number for the day',
+  formatReceiptDate(at) === '08-10-2026 (09:05:07)' && receiptNumber(at, 7) === '#S202610080007', `${formatReceiptDate(at)} ${receiptNumber(at, 7)}`);
+let shortSale = false;
+try { buildReceipt({ lines: sold, customer: null, tender: { method: 'cash', tenderedMinor: 100 }, at, sequence: 1 }); } catch { shortSale = true; }
+check('a short tender never produces a receipt', shortSale);
 
 console.log(`\n${fails} failing`);
 process.exit(fails ? 1 : 0);

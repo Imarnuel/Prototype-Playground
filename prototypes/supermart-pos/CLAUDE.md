@@ -16,7 +16,7 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **87** inconsistencies, including that 31 frames share the name
+anything — it records **101** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
@@ -66,6 +66,20 @@ Queued orders is not designed yet (#80). See BUILD-PLAN, band `152:8774`.
 
 **Hosted preview:** <https://claude.ai/artifact/LnsiYh4uBeTNY1J3XDMJHX> — rebuild and
 republish it with `npm run build:hosted`.
+
+### Built — band `162:8987`, checkout (cash and bank transfer)
+
+| Screen | Node | State |
+|---|---|---|
+| Checkout — cash, bank, Pay disabled | `88:12450`, `88:13497`, `88:12595` | 0 outside 0.5px; `figma:audit` 25 properties |
+| Select payment method | `88:14105` | 0 outside 0.5px; 6 properties |
+| Select bank | `88:14794` | 0 outside 0.5px; 9 properties |
+| Transaction success | `88:8723` | 0 outside 0.5px; 5 properties |
+| Receipt | `88:8735` | 0 outside 0.5px; 9 properties; figures computed (#94) |
+
+`walk-checkout` 27/27. Cash takes change, a transfer must be the total; POS, Customer
+balance, Complimentary and Payment split are not designed and say so. **Open:** the
+receipt's logo is a placeholder (#97). See BUILD-PLAN, band `162:8987`.
 
 ## The store
 
@@ -153,13 +167,13 @@ back to its neutral fill if one is missing.
 npm run dev                # iterate; open with ?dev=1 for the toolbar
 npm run build && npm run preview   # demo from here, not dev
 
-npm run catalogue:verify   # 63 invariants: check digits, units, money, totals, states, CSV
-npm run cart:verify        # 22 rules for changing a line: stock, clamps, unit changes
+npm run catalogue:verify   # 66 invariants: check digits, units, money, totals, states, CSV
+npm run cart:verify        # 29 rules: stock, clamps, unit changes, and the receipt
 npm run catalogue:csv      # regenerate figma/catalogue.csv from catalogue.ts
 npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json
 npm run tokens:verify      # the generated tokens still match the Figma dump
 npm run motion:sample      # transitions animate in BOTH directions (needs a server)
-npm run figma:audit        # 399 properties read off the Figma NODES vs computed style
+npm run figma:audit        # 453 properties read off the Figma NODES vs computed style
 npm run images:manifest    # which photos are missing
 npm run images:optimise -- --box <css-px>   # --box MUST come from a measured frame
 npm run build:hosted       # publish-ready bundle for the hosted preview
@@ -167,6 +181,8 @@ npm run build:hosted       # publish-ready bundle for the hosted preview
 # Browser walks and diffs — pass a server's base URL (default the dev server, :4251)
 node scripts/walk-total.mjs      [url]   # order total: reconciles, motion both ways
 node scripts/walk-discount.mjs   [url]   # More options, order discount, Clear cart + Undo
+node scripts/walk-checkout.mjs   [url]   # both checkout flows, failure, receipt, new sale
+node scripts/diff-checkout.mjs   [url]   # checkout, pickers, success, receipt vs their frames
 node scripts/diff-total.mjs      [url]   # order total vs 88:8639 / 88:9338
 node scripts/walk-stock.mjs      [url]   # stock clamp and its toast
 node scripts/walk-sheet-keys.mjs [url]   # sheet focus, Escape, Tab trap
@@ -185,6 +201,7 @@ entrance that never animates.
 - **The order discount's breakdown**: `88:15652` restyles the total's breakdown and
   puts Discount after Tax; the built one keeps `88:9338`'s (BUILD-PLAN #82).
 - **Queued orders** and the **Undo** toast's action are not designed (#80, #86).
+- **The receipt's logo** is a placeholder: Freshvale has none (#97).
 - The sheet **exit curve** is heavily back-loaded and is deferred to `better-ui`,
   which owns motion and is not installed (BUILD-PLAN #37).
 - **No motion is authored anywhere in the Figma file** — `get_motion_context` returns

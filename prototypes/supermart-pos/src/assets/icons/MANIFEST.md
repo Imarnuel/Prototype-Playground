@@ -1,6 +1,6 @@
 # Icons
 
-All 28 are present, 25 here and 3 in `shared/src/assets/`. `chevron-down` joined with
+All 48 are present, 45 here and 3 in `shared/src/assets/`. `chevron-down` joined with
 the order total (band `115:8774`), exported from its instance `88:8718`. They are the screens' own
 Figma exports — nothing here was substituted, redrawn, or traced.
 
@@ -64,6 +64,17 @@ pink avatar. No recolouring was needed or done.
 | `percent-03.svg` | 20x20 | `#2C4A8B` | More options — Apply discount | `88:15555` |
 | `trash-01.svg` | 20x20 | `#C2261A` | More options — Clear cart | `88:15561` |
 | `list.svg` | 20x20 | `#2C4A8B` | More options — Queued orders | `88:15567` |
+| `chevron-right-subtle.svg` | 20x20 | `#9EA4B3` | Checkout — method and bank rows | `88:12500` |
+| `bank-note-02.svg`, `bank.svg`, `credit-card-02.svg`, `wallet-04.svg`, `gift-02.svg`, `rows-03.svg` | 20x20 | `#20293C` | Select payment method | `88:14112` … `88:14137` |
+| `check-24.svg` | 24x24 | `#2C4A8B` | Select payment method — chosen | `88:14114` |
+| `dot-2.svg` | 2x2 | `#5E6A82` | Select bank — separator | `88:14810` |
+| `check-success.svg` | 40x40 | white | Transaction success | `88:8727` |
+| `share-01.svg`, `printer.svg` | 16x16 | `#2C4A8B` | Receipt — Share / Print | inside `88:8851` |
+| `instagram.svg`, `facebook.svg`, `tiktok.svg`, `twitter.svg` | 15.3 / 13.1 | `#5A5C63` | Receipt — socials | `88:8831` … `88:8847`; built from each vector's path data (below the frame's clip, so not exportable); the X recoloured from #000 (BUILD-PLAN #98) |
+
+Bank logos live in `src/assets/banks/`: Access, Moniepoint and Opay exported as SVG
+from `88:14801`, `88:14826`, `88:14839`; Palmpay holds a raster, so it is a 3x PNG
+(120x120) of `88:14815`.
 
 ## Sizes are intrinsic
 

@@ -10,7 +10,7 @@ import path from 'node:path';
 import {
   PRODUCTS, CATEGORIES, CATEGORY_ORDER, BRANDS, CURRENCY, LOW_STOCK_AT,
   formatPrice, formatSignedPrice, fullName, lineTotalMinor, findByBarcode,
-  maxCount, unitFor, lineGrossMinor, lineDiscountMinor, lineTaxMinor, orderTotals, allocateOrderDiscountMinor,
+  maxCount, unitFor, lineGrossMinor, lineDiscountMinor, lineTaxMinor, orderTotals, allocateOrderDiscountMinor, tenderFor,
   parseCount, parseWholeNaira, parsePercent, VAT_STANDARD_RATE,
 } from '../src/data/catalogue.ts';
 
@@ -184,6 +184,19 @@ for (let k = 0; k < 2_000; k++) {
   if (parts.reduce((a, x) => a + x, 0) !== (base ? d : 0) || parts.some((x, i) => x % M || x < 0 || x > nets[i])) allocBad++;
 }
 check('the split sums to the discount exactly, whole Naira, never past a line, in 2,000 random orders', allocBad === 0, `${allocBad} bad`);
+
+// --- Tender at checkout ---------------------------------------------------------
+// Cash: more is change, less is refused. Bank: the total exactly (the designer's call).
+const T = 1_736_700;
+const cashOver = tenderFor('cash', T, 2_000_000), cashExact = tenderFor('cash', T, T), cashShort = tenderFor('cash', T, T - M);
+check('cash: N20,000 on N17,367 gives N2,633 change; exact gives none; N1 short is refused',
+  cashOver.ok && cashOver.changeMinor === 263_300 && cashExact.ok && cashExact.changeMinor === 0 && !cashShort.ok && cashShort.reason === 'short');
+const bankExact = tenderFor('bank', T, T), bankOver = tenderFor('bank', T, T + M), bankShort = tenderFor('bank', T, T - M);
+check('bank: the total exactly, nothing over or under', bankExact.ok && bankExact.changeMinor === 0
+  && !bankOver.ok && bankOver.reason === 'not-exact' && !bankShort.ok);
+let fracTender = false;
+try { tenderFor('cash', T, 2_000_050); } catch { fracTender = true; }
+check('a tender that is not whole Naira is refused', fracTender);
 
 // --- Displayed totals reconcile, across random baskets -------------------------
 // Seeded so a failure is reproducible. Overrides are odd whole-Naira prices and

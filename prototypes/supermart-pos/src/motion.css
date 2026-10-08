@@ -25,13 +25,13 @@ textarea,
 /* --- Press feedback: discrete controls ------------------------------------------ */
 button:active:not(:disabled):not([aria-disabled='true']):not(
   .orderTotal__toggle, .measurement__row, .customerRow__button, .addCustomer__pick,
-  .moreOptions__row, .cartLine__name, .qtyField__value, .qtyStepper__value, .segmented__option
+  .moreOptions__row, .pickList__row, .checkout__methodRow, .cartLine__name, .qtyField__value, .qtyStepper__value, .segmented__option
 ) {
   transform: scale(var(--press-scale));
 }
 
 /* --- Press feedback: rows -------------------------------------------------------- */
-:is(.orderTotal__toggle, .measurement__row, .customerRow__button, .addCustomer__pick, .moreOptions__row):active:not([aria-disabled='true']) {
+:is(.orderTotal__toggle, .measurement__row, .customerRow__button, .addCustomer__pick, .moreOptions__row, .pickList__row, .checkout__methodRow):active:not([aria-disabled='true']) {
   background-color: var(--color-container-neutral-subtle-hover);
 }
 

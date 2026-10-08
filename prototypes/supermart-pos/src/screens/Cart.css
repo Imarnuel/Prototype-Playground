@@ -387,7 +387,7 @@
 
 .cart__checkout:disabled .cart__checkoutLabel,
 .cart__queue:disabled .cart__queueLabel {
-  color: var(--color-text-on-disabled);
+  color: var(--color-text-ondisabled);
 }
 
 /* The trailing control, which is the whole difference between the Cart's row and

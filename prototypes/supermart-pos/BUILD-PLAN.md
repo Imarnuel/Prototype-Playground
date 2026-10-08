@@ -305,6 +305,20 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 85 | **The Discount field's "%" sat at the field's right edge** in Item details — the input filled the row, pushing its suffix away. Every frame writes the value and its unit as one string: "10%", "₦10" | Mine, from band `115:8774`. **Fixed**: the input sizes to what is typed, so the suffix sits 1px after it, in both sheets |
 | 86 | **Clearing has no designed way back**, and the toast has no designed action | The designer's call: Undo on the existing toast. The pill is the header confirm's colours on the toast's dark fill, the toast stays up 5s, not 2.6s, and takes taps only while it shows an action. **Needs design input** |
 | 87 | **Every bottom sheet: 32px corners and an 8px inset, where every frame draws 28 (Border radius/650) and 6** — e.g. `88:11612`, `88:12129`, `88:15543`, `88:15757` | The designer's request, ahead of the file. Two values in `BottomSheet.css`; the token stays 28, the file's variable. Item details takes the 32 on its top corners. The audits expect 32, and the diffs keep the frames' coordinates and apply the 2px in one place |
+| 88 | **The checkout band names five of its frames "Customer added"** and draws the bank flow's checkout and Select bank as one 886-wide frame (`88:14562`) | Referenced by node ID only |
+| 89 | **`88:12370` and `88:12817` are the same cash Checkout**, sheet for sheet | Built once |
+| 90 | **One state drawn two ways**: the cash flow opens Checkout with the Amount filled (`88:12450`), the bank flow's first frame opens the same Cash state with it empty and Pay disabled (`88:12595`) | Opens at the total — the faster path; `88:12595` is still reachable (dev toolbar "Checkout: Pay disabled") |
+| 91 | **Checkout's header carries the check Button Icon at opacity 0**, as #43 | Not built |
+| 92 | **Every Select bank check is at opacity 0, the chosen bank's included** (`88:14812`), so nothing marks the bank in use; Select payment method shows its chosen check | The chosen bank shows its check, as the method list does |
+| 93 | **Placeholder data in Select bank**: every account held by "Theresa Ventures", and Palmpay and Moniepoint share 8018826172 | Held by the store's business name; Moniepoint given its own number. The banks and their logos are the frame's |
+| 94 | **The receipt's numbers do not reconcile** (`88:8735`): Sales Value ₦9,000 against a ₦10,000 header, Cash ₦5,000, Tendered ₦9,050, Balance ₦50; two lines whose discounts (₦100 + ₦50) do not make the Discount row (₦100); and "Fanta Orange 50cl @ ₦100" for ₦1,000 with no count | Every figure computed (`buildReceipt`); `cart:verify` proves Sales Value − Discount + VAT = Total and Balance = Tendered − Total. Lines read "{count} {name} @ {unit price}" |
+| 95 | **The receipt says "Walk-in Customer"** with Samuel Daudu attached to the order | The attached customer, else Walk-in Customer |
+| 96 | **The receipt is a scaled copy** — 11.487, 15.316, 30.632… are 12, 16, 32 × 0.957 — **in another library's colours** (Omnix Neutral #353645, #bbbbc4, black) | Built at the component's numbers × one factor; the colours kept as drawn |
+| 97 | **The receipt's footnote and social block are 435 wide in a 305 column**, overflowing the card; its footnote is placeholder copy, and its four handles all read "Afonomicstores" | Fit to the column; the footnote and one handle are Freshvale's, invented. Store identity is Freshvale's by the designer's call; Freshvale has no logo, so the frame's slot holds a **placeholder monogram — needs design input** |
+| 98 | **The receipt's X icon is #000000**, the other three socials #5A5C63; the four sit below the frame's 852 clip, so Figma exports none of them | Built from each vector's own path data, at its position in its frame; the X matched to the others' grey |
+| 99 | **Close and New sale on the receipt** — two controls, one meaning once the sale is paid | Both end the sale: empty order, no customer or discount, back to the Sales Point |
+| 100 | **Not designed**: Pay's working state, a failed payment, change due, and the amount's validation | "Processing…" on a disabled Pay; a notice toast that keeps the draft; change under the field in Color/text/success; the field's own error line |
+| 101 | **Mine, from band 4: the empty Cart's disabled Checkout label read a token that does not exist** (`--color-text-on-disabled`), so it inherited a colour instead of Color/text/ondisabled | Fixed |
 
 ## Work order
 
@@ -678,6 +692,31 @@ Verified: `walk-discount` 25/25; the sheets' boxes 0 outside 0.5px against the f
 `figma:audit` 399 properties, 0 differ (+35); `catalogue:verify` with five new
 order-discount checks, 2,000 random splits and 500 random baskets now carrying order
 discounts; every earlier gate green.
+
+### Band `162:8987` — "Checking out using cash" and "Checking out using Bank"
+
+Thirteen frames: Checkout (cash, bank, Pay disabled), Select payment method, Select
+bank, Transaction success and the receipt. The designer's calls, asked before
+building: the four undesigned methods (POS, Customer balance, Complimentary, Payment
+split) raise a notice; **cash may be over-tendered for change and short is refused,
+a transfer must be the total**; the receipt carries **Freshvale's** identity; Share
+and Print do the real thing.
+
+- **Money**: `tenderFor` in the catalogue beside the rest of the arithmetic;
+  `buildReceipt` (`src/state/sale.ts`) builds every receipt figure from the same
+  `totals` the Cart and Checkout show. Payment goes through the mock API (`pay`),
+  so it has latency and a forced failure.
+- **Flow**: the method and bank pickers replace Checkout on screen and hand back to it
+  (the frames draw them alone over the Cart); the draft lives in the App so it
+  survives the round trip. Success gives way to the receipt after 1.6s or a tap.
+- **Reused**: BottomSheet (now with a footer slot), the text field and FieldError,
+  Select customer's search field, CloseButton, the row press feedback. **New**: the
+  four screens, 21 icons and four bank logos, all exported from their instances or
+  — for the four socials Figma would not export — built from their own path data.
+
+Verified: `walk-checkout` 27/27; `diff-checkout` 0 outside 0.5px over 27 boxes;
+`figma:audit` 453 properties, 0 differ (+54); `catalogue:verify` +3 tender checks,
+`cart:verify` +7 receipt checks; every earlier gate green.
 
 ## Screen 1 — verification record
 

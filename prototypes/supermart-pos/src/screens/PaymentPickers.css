@@ -1,0 +1,123 @@
+/* Select payment method `88:14105` and Select bank `88:14794`. */
+
+.methodPicker .modalBody,
+.bankPicker .modalBody {
+  align-items: stretch;
+  padding: 0 var(--spacing-400) 20px;
+}
+
+.bankPicker .modalBody { gap: 20px; }
+
+/* Frame 4980 / Frame 5091: radius 16, clipping its rows; a 1px Color/border/subtle
+   stroke under every row but the last. */
+.pickList {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-400);
+  overflow: clip;
+  flex: none;
+}
+
+.pickList__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pickList__row:not(:last-child) { box-shadow: inset 0 -1px 0 0 var(--color-border-subtle); }
+
+/* Only the chosen row's check shows; the slot keeps its width either way, so a
+   choice never shifts the row. */
+.pickList__check {
+  display: flex;
+  flex: none;
+  opacity: 0;
+  transition: opacity var(--motion-fast) var(--ease-inOut);
+}
+.pickList__row[aria-checked='true'] .pickList__check { opacity: 1; }
+
+/* 56 tall; a 20px icon 12 from its Body/Large label. */
+.methodPicker__row { height: 56px; }
+
+.methodPicker__lead {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.methodPicker__label {
+  font-size: var(--type-Body-Large-size);
+  font-weight: var(--type-Body-Large-weight);
+  line-height: var(--type-Body-Large-line-height);
+  letter-spacing: var(--type-Body-Large-letter-spacing);
+  color: var(--color-text-default);
+}
+
+/* The search: Select customer's Text field at Border radius/200. */
+.customerSearch.bankPicker__search { border-radius: var(--radius-200); }
+
+/* Each row 12 above and below a 48-tall block; Color/surface/default. */
+.bankPicker__list { background: var(--color-surface-default); }
+.bankPicker__row { padding: var(--spacing-300) 0; }
+
+.bankPicker__lead {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.bankPicker__logo {
+  display: block;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+}
+
+.bankPicker__text {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 48px;
+  min-width: 0;
+}
+
+/* Label/Large. */
+.bankPicker__name {
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  letter-spacing: var(--type-Label-Large-letter-spacing);
+  color: var(--color-text-default);
+}
+
+/* Body/Base in Color/text/subtle, a 2px dot 6 either side. */
+.bankPicker__sub {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  white-space: nowrap;
+  font-size: var(--type-Body-Base-size);
+  font-weight: var(--type-Body-Base-weight);
+  line-height: var(--type-Body-Base-line-height);
+  letter-spacing: var(--type-Body-Base-letter-spacing);
+  color: var(--color-text-subtle);
+}
+
+/* Not designed: a search that matches nothing. */
+.bankPicker__empty {
+  margin: 0;
+  padding: 24px 0;
+  text-align: center;
+  font-size: var(--type-Body-Base-size);
+  line-height: var(--type-Body-Base-line-height);
+  color: var(--color-text-subtle);
+}

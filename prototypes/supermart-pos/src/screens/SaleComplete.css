@@ -1,0 +1,289 @@
+/* Transaction success `88:8723` and Receipt `88:8735`: full screens over everything,
+   below the device's own status bar, fading in and out on the project's durations. */
+.saleScreen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-default);
+  transition: opacity var(--motion-base) var(--ease-inOut);
+}
+.saleScreen[data-open='off'] { opacity: 0; }
+.saleScreen[data-open='on'] { opacity: 1; }
+
+/* --- Transaction success ---------------------------------------------------------- */
+.saleSuccess {
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Frame 4905: 327 wide, Spacing/500 between the icon and the line. */
+.saleSuccess__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-500);
+  align-items: center;
+  width: 327px;
+}
+
+/* Featured icon: 72 round in Color/container/success/bold, a 40 check centred. The
+   icon arrives a beat behind the screen, so the success reads as an event. */
+.saleSuccess__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-full);
+  background: var(--color-container-success-bold-default);
+  transition: transform var(--motion-slow) var(--ease-out);
+}
+.saleSuccess[data-open='off'] .saleSuccess__icon { transform: scale(0.6); }
+.saleSuccess[data-open='on'] .saleSuccess__icon { transform: scale(1); }
+
+/* Heading/h4, its box the column's full 327 with the line centred in it. */
+.saleSuccess__text {
+  align-self: stretch;
+  margin: 0;
+  font-size: var(--type-Heading-h4-size);
+  font-weight: var(--type-Heading-h4-weight);
+  line-height: var(--type-Heading-h4-line-height);
+  letter-spacing: var(--type-Heading-h4-letter-spacing);
+  color: var(--color-text-default);
+  text-align: center;
+}
+
+/* --- Receipt screen ----------------------------------------------------------------- */
+.receiptScreen { padding-top: var(--safe-top); }
+
+/* Title bar: 56, 16 x 12, the close leading and New sale trailing. Its "Order
+   Preview" title is at opacity 0 in the frame; not built. */
+.receiptScreen__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 12px var(--spacing-400);
+  flex: none;
+}
+
+/* Label/base in Color/icon/brand — the same value as Color/text/brand, used here. */
+.receiptScreen__newSale {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: var(--type-Label-base-size);
+  font-weight: var(--type-Label-base-weight);
+  line-height: var(--type-Label-base-line-height);
+  letter-spacing: var(--type-Label-base-letter-spacing);
+  color: var(--color-text-brand);
+  cursor: pointer;
+}
+/* 60x20 is under the 44x44 minimum. */
+.receiptScreen__newSale::after { content: ''; position: absolute; inset: -12px -8px; }
+
+/* The receipt scrolls between the bar and the footer: 16 below the bar, and clear of
+   the 104 footer at the end. */
+.receiptScreen__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px var(--spacing-400) 120px;
+}
+
+/* `.Modal footer`: 16 above, 40 below, a shadow cast upward; two equal buttons. */
+.receiptScreen__footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: var(--spacing-400);
+  padding: 16px var(--spacing-400) 40px;
+  background: var(--color-surface-default);
+  /* 0,-4 blur 8 at 8% black: a literal in the frame, no effect style behind it. */
+  box-shadow: 0 -4px 8px 0 rgb(0 0 0 / 8%);
+}
+
+/* Color/container/brand/default, radius Border radius/300, 12 x 12, a 16 icon 8 from
+   a Label/Large label in Color/text/brand. */
+.receiptScreen__action {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  gap: var(--spacing-200);
+  align-items: center;
+  justify-content: center;
+  padding: 12px var(--spacing-300);
+  border: 0;
+  border-radius: var(--radius-300);
+  background: var(--color-container-brand-default);
+  box-shadow: var(--shadow-xs);
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  color: var(--color-text-brand);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* --- The receipt ----------------------------------------------------------------------
+   The frame's receipt is a component scaled to 0.957: 11.487 is 12 x 0.957, 15.316 is
+   16 x 0.957, and so on. One factor, so the numbers below are the component's own.
+   Its greys (#353645, #bbbbc4) and black are another library's ("Omnix Neutral"),
+   not this file's tokens; kept as drawn. */
+.receipt {
+  --r: 0.95725;
+  --receipt-rule: #bbbbc4;
+  display: flex;
+  flex-direction: column;
+  padding: calc(24px * var(--r) + 16px * var(--r)) calc(23px * var(--r)) calc(40px * var(--r));
+  background: #fff;
+  border-radius: var(--radius-50);
+  /* Border width/xl in Color/border/subtle, drawn inside. */
+  box-shadow: inset 0 0 0 var(--border-width-xl) var(--color-border-subtle);
+  color: #000;
+  font-size: calc(12px * var(--r));
+  line-height: calc(16px * var(--r));
+}
+
+.receipt p { margin: 0; }
+.receipt dl, .receipt dd { margin: 0; }
+
+.receipt__head {
+  display: flex;
+  flex-direction: column;
+  gap: calc(20px * var(--r));
+  align-items: center;
+}
+
+.receipt__store {
+  display: flex;
+  flex-direction: column;
+  gap: calc(16px * var(--r));
+  align-items: center;
+}
+
+/* Placeholder: Freshvale has no logo. The frame's slot is a 48 ring around a 41 mark.
+   Needs design input. */
+.receipt__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(48px * var(--r));
+  height: calc(48px * var(--r));
+  border-radius: var(--radius-full);
+  background: var(--color-container-brand-default);
+  color: var(--color-text-brand);
+  font-size: calc(20px * var(--r));
+  font-weight: 600;
+}
+
+.receipt__storeText {
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--r));
+  align-items: center;
+  text-align: center;
+}
+
+.receipt__storeName {
+  font-size: calc(16px * var(--r));
+  font-weight: 600;
+  line-height: calc(20px * var(--r));
+  letter-spacing: calc(-0.16px * var(--r));
+}
+
+.receipt__storeLine { color: #353645; }
+
+.receipt__total {
+  align-self: stretch;
+  padding: calc(20px * var(--r)) 0;
+  border-top: calc(1px * var(--r)) dashed var(--receipt-rule);
+  font-size: calc(32px * var(--r));
+  font-weight: 600;
+  line-height: calc(32px * var(--r));
+  text-align: center;
+}
+
+.receipt__body {
+  display: flex;
+  flex-direction: column;
+  gap: calc(40px * var(--r));
+}
+
+.receipt__block,
+.receipt__item {
+  display: flex;
+  flex-direction: column;
+  gap: calc(6px * var(--r));
+  padding: calc(12px * var(--r)) 0;
+  border-bottom: calc(1px * var(--r)) dashed var(--receipt-rule);
+}
+
+.receipt__block--top {
+  padding: calc(16px * var(--r)) 0;
+  border-top: calc(1px * var(--r)) dashed var(--receipt-rule);
+  border-bottom: 0;
+}
+
+.receipt__items { border-top: calc(1px * var(--r)) dashed var(--receipt-rule); }
+
+.receipt__row {
+  display: flex;
+  justify-content: space-between;
+  gap: calc(8px * var(--r));
+}
+.receipt__row > :last-child { text-align: right; }
+.receipt__row--strong { font-weight: 600; }
+.receipt__at { font-weight: 400; }
+
+.receipt__foot {
+  display: flex;
+  flex-direction: column;
+  gap: calc(20px * var(--r));
+  align-items: center;
+}
+
+.receipt__footnote { line-height: calc(18px * var(--r)); }
+
+/* Two rows of two, solid rules above and below. */
+.receipt__socials {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  justify-content: center;
+  column-gap: calc(29.62px * var(--r));
+  row-gap: calc(12.47px * var(--r));
+  align-self: stretch;
+  padding: calc(16px * var(--r)) 0;
+  border-top: calc(1px * var(--r)) solid var(--receipt-rule);
+  border-bottom: calc(1px * var(--r)) solid var(--receipt-rule);
+  line-height: calc(18px * var(--r));
+}
+
+.receipt__social {
+  display: flex;
+  gap: calc(4px * var(--r));
+  align-items: center;
+}
+
+.receipt__credit { line-height: calc(28px * var(--r)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .saleScreen, .saleSuccess__icon { transition-duration: 0ms !important; }
+}
+
+/* Print receipt: the receipt alone, at paper width, without the phone around it. */
+@media print {
+  body * { visibility: hidden; }
+  .receipt, .receipt * { visibility: visible; }
+  .receipt {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 80mm;
+    box-shadow: none;
+  }
+}

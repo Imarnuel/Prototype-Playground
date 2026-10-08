@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  DeviceFrame, DevToolbar, SHEET_SPRING, devFlagEnabled, duration, useReducedMotion,
+  DeviceFrame, DevToolbar, SHEET_SPRING, devFlagEnabled, duration, failNextRequest, useReducedMotion,
   type DevToolbarItem,
 } from '@playground/shared';
 import { SalesPoint } from './screens/SalesPoint';
@@ -10,7 +10,13 @@ import { QuantitySheet } from './screens/QuantitySheet';
 import { LineDetails } from './screens/LineDetails';
 import { MoreOptions, type MoreOption } from './screens/MoreOptions';
 import { ApplyDiscount } from './screens/ApplyDiscount';
-import { PRODUCTS, maxCount, unitFor, type Discount, type Product } from './data/catalogue';
+import { Checkout, type CheckoutDraft } from './screens/Checkout';
+import { SelectBank, SelectPaymentMethod } from './screens/PaymentPickers';
+import { Receipt, TransactionSuccess } from './screens/SaleComplete';
+import { METHODS, methodLabel } from './data/payments';
+import { submitPayment } from './api/pos';
+import { receiptText, type Receipt as ReceiptRecord } from './state/sale';
+import { PRODUCTS, maxCount, parseWholeNaira, unitFor, type Discount, type Product } from './data/catalogue';
 import { CUSTOMERS, type Customer } from './data/customers';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Toast, type ToastTone } from './components/Toast';
@@ -71,6 +77,19 @@ export function App() {
     setDiscountSheet((d) => ({ current, opening: (d?.opening ?? 0) + 1 }));
     setDiscountOpen(true);
   };
+  /* Checkout. The draft outlives the sheet: the method and bank pickers replace it on
+     screen and hand back to it, as the frames draw them (alone over the Cart). */
+  const [checkout, setCheckout] = useState<CheckoutDraft & { opening: number }>(
+    { method: 'cash', bankId: 'access', amount: '', opening: 0 },
+  );
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [paymentPicker, setPaymentPicker] = useState<'method' | 'bank' | null>(null);
+  const [paying, setPaying] = useState(false);
+  // Once paid: the success screen, then the receipt. `hold` keeps the success screen
+  // up for a presenter instead of moving on by itself.
+  // `closed` keeps the record through the receipt's exit, so it fades rather than cuts.
+  const [sale, setSale] = useState<{ receipt: ReceiptRecord; stage: 'success' | 'receipt' | 'closed'; hold: boolean } | null>(null);
+  const sequence = useRef(0);
   /* Asks the Cart to clear itself, so the lines leave through its own exit whichever
      control asked — the title-bar trash or More options. */
   const [clearRequest, setClearRequest] = useState(0);
@@ -88,6 +107,61 @@ export function App() {
       label: 'Undo',
       onPress: () => { setLines(before.lines); setOrderDiscount(before.orderDiscount); hideToast(); },
     });
+  };
+
+  const orderTotal = () => totals(lines, orderDiscount).total;
+  const openCheckout = (draft?: Partial<CheckoutDraft>) => {
+    setCheckout((c) => ({
+      method: 'cash', bankId: 'access', amount: String(orderTotal() / 100), ...draft, opening: c.opening + 1,
+    }));
+    setPaymentPicker(null);
+    setCheckoutOpen(true);
+  };
+  /* One sheet at a time, as with More options: the checkout leaves, the picker
+     arrives; and back again. */
+  const swapSheets = (closeNow: () => void, openNext: () => void) => { closeNow(); setTimeout(openNext, exitMs); };
+  const pay = () => {
+    setPaying(true);
+    const tenderedMinor = parseWholeNaira(checkout.amount)!;
+    submitPayment({
+      lines, orderDiscount, customer, at: new Date(), sequence: sequence.current + 1,
+      tender: checkout.method === 'cash'
+        ? { method: 'cash', tenderedMinor }
+        : { method: 'bank', bankId: checkout.bankId, tenderedMinor },
+    }).then((receipt) => {
+      sequence.current += 1;
+      setPaying(false);
+      setCheckoutOpen(false);
+      setSale({ receipt, stage: 'success', hold: false });
+    }).catch(() => {
+      setPaying(false);
+      // Not designed: the payment did not go through, and the draft is kept.
+      showToast('Payment failed. Try again.', 'notice');
+    });
+  };
+  // The success screen gives way to the receipt on its own, unless held.
+  useEffect(() => {
+    if (!sale || sale.stage !== 'success' || sale.hold) return undefined;
+    const t = setTimeout(() => setSale((s) => (s ? { ...s, stage: 'receipt' } : s)), 1600);
+    return () => clearTimeout(t);
+  }, [sale]);
+  /* New sale and the receipt's close both end the sale: the order is paid, so there
+     is nothing to go back to. The Sales Point is underneath, ready. */
+  const newSale = () => {
+    setLines([]); setOrderDiscount(undefined); setCustomer(null);
+    setCartOpen(false); setTotalOpen(false); setCheckoutOpen(false); setPaymentPicker(null);
+    setSale((s) => (s ? { ...s, stage: 'closed' } : s));
+  };
+  const shareReceipt = async (receipt: ReceiptRecord) => {
+    const text = receiptText(receipt);
+    try {
+      if (navigator.share) { await navigator.share({ title: `Receipt ${receipt.number}`, text }); return; }
+      await navigator.clipboard.writeText(text);
+      showToast('Receipt copied');
+    } catch (e) {
+      // Closing the share sheet is a choice, not a failure.
+      if ((e as Error).name !== 'AbortError') showToast('Could not share the receipt', 'notice');
+    }
   };
 
   /* A tap the shelf can't supply returns the same lines from `addToCart`. Saying why
@@ -111,6 +185,7 @@ export function App() {
     setForced(undefined); setCartOpen(false); setPickerOpen(false);
     setCustomer(null); setCustomers(CUSTOMERS); hideToast(); setTotalOpen(false); setQtyOpen(false); setDetailsOpen(false);
     setMenuOpen(false); setDiscountOpen(false); setOrderDiscount(undefined);
+    setCheckoutOpen(false); setPaymentPicker(null); setSale(null);
     setResetNonce((n) => n + 1);
   };
 
@@ -219,6 +294,53 @@ export function App() {
         if (show === 'clear') setTimeout(() => setClearRequest((n) => n + 1), enterMs);
       },
     })),
+    ...([
+      ['Checkout: cash', 'Screens', {}],
+      ['Checkout: cash with change', 'States', { amount: 'change' }],
+      ['Checkout: Pay disabled', 'States', { amount: '' }],
+      ['Checkout: bank transfer', 'States', { method: 'bank' }],
+    ] as const).map(([label, group, draft]): DevToolbarItem => ({
+      label, group,
+      onSelect: () => {
+        setLines(fourLines()); setOrderDiscount(undefined); setCartOpen(true);
+        const total = totals(fourLines()).total / 100;
+        const amount = 'amount' in draft ? (draft.amount === 'change' ? String(Math.ceil(total / 5000) * 5000) : '') : String(total);
+        openCheckout({ ...('method' in draft ? { method: draft.method } : {}), amount });
+      },
+    })),
+    {
+      label: 'Checkout: payment fails',
+      group: 'States',
+      // Arms the mock API, then opens a payable checkout: the next Pay fails.
+      onSelect: () => { setLines(fourLines()); setCartOpen(true); failNextRequest(); openCheckout({ amount: String(totals(fourLines()).total / 100) }); },
+    },
+    ...([['Select payment method', 'method'], ['Select bank', 'bank']] as const).map(([label, which]): DevToolbarItem => ({
+      label, group: 'Screens',
+      onSelect: () => {
+        setLines(fourLines()); setCartOpen(true);
+        setCheckout((c) => ({ ...c, method: which === 'bank' ? 'bank' : 'cash', amount: String(totals(fourLines()).total / 100) }));
+        setPaymentPicker(which);
+      },
+    })),
+    ...([
+      ['Transaction success', 'success', 'cash'],
+      ['Receipt: cash', 'receipt', 'cash'],
+      ['Receipt: bank transfer', 'receipt', 'bank'],
+    ] as const).map(([label, stage, method]): DevToolbarItem => ({
+      label, group: 'Screens',
+      onSelect: async () => {
+        // Through the real payment path, with no wait, so the receipt is the app's own.
+        const fill = fourLines();
+        setLines(fill); setCustomer(CUSTOMERS[0]); setCartOpen(true);
+        const total = totals(fill).total;
+        const receipt = await submitPayment({
+          lines: fill, customer: CUSTOMERS[0], at: new Date(), sequence: sequence.current + 1,
+          tender: method === 'cash' ? { method, tenderedMinor: Math.ceil(total / 500_000) * 500_000 } : { method, bankId: 'access', tenderedMinor: total },
+        });
+        sequence.current += 1;
+        setSale({ receipt, stage, hold: stage === 'success' });
+      },
+    })),
   ];
 
   /* Each entry presents one state, whatever was showing before it: a sheet or toast
@@ -227,7 +349,7 @@ export function App() {
     ...entry,
     onSelect: () => {
       setMenuOpen(false); setDiscountOpen(false); setPickerOpen(false); setQtyOpen(false); setDetailsOpen(false);
-      setTotalOpen(false); hideToast();
+      setTotalOpen(false); hideToast(); setCheckoutOpen(false); setPaymentPicker(null); setSale(null);
       entry.onSelect();
     },
   }));
@@ -264,7 +386,7 @@ export function App() {
                 onEditQuantity={(id) => openQuantity(lines.find((l) => l.productId === id)!)}
                 onOpenDetails={(id) => openDetails(lines.find((l) => l.productId === id)!)}
                 onRemove={(id) => setLines((l) => removeLine(l, id))}
-                onCheckout={() => setCartOpen(false)}
+                onCheckout={() => openCheckout()}
                 onQueue={() => { setLines([]); setOrderDiscount(undefined); setCartOpen(false); }}
                 onAddCustomer={() => setPickerOpen(true)}
                 onMoreOptions={() => setMenuOpen(true)}
@@ -338,6 +460,43 @@ export function App() {
                 />
               )}
 
+              <Checkout
+                key={`checkout-${checkout.opening}`}
+                open={checkoutOpen}
+                totals={totals(lines, orderDiscount)}
+                draft={checkout}
+                onAmountChange={(amount) => setCheckout((c) => ({ ...c, amount }))}
+                onPickMethod={() => swapSheets(() => setCheckoutOpen(false), () => setPaymentPicker('method'))}
+                onPickBank={() => swapSheets(() => setCheckoutOpen(false), () => setPaymentPicker('bank'))}
+                onClose={() => setCheckoutOpen(false)}
+                onPay={pay}
+                paying={paying}
+              />
+
+              <SelectPaymentMethod
+                open={paymentPicker === 'method'}
+                current={checkout.method}
+                onClose={() => swapSheets(() => setPaymentPicker(null), () => setCheckoutOpen(true))}
+                onChoose={(id) => {
+                  const m = METHODS.find((x) => x.id === id)!;
+                  // The designer's call: the four undesigned methods say so and change nothing.
+                  if (!m.designed) { showToast(`${methodLabel(id)} is not designed yet`, 'notice'); return; }
+                  setCheckout((c) => ({ ...c, method: id as CheckoutDraft['method'] }));
+                  swapSheets(() => setPaymentPicker(null), () => setCheckoutOpen(true));
+                }}
+              />
+
+              <SelectBank
+                key={`bank-${checkout.opening}`}
+                open={paymentPicker === 'bank'}
+                current={checkout.bankId}
+                onClose={() => swapSheets(() => setPaymentPicker(null), () => setCheckoutOpen(true))}
+                onChoose={(bankId) => {
+                  setCheckout((c) => ({ ...c, bankId }));
+                  swapSheets(() => setPaymentPicker(null), () => setCheckoutOpen(true));
+                }}
+              />
+
               {details && (
                 <LineDetails
                   key={details.opening}
@@ -351,6 +510,22 @@ export function App() {
                 />
               )}
             </div>
+          )}
+
+          {sale && (
+            <>
+              <TransactionSuccess
+                open={sale.stage === 'success'}
+                onContinue={() => setSale((s) => (s ? { ...s, stage: 'receipt' } : s))}
+              />
+              <Receipt
+                open={sale.stage === 'receipt'}
+                receipt={sale.receipt}
+                onNewSale={newSale}
+                onShare={() => shareReceipt(sale.receipt)}
+                onPrint={() => window.print()}
+              />
+            </>
           )}
 
           {/* Outside the Cart sheet, so it can confirm or refuse something on any

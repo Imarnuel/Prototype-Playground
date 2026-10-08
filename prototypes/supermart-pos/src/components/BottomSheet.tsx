@@ -15,7 +15,7 @@ import './BottomSheet.css';
  */
 export function BottomSheet({
   open, title, onClose, closeLabel, children, dismissOnBlanket = true, confirm, className, initialFocus,
-  showTitle = true,
+  showTitle = true, footer,
 }: {
   open: boolean;
   /** The dialog's accessible name, and its visible heading unless `showTitle` is off. */
@@ -38,6 +38,8 @@ export function BottomSheet({
       opens straight into typing. Focused HERE, after the opener is recorded: a child
       focusing itself on mount would run first and be recorded as the opener. */
   initialFocus?: RefObject<HTMLElement>;
+  /** The board's `.Modal footer`: the sheet's main action, pinned under the body. */
+  footer?: ReactNode;
 }) {
   const { mounted, entered } = usePresented(open);
   const reducedMotion = useReducedMotion();
@@ -110,6 +112,7 @@ export function BottomSheet({
         </header>
 
         <div className="modalBody">{children}</div>
+        {footer && <div className="modalFooter">{footer}</div>}
       </div>
     </div>
   );

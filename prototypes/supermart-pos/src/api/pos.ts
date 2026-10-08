@@ -5,6 +5,7 @@
  */
 import { request } from '@playground/shared';
 import { CATEGORY_ORDER, PRODUCTS, type Category, type Product } from '../data/catalogue';
+import { buildReceipt, type Receipt } from '../state/sale';
 
 export type ProductFilter = Category | 'All';
 
@@ -27,4 +28,12 @@ export function fetchProducts(filter: ProductFilter): Promise<readonly Product[]
   return request('products', () =>
     filter === 'All' ? MIXED : PRODUCTS.filter((p) => p.category === filter),
   );
+}
+
+/**
+ * Takes payment. Never fails on its own; the dev toolbar forces a failure. The
+ * receipt is built inside the request, so a failed payment never produces one.
+ */
+export function submitPayment(sale: Parameters<typeof buildReceipt>[0]): Promise<Receipt> {
+  return request('pay', () => buildReceipt(sale));
 }

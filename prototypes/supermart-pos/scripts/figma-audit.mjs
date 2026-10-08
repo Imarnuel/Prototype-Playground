@@ -532,6 +532,80 @@ const APPLY = [
   ['88:15859 "₦"',          ".applyDiscount .segmented__option[aria-checked='false']", 'color', 'rgb(122, 133, 153)'],
 ];
 
+/* Checkout `88:12450` (cash), from its nodes. */
+const CHECKOUT = [
+  ['88:12454 total',        '.checkout__total',        'fontSize',        '40px'],
+  ['88:12454 total',        '.checkout__total',        'fontWeight',      '600'],
+  ['88:12454 total',        '.checkout__total',        'lineHeight',      '36px'],
+  ['88:12454 total',        '.checkout__total',        'letterSpacing',   '-0.72px'],
+  ['88:12458 breakdown',    '.checkout__breakdown',    'borderRadius',    '12px'],
+  ['88:12458 breakdown',    '.checkout__breakdown',    'boxShadow',       'inset 0 0 0 1px rgba(37, 43, 55, 0.08)'],
+  ['88:12458 breakdown',    '.checkout__breakdown',    'padding',         '4px 16px'],
+  ['88:12461 "Subtotal"',   '.checkout__row dt',       'fontSize',        '14px'],
+  ['88:12461 "Subtotal"',   '.checkout__row dt',       'fontWeight',      '500'],
+  ['88:12461 "Subtotal"',   '.checkout__row dt',       'color',           'rgb(50, 60, 82)'],
+  ['88:12494 method card',  '.checkout__methodCard',   'backgroundColor', 'rgb(246, 247, 249)'],
+  ['88:12494 method card',  '.checkout__methodCard',   'borderRadius',    '16px'],
+  ['88:12495 row',          '.checkout__methodRow',    'height',          '56px'],
+  ['88:12497 label',        '.checkout__methodLabel',  'fontWeight',      '500'],
+  ['88:12497 label',        '.checkout__methodLabel',  'letterSpacing',   '-0.24px'],
+  ['88:12499 "Cash"',       '.checkout__valueText',    'fontWeight',      '400'],
+  ['88:12499 "Cash"',       '.checkout__valueText',    'letterSpacing',   '-0.2px'],
+  ['88:12513 amount',       '.checkout .detailField',  'height',          '60px'],
+  ['I...8135 Pay',          '.payButton',              'backgroundColor', 'rgb(44, 74, 139)'],
+  ['I...8135 Pay',          '.payButton',              'borderRadius',    '12px'],
+  ['I...7605 Pay label',    '.payButton',              'color',           'rgb(255, 255, 255)'],
+  ['I...7605 Pay label',    '.payButton',              'fontSize',        '16px'],
+  ['I...7605 Pay label',    '.payButton',              'lineHeight',      '24px'],
+];
+
+/* Pay disabled, `88:12595`. */
+const CHECKOUT_OFF = [
+  ['I...8135 Pay disabled', '.payButton',              'backgroundColor', 'rgba(12, 14, 24, 0.02)'],
+  ['I...7813 "Pay"',        '.payButton',              'color',           'rgb(158, 164, 179)'],
+];
+
+/* Select payment method `88:14105` and Select bank `88:14794`. */
+const PICKERS = [
+  ['88:14109 row',          '.methodPicker__row',      'height',          '56px'],
+  ['88:14109 row stroke',   '.methodPicker__row',      'boxShadow',       'inset 0 -1px 0 0 rgba(37, 43, 55, 0.08)'],
+  ['88:14111 icon gap',     '.methodPicker__lead',     'columnGap',       '12px'],
+  ['88:14113 "Cash"',       '.methodPicker__label',    'fontSize',        '16px'],
+  ['88:14113 "Cash"',       '.methodPicker__label',    'fontWeight',      '400'],
+  ['88:14113 "Cash"',       '.methodPicker__label',    'letterSpacing',   '-0.24px'],
+];
+const BANKS = [
+  ['88:14797 search',       '.bankPicker__search',     'borderRadius',    '8px'],
+  ['88:14797 search',       '.bankPicker__search',     'height',          '40px'],
+  ['88:14799 row',          '.bankPicker__row',        'paddingTop',      '12px'],
+  ['88:14801 logo',         '.bankPicker__logo',       'width',           '40px'],
+  ['88:14807 name',         '.bankPicker__name',       'fontWeight',      '500'],
+  ['88:14807 name',         '.bankPicker__name',       'letterSpacing',   '-0.24px'],
+  ['88:14809 number',       '.bankPicker__sub',        'fontSize',        '14px'],
+  ['88:14809 number',       '.bankPicker__sub',        'color',           'rgb(94, 106, 130)'],
+  ['88:14808 gap',          '.bankPicker__sub',        'columnGap',       '6px'],
+];
+
+/* Transaction success `88:8723` and the receipt screen `88:8735`. */
+const SUCCESS = [
+  ['88:8726 icon',          '.saleSuccess__icon',      'backgroundColor', 'rgb(3, 140, 78)'],
+  ['88:8726 icon',          '.saleSuccess__icon',      'width',           '72px'],
+  ['88:8728 line',          '.saleSuccess__text',      'fontSize',        '20px'],
+  ['88:8728 line',          '.saleSuccess__text',      'fontWeight',      '600'],
+  ['88:8728 line',          '.saleSuccess__text',      'letterSpacing',   '-0.48px'],
+];
+const RECEIPT = [
+  ['88:8742 card',          '.receipt',                'borderRadius',    '4px'],
+  ['88:8742 card stroke',   '.receipt',                'boxShadow',       'inset 0 0 0 6px rgba(37, 43, 55, 0.08)'],
+  ['88:8761 total',         '.receipt__total',         'fontSize',        '30.632px'],
+  ['88:8766 row',           '.receipt__row',           'fontSize',        '11.487px'],
+  ['88:8741 New sale',      '.receiptScreen__newSale', 'color',           'rgb(44, 74, 139)'],
+  ['88:8741 New sale',      '.receiptScreen__newSale', 'fontSize',        '14px'],
+  ['I...30556 Share',       '.receiptScreen__action',  'backgroundColor', 'rgb(231, 237, 249)'],
+  ['I...30556 Share',       '.receiptScreen__action',  'color',           'rgb(44, 74, 139)'],
+  ['88:8851 footer',        '.receiptScreen__footer',  'boxShadow',       'rgba(0, 0, 0, 0.08) 0px -4px 8px 0px'],
+];
+
 const browser = await pw.chromium.launch({ executablePath: EXE });
 const page = await browser.newPage({ viewport: { width: 1200, height: 1100 } });
 await page.goto(URL + '?dev=1', { waitUntil: 'networkidle' });
@@ -657,10 +731,23 @@ await pick('More options');
 fails += await run('More options', MENU);
 await pick('Apply discount: 10%');
 fails += await run('Apply discount', APPLY);
+await pick('Checkout: cash');
+fails += await run('Checkout', CHECKOUT);
+await pick('Checkout: Pay disabled');
+fails += await run('Checkout Pay disabled', CHECKOUT_OFF);
+await pick('Select payment method');
+fails += await run('Select payment method', PICKERS);
+await pick('Select bank');
+fails += await run('Select bank', BANKS);
+await pick('Transaction success');
+fails += await run('Transaction success', SUCCESS);
+await pick('Receipt: cash');
+fails += await run('Receipt', RECEIPT);
 
 const total = SCALAR.length + COMPOUND.length + CART.length + SHEET.length + EMPTY.length + ADDED.length + TOAST.length
   + TOTAL.length + TOTAL_OPEN.length + TOTAL_DISCOUNT.length + QTY.length + QTY_EDIT.length + DETAILS.length
-  + MENU.length + APPLY.length;
+  + MENU.length + APPLY.length + CHECKOUT.length + CHECKOUT_OFF.length + PICKERS.length + BANKS.length
+  + SUCCESS.length + RECEIPT.length;
 console.log('-'.repeat(60));
 console.log(`${total} properties checked against Figma nodes, ${fails} differ`);
 await browser.close();

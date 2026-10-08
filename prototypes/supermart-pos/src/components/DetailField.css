@@ -32,7 +32,6 @@
 .detailField__row {
   display: flex;
   align-items: center;
-  gap: 2px;
 }
 
 .detailField__row,
@@ -85,8 +84,8 @@
 }
 
 
-/* A value that sizes to what is typed, so a suffix sits right after it: the frames
-   write "10%" and "₦10" as one string. The hidden copy sets the width, and the input
+/* A value that sizes to what is typed, so a suffix sits right after it. The frames
+   write "₦10,000", "10%" and "₦10" as one string, so prefix and suffix sit flush. The hidden copy sets the width, and the input
    lies over it in the same grid cell. */
 .detailField__grow {
   display: inline-grid;
@@ -100,9 +99,6 @@
   /* Room for the caret at the end of the value. */
   padding-right: 1px;
 }
-/* A suffix sits flush, as in the frames' "10%": the row's 2px gap is for a prefix. */
-.detailField__grow + [aria-hidden] { margin-left: -2px; }
-
 /* Zero width so the input's own default (20 characters) adds nothing to the column;
    min-width then stretches it over the copy's width. */
 .detailField .detailField__grow input {
