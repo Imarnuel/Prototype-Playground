@@ -4,16 +4,26 @@
    proven pure by a computed-style snapshot of every element, both states, before and
    after. Geometry notes below are the Select customer sheet's, which is the inset
    variant every sheet so far uses. */
+/* DELIBERATE DEVIATIONS from every sheet frame, at the designer's request: a 32px
+   corner where the frames bind Border radius/650 (28), and an 8px inset where they
+   draw 6. Not written into the token, which is the file's variable and still 28. The
+   corner scales with the rest under continuous corners (index.css). */
+:root {
+  --sheet-inset: 8px;
+  --sheet-radius: calc(32px * var(--corner-scale));
+}
+
 .blanket {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* The sheet is bottom-docked with a uniform 6px inset: the frame places it at
-     x=6 y=126 w=381 h=720 on an 852 screen, so 6 from left, right and bottom. */
+  /* Bottom-docked with a uniform inset. DELIBERATE DEVIATION, at the designer's
+     request: 8, where every frame places the sheet 6 from left, right and bottom
+     (x=6 w=381 on a 393 screen). The audits and diffs expect 8. */
   justify-content: flex-end;
-  padding: 6px;
+  padding: var(--sheet-inset);
   background: var(--color-container-blanket);
   backdrop-filter: blur(3px);
   transition-property: opacity;
@@ -34,7 +44,7 @@
      than the sheet growing past the status bar. */
   max-height: 720px;
   background: var(--color-surface-default);
-  border-radius: var(--radius-650);
+  border-radius: var(--sheet-radius);
   overflow: clip;
   transition-property: transform;
   transition-duration: inherit;

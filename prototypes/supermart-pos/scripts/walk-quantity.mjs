@@ -11,6 +11,8 @@ const BASE = process.argv[2] ?? 'http://127.0.0.1:4251/';
 const browser = await pw.chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
 let fails = 0;
 const check = (n, pass, d = '') => { if (!pass) fails++; console.log(`${pass ? 'PASS' : 'FAIL'}  ${n}${d ? `  ${d}` : ''}`); };
+// The frame's sheet top is 335; it stands 2 higher on the designer's 8px inset (BottomSheet.css).
+const SHEET_TOP = 335 - (8 - 6);
 const money = (s) => Number(String(s).replace(/[^\d]/g, ''));
 
 const open = async (opts = {}) => {
@@ -196,8 +198,8 @@ const sample = (act) => page.evaluate((a) => new Promise((done) => {
 const { out: entering } = await sample('open');
 await page.waitForTimeout(300);
 const { out: leaving, times: leaveTimes } = await sample('close');
-const travel = (a) => new Set(a.filter((v) => v !== null && v > 335 && v < 846)).size;
-check('the sheet travels in over several frames', travel(entering) > 4 && entering.at(-1) === 335,
+const travel = (a) => new Set(a.filter((v) => v !== null && v > SHEET_TOP && v < 846)).size;
+check('the sheet travels in over several frames', travel(entering) > 4 && entering.at(-1) === SHEET_TOP,
   `${travel(entering)} in-between frames, ends at ${entering.at(-1)}`);
 const gone = leaving.indexOf(null);
 // The shared exit curve is back-loaded (BUILD-PLAN #37), so where its last painted
@@ -211,7 +213,7 @@ page = await open({ reducedMotion: 'reduce' });
 await pick(page, 'Cart: fill with 4 lines');
 await page.evaluate(() => document.querySelector('button.qtyField__value').click());
 await page.waitForTimeout(100);
-check('reduced motion: in place at once', Math.round((await sheet(page)).top) === 335, String((await sheet(page)).top));
+check('reduced motion: in place at once', Math.round((await sheet(page)).top) === SHEET_TOP, String((await sheet(page)).top));
 await page.close();
 
 await browser.close();

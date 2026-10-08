@@ -272,7 +272,7 @@ const SHEET = [
   ['88:11930 scrim',      '.blanket',         'backgroundColor', 'rgba(12, 14, 24, 0.5)'],
   ['88:11930 scrim',      '.blanket',         'backdropFilter',  'blur(3px)'],
   ['88:11931 sheet',      '.sheetPanel',     'backgroundColor', 'rgb(255, 255, 255)'],
-  ['88:11931 sheet',      '.sheetPanel',     'borderRadius',    '28px'],
+  ['88:11931 sheet',      '.sheetPanel',     'borderRadius',    '32px'],  // node: 28 — 32 at the designer's request (BottomSheet.css)
   ['88:12133 add btn',    '.customerAdd',   'backgroundColor', 'rgb(231, 237, 249)'],
   ['88:12133 add btn',    '.customerAdd',   'borderRadius',    '12px'],
   ['88:12133 add btn',    '.customerAdd',   'boxShadow',       '0 1px 2px 0 rgba(10, 13, 18, 0.05)'],
@@ -385,7 +385,7 @@ const TOTAL_DISCOUNT = [
    fixed 278 height (#77). */
 const QTY = [
   ['88:11612 sheet',        '.quantitySheet',          'backgroundColor', 'rgb(246, 247, 249)'],
-  ['88:11612 sheet',        '.quantitySheet',          'borderRadius',    '28px'],
+  ['88:11612 sheet',        '.quantitySheet',          'borderRadius',    '32px'],  // node: 28 — 32 at the designer's request (BottomSheet.css)
   ['I...8087 close',        '.quantitySheet .closeButton', 'backgroundColor', 'rgb(255, 255, 255)'],
   ['I...8149 confirm',      '.modalHeader__confirm',   'backgroundColor', 'rgb(231, 237, 249)'],
   ['I...8149 confirm',      '.modalHeader__confirm',   'borderRadius',    '9999px'],
@@ -491,7 +491,7 @@ const DETAILS = [
 /* More options, `88:15543`. The rows' trailing checks are at opacity 0 and not built. */
 const MENU = [
   ['88:15543 sheet',        '.sheetPanel.moreOptions', 'backgroundColor', 'rgb(246, 247, 249)'],
-  ['88:15543 sheet',        '.sheetPanel.moreOptions', 'borderRadius',    '28px'],
+  ['88:15543 sheet',        '.sheetPanel.moreOptions', 'borderRadius',    '32px'],  // node: 28 — 32 at the designer's request (BottomSheet.css)
   ['I...8087 close',        '.moreOptions .closeButton', 'backgroundColor', 'rgb(255, 255, 255)'],
   ['88:15545 body',         '.moreOptions .modalBody', 'rowGap',          '12px'],
   ['88:15545 body',         '.moreOptions .modalBody', 'paddingBottom',   '20px'],

@@ -304,6 +304,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 84 | **The unchosen option changes colour between states of one sheet**: Color/text/subtle in `88:15949`, Color/text/subtlest in `88:15767`, `88:15859` and Item details' `88:9564` | Subtlest throughout |
 | 85 | **The Discount field's "%" sat at the field's right edge** in Item details — the input filled the row, pushing its suffix away. Every frame writes the value and its unit as one string: "10%", "₦10" | Mine, from band `115:8774`. **Fixed**: the input sizes to what is typed, so the suffix sits 1px after it, in both sheets |
 | 86 | **Clearing has no designed way back**, and the toast has no designed action | The designer's call: Undo on the existing toast. The pill is the header confirm's colours on the toast's dark fill, the toast stays up 5s, not 2.6s, and takes taps only while it shows an action. **Needs design input** |
+| 87 | **Every bottom sheet: 32px corners and an 8px inset, where every frame draws 28 (Border radius/650) and 6** — e.g. `88:11612`, `88:12129`, `88:15543`, `88:15757` | The designer's request, ahead of the file. Two values in `BottomSheet.css`; the token stays 28, the file's variable. Item details takes the 32 on its top corners. The audits expect 32, and the diffs keep the frames' coordinates and apply the 2px in one place |
 
 ## Work order
 

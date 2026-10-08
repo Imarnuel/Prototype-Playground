@@ -1,7 +1,7 @@
 /* Item details — `88:9439`. Full width, flush to the bottom, unlike the inset sheets. */
 .blanket:has(.lineDetails) { padding: 0; }
 .sheetPanel.lineDetails {
-  border-radius: var(--radius-650) var(--radius-650) 0 0;
+  border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
   max-height: 780px;
 }
 

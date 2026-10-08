@@ -9,26 +9,32 @@
 import pw from '/opt/node-tools/node_modules/playwright/index.js';
 
 const BASE = process.argv[2] ?? 'http://127.0.0.1:4251/';
-const SHIFT = 0;
-// label, selector, x, y (frame), w, h — null skips; y takes SHIFT
+/* The sheet sits 8 from the screen's edges where the frame draws 6 — a deliberate
+   deviation at the designer's request (BottomSheet.css). Targets stay the frame's own
+   numbers; INSET moves them: everything up by the 2, a left-anchored box right by it,
+   a right-anchored box left by it, and a full-width box both, 4 narrower. */
+const INSET = 8 - 6;
+const SHIFT = -INSET;
+// label, selector, anchor (L / R / S = stretches / C = centred), x, y (frame), w, h — null skips
 const T = [
-  ['sheet',          '.quantitySheet',                     6, 335, 381, 511],
-  ['header',         '.quantitySheet .modalHeader',        6, 335, 381,  64],
-  ['close',          '.quantitySheet .closeButton',       22, 347,  40,  40],
-  ['confirm',        '.modalHeader__confirm',            331, 347,  40,  40],
-  ['title',          '.quantitySheet .modalHeader__title', null, 353, null, 24],
-  ['stepper card',   '.qtyStepper',                       22, 404, 349,  80],
-  ['minus',          '.qtyStepper__step:first-child',     34, 416,  56,  56],
-  ['plus',           '.qtyStepper__step:last-child',     303, 416,  56,  56],
-  ['"Measurement"',  '.measurement__title',               22, 508, null, 20],
-  ['list card',      '.measurement__list',                22, 536, 349, 278],
-  ['row Each',       '.measurement__row:nth-child(1)',    38, 536, 317,  56],
-  ['row Pack',       '.measurement__row:nth-child(2)',    38, 592, 317,  56],
-  ['row Carton',     '.measurement__row:nth-child(3)',    38, 648, 317,  56],
-  ['row Box',        '.measurement__row:nth-child(4)',    38, 704, 317,  56],
-  ['label Each',     '.measurement__row:nth-child(1) .measurement__label', 38, 552, null, 24],
-  ['check',          '.measurement__row:nth-child(1) .measurement__check', 335, 554, 20, 20],
+  ['sheet',          '.quantitySheet',                    'S',   6, 335, 381, 511],
+  ['header',         '.quantitySheet .modalHeader',       'S',   6, 335, 381,  64],
+  ['close',          '.quantitySheet .closeButton',       'L',  22, 347,  40,  40],
+  ['confirm',        '.modalHeader__confirm',             'R', 331, 347,  40,  40],
+  ['title',          '.quantitySheet .modalHeader__title', 'C', null, 353, null, 24],
+  ['stepper card',   '.qtyStepper',                       'S',  22, 404, 349,  80],
+  ['minus',          '.qtyStepper__step:first-child',     'L',  34, 416,  56,  56],
+  ['plus',           '.qtyStepper__step:last-child',      'R', 303, 416,  56,  56],
+  ['"Measurement"',  '.measurement__title',               'L',  22, 508, null, 20],
+  ['list card',      '.measurement__list',                'S',  22, 536, 349, 278],
+  ['row Each',       '.measurement__row:nth-child(1)',    'S',  38, 536, 317,  56],
+  ['row Pack',       '.measurement__row:nth-child(2)',    'S',  38, 592, 317,  56],
+  ['row Carton',     '.measurement__row:nth-child(3)',    'S',  38, 648, 317,  56],
+  ['row Box',        '.measurement__row:nth-child(4)',    'S',  38, 704, 317,  56],
+  ['label Each',     '.measurement__row:nth-child(1) .measurement__label', 'L', 38, 552, null, 24],
+  ['check',          '.measurement__row:nth-child(1) .measurement__check', 'R', 335, 554, 20, 20],
 ];
+const dx = { L: INSET, R: -INSET, S: INSET, C: 0 };
 
 const browser = await pw.chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
 const page = await browser.newPage({ viewport: { width: 1200, height: 1100 } });
@@ -55,12 +61,12 @@ const line = (label, axis, target, actual) => {
   console.log(`  ${label.padEnd(15)} ${axis.padEnd(7)} ${String(target).padStart(6)}  ${actual.toFixed(2).padStart(8)}  ${diff.toFixed(2).padStart(6)}${off ? '  <-- OFF' : ''}`);
 };
 console.log('88:11532');
-T.forEach(([label, sel, x, y, w, h], i) => {
+T.forEach(([label, sel, anchor, x, y, w, h], i) => {
   const m = res.rows[i];
   if (!m) { fails++; console.log(`  ${label.padEnd(15)} MISSING ${sel}`); return; }
-  if (x !== null) line(label, 'x', x, m.x);
+  if (x !== null) line(label, 'x', x + dx[anchor], m.x);
   if (y !== null) line(label, 'y', y + SHIFT, m.y);
-  if (w !== null) line(label, 'w', w, m.w);
+  if (w !== null) line(label, 'w', anchor === 'S' ? w - 2 * INSET : w, m.w);
   if (h !== null) line(label, 'h', h, m.h);
 });
 // Centred things are compared by their centre: the text width is Figma's integer.
@@ -68,7 +74,7 @@ line('title', 'centre', 196.5, res.titleCentre);
 line('count "10 ea"', 'centre', 196.5, res.countCentre);
 line('count "10 ea"', 'y', 430 + SHIFT, res.countY);
 // "10 ea" 292+35 on the chosen row; "40 ea" 318+37, "80 ea" 318+37, "160 ea" 312+43.
-res.each.forEach((r, i) => line(`equivalent ${i + 1}`, 'right', i === 0 ? 327 : 355, r));
+res.each.forEach((r, i) => line(`equivalent ${i + 1}`, 'right', (i === 0 ? 327 : 355) - INSET, r));
 
 await browser.close();
 console.log(`\n${fails} measurement(s) outside 0.5px`);
