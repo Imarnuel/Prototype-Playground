@@ -94,7 +94,7 @@ export function App() {
       group: 'States',
       onSelect: () => {
         // Drawn from the catalogue, so the lines, totals and stock ceilings are real.
-        const picks = ['bev-cola', 'noo-multipack', 'cok-oil', 'bev-malt']
+        const picks = ['acc-socks', 'tops-tee', 'btm-jeans', 'acc-beanie']
           .map((id) => PRODUCTS.find((p) => p.id === id)!);
         setLines(picks.reduce<readonly CartLine[]>((acc, p) => addToCart(acc, p), []));
         setCartOpen(true);
@@ -106,24 +106,24 @@ export function App() {
       onSelect: () => {
         // A discounted line, so the breakdown's Discount row is on show too.
         setLines([
-          { productId: 'bev-cola', unitId: 'each', count: 1, discount: { kind: 'percent', percent: 15 } },
-          { productId: 'noo-multipack', unitId: 'each', count: 2 },
+          { productId: 'acc-socks', unitId: 'each', count: 1, discount: { kind: 'percent', percent: 15 } },
+          { productId: 'tops-tee', unitId: 'each', count: 2 },
         ]);
         setCartOpen(true); setTotalOpen(true);
       },
     },
     ...([
-      ['Quantity sheet', 'bev-cola', 10, false],
-      ['Quantity sheet: editing', 'bev-cola', 10, true],
-      // 2 malt drinks is 2 each but 12 in packs of 6, past the 3 on the shelf.
-      ['Quantity sheet: unit over stock', 'bev-malt', 2, false],
+      ['Quantity sheet', 'acc-socks', 10, false],
+      ['Quantity sheet: editing', 'acc-socks', 10, true],
+      // 2 beanies is 2 each but 12 in packs of 6, past the 3 on the shelf.
+      ['Quantity sheet: unit over stock', 'acc-beanie', 2, false],
     ] as const).map(([label, productId, count, editing]): DevToolbarItem => ({
       label,
       group: 'States',
       onSelect: () => {
         // The frame's own state: 10 single units, every pack size available.
         const line: CartLine = { productId, unitId: 'each', count };
-        setLines([line, { productId: 'noo-multipack', unitId: 'each', count: 2 }]);
+        setLines([line, { productId: 'tops-tee', unitId: 'each', count: 2 }]);
         setCartOpen(true);
         openQuantity(line, editing);
       },
@@ -135,8 +135,8 @@ export function App() {
       label,
       group: 'States',
       onSelect: () => {
-        const line: CartLine = { productId: 'bev-cola', unitId: 'each', count: 1, ...(discount ? { discount } : {}) };
-        setLines([line, { productId: 'noo-multipack', unitId: 'each', count: 2 }]);
+        const line: CartLine = { productId: 'acc-socks', unitId: 'each', count: 1, ...(discount ? { discount } : {}) };
+        setLines([line, { productId: 'tops-tee', unitId: 'each', count: 2 }]);
         setCartOpen(true);
         openDetails(line);
       },

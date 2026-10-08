@@ -66,11 +66,11 @@ check('a fractional quantity is rejected', threw);
 // own arithmetic only proves the verifier agrees with itself.
 const byId = (id) => PRODUCTS.find((p) => p.id === id);
 const basket = [
-  { product: byId('bev-cola'), unitId: 'each', count: 6 },
-  { product: byId('noo-multipack'), unitId: 'each', count: 1 },
-  { product: byId('cok-oil'), unitId: 'each', count: 1 },
-  { product: byId('hse-tissue'), unitId: 'each', count: 2 },
-  { product: byId('brk-milkpowder'), unitId: 'each', count: 1 },
+  { product: byId('acc-socks'), unitId: 'each', count: 6 },
+  { product: byId('tops-tee'), unitId: 'each', count: 1 },
+  { product: byId('btm-jeans'), unitId: 'each', count: 1 },
+  { product: byId('acc-cap'), unitId: 'each', count: 2 },
+  { product: byId('tops-hoodie'), unitId: 'each', count: 1 },
 ];
 const t = orderTotals(basket);
 const grosses = basket.map(lineGrossMinor);
@@ -95,9 +95,9 @@ const multiUnit = PRODUCTS.filter((p) => p.units.length > 1);
 const singleUnit = PRODUCTS.filter((p) => p.units.length === 1);
 check('a multi-unit product exists (Measurement list)', multiUnit.length > 0, `${multiUnit.length} products`);
 check('a single-unit product exists (no Measurement list)', singleUnit.length > 0, singleUnit.map((p) => p.id).join(', '));
-const cola = byId('bev-cola');
-check('Zivra Cola carries the Quantity frame\'s own 1/4/8/16',
-  cola.units.map((u) => u.each).join('/') === '1/4/8/16', cola.units.map((u) => u.each).join('/'));
+const socks = byId('acc-socks');
+check('Crew Socks carry the Quantity frame\'s own 1/4/8/16',
+  socks.units.map((u) => u.each).join('/') === '1/4/8/16', socks.units.map((u) => u.each).join('/'));
 check('a unit the shelf cannot supply even once is reachable',
   PRODUCTS.some((p) => p.stock > 0 && p.units.some((u) => maxCount(p, u.id) === 0)),
   PRODUCTS.filter((p) => p.stock > 0 && p.units.some((u) => maxCount(p, u.id) === 0)).map((p) => p.id).join(', '));
@@ -110,7 +110,7 @@ for (const p of PRODUCTS) for (const u of p.units) for (let c = 1; c <= maxCount
 }
 check('every product x unit x sellable count is whole Naira and within stock', unitBad === 0, `${unitCases} cases`);
 let unknownUnit = false;
-try { unitFor(byId('bby-wipes'), 'carton'); } catch { unknownUnit = true; }
+try { unitFor(byId('bag-tote'), 'carton'); } catch { unknownUnit = true; }
 check('asking for a unit a product is not sold in is refused', unknownUnit);
 
 // --- Discounts ----------------------------------------------------------------
@@ -131,23 +131,24 @@ for (const p of PRODUCTS) for (const u of p.units) for (const c of [1, 2, 3, 7])
 }
 check('every percent discount matches the exact integer reference', pctBad === 0,
   `${pctCases} cases; a float implementation would have got ${pctFloatWrong} wrong`);
-const n350 = { product: byId('noo-single'), unitId: 'each', count: 1, discount: { kind: 'percent', percent: 69 } };
+// Arithmetic, not catalogue data: a N350 item exists only to hit the float's miss.
+const n350 = { product: { ...socks, priceMinor: 35_000 }, unitId: 'each', count: 1, discount: { kind: 'percent', percent: 69 } };
 check('69% of N350 is N242, the case floats get wrong', lineDiscountMinor(n350) === 242 * M, formatPrice(lineDiscountMinor(n350)));
-const over = { product: cola, unitId: 'each', count: 1, discount: { kind: 'amount', minor: 100_000 } };
+const over = { product: socks, unitId: 'each', count: 1, discount: { kind: 'amount', minor: 100_000 } };
 check('an amount discount larger than the line clamps to the line', lineDiscountMinor(over) === lineGrossMinor(over)
   && lineGrossMinor(over) - lineDiscountMinor(over) === 0, formatPrice(lineDiscountMinor(over)));
 let badOverride = false;
-try { lineGrossMinor({ product: cola, unitId: 'each', count: 1, priceOverrideMinor: 10_050 }); } catch { badOverride = true; }
+try { lineGrossMinor({ product: socks, unitId: 'each', count: 1, priceOverrideMinor: 10_050 }); } catch { badOverride = true; }
 check('a price override that is not whole Naira is refused', badOverride);
 
 // --- Tax ----------------------------------------------------------------------
-// The walk's case: standard-rated, odd-Naira net. Cola N500 less 15% = N425 net,
-// 7.5% = 3187.5 kobo -> 3188 kobo on the line -> N32 on the order.
-const colaLine = { product: cola, unitId: 'each', count: 1, discount: { kind: 'percent', percent: 15 } };
-const colaT = orderTotals([colaLine]);
-check('Cola N500 less 15%: discount N75, tax on the NET 3188 kobo, order tax N32, total N457',
-  lineDiscountMinor(colaLine) === 7_500 && lineTaxMinor(colaLine) === 3_188 && colaT.tax === 3_200 && colaT.total === 45_700,
-  `${formatPrice(colaT.subtotal)} - ${formatPrice(colaT.discount)} + ${formatPrice(colaT.tax)} = ${formatPrice(colaT.total)}`);
+// The walk's case, rounding half-up twice. Socks N950 less 15% = N142.50 -> N143 off,
+// N807 net; 7.5% of that = 6052.5 kobo -> 6053 on the line -> N61 on the order.
+const socksLine = { product: socks, unitId: 'each', count: 1, discount: { kind: 'percent', percent: 15 } };
+const socksT = orderTotals([socksLine]);
+check('Socks N950 less 15%: discount N143, tax on the NET 6053 kobo, order tax N61, total N868',
+  lineDiscountMinor(socksLine) === 14_300 && lineTaxMinor(socksLine) === 6_053 && socksT.tax === 6_100 && socksT.total === 86_800,
+  `${formatPrice(socksT.subtotal)} - ${formatPrice(socksT.discount)} + ${formatPrice(socksT.tax)} = ${formatPrice(socksT.total)}`);
 let vatDisagree = 0;
 for (let net = 0; net <= 5_000_000; net += M) {
   if (Math.floor((net * 750 + 5_000) / 10_000) !== Math.round(net * VAT_STANDARD_RATE)) vatDisagree++;
@@ -206,10 +207,9 @@ check('signed prices never print "N-" or a negative zero', signed.every((x) => !
   signed.join('  '));
 
 // --- Demo state coverage (CLAUDE.md sections 4 and 6) ---
-const noPhoto = PRODUCTS.filter((p) => p.image === null);
 const oos = PRODUCTS.filter((p) => p.stock === 0);
-check('a product with no image exists (fallback state)', noPhoto.length > 0,
-  noPhoto.map((p) => p.id).join(', '));
+check('every product has a photo', PRODUCTS.every((p) => p.image !== null),
+  PRODUCTS.filter((p) => p.image === null).map((p) => p.id).join(', '));
 check('an out-of-stock product exists', oos.length > 0, oos.map((p) => p.id).join(', '));
 check('a discounted product exists', discounted.length > 0, discounted.map((p) => p.id).join(', '));
 // The Sales Point card renders three stock states. All three must be reachable from
@@ -224,9 +224,9 @@ check('a long name exists to force truncation', longest.name.length >= 45,
   `${longest.name.length} chars: "${longest.name}"`);
 
 const single = CATEGORIES.filter((c) => c.count === 1);
-const big = CATEGORIES.filter((c) => c.count >= 12);
+const big = CATEGORIES.filter((c) => c.count >= 3);
 check('a single-item category exists', single.length > 0, single.map((c) => c.name).join(', '));
-check('a category with 12+ items exists (grid wrap)', big.length > 0,
+check('a category with 3+ items exists (its grid wraps)', big.length > 0,
   big.map((c) => `${c.name}:${c.count}`).join(', '));
 check('every category has at least one product', CATEGORIES.every((c) => c.count > 0),
   CATEGORIES.map((c) => `${c.name}:${c.count}`).join(' '));
@@ -239,11 +239,7 @@ const digits = PRODUCTS.map((p) => formatPrice(p.priceMinor).replace(/\D/g, '').
 check('price widths span at least 3 digit-counts', new Set(digits).size >= 3,
   `${Math.min(...digits)} to ${Math.max(...digits)} digits — ${formatPrice(Math.min(...PRODUCTS.map((p) => p.priceMinor)))} to ${formatPrice(Math.max(...PRODUCTS.map((p) => p.priceMinor)))}`);
 
-// Two sizes of the same product must stay distinguishable on a receipt line.
-const sameName = PRODUCTS.filter((p) => p.name === 'Still Water');
-check('same product in two pack sizes stays distinct',
-  sameName.length === 2 && new Set(sameName.map(fullName)).size === 2,
-  sameName.map(fullName).join(' | '));
+check('full names are unique, so receipt lines stay distinct', new Set(PRODUCTS.map(fullName)).size === PRODUCTS.length);
 check('barcode lookup resolves', findByBarcode(PRODUCTS[0].barcode)?.id === PRODUCTS[0].id);
 
 // --- The generated Figma sheet must still agree with this file ---

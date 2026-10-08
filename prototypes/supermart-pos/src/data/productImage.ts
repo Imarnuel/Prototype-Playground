@@ -17,18 +17,7 @@ const PHOTOS = import.meta.glob('../../assets/products/*.webp', {
   eager: true, query: '?url', import: 'default',
 }) as Record<string, string>;
 
-/**
- * Drawn stand-ins, one per product, generated from the catalogue by
- * scripts/gen-packshots.mjs. They are NOT photography and are not presented as it.
- *
- * A real photo always wins: drop one into assets/products/ and that product stops
- * using its packshot, with nothing to delete and no per-product switch to flip.
- */
-const PACKSHOTS = import.meta.glob('../../assets/packshots/*.svg', {
-  eager: true, query: '?url', import: 'default',
-}) as Record<string, string>;
-
+/** A product with no photo renders the card's neutral fill — the no-photo state. */
 export function productImage(p: Product): string | undefined {
-  return (p.image ? PHOTOS[`../../assets/products/${p.image}`] : undefined)
-    ?? PACKSHOTS[`../../assets/packshots/${p.id}.svg`];
+  return p.image ? PHOTOS[`../../assets/products/${p.image}`] : undefined;
 }

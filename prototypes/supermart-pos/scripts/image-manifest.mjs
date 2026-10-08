@@ -21,15 +21,3 @@ if (missing.length) {
 }
 const extra = [...have].filter((f) => !needed.some((p) => p.image === f));
 if (extra.length) console.log(`\nunreferenced files in assets/products: ${extra.join(', ')}`);
-
-/* "42 missing" would read as 42 blank tiles. It is not: every product without a photo
-   falls back to a generated packshot, so the grid is demoable now and a real photo
-   simply takes over per product when one lands. Report the coverage so the count
-   above cannot be mistaken for a broken grid. */
-const packDir = path.join(import.meta.dirname, '..', 'assets', 'packshots');
-const packs = fs.existsSync(packDir) ? fs.readdirSync(packDir).filter((f) => f.endsWith('.svg')) : [];
-const covered = PRODUCTS.filter((p) => p.image !== null && packs.includes(`${p.id}.svg`)).length;
-const uncovered = PRODUCTS.filter((p) => p.image !== null && !packs.includes(`${p.id}.svg`));
-console.log(`\npackshot coverage: ${covered}/${PRODUCTS.filter((p) => p.image !== null).length} photoless products have a generated packshot`);
-if (uncovered.length) console.log(`NO image at all: ${uncovered.map((p) => p.id).join(', ')} — run npm run images:packshots`);
-

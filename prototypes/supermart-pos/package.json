@@ -16,7 +16,6 @@
     "tokens:verify": "node --experimental-strip-types scripts/verify-tokens.mjs",
     "motion:sample": "node scripts/sample-motion.mjs",
     "build:hosted": "node scripts/build-hosted.mjs",
-    "images:packshots": "node --experimental-strip-types scripts/gen-packshots.mjs",
     "figma:audit": "node scripts/figma-audit.mjs",
     "type:audit": "node scripts/type-audit.mjs"
   },

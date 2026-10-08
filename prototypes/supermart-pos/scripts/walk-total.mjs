@@ -59,7 +59,7 @@ check('the lines add up to the Subtotal on screen', sum === money(s.rows.Subtota
 check('no discount, no Discount row', !('Discount' in s.rows), Object.keys(s.rows).join(', '));
 check('Subtotal + Tax = Total, on screen', money(s.rows.Subtotal) + money(s.rows.Tax) === money(s.total),
   `${s.rows.Subtotal} + ${s.rows.Tax} = ${s.total}`);
-const fill = ['bev-cola', 'noo-multipack', 'cok-oil', 'bev-malt'].map((id) => ({
+const fill = ['acc-socks', 'tops-tee', 'btm-jeans', 'acc-beanie'].map((id) => ({
   product: cat.PRODUCTS.find((p) => p.id === id), unitId: 'each', count: 1,
 }));
 const ref = cat.orderTotals(fill);
@@ -77,14 +77,15 @@ const clearance = () => page.evaluate(async () => {
 const openGap = await clearance();
 check('open: the last line scrolls clear of the panel', openGap >= 0, `${openGap.toFixed(1)}px above it`);
 
-// --- The walk's discount case: Cola N500 less 15% -----------------------------
+// --- The walk's discount case: Socks N950 less 15%, with two tees --------------
 await pick(page, 'Cart: total expanded');
 s = await read(page);
-check('a discounted order shows the Discount row, signed', s.rows.Discount === '−₦75', s.rows.Discount);
-check('Cola less 15% with two noodle packs: Subtotal - Discount + Tax = Total',
+check('a discounted order shows the Discount row, signed', s.rows.Discount === '−₦143', s.rows.Discount);
+check('Socks less 15% with two tees: Subtotal - Discount + Tax = Total',
   money(s.rows.Subtotal) + money(s.rows.Discount) + money(s.rows.Tax) === money(s.total),
   `${s.rows.Subtotal} ${s.rows.Discount} + ${s.rows.Tax} = ${s.total}`);
-check('VAT is on the cola\'s NET (N425 -> N32); the noodles are zero-rated', s.rows.Tax === '₦32', s.rows.Tax);
+// VAT on the socks' NET (N807 -> 6053 kobo) plus the tees' 127,500 kobo, rounded once.
+check('VAT is on the NET, rounded once for the order: N1,336', s.rows.Tax === '₦1,336', s.rows.Tax);
 
 // --- Motion: both directions, over several frames, buttons pinned -------------
 await pick(page, 'Cart: fill with 4 lines');

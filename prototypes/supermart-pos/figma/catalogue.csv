@@ -1,44 +1,11 @@
 brand,name,size,fullName,category,price,wasPrice,barcode,stock,status,image,id
-Zivra,Cola,50cl PET,Zivra Cola 50cl PET,Beverages,₦500,,6151000000010,180,In stock,cola.webp,bev-cola
-Zivra,Lemon-Lime Soda,50cl PET,Zivra Lemon-Lime Soda 50cl PET,Beverages,₦500,,6151000000027,68,In stock,lemonlime.webp,bev-lemonlime
-Zivra,Orange Soda,50cl PET,Zivra Orange Soda 50cl PET,Beverages,₦500,,6151000000034,61,In stock,orangesoda.webp,bev-orangesoda
-Zivra,Iced Tea Lemon,50cl PET,Zivra Iced Tea Lemon 50cl PET,Beverages,₦800,,6151000000041,44,In stock,icedtea.webp,bev-icedtea
-Zivra,Energy Drink,25cl Can,Zivra Energy Drink 25cl Can,Beverages,₦900,,6151000000058,35,In stock,energy.webp,bev-energy
-Freshvale,Still Water,75cl,Freshvale Still Water 75cl,Beverages,₦300,,6151000000065,96,In stock,water75.webp,bev-water75
-Freshvale,Still Water,1.5L,Freshvale Still Water 1.5L,Beverages,₦600,,6151000000072,52,In stock,water15.webp,bev-water15
-Freshvale,Sparkling Water,50cl,Freshvale Sparkling Water 50cl,Beverages,₦700,,6151000000089,38,In stock,sparkling.webp,bev-sparkling
-Bluewell,Orange Juice,1L Carton,Bluewell Orange Juice 1L Carton,Beverages,"₦2,500",,6151000000096,23,In stock,orangejuice.webp,bev-orangejuice
-Bluewell,Pineapple Juice,1L Carton,Bluewell Pineapple Juice 1L Carton,Beverages,"₦2,500",,6151000000102,19,In stock,pinejuice.webp,bev-pinejuice
-Bluewell,Apple Juice,1L Carton,Bluewell Apple Juice 1L Carton,Beverages,"₦2,500",,6151000000119,0,Out of stock,applejuice.webp,bev-applejuice
-Koloma,Malt Drink,33cl Can,Koloma Malt Drink 33cl Can,Beverages,₦700,,6151000000126,3,In stock,malt.webp,bev-malt
-Koloma,Potato Crisps Salted,50g,Koloma Potato Crisps Salted 50g,Snacks & Confectionery,₦700,,6152000000017,82,In stock,crisps.webp,snk-crisps
-Koloma,Plantain Chips,100g,Koloma Plantain Chips 100g,Snacks & Confectionery,"₦1,000",,6152000000024,67,In stock,plantain.webp,snk-plantain
-Koloma,Dark Chocolate 70%,80g,Koloma Dark Chocolate 70% 80g,Snacks & Confectionery,"₦3,500",,6152000000031,1,In stock,choc.webp,snk-choc
-Bluewell,Digestive Biscuits,250g,Bluewell Digestive Biscuits 250g,Snacks & Confectionery,"₦2,200",,6152000000048,41,In stock,digestive.webp,snk-digestive
-Koloma,Salted Peanuts,150g,Koloma Salted Peanuts 150g,Snacks & Confectionery,"₦1,500",,6152000000055,56,In stock,peanuts.webp,snk-peanuts
-Bluewell,Corn Flakes,500g,Bluewell Corn Flakes 500g,Breakfast,"₦4,800",,6153000000014,26,In stock,cornflakes.webp,brk-cornflakes
-Bluewell,Rolled Oats,1kg,Bluewell Rolled Oats 1kg,Breakfast,"₦5,200",,6153000000021,21,In stock,oats.webp,brk-oats
-Bluewell,Full Cream Milk Powder,900g Tin,Bluewell Full Cream Milk Powder 900g Tin,Breakfast,"₦11,500",,6153000000038,14,In stock,milkpowder.webp,brk-milkpowder
-Bluewell,Chocolate Malt Drink Powder,400g Tin,Bluewell Chocolate Malt Drink Powder 400g Tin,Breakfast,"₦4,200",,6153000000045,29,In stock,maltpowder.webp,brk-maltpowder
-Freshvale,Tea Bags,50 bags,Freshvale Tea Bags 50 bags,Breakfast,"₦2,600",,6153000000052,33,In stock,teabags.webp,brk-teabags
-Koloma,Instant Noodles Chicken,70g,Koloma Instant Noodles Chicken 70g,Noodles & Pasta,₦350,,6154000000011,120,In stock,single.webp,noo-single
-Koloma,Instant Noodles,10-pack,Koloma Instant Noodles 10-pack,Noodles & Pasta,"₦3,200",,6154000000028,37,In stock,multipack.webp,noo-multipack
-Palmrise,Spaghetti,500g,Palmrise Spaghetti 500g,Noodles & Pasta,"₦1,400",,6154000000035,52,In stock,spaghetti.webp,noo-spaghetti
-Palmrise,Macaroni,400g,Palmrise Macaroni 400g,Noodles & Pasta,"₦1,600",,6154000000042,44,In stock,macaroni.webp,noo-macaroni
-Palmrise,Vegetable Oil,3L Bottle,Palmrise Vegetable Oil 3L Bottle,Cooking & Baking,"₦11,000","₦12,500",6155000000018,17,Offer,oil.webp,cok-oil
-Palmrise,Tomato Paste,400g Tin,Palmrise Tomato Paste 400g Tin,Cooking & Baking,"₦1,800",,6155000000025,64,In stock,paste.webp,cok-paste
-Freshvale,All-Purpose Flour,1kg,Freshvale All-Purpose Flour 1kg,Cooking & Baking,"₦2,200",,6155000000032,29,In stock,flour.webp,cok-flour
-Freshvale,Granulated Sugar,1kg,Freshvale Granulated Sugar 1kg,Cooking & Baking,"₦2,200",,6155000000049,31,In stock,sugar.webp,cok-sugar
-Freshvale,Iodised Table Salt,500g,Freshvale Iodised Table Salt 500g,Cooking & Baking,₦500,,6155000000056,48,In stock,salt.webp,cok-salt
-Palmrise,Baked Beans in Tomato Sauce,400g Tin,Palmrise Baked Beans in Tomato Sauce 400g Tin,Canned & Jarred,"₦2,400",,6156000000015,38,In stock,beans.webp,can-beans
-Palmrise,Sardines in Tomato Sauce,125g Tin,Palmrise Sardines in Tomato Sauce 125g Tin,Canned & Jarred,"₦1,500",,6156000000022,72,In stock,sardines.webp,can-sardines
-Palmrise,Sweetcorn,340g Tin,Palmrise Sweetcorn 340g Tin,Canned & Jarred,"₦2,000",,6156000000039,26,In stock,,can-sweetcorn
-Bluewell,Mayonnaise,430ml Jar,Bluewell Mayonnaise 430ml Jar,Canned & Jarred,"₦3,800",,6156000000046,23,In stock,mayo.webp,can-mayo
-Verdane,Unscented Antibacterial Laundry Detergent Powder,900g,Verdane Unscented Antibacterial Laundry Detergent Powder 900g,Household & Cleaning,"₦4,200",,6157000000012,25,In stock,detergent.webp,hse-detergent
-Verdane,Dishwashing Liquid Lemon,500ml,Verdane Dishwashing Liquid Lemon 500ml,Household & Cleaning,"₦2,400",,6157000000029,39,In stock,dishliquid.webp,hse-dishliquid
-Freshvale,Toilet Tissue,4-pack,Freshvale Toilet Tissue 4-pack,Household & Cleaning,"₦3,000","₦3,600",6157000000036,58,Offer,tissue.webp,hse-tissue
-Verdane,Multi-Surface Bleach,750ml,Verdane Multi-Surface Bleach 750ml,Household & Cleaning,"₦2,200",,6157000000043,44,In stock,bleach.webp,hse-bleach
-Verdane,Toothpaste Fresh Mint,140g,Verdane Toothpaste Fresh Mint 140g,Personal Care,"₦2,800",,6158000000019,51,In stock,toothpaste.webp,per-toothpaste
-Verdane,Moisturising Bar Soap,175g,Verdane Moisturising Bar Soap 175g,Personal Care,"₦1,000",,6158000000026,88,In stock,soap.webp,per-soap
-Verdane,Anti-Dandruff Shampoo,400ml,Verdane Anti-Dandruff Shampoo 400ml,Personal Care,"₦7,500",,6158000000033,18,In stock,shampoo.webp,per-shampoo
-Tiny Steps,Baby Wipes,72 wipes,Tiny Steps Baby Wipes 72 wipes,Baby,"₦3,800",,6159000000016,31,In stock,wipes.webp,bby-wipes
+Freshvale,Organic Cotton Tee,M,Freshvale Organic Cotton Tee M,Tops,"₦8,500",,6153000000014,40,In stock,tee.webp,tops-tee
+Northline,Oxford Shirt,L,Northline Oxford Shirt L,Tops,"₦18,500",,6153000000021,22,In stock,oxford.webp,tops-oxford
+Kora,Fleece Hoodie,M,Kora Fleece Hoodie M,Tops,"₦26,000",,6153000000038,14,In stock,hoodie.webp,tops-hoodie
+Northline,Water-Repellent Lightweight Packable Rain Jacket,M,Northline Water-Repellent Lightweight Packable Rain Jacket M,Tops,"₦39,500",,6153000000045,9,In stock,rainjacket.webp,tops-rainjacket
+Freshvale,Slim Denim Jeans,32W,Freshvale Slim Denim Jeans 32W,Bottoms,"₦24,000","₦28,000",6153000000052,18,Offer,jeans.webp,btm-jeans
+Kora,Leather Sneakers,UK 9,Kora Leather Sneakers UK 9,Footwear,"₦45,000",,6153000000069,0,Out of stock,sneakers.webp,ftw-sneakers
+Freshvale,Crew Socks,One size,Freshvale Crew Socks One size,Accessories,₦950,,6153000000076,180,In stock,socks.webp,acc-socks
+Northline,Baseball Cap,One size,Northline Baseball Cap One size,Accessories,"₦7,500",,6153000000083,30,In stock,cap.webp,acc-cap
+Kora,Wool Beanie,One size,Kora Wool Beanie One size,Accessories,"₦6,000",,6153000000090,3,In stock,beanie.webp,acc-beanie
+Freshvale,Canvas Tote,One size,Freshvale Canvas Tote One size,Bags,"₦5,500",,6153000000106,25,In stock,tote.webp,bag-tote

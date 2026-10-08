@@ -12,7 +12,7 @@ await page.goto(`${BASE}?dev=1`, { waitUntil: 'networkidle' });
 await page.waitForSelector('.productCard');
 
 const juice = cat.PRODUCTS.find((p) => p.stock === 0);
-const malt = cat.PRODUCTS.find((p) => p.id === 'bev-malt');
+const low = cat.PRODUCTS.find((p) => p.id === 'acc-beanie');
 const tap = (name) => page.evaluate((n) => [...document.querySelectorAll('.productCard')]
   .find((c) => c.querySelector('.productCard__name').textContent === n).click(), name);
 const toast = () => page.evaluate(() => {
@@ -32,29 +32,29 @@ check('...and says why', t.open === 'on' && t.text === 'Out of stock', `"${t.tex
 check('...without the success check-circle', !t.icon);
 
 // --- At the shelf ceiling -----------------------------------------------------
-for (let i = 0; i < malt.stock; i++) { await tap(malt.name); await page.waitForTimeout(60); }
+for (let i = 0; i < low.stock; i++) { await tap(low.name); await page.waitForTimeout(60); }
 await page.evaluate(() => document.querySelector('.viewCart').click());
 await page.waitForTimeout(700);
-const maltQty = () => page.evaluate((n) => {
+const lowQty = () => page.evaluate((n) => {
   const l = [...document.querySelectorAll('.cartLine')].find((x) => x.querySelector('.cartLine__name').textContent === n);
   return l && { count: Number(l.querySelector('.qtyField__value span').textContent),
     unit: l.querySelectorAll('.qtyField__value span')[1].textContent,
     plusDisabled: l.querySelectorAll('.qtyField__step')[1].disabled };
-}, malt.name);
-let q = await maltQty();
-check(`taps up to the shelf (${malt.stock}) all land`, q?.count === malt.stock, JSON.stringify(q));
-check('the stepper shows the unit abbreviation from the catalogue', q?.unit === malt.units[0].abbrev, q?.unit);
+}, low.name);
+let q = await lowQty();
+check(`taps up to the shelf (${low.stock}) all land`, q?.count === low.stock, JSON.stringify(q));
+check('the stepper shows the unit abbreviation from the catalogue', q?.unit === low.units[0].abbrev, q?.unit);
 check('the line\'s plus is disabled at the ceiling', q?.plusDisabled === true);
 await page.evaluate(() => document.querySelector('[aria-label="Close order preview"]').click());
 await page.waitForTimeout(700);
-await tap(malt.name);
+await tap(low.name);
 await page.waitForTimeout(400);
 t = await toast();
-check('one more tap past the shelf says how many are left', t.text === `Only ${malt.stock} ${malt.units[0].abbrev} left`, `"${t.text}"`);
+check('one more tap past the shelf says how many are left', t.text === `Only ${low.stock} ${low.units[0].abbrev} left`, `"${t.text}"`);
 await page.evaluate(() => document.querySelector('.viewCart').click());
 await page.waitForTimeout(700);
-q = await maltQty();
-check('...and the line is unchanged', q?.count === malt.stock, `count ${q?.count}`);
+q = await lowQty();
+check('...and the line is unchanged', q?.count === low.stock, `count ${q?.count}`);
 
 // --- Exit keeps its text ------------------------------------------------------
 await page.waitForFunction(() => document.querySelector('.toast').dataset.open === 'off', null, { timeout: 5000 });
@@ -68,9 +68,9 @@ check('the toast fades out with its message still in it', mid.length > 0 && mid.
 // Second refusal 2s into a 2.6s toast: it must still be up at 3s, and gone by 5.5s.
 await page.evaluate(() => document.querySelector('[aria-label="Close order preview"]').click());
 await page.waitForTimeout(700);
-await tap(malt.name);
+await tap(low.name);
 await page.waitForTimeout(2000);
-await tap(malt.name);
+await tap(low.name);
 await page.waitForTimeout(1000);
 const at3 = (await toast()).open;
 await page.waitForTimeout(2500);

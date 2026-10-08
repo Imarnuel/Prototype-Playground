@@ -57,10 +57,10 @@ const frameScroll = (page) => page.evaluate(() => [...document.querySelectorAll(
 // --- Opened from the Cart line's quantity ------------------------------------
 let page = await open();
 await pick(page, 'Cart: fill with 4 lines');
-const before = await line(page, 'Cola');
+const before = await line(page, 'Crew Socks');
 // The keyboard path — focus, then Enter — since that is where focus return matters.
 // A programmatic click() moves no focus, so there would be nothing to return to.
-await page.evaluate(() => [...document.querySelectorAll('.cartLine')].find((l) => l.querySelector('.cartLine__name').textContent === 'Cola')
+await page.evaluate(() => [...document.querySelectorAll('.cartLine')].find((l) => l.querySelector('.cartLine__name').textContent === 'Crew Socks')
   .querySelector('button.qtyField__value').focus());
 await page.keyboard.press('Enter');
 await page.waitForTimeout(800);
@@ -76,12 +76,12 @@ await click(page, '.qtyStepper__step:last-child');
 await click(page, '.qtyStepper__step:last-child');
 s = await sheet(page);
 check('the stepper changes the draft', s.count === String(before.count + 2), s.count);
-check('...and not the cart', (await line(page, 'Cola')).count === before.count);
+check('...and not the cart', (await line(page, 'Crew Socks')).count === before.count);
 await page.evaluate(() => document.querySelector('.blanket:has(.quantitySheet)').click());
 await page.waitForTimeout(500);
 check('a tap on the blanket does not throw the draft away', (await sheet(page)).open === 'on' && (await sheet(page)).count === String(before.count + 2));
 await click(page, '.quantitySheet .closeButton', 700);
-check('the close discards it: the line is unchanged', JSON.stringify(await line(page, 'Cola')) === JSON.stringify(before), JSON.stringify(await line(page, 'Cola')));
+check('the close discards it: the line is unchanged', JSON.stringify(await line(page, 'Crew Socks')) === JSON.stringify(before), JSON.stringify(await line(page, 'Crew Socks')));
 check('...focus returns to the quantity that opened it', (await page.evaluate(() => document.activeElement?.className)) === 'qtyField__value');
 await page.keyboard.press('Enter');
 await page.waitForTimeout(800);
@@ -93,9 +93,9 @@ await click(page, '.qtyStepper__step:last-child');
 s = await sheet(page);
 check('choosing Pack moves the selection', s.checked.join() === 'pack');
 await click(page, '.modalHeader__confirm', 800);
-const after = await line(page, 'Cola');
+const after = await line(page, 'Crew Socks');
 check('the check commits: the line reads in packs', after.count === 2 && after.unit === 'pck', `${after.count} ${after.unit}`);
-check('...and is priced as 2 packs of 4 at N500', money(after.price) === 2 * 4 * 500, after.price);
+check('...and is priced as 2 packs of 4 at N950', money(after.price) === 2 * 4 * 950, after.price);
 await page.evaluate(() => document.querySelector('.orderTotal__toggle').click());
 await page.waitForTimeout(600);
 const totals = await page.evaluate(() => ({
@@ -125,7 +125,7 @@ const r1 = await type('1e2');
 check('"1e2" is refused, not read as 100', r1 === '10');
 check('"0" is refused', (await type('0')) === '10');
 check('"7" is taken', (await type('7')) === '7');
-check('"9999" is held to the shelf', (await type('9999')) === '180', 'Zivra Cola: 180 in stock');
+check('"9999" is held to the shelf', (await type('9999')) === '180', 'Crew Socks: 180 in stock');
 await click(page, '.qtyStepper__value', 300);
 await page.keyboard.press('Escape');
 await page.waitForTimeout(200);
@@ -135,7 +135,7 @@ await page.keyboard.press('Escape');
 await page.waitForTimeout(700);
 // Once its exit has finished the sheet unmounts, so "closed" is off OR gone.
 const closed = await sheet(page);
-check('a second Escape closes the sheet without committing', (closed === null || closed.open === 'off') && (await line(page, 'Cola')).count === 10);
+check('a second Escape closes the sheet without committing', (closed === null || closed.open === 'off') && (await line(page, 'Crew Socks')).count === 10);
 await page.close();
 
 // --- The editing state, presented directly ------------------------------------
@@ -149,8 +149,8 @@ await page.close();
 page = await open();
 await pick(page, 'Quantity sheet: unit over stock');
 s = await sheet(page);
-check('2 malt drinks in packs of 6 is past the 3 on the shelf: Pack and Carton refused',
-  s.disabled.join() === 'pack,carton', s.disabled.join());
+check('2 beanies in packs of 6 is past the 3 on the shelf: Pack refused',
+  s.disabled.join() === 'pack', s.disabled.join());
 await click(page, '[data-unit="pack"]');
 check('tapping a refused unit does not select it', (await sheet(page)).checked.join() === 'each');
 await page.evaluate(() => document.querySelector('[data-unit="each"]').focus());
@@ -163,7 +163,7 @@ await page.close();
 
 // --- A product sold only singly -----------------------------------------------
 page = await open();
-await page.evaluate(() => [...document.querySelectorAll('.productCard')].find((c) => c.querySelector('.productCard__name').textContent === 'Baby Wipes').click());
+await page.evaluate(() => [...document.querySelectorAll('.productCard')].find((c) => c.querySelector('.productCard__name').textContent === 'Canvas Tote').click());
 await page.evaluate(() => document.querySelector('.viewCart').click());
 await page.waitForTimeout(800);
 await page.evaluate(() => document.querySelector('button.qtyField__value').click());

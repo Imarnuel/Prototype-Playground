@@ -1,4 +1,4 @@
-# Freshvale Supermart POS — case study specifics
+# Freshvale POS — case study specifics
 
 Inherits the working agreement at the repo root. This file records only what is
 specific to this study.
@@ -56,26 +56,22 @@ republish it with `npm run build:hosted`.
 
 ## The store
 
-Freshvale Supermart — a **fictional** supermart selling **packaged goods only**.
+Freshvale — a **fictional** store selling **clothing and wearables**.
 
-Every brand in the catalogue is invented: Freshvale (own brand), Bluewell, Koloma,
-Palmrise, Tiny Steps, Verdane, Zivra. Nothing names a real product — a case study
-showing a real brand's packaging reads as work you weren't engaged for.
+It began as a packaged-goods supermart, and changed for the photography: no stock
+library is reachable from this environment's network, and image models put garbled
+text on every packaged-goods label. A garment has no label to garble, so one fixed
+prompt gives a library of shots that match (see "Product images"). The screens are
+unchanged; only the data and the pictures moved.
 
-### Packaged-only is a scope decision, not an omission
+Every brand is invented: Freshvale (house brand), Northline, Kora. Nothing names a
+real product.
 
-Nothing is loose, fresh or weighed. Two things follow from it:
-
-- **No scale, so no per-kilogram pricing.** A line quantity is always a whole count
-  of units, and `lineTotalMinor` throws on a fractional quantity rather than
-  rounding it into a total that cannot be reconciled.
-- **Every barcode carries the GS1 Nigeria manufacturer prefix `615`.** The in-store
-  `2x` range is for items a shop codes itself, which only applies to loose and
-  weighed goods, so it has no place here. A verification check asserts no item
-  drifts onto it.
-
-It also makes the photography tractable: packaged goods shoot consistently against
-a plain background, which a grid of loose produce does not.
+- **Every item is a counted unit with a printed barcode.** A line quantity is always a
+  whole count, and `lineTotalMinor` throws on a fractional one rather than rounding it
+  into a total that cannot be reconciled.
+- **Every barcode carries the GS1 Nigeria manufacturer prefix `615`**, never the
+  in-store `2x` range. A verification check asserts it.
 
 ## Catalogue
 
@@ -83,14 +79,14 @@ a plain background, which a grid of loose produce does not.
 both the prototype and the Figma frames. **Product names reach Figma by export, never
 by retyping** — see `figma/README.md`.
 
-- 43 products, 9 categories, 7 invented brands.
-- `brand`, `name` and `size` are **separate fields**. Packaged items are identified
-  by all three, and a POS card renders them as separate lines, so the pack size is
-  never baked into the name. A check asserts it never gets duplicated back in.
+- 10 products, 5 categories (Tops, Bottoms, Footwear, Accessories, Bags), 3 invented
+  brands. Ten, because each needs a generated photograph and this is a prototype.
+- `brand`, `name` and `size` are **separate fields**: the garment size ('M', '32W',
+  'UK 9', 'One size') is never baked into the name. A check asserts it.
 - Money is integer minor units (kobo). Never a float: 0.1 + 0.2 arithmetic on prices
   is how demo receipts stop reconciling.
 - Every product lists its **pack units** (`units`), Each first. Prices stay per single
-  unit; a pack's price is derived. Only Zivra Cola's 1/4/8/16 comes from a frame — the
+  unit; a pack's price is derived. Only Crew Socks' 1/4/8/16 comes from a frame — the
   rest, and the "ctn" / "box" abbreviations, are invented (BUILD-PLAN #64).
 
 ### Money
@@ -110,11 +106,10 @@ Nothing else does arithmetic on money.
 
 ### ASSUMPTION — currency and tax
 
-Naira, 7.5% VAT, basic food zero-rated. Chosen because "supermart" and this price
-range put the POS somewhere mixed tax classes are normal, which gives the receipt
-something real to show. **If this is wrong, say so** — `CURRENCY` and the
-`priceMinor` values are the only things that change, and no component reads a
-currency symbol directly.
+Naira, 7.5% VAT, every item standard-rated (clothing carries VAT). The money model
+still handles zero-rated lines and its verifier still proves them. **If this is wrong,
+say so** — `CURRENCY` and the `priceMinor` values are the only things that change, and
+no component reads a currency symbol directly.
 
 ### States deliberately reachable
 
@@ -122,16 +117,18 @@ Seeded so every state can be demoed without editing data (root agreement §4, §
 
 | State | Product |
 |---|---|
-| No photo (fallback) | Palmrise Sweetcorn 340g Tin — and, until photos exist, all 43 |
-| Out of stock | Bluewell Apple Juice 1L Carton |
-| Stock ceiling (3), and a pack the shelf can't fill once | Koloma Malt Drink — 3 in stock, sold in packs of 6 |
-| Sold singly only (no Measurement list) | Tiny Steps Baby Wipes |
-| Discounted | Palmrise Vegetable Oil 3L, Freshvale Toilet Tissue 4-pack |
-| Long name (truncation) | Unscented Antibacterial Laundry Detergent Powder — 48 chars |
-| Single-item category | Baby |
-| Category that wraps | Beverages — 12 items |
-| Price width range | ₦300 to ₦11,500 (3 to 5 digits) |
-| Same product, two pack sizes | Freshvale Still Water 75cl and 1.5L |
+| Out of stock | Kora Leather Sneakers |
+| Stock ceiling (3), and a pack the shelf can't fill once | Kora Wool Beanie — 3 in stock, sold in packs of 6 |
+| The Quantity frame's 1/4/8/16 | Freshvale Crew Socks — 180 in stock |
+| Sold singly only (no Measurement list) | Freshvale Canvas Tote |
+| Discounted | Freshvale Slim Denim Jeans, ₦24,000 (was ₦28,000) |
+| Long name (truncation) | Water-Repellent Lightweight Packable Rain Jacket — 48 chars |
+| Single-item category | Bottoms, Footwear, Bags |
+| Category that wraps | Tops — 4 items |
+| Price width range | ₦950 to ₦45,000 (3 to 5 digits) |
+
+The no-photo state is no longer seeded: every item has a photo. The card still falls
+back to its neutral fill if one is missing.
 
 ## Commands
 
@@ -146,8 +143,7 @@ npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json
 npm run tokens:verify      # the generated tokens still match the Figma dump
 npm run motion:sample      # transitions animate in BOTH directions (needs a server)
 npm run figma:audit        # 274 properties read off the Figma NODES vs computed style
-npm run images:manifest    # which photos are missing, and packshot coverage
-npm run images:packshots   # regenerate the placeholder packshots from catalogue.ts
+npm run images:manifest    # which photos are missing
 npm run images:optimise -- --box <css-px>   # --box MUST come from a measured frame
 npm run build:hosted       # publish-ready bundle for the hosted preview
 
@@ -166,14 +162,6 @@ entrance that never animates.
 
 ## Still open
 
-- **No product photography exists, and the grid runs on generated packshots.**
-  Counted in the Figma file: the whole 90-frame section holds **354 image fills but
-  only 10 distinct images**, and just four of those are grid photos — reused 109, 61,
-  60 and 59 times. All four are **real-brand stock** (a Fanta can, a Coca-Cola bottle,
-  a Sprite can, a Fanta bottle), under cards that all read "Fanta Orange 50cl, ₦1,000".
-  That is the placeholder set this study replaced, so it is not a source — and a stock
-  library is not one either, since the seven brands are invented and no photograph of
-  a Freshvale product exists. See "Product images" below.
 - `search-sm` carries a non-token stroke, and the filter button has no designed
   destination (BUILD-PLAN #50, #51).
 - **The Cart's title-bar trash clears the whole order in one tap** — no confirmation
@@ -186,59 +174,28 @@ entrance that never animates.
 
 ## Product images
 
-### Generated packshots — what the grid shows today
+Ten generated photographs, one per product, made with Figma's image generation
+(`gemini-3.1-flash-image`, billed to klakpad's team) from ONE prompt template, so the
+library matches — same backdrop, light, angle and margin:
 
-`scripts/gen-packshots.mjs` draws one SVG packshot per product into
-`assets/packshots/`, from `catalogue.ts`. They are **illustrations, not photography,
-and must never be presented as photography** — they are the designed stand-in that
-lets every other state of the grid be demoed truthfully.
+> E-commerce studio product photo of a {item}, {colour}, centred, front-facing, on a
+> seamless warm light-grey backdrop, soft diffused top light, subtle contact shadow,
+> no text, no logos, no labels, no model, square composition with generous margin
+> around the product.
 
-```bash
-npm run images:packshots   # regenerate after editing catalogue.ts
-```
-
-- **Vessel comes from the data.** `Tin`, `Can`, `Carton`, `Jar`, `Bottle`, `PET`,
-  `-pack`, `bags` and `wipes` are all explicit in each product's `size`, so the
-  silhouette is derived, not assigned. Category decides only where `size` is silent.
-  Current spread: bottle 11, box 8, pouch 6, tin 5, pack 4, carton 3, can 2, tube 2,
-  jar 1.
-- **Colour is category hue + brand shift + a stable hash of the product id.** All 42
-  files are distinct — checked by checksum, because category and brand alone collapse
-  four 50cl beverages from one brand into one identical tile, which is the exact
-  failure this study removed from the design.
-- **INTERPRETED: packshot colour encodes category, not flavour.** An orange soda is
-  drawn blue because it is a beverage. That makes a scrolling grid legible by
-  category, at the cost of looking wrong next to the product name. If per-product
-  colour is wanted instead, `CATEGORY_HUE` is the one thing to change.
-- **NOT DESIGN VALUES.** Every colour in that script is invented for the placeholder
-  system. There is no Figma source for packaging colour — the design's packaging is
-  photographed, not specified — so none of it is in `tokens.ts` and none of it is a
-  token.
-- **Composed for the card's scrim**, which is the design's own value (transparent to
-  50%, 40% black at 64.6%, 80% at the bottom). A product standing on the floor of the
-  tile loses its lower half to it, so each packshot is a lit backdrop with the product
-  filling the frame, the way the design's own photographs sit under it.
-- **`image: null` is respected.** Palmrise Sweetcorn gets no packshot, so the no-photo
-  fallback stays reachable exactly as the states table above promises. Verified in a
-  production build: 43 cards, 42 with an image, Sweetcorn alone on the neutral fill.
-
-### Real photography — how to take over
-
-A real photo always wins, per product, with nothing to delete and no switch to flip.
-43 shots of packaged goods against a plain background, one per `image` field in
-`catalogue.ts`. Drop the originals in `assets/products-src/` (gitignored) and run:
+They are **generated, not photographed**, and must not be presented as photography of
+real stock. The originals land in `assets/products-src/` (gitignored) and go through:
 
 ```bash
 npm run images:optimise -- --box 160
 ```
 
-**160 is measured, not assumed**: `.productCard__image` renders 160x108 on all 43
-cards, and the design's own "Product Image" frame is 160x108. The pipeline sniffs the
-real format, resizes against a square box with `fit: 'outside'` (because
-`object-fit: cover` is driven by the short side), writes WebP q80 with metadata
-stripped, and reports mean absolute pixel error at display size so a sizing mistake
-is a number rather than an impression.
+**160 is measured, not assumed**: `.productCard__image` renders 160x108, and the
+design's own "Product Image" frame is 160x108. The pipeline sniffs the real format,
+resizes against a square box with `fit: 'outside'` (because `object-fit: cover` is
+driven by the short side), writes WebP q80 with metadata stripped, and reports mean
+absolute pixel error at display size.
 
-`ProductCard` resolves `assets/products/` first and falls back to
-`assets/packshots/`, so a file appearing in the products directory is enough to retire
-that product's packshot.
+**Status:** the full-resolution downloads come from `www.figma.com`, which this
+environment's network policy blocks; it needs adding under Allowed domains. Until then
+the cards show their neutral fill.
