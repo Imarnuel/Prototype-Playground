@@ -130,7 +130,6 @@ Seeded so every state can be demoed without editing data (root agreement §4, §
 
 | State | Product |
 |---|---|
-| Out of stock | Kora Leather Sneakers |
 | Stock ceiling (3), and a pack the shelf can't fill once | Kora Wool Beanie — 3 in stock, sold in packs of 6 |
 | The Quantity frame's 1/4/8/16 | Freshvale Crew Socks — 180 in stock |
 | Sold singly only (no Measurement list) | Freshvale Canvas Tote |
@@ -141,7 +140,10 @@ Seeded so every state can be demoed without editing data (root agreement §4, §
 | Category that wraps | Tops — 4 items |
 | Price width range | ₦950 to ₦45,000 (3 to 5 digits) |
 
-The no-photo state is no longer seeded: every item has a photo. The card still falls
+**Out of stock is not seeded**, by the designer's call: every item is in stock. The
+card's danger colour and the "Out of stock" refusal remain for real data, and
+`cart:verify` proves the refusal on a stand-in. The no-photo state is no longer
+seeded either: every item has a photo. The card still falls
 back to its neutral fill if one is missing.
 
 ## Commands

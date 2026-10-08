@@ -36,7 +36,8 @@ const lineOf = (lines, id) => lines.find((l) => l.productId === id);
 const discountOf = (line) => (line.discount?.kind === 'amount' ? line.discount.minor : null);
 
 // --- Adding from the grid -----------------------------------------------------
-const outOfStock = byId('ftw-sneakers');
+// Nothing is seeded out of stock (the designer's call), so the rule is proved on a stand-in.
+const outOfStock = { ...byId('ftw-sneakers'), stock: 0 };
 const none = [];
 check('an out-of-stock product adds no line, and says so by returning the same lines',
   outOfStock.stock === 0 && addToCart(none, outOfStock) === none);

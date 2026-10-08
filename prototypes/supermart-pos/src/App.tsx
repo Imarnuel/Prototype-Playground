@@ -172,12 +172,6 @@ export function App() {
       },
     })),
     {
-      // Through the real path, so it proves the clamp rather than forcing a toast.
-      label: 'Sales point: out-of-stock tap',
-      group: 'States',
-      onSelect: () => { resetScreens(); addProduct(PRODUCTS.find((p) => p.stock === 0)!); },
-    },
-    {
       label: 'Select customer',
       group: 'Screens',
       onSelect: () => { setCustomers(CUSTOMERS); setCartOpen(true); setPickerOpen(true); },

@@ -1,5 +1,5 @@
-// Stock clamp, proved by consequence: the tap changes no line, the cart count stays,
-// and the toast says why — without the success icon — and keeps its text through exit.
+// Stock clamp, proved by consequence: a tap past the shelf changes no line, and the
+// toast says why — without the success icon — and keeps its text through exit.
 import pw from '/opt/node-tools/node_modules/playwright/index.js';
 const { chromium } = pw;
 const cat = await import(new URL('../src/data/catalogue.ts', import.meta.url).href);
@@ -11,7 +11,6 @@ const page = await browser.newPage({ viewport: { width: 1200, height: 1100 } });
 await page.goto(`${BASE}?dev=1`, { waitUntil: 'networkidle' });
 await page.waitForSelector('.productCard');
 
-const juice = cat.PRODUCTS.find((p) => p.stock === 0);
 const low = cat.PRODUCTS.find((p) => p.id === 'acc-beanie');
 const tap = (name) => page.evaluate((n) => [...document.querySelectorAll('.productCard')]
   .find((c) => c.querySelector('.productCard__name').textContent === n).click(), name);
@@ -22,14 +21,8 @@ const toast = () => page.evaluate(() => {
 });
 const cartLabel = () => page.evaluate(() => document.querySelector('.viewCart__label')?.textContent ?? '(no cart button)');
 
-// --- Out of stock -------------------------------------------------------------
-const before = await cartLabel();
-await tap(juice.name);
-await page.waitForTimeout(400);
-let t = await toast();
-check('tapping an out-of-stock product adds nothing', (await cartLabel()) === before, `${before} -> ${await cartLabel()}`);
-check('...and says why', t.open === 'on' && t.text === 'Out of stock', `"${t.text}"`);
-check('...without the success check-circle', !t.icon);
+// Nothing is seeded out of stock (the designer's call); verify-cart proves that refusal.
+let t;
 
 // --- At the shelf ceiling -----------------------------------------------------
 for (let i = 0; i < low.stock; i++) { await tap(low.name); await page.waitForTimeout(60); }
@@ -85,15 +78,6 @@ await page.evaluate(() => [...document.querySelectorAll('.devbar__item')].find((
 await page.waitForTimeout(500);
 t = await toast();
 check('the success toast still carries its check-circle', t.icon && t.text === 'Customer has been created');
-
-// --- Dev toolbar entry --------------------------------------------------------
-await page.evaluate(() => { if (!document.querySelector('.devbar__panel')) document.querySelector('.devbar__handle').click(); });
-await page.waitForTimeout(450);
-await page.evaluate(() => [...document.querySelectorAll('.devbar__item')].find((b) => b.textContent.trim() === 'Sales point: out-of-stock tap').click());
-await page.waitForTimeout(500);
-t = await toast();
-check('the dev toolbar reaches the out-of-stock tap in one go', t.open === 'on' && t.text === 'Out of stock' && !t.icon,
-  `"${t.text}"`);
 
 await browser.close();
 console.log(`\n${fails} failing`);

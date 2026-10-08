@@ -238,13 +238,15 @@ check('signed prices never print "N-" or a negative zero', signed.every((x) => !
   signed.join('  '));
 
 // --- Demo state coverage (CLAUDE.md sections 4 and 6) ---
-const oos = PRODUCTS.filter((p) => p.stock === 0);
 check('every product has a photo', PRODUCTS.every((p) => p.image !== null),
   PRODUCTS.filter((p) => p.image === null).map((p) => p.id).join(', '));
-check('an out-of-stock product exists', oos.length > 0, oos.map((p) => p.id).join(', '));
+// The designer's call: nothing is out of stock. The card's danger colour and the cart's
+// refusal still exist for real data; verify-cart proves the refusal on a stand-in.
+check('no product is out of stock', PRODUCTS.every((p) => p.stock > 0),
+  PRODUCTS.filter((p) => p.stock === 0).map((p) => p.id).join(', '));
 check('a discounted product exists', discounted.length > 0, discounted.map((p) => p.id).join(', '));
-// The Sales Point card renders three stock states. All three must be reachable from
-// the seed data, or one of them can never be demoed.
+// The Sales Point card renders three stock states; low and normal are seeded, and
+// out of stock is not, by the designer's call.
 const low = PRODUCTS.filter((p) => p.stock > 0 && p.stock <= LOW_STOCK_AT);
 check(`a low-stock product exists (0 < stock <= ${LOW_STOCK_AT})`, low.length > 0,
   low.map((p) => `${p.id}:${p.stock}`).join(', '));

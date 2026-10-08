@@ -181,7 +181,7 @@ export const PRODUCTS: readonly Product[] = [
     image: 'jeans.webp',
   },
   {
-    // Out of stock, and the top of the price range.
+    // The top of the price range. Nothing is seeded out of stock: the designer's call.
     id: 'ftw-sneakers',
     brand: 'Kora',
     name: "Leather Sneakers",
@@ -190,7 +190,7 @@ export const PRODUCTS: readonly Product[] = [
     priceMinor: 4500000,
     barcode: '6153000000069',
     taxClass: 'standard',
-    stock: 0,
+    stock: 12,
     units: units(),
     image: 'sneakers.webp',
   },
