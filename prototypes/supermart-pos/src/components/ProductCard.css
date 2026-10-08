@@ -49,15 +49,15 @@
   position: absolute;
   inset: 0;
   border-radius: var(--radius-200);
-  /* Resolved from the paint's own gradientTransform rather than the codegen, which
-     emitted 179.8deg / 64.588% / 99.743% — close, but not the node's values. The
-     fill's 0.8 layer opacity is folded into the stop alphas (0.5 -> 0.4, 1 -> 0.8),
-     which is equivalent and keeps this to one declaration. */
+  /* DELIBERATE DEVIATION from `88:8113`, at the designer's request. The node's scrim
+     (clear at 50%, 40% black by 64.663%, 80% at the edge) read as a hard dark band
+     across the bottom of every photo. Softened: it starts higher, ramps gently and
+     tops out at 20%. The audit expects this value, not the node's. */
   background: linear-gradient(
     180deg,
-    rgb(0 0 0 / 0%) 50%,
-    rgb(0 0 0 / 40%) 64.663%,
-    rgb(0 0 0 / 80%) 100%
+    rgb(0 0 0 / 0%) 40%,
+    rgb(0 0 0 / 6%) 70%,
+    rgb(0 0 0 / 20%) 100%
   );
 }
 

@@ -214,11 +214,12 @@
 .cartLine__scrim {
   position: absolute;
   inset: 0;
+  /* Softened to match the product card's scrim — see ProductCard.css. */
   background: linear-gradient(
-    179.7deg,
-    rgb(0 0 0 / 0%) 50%,
-    rgb(0 0 0 / 40%) 64.588%,
-    rgb(0 0 0 / 80%) 99.743%
+    180deg,
+    rgb(0 0 0 / 0%) 40%,
+    rgb(0 0 0 / 6%) 70%,
+    rgb(0 0 0 / 20%) 100%
   );
 }
 

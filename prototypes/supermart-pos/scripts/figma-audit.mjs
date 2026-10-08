@@ -151,8 +151,10 @@ const COMPOUND = [
     'rgba(37, 43, 55, 0.14) 0px 0px 0px 1px inset'],
   ['88:8104 card',        '.productCard',        'boxShadow',
     'rgba(10, 13, 18, 0.01) 0px 4px 6px 0px, rgba(10, 13, 18, 0.02) 0px 12px 16px -2px, rgba(0, 0, 0, 0.01) 0px 0px 1px 0.5px'],
+  // Deliberately softer than the node (0 at 50%, 0.4 at 64.663%, 0.8 at 100%), at the
+  // designer's request — see ProductCard.css.
   ['88:8113 img scrim',   '.productCard__scrim', 'backgroundImage',
-    'linear-gradient(180deg, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.4) 64.663%, rgba(0, 0, 0, 0.8) 100%)'],
+    'linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.06) 70%, rgba(0, 0, 0, 0.2) 100%)'],
   ['88:8152 bottom scrim','.salesPoint .bottomScrim', 'backgroundImage',
     'linear-gradient(rgba(246, 247, 248, 0) 33.537%, rgba(255, 255, 255, 0.898) 58.748%, rgb(255, 255, 255) 122.418%)'],
   ['88:8152 blur',        '.salesPoint .bottomScrim__blur', 'backdropFilter', 'blur(8px)'],

@@ -205,6 +205,7 @@ enlarges a source: that would add bytes, not detail. To fix: allow `www.figma.co
 regenerate (the 1024px URLs expire after 7 days), drop the PNGs into
 `assets/products-src/` under the same names, and rerun the optimiser.
 
-The card's scrim (BUILD-PLAN #22) is the design's own and stays, so the lower half of
-every photo sits under up to 80% black — light garments (the tee, the sneakers) lose
-the most.
+**The image scrim is softer than the design, on the designer's request.** `88:8113`
+goes clear -> 40% black by 64.663% -> 80% at the edge, which read as a hard dark band
+over the lower half of every photo. The card and Cart thumbnails now share 0% at 40%
+-> 6% at 70% -> 20% at the edge; `figma:audit` expects that value, not the node's.
