@@ -34,9 +34,14 @@ export function fetchProducts(filter: ProductFilter): Promise<readonly Product[]
 /**
  * Takes payment. Never fails on its own; the dev toolbar forces a failure. The
  * receipt is built inside the request, so a failed payment never produces one.
+ *
+ * A fixed 300ms, not the shared 280-620 window: the designer found the wait "too
+ * long", and a confirmation that lands at the same moment every time demos the same
+ * way every time. The dev toolbar's latency scale still applies.
  */
+const PAY_LATENCY_MS = 300;
 export function submitPayment(sale: Parameters<typeof buildReceipt>[0]): Promise<Receipt> {
-  return request('pay', () => buildReceipt(sale));
+  return request('pay', () => buildReceipt(sale), { latency: PAY_LATENCY_MS });
 }
 
 /* --- Queued orders (band `170:8988`) ----------------------------------------------

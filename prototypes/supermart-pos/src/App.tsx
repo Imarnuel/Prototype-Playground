@@ -176,8 +176,9 @@ export function App() {
      confirmation screen takes over at once, from the Pay button, and the wait happens
      there — its loader becomes the success mark. Checkout and the Cart stay under it
      until the payment lands, so a failure can draw the screen back into the button
-     and leave the draft exactly where it was. The loader is held for at least the
-     reveal plus `slow`, so a fast answer still reads as a wait that resolved. */
+     and leave the draft exactly where it was. The loader is held for at least `slow`
+     — the reveal and a beat of spin — so a fast answer still reads as a wait that
+     resolved; no longer (the designer: "the loading is too long"). */
   const pay = () => {
     setPaying(true);
     const button = document.querySelector('.payButton')?.getBoundingClientRect();
@@ -188,7 +189,7 @@ export function App() {
     setSale({ stage: 'processing', hold: false, origin });
     const started = performance.now();
     const settle = (then: () => void) => window.setTimeout(then,
-      Math.max(0, duration(DURATION.base + DURATION.slow, reducedMotion) - (performance.now() - started)));
+      Math.max(0, duration(DURATION.slow, reducedMotion) - (performance.now() - started)));
     const tenderedMinor = parseWholeNaira(checkout.amount)!;
     submitPayment({
       lines, orderDiscount, customer, at: new Date(), sequence: sequence.current + 1,

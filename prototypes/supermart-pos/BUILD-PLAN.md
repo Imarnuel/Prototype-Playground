@@ -886,8 +886,11 @@ the receipt — so it is built only from the existing tokens. (A first version a
    `base` ease-out, on a small brand ring (40, the check's own size) that spins while
    the payment runs, with no words on screen — the designer cut "Processing payment…";
    it stays as visually hidden text for assistive tech. Checkout and the Cart
-   stay under it until the payment lands. The wait is held for at least `base + slow`
-   (~720ms), so a fast answer still reads as a wait that resolved.
+   stay under it until the payment lands. The wait is held for at least `slow` — the
+   reveal and a beat of spin — so a fast answer still reads as a wait that resolved,
+   and the mock payment answers in a fixed 300ms (the designer: "the loading is too
+   long"; it was `base + slow` on a 280–620ms answer, landing ~750ms). Sampled: success
+   at ~435ms after the tap, every run.
 3. **The loader becomes the mark.** When the payment lands, the ring stops where it
    is (sampled: it holds its angle, no jump), grows from 40 to the disc's 72 as it
    sweeps closed in success green over `fast`, and fills into the disc; the check strokes on; it ends in a small particle
@@ -918,8 +921,8 @@ drawn here (bloom, burst dots, spinner) join the `corner-shape: round`
 list — on the global superellipse they rendered as squircles.
 
 `walk-checkout` checks in-page that the confirmation screen takes over within 100ms in
-its waiting state with Checkout still under it, that success follows no sooner than
-the hold, and that a failure draws back to Checkout with its draft; `diff-checkout` waits for finite animations to end
+its waiting state with Checkout still under it, that success follows within
+400–600ms, and that a failure draws back to Checkout with its draft; `diff-checkout` waits for finite animations to end
 before measuring, since the screens choreograph in after the mock API's latency.
 
 ## Resolved: `Frame 4908` is `CloseButton` (#15)

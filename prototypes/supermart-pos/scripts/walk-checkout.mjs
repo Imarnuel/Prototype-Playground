@@ -153,7 +153,7 @@ check('the confirmation screen takes over at once, waiting, with Checkout kept u
   waitState && waitState.at < 100 && waitState.checkoutUnder, JSON.stringify(waitState));
 check('...on a small loader with no words on screen, the wait still said to assistive tech',
   Math.abs(waitState.ring - 40) < 1 && waitState.words.length === 0 && waitState.said === 'Processing payment…', JSON.stringify(waitState));
-check('...and turns to success once paid, held at least the reveal plus `slow`', paid && paid.at >= 700,
+check('...and turns to success once paid, held at least `slow` and not much past it', paid && paid.at >= 400 && paid.at < 600,
   `waiting at ${Math.round(waitState?.at)}ms, paid at ${Math.round(paid?.at)}ms`);
 check('then Transaction success', true);
 await page.waitForSelector('.receiptScreen[data-open="on"]', { timeout: 4000 });
