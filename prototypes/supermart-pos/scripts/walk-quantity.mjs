@@ -11,8 +11,9 @@ const BASE = process.argv[2] ?? 'http://127.0.0.1:4251/';
 const browser = await pw.chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
 let fails = 0;
 const check = (n, pass, d = '') => { if (!pass) fails++; console.log(`${pass ? 'PASS' : 'FAIL'}  ${n}${d ? `  ${d}` : ''}`); };
-// The frame's sheet top is 335; it stands 2 higher on the designer's 8px inset (BottomSheet.css).
-const SHEET_TOP = 335 - (8 - 6);
+// The frame's sheet top is 335; it stands 2 higher on the designer's 8px inset (BottomSheet.css),
+// and 54 lower without the Measurement card's empty space (QuantitySheet.css).
+const SHEET_TOP = 335 - (8 - 6) + 54;
 const money = (s) => Number(String(s).replace(/[^\d]/g, ''));
 
 const open = async (opts = {}) => {

@@ -319,6 +319,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 99 | **Close and New sale on the receipt** — two controls, one meaning once the sale is paid | Both end the sale: empty order, no customer or discount, back to the Sales Point |
 | 100 | **Not designed**: Pay's working state, a failed payment, change due, and the amount's validation | A spinner on Pay, in its brand fill ("Processing…" for screen readers), then straight to success; a notice toast that keeps the draft; change under the field in Color/text/success; the field's own error line |
 | 101 | **Mine, from band 4: the empty Cart's disabled Checkout label read a token that does not exist** (`--color-text-on-disabled`), so it inherited a colour instead of Color/text/ondisabled | Fixed |
+| 102 | **The Measurement card is a fixed 278 around four 56px rows** (`88:11532`, Frame 4981), leaving 54px of open card under the last rule — it read as an empty row (the designer: "remove the empty row") | Removed: the card ends at its last row, which drops its rule; the sheet is 54 shorter and docks 54 lower. `diff-quantity` and `walk-quantity` move their targets by the 54, not the frame's numbers |
 
 ## Work order
 

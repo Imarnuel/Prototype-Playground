@@ -103,18 +103,21 @@
   color: var(--color-text-subtle);
 }
 
-/* Frame 4981: white, radius 20, 16px either side, a fixed 278 around four 56px rows
-   — 54 of open card below the last rule, as drawn. */
+/* Frame 4981: white, radius 20, 16px either side. DELIBERATE DEVIATION, at the
+   designer's request ("remove the empty row"): the frame is a fixed 278 around four
+   56px rows, leaving 54 of open card under the last rule that read as an empty row.
+   The card now ends at its last row. */
 .measurement__list {
   display: flex;
   flex-direction: column;
-  padding: 0 var(--spacing-400) 54px;
+  padding: 0 var(--spacing-400);
   background: var(--color-surface-default);
   border-radius: var(--radius-500);
 }
 
-/* Each row: 56 tall, a 1px Color/border/subtle rule INSIDE its bottom edge — the last
-   row's too — the label and its single-unit equivalent spread apart. */
+/* Each row: 56 tall, a 1px Color/border/subtle rule INSIDE its bottom edge, the label
+   and its single-unit equivalent spread apart. Not the last row's: with the open card
+   below it gone, that rule would sit on the card's own edge. */
 .measurement__row {
   display: flex;
   align-items: center;
@@ -126,6 +129,7 @@
   text-align: left;
   cursor: pointer;
 }
+.measurement__row:last-child { box-shadow: none; }
 
 .measurement__label {
   flex: 1 1 auto;

@@ -1,7 +1,8 @@
 /**
  * Coordinate diff of the Quantity sheet against `88:11532`. Targets are each node's
- * own absolute box, read with use_figma. Built as drawn: the Measurement card at its
- * fixed 278, and only the chosen row's check taking room, so its equivalent ends at
+ * own absolute box, read with use_figma. Built as drawn but for the Measurement card,
+ * which ends at its last row instead of the frame's fixed 278 (the designer: "remove
+ * the empty row"); only the chosen row's check takes room, so its equivalent ends at
  * 327 and the others' at 355. Text widths are not asserted (#56).
  *
  *   node scripts/diff-quantity.mjs [base-url]
@@ -14,7 +15,10 @@ const BASE = process.argv[2] ?? 'http://127.0.0.1:4251/';
    numbers; INSET moves them: everything up by the 2, a left-anchored box right by it,
    a right-anchored box left by it, and a full-width box both, 4 narrower. */
 const INSET = 8 - 6;
-const SHIFT = -INSET;
+/* The card's 54 of open space is gone, and the sheet is bottom-docked: it is 54
+   shorter, and everything in it sits 54 lower. Targets stay the frame's; EMPTY moves them. */
+const EMPTY = 54;
+const SHIFT = -INSET + EMPTY;
 // label, selector, anchor (L / R / S = stretches / C = centred), x, y (frame), w, h — null skips
 const T = [
   ['sheet',          '.quantitySheet',                    'S',   6, 335, 381, 511],
@@ -67,7 +71,7 @@ T.forEach(([label, sel, anchor, x, y, w, h], i) => {
   if (x !== null) line(label, 'x', x + dx[anchor], m.x);
   if (y !== null) line(label, 'y', y + SHIFT, m.y);
   if (w !== null) line(label, 'w', anchor === 'S' ? w - 2 * INSET : w, m.w);
-  if (h !== null) line(label, 'h', h, m.h);
+  if (h !== null) line(label, 'h', label === 'sheet' || label === 'list card' ? h - EMPTY : h, m.h);
 });
 // Centred things are compared by their centre: the text width is Figma's integer.
 line('title', 'centre', 196.5, res.titleCentre);

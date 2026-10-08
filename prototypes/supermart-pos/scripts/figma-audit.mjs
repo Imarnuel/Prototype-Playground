@@ -382,7 +382,7 @@ const TOTAL_DISCOUNT = [
 ];
 
 /* Quantity sheet, `88:11532`. Not asserted, on purpose: the Measurement card's
-   fixed 278 height (#77). */
+   height — the frame's fixed 278, removed down to its rows at the designer's request. */
 const QTY = [
   ['88:11612 sheet',        '.quantitySheet',          'backgroundColor', 'rgb(246, 247, 249)'],
   ['88:11612 sheet',        '.quantitySheet',          'borderRadius',    '32px'],  // node: 28 — 32 at the designer's request (BottomSheet.css)
