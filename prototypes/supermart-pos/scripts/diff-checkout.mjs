@@ -83,9 +83,12 @@ await run('88:14794 Select bank', [
   ['row Opay 2', '.bankPicker__row', 4, [22, 754, 349, 72], 'S'],
 ]);
 await pick('Transaction success');
+// The frame centres the group (icon 368, line 460); it sits 85 higher, at the optical
+// centre, at the designer's request (SaleComplete.css).
+const LIFT = 85;
 await run('88:8723 Transaction success', [
-  ['icon', '.saleSuccess__icon', 0, [160.5, 368, 72, 72], 'F'],
-  ['line', '.saleSuccess__text--done', 0, [33, 460, 327, 24], 'F'],
+  ['icon', '.saleSuccess__icon', 0, [160.5, 368 - LIFT, 72, 72], 'F'],
+  ['line', '.saleSuccess__text', 0, [33, 460 - LIFT, 327, 24], 'F'],
 ]);
 await pick('Receipt: cash');
 await run('88:8735 Receipt', [

@@ -17,6 +17,11 @@
 .saleSuccess {
   align-items: center;
   justify-content: center;
+  /* DELIBERATE DEVIATION, at the designer's request ("almost out of the user's sight at
+     first glance"): `88:8723` centres the mark and line on the screen (centre y 426).
+     They sit at the optical centre instead, 40% down (341): this padding lifts the
+     centred group by half of it, 85. */
+  padding-bottom: 170px;
   /* Opens as a circle from the Pay button. 1000px clears the far corner from any
      origin on a 393x852 screen. */
   clip-path: circle(0 at var(--ox) var(--oy));
@@ -68,9 +73,11 @@
 }
 .saleSuccess__mark > * { grid-area: 1 / 1; }
 
-/* --- Waiting: a brand ring, a quarter drawn, spinning ------------------------------- */
+/* --- Waiting: a small brand ring, a quarter drawn, spinning, no words --------------- */
 .saleSuccess__ring {
   overflow: visible;
+  transform: scale(calc(40 / 72));
+  transition: transform var(--motion-fast) var(--ease-out);
   animation: success-spin 900ms linear infinite;
 }
 .saleSuccess__ring circle {
@@ -85,7 +92,7 @@
 
 /* --- Paid: the ring stops where it is and sweeps closed in success green, then fills
    into the disc; the check draws; one soft bloom breathes out. ------------------------ */
-.saleSuccess[data-status='success'] .saleSuccess__ring { animation-play-state: paused; }
+.saleSuccess[data-status='success'] .saleSuccess__ring { animation-play-state: paused; transform: none; }
 .saleSuccess[data-status='success'] .saleSuccess__ring circle {
   stroke: var(--color-container-success-bold-default);
   stroke-dashoffset: 0;
@@ -171,16 +178,10 @@
   100% { transform: rotate(var(--a)) translateY(var(--to)) scale(0.3); opacity: 0; }
 }
 
-/* The two lines share one cell: "Processing payment…" lets go as "Transaction
-   success!" de-blurs in over it, so the words change where they stand. */
-.saleSuccess__lines {
-  display: grid;
-  align-self: stretch;
-}
-.saleSuccess__lines > * { grid-area: 1 / 1; }
-
-/* Heading/h4, its box the column's full 327 with the line centred in it. */
+/* Heading/h4, its box the column's full 327 with the line centred in it. It de-blurs
+   in as it rises once the payment lands. */
 .saleSuccess__text {
+  align-self: stretch;
   margin: 0;
   font-size: var(--type-Heading-h4-size);
   font-weight: var(--type-Heading-h4-weight);
@@ -188,34 +189,19 @@
   letter-spacing: var(--type-Heading-h4-letter-spacing);
   color: var(--color-text-default);
   text-align: center;
+  opacity: 0;
+  transform: translateY(6px);
+  filter: blur(6px);
   transition:
-    opacity var(--motion-fast) var(--ease-out),
-    transform var(--motion-base) var(--ease-out),
-    filter var(--motion-base) var(--ease-out);
+    opacity var(--motion-fast) var(--ease-out) var(--motion-instant),
+    transform var(--motion-base) var(--ease-out) var(--motion-instant),
+    filter var(--motion-base) var(--ease-out) var(--motion-instant);
 }
-/* Undesigned copy, quieter than the result: Color/text/subtle. It rises in only while
-   waiting — a screen that opens already paid never shows it. `backwards`, not `both`:
-   a fill that held the end state would outrank the transition that lets it go. */
-.saleSuccess__text--waiting { color: var(--color-text-subtle); }
-.saleSuccess[data-status='processing'] .saleSuccess__text--waiting {
-  animation: success-text var(--motion-base) var(--ease-out) var(--motion-fast) backwards;
-}
-.saleSuccess__text--done { opacity: 0; transform: translateY(6px); filter: blur(6px); }
-.saleSuccess[data-status='success'] .saleSuccess__text--waiting {
-  opacity: 0; transform: translateY(-6px); filter: blur(6px);
-}
-.saleSuccess[data-status='success'] .saleSuccess__text--done {
-  opacity: 1; transform: none; filter: blur(0);
-  transition-delay: var(--motion-instant);
-}
+.saleSuccess[data-status='success'] .saleSuccess__text { opacity: 1; transform: none; filter: blur(0); }
 
 @keyframes success-spin { to { rotate: 360deg; } }
 @keyframes success-focus {
   from { transform: scale(0.6); opacity: 0; filter: blur(8px); }
-  to { transform: none; opacity: 1; filter: blur(0); }
-}
-@keyframes success-text {
-  from { transform: translateY(6px); opacity: 0; filter: blur(6px); }
   to { transform: none; opacity: 1; filter: blur(0); }
 }
 @keyframes success-bloom {
@@ -462,7 +448,7 @@
 @keyframes receipt-actions { from { transform: translateY(100%); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .saleScreen, .saleSuccess__content, .saleSuccess__ring circle, .saleSuccess__icon, .saleSuccess__icon path,
+  .saleScreen, .saleSuccess__content, .saleSuccess__ring, .saleSuccess__ring circle, .saleSuccess__icon, .saleSuccess__icon path,
   .saleSuccess__text, .receipt, .receiptScreen__footer { transition-duration: 0ms !important; transition-delay: 0ms !important; }
 }
 

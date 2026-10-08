@@ -131,7 +131,11 @@ await page.evaluate(() => {
     const st = s?.dataset.status ?? null;
     if (st !== t.states.at(-1)?.status) t.states.push({ at: performance.now() - t0, status: st,
       checkoutUnder: !!document.querySelector('[role="dialog"][aria-label="Checkout"]'),
-      waiting: document.querySelector('.saleSuccess__text--waiting')?.textContent ?? null });
+      // What the wait shows: the loader's drawn size, and any line a sighted user can read.
+      // Its own scale, not its box: a spinning square's box is the rotated one's.
+      ring: (r => r ? 72 * new DOMMatrix(getComputedStyle(r).transform).a : null)(document.querySelector('.saleSuccess__ring')),
+      words: [...(s?.querySelectorAll('p') ?? [])].filter((e) => getComputedStyle(e).opacity !== '0').map((e) => e.textContent),
+      said: s?.querySelector('.visuallyHidden')?.textContent ?? null });
     if (performance.now() - t0 < 2500) requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
@@ -146,7 +150,9 @@ await page.waitForSelector('.saleSuccess[data-status="success"]', { timeout: 300
 const states = await page.evaluate(() => window.__pay.states);
 const waitState = states.find((x) => x.status === 'processing'), paid = states.find((x) => x.status === 'success');
 check('the confirmation screen takes over at once, waiting, with Checkout kept under it',
-  waitState && waitState.at < 100 && waitState.checkoutUnder && waitState.waiting === 'Processing payment…', JSON.stringify(waitState));
+  waitState && waitState.at < 100 && waitState.checkoutUnder, JSON.stringify(waitState));
+check('...on a small loader with no words on screen, the wait still said to assistive tech',
+  Math.abs(waitState.ring - 40) < 1 && waitState.words.length === 0 && waitState.said === 'Processing payment…', JSON.stringify(waitState));
 check('...and turns to success once paid, held at least the reveal plus `slow`', paid && paid.at >= 700,
   `waiting at ${Math.round(waitState?.at)}ms, paid at ${Math.round(paid?.at)}ms`);
 check('then Transaction success', true);

@@ -16,7 +16,7 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **113** inconsistencies, including that 31 frames share the name
+anything — it records **114** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
@@ -223,8 +223,9 @@ entrance that never animates.
 - **The receipt's logo** is a placeholder: Freshvale has none (#97).
 - The sheet **exit curve** is heavily back-loaded and is deferred to `better-ui`,
   which owns motion and is not installed (BUILD-PLAN #37).
-- **The post-Pay sequence is not designed** — the confirmation screen's wait (a
-  ring that becomes the success mark, with a particle burst), the circular reveal and
+- **The post-Pay sequence is not designed** — the confirmation screen's wordless wait
+  (a small ring that grows into the success mark, with a particle burst; the mark sits
+  85 above the frame's centre, #114), the circular reveal and
   its retreat on failure, the bloom, the receipt's print feed and the
   grid's re-rise are choreographed from the motion tokens (BUILD-PLAN, Motion).
   Any later Figma motion replaces it.

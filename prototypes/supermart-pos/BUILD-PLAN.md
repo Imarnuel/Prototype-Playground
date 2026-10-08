@@ -331,6 +331,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 111 | **This sheet's body starts flush under the header** (y 64), where the other sheets' frames leave 5 (y 69) | Followed: `gap: 0` on this sheet only |
 | 112 | **Not designed**: the queue's loading and failure, a failed Queue order, a failed recall, Recall order working, a recall over a Cart that already holds a sale, the delete's confirmation | Skeleton cards and the Sales Point's message; notice toasts that keep everything as it was; a spinner in place; the designer's calls — a recall over a sale queues that sale first, a delete is immediate with Undo |
 | 113 | **POS has no frames, and Bank transfer returns to Checkout before a bank is chosen** — `88:14105` lists POS among the undesigned methods; the frames show the method picker handing back to Checkout, the bank picked separately from its row | At the designer's request: POS works exactly as Bank transfer (`paysIntoAccount`: Select bank, the account on Checkout and the receipt as "POS · {bank}", the total exactly), and picking either goes straight on to Select bank. The method lands with the bank; closing Select bank cancels, leaving Checkout as it was |
+| 114 | **Transaction success centres its mark and line on the screen** (`88:8723`: centre y 426) — at first glance they read as too low | At the designer's request, at the optical centre, 40% down (341): 85 higher. `diff-checkout` moves its two targets by the 85 |
 
 ## Work order
 
@@ -882,17 +883,20 @@ the receipt — so it is built only from the existing tokens. (A first version a
    turned it green with a check — both gone.
 2. **The screen grows out of the button at once** (~20ms after the tap): a
    `clip-path: circle()` reveal centred on the Pay button's measured centre, over
-   `base` ease-out, on a brand ring that spins while the payment runs, with
-   "Processing payment…" (undesigned copy, Color/text/subtle). Checkout and the Cart
+   `base` ease-out, on a small brand ring (40, the check's own size) that spins while
+   the payment runs, with no words on screen — the designer cut "Processing payment…";
+   it stays as visually hidden text for assistive tech. Checkout and the Cart
    stay under it until the payment lands. The wait is held for at least `base + slow`
    (~720ms), so a fast answer still reads as a wait that resolved.
 3. **The loader becomes the mark.** When the payment lands, the ring stops where it
-   is (sampled: it holds its angle, no jump), sweeps closed in success green over
-   `fast`, and fills into the disc; the check strokes on; it ends in a small particle
+   is (sampled: it holds its angle, no jump), grows from 40 to the disc's 72 as it
+   sweeps closed in success green over `fast`, and fills into the disc; the check strokes on; it ends in a small particle
    burst (the designer: "just a subtle particle burst") — 8 dots, two sizes and two
    greens, every 45°, thrown 12–18px out from the disc's edge as they shrink and fade
-   on `base`, with the haptic tick; one soft bloom breathes out; "Processing payment…"
-   lets go as "Transaction success!" de-blurs in over it. Sampled from the switch:
+   on `base`, with the haptic tick; one soft bloom breathes out; "Transaction success!"
+   de-blurs in as it rises. The mark and line sit at the optical centre, 40% down the
+   screen, 85 above where `88:8723` centres them (the designer: "almost out of the
+   user's sight at first glance"; #114). Sampled from the switch:
    ring closed ~200ms, disc in ~310ms, check drawn ~490ms, burst out to 57.9px of 58
    from ~555ms and gone by ~775ms.
    **A failed payment** draws the screen back into the Pay button (the reveal run

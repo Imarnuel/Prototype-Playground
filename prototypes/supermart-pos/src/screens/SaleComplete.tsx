@@ -13,13 +13,13 @@ import './SaleComplete.css';
  *
  * Not designed — the frame is a still. The designer's call: confirming Pay goes
  * straight here, and the waiting happens here, not in the button. The screen opens as
- * a circle from the Pay button (`origin`) on a brand ring that spins while the payment
- * runs. When it lands, the ring stops where it is, sweeps closed in success green and
- * fills into the disc, the check draws and ends in a small burst of dots, a soft bloom
- * breathes out and the line changes — loading and success are one mark. A light
- * haptic tick lands with the burst. If the
- * payment fails, the circle draws back into the Pay button (`retract`). Reduced motion
- * shows each state settled. The check is the frame's own export (`check-success.svg`),
+ * a circle from the Pay button (`origin`) on a small brand ring that spins, wordless,
+ * while the payment runs. When it lands, the ring stops where it is, grows as it
+ * sweeps closed in success green, and fills into the disc; the check draws and ends in
+ * a small burst of dots, a soft bloom breathes out and the line rises — loading and
+ * success are one mark. A light haptic tick lands with the burst. If the payment
+ * fails, the circle draws back into the Pay button (`retract`). Reduced motion shows
+ * each state settled. The check is the frame's own export (`check-success.svg`),
  * inlined so it can draw.
  */
 export function TransactionSuccess({ open, status, retract = false, origin, onContinue }: {
@@ -70,16 +70,16 @@ export function TransactionSuccess({ open, status, retract = false, origin, onCo
                 strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </span>
-          {/* The loader, 72 like the disc it becomes: a 4 stroke on r 34, so its outer
-              edge is the disc's edge. Not designed; its stroke has no token. */}
+          {/* The loader: drawn at the disc's 72 (a 4 stroke on r 34, its outer edge the
+              disc's edge) and shown at 40 while it waits, so it grows into the disc it
+              becomes. Not designed; its stroke has no token. */}
           <svg className="saleSuccess__ring" width="72" height="72" viewBox="0 0 72 72" fill="none" aria-hidden="true">
             <circle cx="36" cy="36" r="34" pathLength={1} strokeWidth="4" strokeLinecap="round" />
           </svg>
         </span>
-        <span className="saleSuccess__lines">
-          <p className="saleSuccess__text saleSuccess__text--waiting" aria-hidden={status !== 'processing'}>Processing payment…</p>
-          <p className="saleSuccess__text saleSuccess__text--done" aria-hidden={status !== 'success'}>Transaction success!</p>
-        </span>
+        {/* The wait has no words on screen (the designer's call); it is still said. */}
+        {status === 'processing' && <span className="visuallyHidden">Processing payment…</span>}
+        <p className="saleSuccess__text" aria-hidden={status !== 'success'}>Transaction success!</p>
       </div>
     </div>
   );
