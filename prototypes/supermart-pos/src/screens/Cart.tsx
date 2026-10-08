@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatedText } from '../components/AnimatedText';
 import { DURATION, EASING, duration, useReducedMotion } from '@playground/shared';
 import { Icon } from '../components/Icon';
-import { CloseButton } from '../components/CloseButton';
 import { QtyInputField } from '../components/QtyInputField';
 import { formatPrice, maxCount, unitFor, type Discount } from '../data/catalogue';
 import { productImage } from '../data/productImage';
@@ -10,6 +9,8 @@ import type { Customer } from '../data/customers';
 import { lineGross, productFor, totals, type CartLine } from '../state/cart';
 import { BottomScrim } from '../components/BottomScrim';
 import { OrderTotal } from '../components/OrderTotal';
+import { EmptyState } from '../components/EmptyState';
+import { ScanButton } from '../components/ScanButton';
 import './Cart.css';
 
 /**
@@ -45,12 +46,23 @@ type CartProps = {
   /** Lifted to the App so the dev toolbar can present the expanded state. */
   totalOpen: boolean;
   onToggleTotal: () => void;
+  /** "docked": the Order Preview under the scanner's camera (`88:19506`, `88:19584`) —
+      an expand control where the close was, no order total, a fixed body. The same
+      Cart, so the lines, the customer and every sheet it opens are shared. */
+  mode?: 'full' | 'docked';
+  /** Docked only: grows into the full Cart (`88:19119`). */
+  onExpand?: () => void;
+  /** The empty Cart's scan button (`88:19466`). */
+  onScan?: () => void;
 };
 
 export function Cart({
   lines, orderDiscount, onClose, onQtyChange, onEditQuantity, onOpenDetails, onRemove, onCheckout, onQueue, queueing = false, onAddCustomer,
   onMoreOptions, onClearAll, clearRequest = 0, customer, onRemoveCustomer, totalOpen, onToggleTotal,
+  mode = 'full', onExpand, onScan,
 }: CartProps) {
+  const docked = mode === 'docked';
+  const empty = lines.length === 0;
   const reducedMotion = useReducedMotion();
   /* A removed line collapses before it leaves the state, so nothing cuts. Its
      product id is held here for the length of the exit, then the removal lands. */
@@ -72,6 +84,8 @@ export function Cart({
     <div
       className="cart"
       data-total={totalOpen ? 'on' : 'off'}
+      data-mode={mode}
+      data-empty={empty ? 'on' : 'off'}
       style={{
         '--order-total-ms': `${duration(DURATION.base, reducedMotion)}ms`,
         '--order-total-easing': totalOpen ? EASING.out : EASING.in,
@@ -79,7 +93,13 @@ export function Cart({
     >
       <header className="cart__titleBar">
         <div className="cart__titleLeft">
-          <CloseButton onPress={onClose} label="Close order preview" />
+          {/* One control in both modes: the frames put expand (docked) and close (full)
+              in the same 40px slot, so the glyphs cross-fade as the panel grows. */}
+          <button type="button" className="closeButton cart__lead" onClick={docked ? onExpand : onClose}
+            aria-label={docked ? 'Expand order preview' : 'Close order preview'}>
+            <span className="cart__leadGlyph" data-on={docked ? 'on' : 'off'}><Icon name="expand-01" /></span>
+            <span className="cart__leadGlyph" data-on={docked ? 'off' : 'on'}><Icon name="x-close" /></span>
+          </button>
           <h1 className="cart__title">Order Preview</h1>
         </div>
         <div className="cart__titleActions">
@@ -98,6 +118,10 @@ export function Cart({
             swapped, not a separate screen. With a customer attached the whole row
             stops being a single button: the trailing control removes the customer,
             so it cannot sit inside a button that opens the picker. */}
+        {/* The empty Cart (`88:16199`, `88:19449`) and the empty scanner (`88:19506`)
+            draw no customer row; it returns with the first line. A customer already
+            attached keeps it, so they can still be removed. */}
+        {(!empty || customer) && (
         <div className="addCustomer" data-state={customer ? 'added' : 'empty'}>
           <button
             type="button"
@@ -131,12 +155,14 @@ export function Cart({
             </button>
           )}
         </div>
+        )}
 
-        {lines.length === 0 ? (
-          <div className="cart__empty">
-            <p className="cart__emptyTitle">No items yet</p>
-            <p className="cart__emptyBody">Add products from the Sales Point to start an order.</p>
-          </div>
+        {empty ? (
+          docked
+            ? <EmptyState key="scan" className="cart__empty" icon="shopping-cart-40" title="Scan barcode or text"
+                body="Align the barcode or product name within the frame." />
+            : <EmptyState key="cart" className="cart__empty" icon="shopping-cart-40"
+                body={<>Your cart is empty.<br />Items you add to cart will appear here.</>} />
         ) : (
           <ul className="cart__lines">
             {lines.map((line) => {
@@ -198,7 +224,12 @@ export function Cart({
       <BottomScrim height={239} />
 
       <div className="cart__footer">
-        <OrderTotal totals={totals(lines, orderDiscount)} open={totalOpen} onToggle={onToggleTotal} />
+        {/* Docked, the total folds away: the scanner's footer is the buttons alone. */}
+        <div className="cart__totalSlot">
+          <div className="cart__totalClip">
+            <OrderTotal totals={totals(lines, orderDiscount)} open={totalOpen} onToggle={onToggleTotal} />
+          </div>
+        </div>
         <div className="cart__actions">
           <button type="button" className="cart__checkout" onClick={onCheckout} disabled={lines.length === 0}>
             <span className="cart__checkoutLabel">Checkout (<AnimatedText value={String(lines.length)} />)</span>
@@ -212,6 +243,8 @@ export function Cart({
           </button>
         </div>
       </div>
+
+      {empty && !docked && onScan && <ScanButton className="cart__scan" onPress={onScan} />}
     </div>
   );
 }

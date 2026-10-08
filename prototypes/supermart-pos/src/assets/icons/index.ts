@@ -32,6 +32,7 @@ import dot_2 from './dot-2.svg';
 import dots_horizontal from './dots-horizontal.svg';
 import dots_horizontal_24 from './dots-horizontal-24.svg';
 import ellipse_79 from './ellipse-79.svg';
+import expand_01 from './expand-01.svg';
 import facebook from './facebook.svg';
 import filter_lines from './filter-lines.svg';
 import gift_02 from './gift-02.svg';
@@ -48,10 +49,14 @@ import plus_circle from './plus-circle.svg';
 import plus_lg from './plus-lg.svg';
 import printer from './printer.svg';
 import rows_03 from './rows-03.svg';
+import scan from './scan.svg';
+import scan_line from './scan-line.svg';
 import search_sm from './search-sm.svg';
 import share_01 from './share-01.svg';
 import shopping_cart_01 from './shopping-cart-01.svg';
+import shopping_cart_40 from './shopping-cart-40.svg';
 import tiktok from './tiktok.svg';
+import toast_check_card from './toast-check-card.svg';
 import toast_success from './toast-success.svg';
 import trash_01 from './trash-01.svg';
 import trash_03 from './trash-03.svg';
@@ -64,6 +69,7 @@ import users_02 from './users-02.svg';
 import wallet_04 from './wallet-04.svg';
 import x_circle from './x-circle.svg';
 import x_close from './x-close.svg';
+import x_close_camera from './x-close-camera.svg';
 
 export type IconName =
   | 'add-one'
@@ -84,6 +90,7 @@ export type IconName =
   | 'dots-horizontal'
   | 'dots-horizontal-24'
   | 'ellipse-79'
+  | 'expand-01'
   | 'facebook'
   | 'filter-lines'
   | 'gift-02'
@@ -100,10 +107,14 @@ export type IconName =
   | 'plus-lg'
   | 'printer'
   | 'rows-03'
+  | 'scan'
+  | 'scan-line'
   | 'search-sm'
   | 'share-01'
   | 'shopping-cart-01'
+  | 'shopping-cart-40'
   | 'tiktok'
+  | 'toast-check-card'
   | 'toast-success'
   | 'trash-01'
   | 'trash-03'
@@ -115,7 +126,8 @@ export type IconName =
   | 'users-02'
   | 'wallet-04'
   | 'x-circle'
-  | 'x-close';
+  | 'x-close'
+  | 'x-close-camera';
 
 export const ICONS: Record<IconName, { src: string; width: number; height: number }> = {
   'add-one': { src: add_one, width: 20, height: 20 },
@@ -136,6 +148,7 @@ export const ICONS: Record<IconName, { src: string; width: number; height: numbe
   'dots-horizontal': { src: dots_horizontal, width: 20, height: 20 },
   'dots-horizontal-24': { src: dots_horizontal_24, width: 24, height: 24 },
   'ellipse-79': { src: ellipse_79, width: 3, height: 3 },
+  'expand-01': { src: expand_01, width: 20, height: 20 },
   'facebook': { src: facebook, width: 15.316, height: 15.316 },
   'filter-lines': { src: filter_lines, width: 16, height: 16 },
   'gift-02': { src: gift_02, width: 20, height: 20 },
@@ -152,10 +165,14 @@ export const ICONS: Record<IconName, { src: string; width: number; height: numbe
   'plus-lg': { src: plus_lg, width: 32, height: 32 },
   'printer': { src: printer, width: 16, height: 16 },
   'rows-03': { src: rows_03, width: 20, height: 20 },
+  'scan': { src: scan, width: 28, height: 28 },
+  'scan-line': { src: scan_line, width: 274, height: 3 },
   'search-sm': { src: search_sm, width: 20, height: 20 },
   'share-01': { src: share_01, width: 16, height: 16 },
   'shopping-cart-01': { src: shopping_cart_01, width: 16, height: 16 },
+  'shopping-cart-40': { src: shopping_cart_40, width: 40, height: 40 },
   'tiktok': { src: tiktok, width: 15.316, height: 15.316 },
+  'toast-check-card': { src: toast_check_card, width: 20, height: 20 },
   'toast-success': { src: toast_success, width: 20, height: 20 },
   'trash-01': { src: trash_01, width: 20, height: 20 },
   'trash-03': { src: trash_03, width: 20, height: 20 },
@@ -168,4 +185,5 @@ export const ICONS: Record<IconName, { src: string; width: number; height: numbe
   'wallet-04': { src: wallet_04, width: 20, height: 20 },
   'x-circle': { src: x_circle, width: 20, height: 20 },
   'x-close': { src: x_close, width: 20, height: 20 },
+  'x-close-camera': { src: x_close_camera, width: 20, height: 20 },
 };

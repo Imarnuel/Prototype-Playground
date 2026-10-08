@@ -132,6 +132,19 @@
   white-space: nowrap;
 }
 
+/* The light style, as iOS shows it over dark content: white time and glyphs. The
+   glyphs are the component's own dark exports, whitened rather than re-exported, so
+   one set stays the source. The change cross-fades on the app's base duration when
+   the app publishes one, and is instant where it does not. */
+.statusBar__time,
+.statusBar__levels img {
+  transition:
+    color var(--motion-base, 0ms) ease-out,
+    filter var(--motion-base, 0ms) ease-out;
+}
+.statusBar[data-appearance='light'] .statusBar__time { color: #fff; }
+.statusBar[data-appearance='light'] .statusBar__levels img { filter: brightness(0) invert(1); }
+
 .statusBar__islandSpacer {
   width: 124px;
   height: 10px;

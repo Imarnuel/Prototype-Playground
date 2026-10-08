@@ -14,8 +14,11 @@ import { QueuedOrders, type RecallResult } from './screens/QueuedOrders';
 import { Checkout, type CheckoutDraft } from './screens/Checkout';
 import { SelectBank, SelectPaymentMethod } from './screens/PaymentPickers';
 import { Receipt, TransactionSuccess } from './screens/SaleComplete';
+import { Scanner } from './screens/Scanner';
+import { ScanMatches } from './screens/ScanMatches';
 import { METHODS, methodLabel, paysIntoAccount, type AccountMethod } from './data/payments';
-import { queueOrder, setQueueForDemo, submitPayment } from './api/pos';
+import { lookupBarcode, matchScannedText, queueOrder, setQueueForDemo, submitPayment } from './api/pos';
+import { SCAN_SEQUENCE, UNKNOWN_BARCODE, UNKNOWN_TAG, barcodeOf, tagOf, type ScanTarget, type TextResult } from './state/scan';
 import { receiptText, type Receipt as ReceiptRecord } from './state/sale';
 import { PRODUCTS, maxCount, parseWholeNaira, unitFor, type Discount, type Product } from './data/catalogue';
 import { CUSTOMERS, type Customer } from './data/customers';
@@ -114,6 +117,25 @@ export function App() {
   const reducedMotion = useReducedMotion();
   const enterMs = duration(SHEET_SPRING.duration, reducedMotion);
   const exitMs = duration(SHEET_SPRING.exitDuration, reducedMotion);
+
+  /* Scanning, band `214:26054`. The scanner is the Cart presented DOCKED under a
+     camera: the Sales Point's scan button opens it (`88:19293` → `88:19506`), and so
+     does the empty Cart's (`88:19449`), which undocks back into the Cart on close.
+     Expand grows the docked Cart into the full one (`88:19119`). */
+  const [scanning, setScanning] = useState(false);
+  const scanFrom = useRef<'salesPoint' | 'cart'>('salesPoint');
+  const { mounted: cameraMounted, entered: cameraEntered } = usePresented(scanning);
+  /* What is in front of the camera; one item at a time. A ref as well, so a second
+     tap while one is being read is refused without waiting for a render. */
+  const [inView, setInView] = useState<ScanTarget | null>(null);
+  const reading = useRef(false);
+  const scanStep = useRef(0);
+  const [matchSheet, setMatchSheet] = useState<TextResult | null>(null);
+  const [matchesOpen, setMatchesOpen] = useState(false);
+  const demoAffordances = devFlagEnabled() || import.meta.env.VITE_SHOWCASE === '1';
+  // Async results add against the Cart as it stands when they land, not when asked.
+  const linesRef = useRef(lines);
+  linesRef.current = lines;
 
   /* The user's call: clearing is immediate, with a way back (BUILD-PLAN #35). Undo
      restores the lines and the order's discount together. */
@@ -241,15 +263,80 @@ export function App() {
   /* A tap the shelf can't supply returns the same lines from `addToCart`. Saying why
      beats a tap that silently does nothing. The copy is not from the design, which
      draws no stock-limit message. */
-  const addProduct = (product: Product) => {
-    const next = addToCart(lines, product);
-    if (next !== lines) { setLines(next); return; }
-    const line = lines.find((l) => l.productId === product.id);
-    if (!line) { showToast('Out of stock', 'notice'); return; }
+  /** Adds one, or says why not. One rule for a tap on the grid and a scan alike. */
+  const tryAdd = (product: Product): string | null => {
+    const current = linesRef.current;
+    const next = addToCart(current, product);
+    if (next !== current) { linesRef.current = next; setLines(next); return null; }
+    const line = current.find((l) => l.productId === product.id);
+    if (!line) return 'Out of stock';
     // In the line's own unit, written the way the stepper writes it: "18 pck".
-    showToast(`Only ${maxCount(product, line.unitId)} ${unitFor(product, line.unitId).abbrev} left`, 'notice');
+    return `Only ${maxCount(product, line.unitId)} ${unitFor(product, line.unitId).abbrev} left`;
+  };
+  const addProduct = (product: Product) => {
+    const refusal = tryAdd(product);
+    if (refusal) showToast(refusal, 'notice');
   };
 
+  const openScanner = (from: 'salesPoint' | 'cart') => {
+    scanFrom.current = from;
+    setTotalOpen(false);
+    setScanning(true);
+    setCartOpen(true);
+  };
+  /* The scanner's X: back to whatever opened it. From the Sales Point the whole
+     presentation goes down; from the Cart, the Cart grows back over the camera. */
+  const closeScanner = () => {
+    if (scanFrom.current === 'cart') { setScanning(false); return; }
+    setCartOpen(false);
+  };
+  /* However the Cart goes — the scanner's X, Queue order, a payment — the scanner goes
+     with it, once the exit has run: the next View cart opens the Cart, not a camera. */
+  useEffect(() => {
+    if (cartOpen) return undefined;
+    const t = window.setTimeout(() => { setScanning(false); setInView(null); reading.current = false; }, exitMs);
+    return () => window.clearTimeout(t);
+  }, [cartOpen, exitMs]);
+  /* The item leaves the lens a beat after its result, so the toast and the item it
+     names are on screen together (`88:19938`), then the camera is dark again (`88:19584`). */
+  const releaseItem = () => {
+    window.setTimeout(() => { setInView(null); reading.current = false; }, duration(DURATION.slow, reducedMotion));
+  };
+  const addScanned = (product: Product) => {
+    const refusal = tryAdd(product);
+    showToast(refusal ?? `${product.name} added to cart`, refusal ? 'notice' : 'success', undefined, 'banner');
+    releaseItem();
+  };
+  /* Not designed: a read that matches nothing, and a lookup that fails. Both say so
+     in the scanner's banner and let the next scan go ahead. */
+  const scanRefused = (message: string) => { showToast(message, 'notice', undefined, 'banner'); releaseItem(); };
+  /* Holds an item up to the camera. It comes into view, is read for at least `slow`
+     (a read that lands sooner still reads as a read), then is looked up. */
+  const holdUp = (target?: ScanTarget) => {
+    if (reading.current) return;
+    reading.current = true;
+    const item = target ?? SCAN_SEQUENCE[scanStep.current++ % SCAN_SEQUENCE.length];
+    setInView(item);
+    const started = performance.now();
+    const settle = <T,>(then: (v: T) => void) => (v: T) => window.setTimeout(() => then(v),
+      Math.max(0, duration(DURATION.slow, reducedMotion) - (performance.now() - started)));
+    const failed = settle(() => scanRefused('Couldn’t read that. Try again.'));
+    if (item.kind === 'barcode') {
+      lookupBarcode(item.code).then(settle((product: Product | null) => (product
+        ? addScanned(product)
+        : scanRefused(`No product has the barcode ${item.code}`)))).catch(failed);
+      return;
+    }
+    matchScannedText(item.lines).then(settle((result: TextResult) => {
+      if (result.matches.length === 0) { scanRefused(`No product matches “${result.detected}”`); return; }
+      if (result.matches.length === 1) { addScanned(result.matches[0].product); return; }
+      setMatchSheet(result); setMatchesOpen(true);
+    })).catch(failed);
+  };
+  // Closing "Which product?" without a pick puts the item down: back to scanning.
+  const closeMatches = () => { setMatchesOpen(false); setInView(null); reading.current = false; };
+
+  const byId = (id: string) => PRODUCTS.find((p) => p.id === id)!;
   // Drawn from the catalogue, so the lines, totals and stock ceilings are real.
   const fourLines = () => ['acc-socks', 'tops-tee', 'btm-jeans', 'acc-beanie']
     .map((id) => PRODUCTS.find((p) => p.id === id)!)
@@ -261,6 +348,7 @@ export function App() {
     setMenuOpen(false); setDiscountOpen(false); setOrderDiscount(undefined);
     setCheckoutOpen(false); setPaymentPicker(null); setPendingMethod(null); setSale(null);
     setQueuedOpen(false); setQueueForce(undefined); setQueueForDemo('seeded');
+    setScanning(false); setInView(null); reading.current = false; setMatchesOpen(false);
     setResetNonce((n) => n + 1);
   };
 
@@ -384,6 +472,30 @@ export function App() {
         openCheckout({ ...('method' in draft ? { method: draft.method } : {}), amount });
       },
     })),
+    /* Scanning, band `214:26054`. Every scan runs the real path: the item is held up,
+       read through the mock API, and added by the same rule as a tap on the grid. The
+       hold-up waits for the presentation to arrive, so the read is seen. */
+    ...([
+      ['Scanner', 'Screens', [], undefined],
+      ['Scanner: with items', 'States', 'four', undefined],
+      ['Scanner: scan a barcode', 'States', [], () => barcodeOf(byId('acc-socks'))],
+      ['Scanner: scan a product name', 'States', [], () => tagOf(byId('tops-oxford'))],
+      // Every brand sells three or more, so a brand tag never matches once; a label
+      // with the name alone does.
+      ['Scanner: name with one match', 'States', [], (): ScanTarget => ({ kind: 'text', lines: ['Canvas Tote'], productId: 'bag-tote' })],
+      ['Scanner: unknown barcode', 'States', [], () => UNKNOWN_BARCODE],
+      ['Scanner: name matches nothing', 'States', [], () => UNKNOWN_TAG],
+      ['Scanner: past the stock', 'States', 'beanies', () => barcodeOf(byId('acc-beanie'))],
+      ['Scanner: read fails', 'States', [], () => { failNextRequest(); return barcodeOf(byId('acc-socks')); }],
+    ] as const).map(([label, group, fill, scan]): DevToolbarItem => ({
+      label, group,
+      onSelect: () => {
+        setLines(fill === 'four' ? fourLines() : fill === 'beanies' ? [{ productId: 'acc-beanie', unitId: 'each', count: 3 }] : []);
+        setOrderDiscount(undefined); setCustomer(null);
+        openScanner('salesPoint');
+        if (scan) window.setTimeout(() => holdUp(scan()), enterMs);
+      },
+    })),
     /* Queueing & recalling an order, band `170:8988`. Each opens the sheet over the
        Cart, as More options would; the queue is reseeded unless the entry says empty. */
     ...([
@@ -475,14 +587,15 @@ export function App() {
     onSelect: () => {
       setMenuOpen(false); setDiscountOpen(false); setPickerOpen(false); setQtyOpen(false); setDetailsOpen(false);
       setTotalOpen(false); hideToast(); setCheckoutOpen(false); setPaymentPicker(null); setPendingMethod(null); setSale(null);
-      setQueuedOpen(false);
+      setQueuedOpen(false); setMatchesOpen(false); setInView(null); reading.current = false; setScanning(false);
       entry.onSelect();
     },
   }));
 
   return (
     <>
-      <DeviceFrame>
+      {/* White over the camera, as the scanner frames draw it (`88:19507`). */}
+      <DeviceFrame statusBar={scanning && cartOpen ? 'light' : 'dark'}>
         {/* A render failure most likely came from a cart line, so recovering also
             empties the cart rather than re-rendering the line that threw. */}
         <ErrorBoundary onReset={() => { setLines([]); resetScreens(); }}>
@@ -493,6 +606,7 @@ export function App() {
             freshSale={freshSale}
             onAddProduct={addProduct}
             onViewCart={() => setCartOpen(true)}
+            onScan={() => openScanner('salesPoint')}
           />
 
           {cartMounted && (
@@ -504,7 +618,16 @@ export function App() {
                 transitionTimingFunction: cartOpen ? SHEET_SPRING.easing : SHEET_SPRING.exitEasing,
               }}
             >
+              {cameraMounted && (
+                <div className="scanStage" data-open={cameraEntered ? 'on' : 'off'}>
+                  <Scanner target={inView} onClose={closeScanner} onHoldUp={() => holdUp()} hint={demoAffordances} />
+                </div>
+              )}
+
               <Cart
+                mode={scanning ? 'docked' : 'full'}
+                onExpand={() => setScanning(false)}
+                onScan={() => openScanner('cart')}
                 lines={lines}
                 orderDiscount={orderDiscount}
                 clearRequest={clearRequest}
@@ -523,6 +646,13 @@ export function App() {
                 onRemoveCustomer={() => setCustomer(null)}
                 totalOpen={totalOpen}
                 onToggleTotal={() => setTotalOpen((o) => !o)}
+              />
+
+              <ScanMatches
+                open={matchesOpen}
+                result={matchSheet}
+                onClose={closeMatches}
+                onChoose={(product) => { setMatchesOpen(false); addScanned(product); }}
               />
 
               <SelectCustomer

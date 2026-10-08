@@ -12,8 +12,9 @@ import './Toast.css';
 export type ToastTone = 'success' | 'notice';
 export type ToastAction = { label: string; onPress: () => void };
 /** `card`: `88:8401`, centred. `pill`: the board's Toast notification `88:16028`,
-    low on the screen, used where a flow's frames draw that one ("Order has been queued"). */
-export type ToastVariant = 'card' | 'pill';
+    low on the screen, used where a flow's frames draw that one ("Order has been queued").
+    `banner`: the scanner's, `88:20033` — full width at the top, over the camera. */
+export type ToastVariant = 'card' | 'pill' | 'banner';
 
 /**
  * Confirmation toast — Figma `88:8401`, the only thing that separates "Customer
@@ -57,6 +58,8 @@ export function Toast({
       data-open={open ? 'on' : 'off'}
       data-action={action ? 'on' : 'off'}
       data-variant={variant}
+      data-tone={tone}
+      data-shown={shown}
       role="status"
       aria-live="polite"
       style={{
@@ -64,7 +67,7 @@ export function Toast({
         transitionTimingFunction: open ? EASING.out : EASING.in,
       }}
     >
-      {tone === 'success' && <Icon name={variant === 'pill' ? 'toast-success' : 'check-circle'} />}
+      {tone === 'success' && <Icon name={variant === 'pill' ? 'toast-success' : variant === 'banner' ? 'toast-check-card' : 'check-circle'} />}
       <p className="toast__message">{message}</p>
       {action && (
         <button type="button" className="toast__action" onClick={action.onPress} tabIndex={open ? 0 : -1}>

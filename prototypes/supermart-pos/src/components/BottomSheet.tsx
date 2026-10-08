@@ -15,13 +15,16 @@ import './BottomSheet.css';
  */
 export function BottomSheet({
   open, title, onClose, closeLabel, children, dismissOnBlanket = true, confirm, className, initialFocus,
-  showTitle = true, footer, handoff = false,
+  showTitle = true, footer, handoff = false, subtitle,
 }: {
   open: boolean;
   /** The dialog's accessible name, and its visible heading unless `showTitle` is off. */
   title: string;
   /** Off for a sheet whose design draws no heading: the name is still read out. */
   showTitle?: boolean;
+  /** The scanner's "Which product?" header (`88:19901`): the title over a subtitle,
+      with the close at the trailing edge instead of the leading one. */
+  subtitle?: ReactNode;
   onClose: () => void;
   closeLabel: string;
   children: ReactNode;
@@ -107,6 +110,15 @@ export function BottomSheet({
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
       >
+        {subtitle !== undefined ? (
+          <header className="modalHeader modalHeader--titled">
+            <div className="modalHeader__heading">
+              <h2 className="modalHeader__title">{title}</h2>
+              <p className="modalHeader__subtitle">{subtitle}</p>
+            </div>
+            <CloseButton onPress={onClose} label={closeLabel} />
+          </header>
+        ) : (
         <header className="modalHeader">
           <CloseButton onPress={onClose} label={closeLabel} />
           {showTitle && <h2 className="modalHeader__title">{title}</h2>}
@@ -116,6 +128,7 @@ export function BottomSheet({
             </button>
           )}
         </header>
+        )}
 
         <div className="modalBody">{children}</div>
         {footer && <div className="modalFooter">{footer}</div>}

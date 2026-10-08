@@ -6,6 +6,7 @@ import { BottomScrim } from '../components/BottomScrim';
 import { fetchProducts, type ProductFilter } from '../api/pos';
 import { CATEGORY_ORDER, fullName, type Product } from '../data/catalogue';
 import { ListMessage } from '../components/ListMessage';
+import { ScanButton } from '../components/ScanButton';
 import './SalesPoint.css';
 
 /**
@@ -31,9 +32,11 @@ type SalesPointProps = {
   freshSale?: number;
   onAddProduct: (p: Product) => void;
   onViewCart: () => void;
+  /** The green scan button, `88:19369`: opens the scanner. */
+  onScan: () => void;
 };
 
-export function SalesPoint({ forceState, cartCount, freshSale = 0, onAddProduct, onViewCart }: SalesPointProps) {
+export function SalesPoint({ forceState, cartCount, freshSale = 0, onAddProduct, onViewCart, onScan }: SalesPointProps) {
   const [filter, setFilter] = useState<ProductFilter>('All');
   const [query, setQuery] = useState('');
   const [load, setLoad] = useState<Load>({ status: 'loading' });
@@ -108,6 +111,7 @@ export function SalesPoint({ forceState, cartCount, freshSale = 0, onAddProduct,
       </main>
 
       <BottomScrim height={272} />
+      <ScanButton className="salesPoint__scan" onPress={onScan} />
       <ViewCartButton count={cartCount} onPress={onViewCart} />
       <TabBar onNavigate={() => {}} />
     </div>

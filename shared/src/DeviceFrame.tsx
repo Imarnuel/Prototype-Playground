@@ -20,13 +20,15 @@ type DeviceFrameProps = {
   scale?: number;
   /** Hidden for a frame-less screenshot that should match a Figma export exactly. */
   showBody?: boolean;
+  /** The status bar's style: `light` while the screen under it is dark. */
+  statusBar?: 'dark' | 'light';
 };
 
 /**
  * iPhone 15 Pro shell. A Figma frame is the screen, not the device (CLAUDE.md:128)
  * — the body, bezel and Dynamic Island are built here, not exported from a design.
  */
-export function DeviceFrame({ children, scale = 1, showBody = true }: DeviceFrameProps) {
+export function DeviceFrame({ children, scale = 1, showBody = true, statusBar = 'dark' }: DeviceFrameProps) {
   // Custom properties only. Setting --vars does not create a stacking context,
   // unlike an inline z-index or translate (CLAUDE.md:117).
   const vars = {
@@ -54,7 +56,7 @@ export function DeviceFrame({ children, scale = 1, showBody = true }: DeviceFram
           {/* System chrome, drawn once above the app rather than by each screen —
               see StatusBar.tsx. Rendered whatever `showBody` is: the Figma frames
               carry a status bar, so a frame-less screenshot still needs one. */}
-          <StatusBar />
+          <StatusBar appearance={statusBar} />
           {/* The island lives inside the screen, not the body: it is a display
               feature, and CLAUDE.md:136 specifies its 11pt offset against the
               screen. Positioned against the body it resolves against the body's

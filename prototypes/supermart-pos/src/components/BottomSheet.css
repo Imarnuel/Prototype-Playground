@@ -137,6 +137,36 @@
    fully round, 10px padding, the frame's xs shadow, a 20x20 check in
    Color/icon/brand. Pushed to the trailing edge; the title stays absolutely centred,
    so a sheet with it and a sheet without it share one header height. */
+/* `88:19901`, the scanner's "Which product?": the title over a subtitle at the
+   leading edge (8 down, 4 apart), the close trailing, 16/12 padded, 12 apart. */
+.modalHeader--titled {
+  align-items: flex-start;
+  gap: 12px;
+  padding: var(--spacing-400) var(--spacing-400) 12px;
+}
+.modalHeader__heading {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--spacing-50);
+  padding-top: var(--spacing-200);
+}
+.modalHeader--titled .modalHeader__title {
+  position: static;
+  transform: none;
+  text-align: left;
+  white-space: normal;
+}
+.modalHeader__subtitle {
+  margin: 0;
+  font-size: var(--type-Body-Base-size);
+  font-weight: var(--type-Body-Base-weight);
+  line-height: var(--type-Body-Base-line-height);
+  letter-spacing: var(--type-Body-Base-letter-spacing);
+  color: var(--color-text-subtle);
+}
+
 .modalHeader__confirm {
   position: relative;
   display: flex;

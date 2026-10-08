@@ -1,0 +1,133 @@
+/* "Which product?", `88:19899`. The header is BottomSheet's titled variant; the body
+   (`88:19906`) is 8/16/16 padded with 20 between the detected text and the list, and
+   the header sits flush on it (no panel gap). */
+.scanMatches { gap: 0; }
+.scanMatches .modalBody {
+  gap: var(--spacing-500);
+  padding: var(--spacing-200) var(--spacing-400) var(--spacing-400);
+}
+
+/* `88:19907`: Body/Base subtle, then the brand Badge — Label/Base in Color/text/brand
+   on Color/container/brand, 10/2 padded, 16 round. */
+.scanMatches__detected {
+  display: flex;
+  gap: var(--spacing-200);
+  align-items: center;
+  font-size: var(--type-Body-Base-size);
+  line-height: var(--type-Body-Base-line-height);
+  letter-spacing: var(--type-Body-Base-letter-spacing);
+  color: var(--color-text-subtle);
+}
+.scanMatches__badge {
+  padding: 2px 10px;
+  border-radius: calc(16px * var(--corner-scale));
+  background: var(--color-container-brand-default);
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  color: var(--color-text-brand);
+}
+
+.scanMatches__list {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* `88:19911`: a 48 image and the text 14 apart, the price at the trailing edge, 16
+   apart; rows divided by Color/border/subtle, the first flush to the top, the last
+   with no divider. */
+.scanMatches__row {
+  display: flex;
+  width: 100%;
+  gap: var(--spacing-400);
+  align-items: center;
+  padding: var(--spacing-400) 0;
+  border: 0;
+  background: none;
+  box-shadow: inset 0 -1px 0 0 var(--color-border-subtle);
+  text-align: left;
+  cursor: pointer;
+}
+.scanMatches__list > li:first-child .scanMatches__row { padding-top: 0; }
+.scanMatches__list > li:last-child .scanMatches__row { box-shadow: none; padding-bottom: 0; }
+
+.scanMatches__lead {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  gap: 14px;
+  align-items: center;
+}
+
+.scanMatches__image {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  border-radius: var(--radius-100);
+  background: var(--color-container-neutral-default);
+  overflow: clip;
+}
+.scanMatches__image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* The frame still carries the image component's original 80% scrim; the photos here
+   take the softened one the designer asked for on the card and Cart (see
+   ProductCard.css), so the same photo does not darken from one screen to the next. */
+.scanMatches__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(0 0 0 / 0%) 40%, rgb(0 0 0 / 6%) 70%, rgb(0 0 0 / 20%) 100%);
+}
+
+.scanMatches__text {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--spacing-50);
+}
+
+.scanMatches__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  letter-spacing: var(--type-Label-Large-letter-spacing);
+  color: var(--color-text-default);
+}
+
+.scanMatches__meta {
+  display: flex;
+  gap: var(--spacing-200);
+  align-items: center;
+  font-size: var(--type-Body-Base-size);
+  line-height: var(--type-Body-Base-line-height);
+  letter-spacing: var(--type-Body-Base-letter-spacing);
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+}
+
+/* `88:19918`: Text xs/Medium in Color/text/success on Color/container/success, 8/2. */
+.scanMatches__best {
+  padding: 2px var(--spacing-200);
+  border-radius: calc(16px * var(--corner-scale));
+  background: var(--color-container-success-default);
+  font-size: var(--type-Text-xs-Medium-size);
+  font-weight: var(--type-Text-xs-Medium-weight);
+  line-height: var(--type-Text-xs-Medium-line-height);
+  letter-spacing: var(--type-Text-xs-Medium-letter-spacing);
+  color: var(--color-text-success);
+}
+
+.scanMatches__price {
+  flex: none;
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  letter-spacing: var(--type-Label-Large-letter-spacing);
+  color: var(--color-text-default);
+}

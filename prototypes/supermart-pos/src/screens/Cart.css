@@ -1,9 +1,16 @@
 .cart {
-  position: relative;
+  /* Absolute rather than in flow, so the scanner can dock it at 340 and the expand
+     can grow it back to the full screen as one motion (`top`, below). */
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  height: 100%;
   background: var(--color-surface-default);
+  overflow: clip;
+  transition:
+    top var(--motion-slow) var(--ease-out),
+    padding-top var(--motion-slow) var(--ease-out),
+    border-radius var(--motion-slow) var(--ease-out);
   /* See SalesPoint.css — the status bar is device chrome, so this reserves the inset
      instead of rendering one. On a real device a sheet slides UNDER the status bar;
      rendering one per screen put two clocks on screen at once mid-transition. */
@@ -26,7 +33,23 @@
   margin-top: 8px;
   background: var(--color-surface-default);
   overflow: clip;
+  box-sizing: border-box;
+  transition:
+    margin-top var(--motion-slow) var(--ease-out),
+    height var(--motion-slow) var(--ease-out),
+    padding var(--motion-slow) var(--ease-out);
 }
+
+/* Expand (docked) and close (full) share the title bar's leading slot. */
+.cart__leadGlyph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var(--motion-fast) var(--ease-out);
+}
+.cart__leadGlyph[data-on='off'] { opacity: 0; }
 
 .cart__titleLeft {
   display: flex;
@@ -180,6 +203,9 @@
 }
 
 .cart__empty { animation: motion-fade var(--motion-base) var(--ease-out) backwards; }
+/* The customer row arrives with the first line, so it fades in rather than drawing
+   its border a beat before its content. */
+.addCustomer { animation: motion-fade var(--motion-base) var(--ease-out) backwards; }
 
 /* The customer row's two states cross-fade rather than swap. */
 .addCustomer__pick > *, .addCustomer__remove { animation: motion-fade var(--motion-fast) var(--ease-out) backwards; }
@@ -285,26 +311,31 @@
   white-space: nowrap;
 }
 
-.cart__empty {
-  padding: 48px 8px;
-  text-align: center;
+/* The empty Cart, `88:16199` / `88:19449`: the board's empty state with the 40 cart
+   glyph and two lines of Body/large, no title, 16 below the rings, the group centred
+   on the SCREEN (its frame centres it at y 426), not on the list area. No customer
+   row and no footer: an empty sale has nothing to check out or queue. */
+.cart__empty { gap: 16px; }
+.cart[data-mode='full'] .cart__empty {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  width: 361px;
+  translate: 0 -50%;
 }
 
-.cart__emptyTitle {
-  margin: 0 0 4px;
-  font-size: var(--type-Label-Large-size);
-  font-weight: var(--type-Label-Large-weight);
-  line-height: var(--type-Label-Large-line-height);
-  color: var(--color-text-default);
+/* Docked and empty, `88:19506`: the same rings over "Scan barcode or text", centred
+   in the 348 body, the text block 291 wide. */
+.cart[data-mode='docked'][data-empty='on'] .cart__scroll {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 16px 96px;
 }
+.cart[data-mode='docked'] .cart__empty .emptyState__text { width: 291px; }
 
-.cart__emptyBody {
-  margin: 0;
-  font-size: var(--type-Body-Base-size);
-  line-height: var(--type-Body-Base-line-height);
-  letter-spacing: var(--type-Body-Base-letter-spacing);
-  color: var(--color-text-subtle);
-}
+/* `88:19466`: 16 from the right, 32 from the bottom. */
+.cart__scan { right: 16px; bottom: 32px; }
 
 
 /* Bottom-docked, so no +9 shift: design 773..821 on an 852 screen leaves 31. */
@@ -324,7 +355,59 @@
   /* The frame's own pair, unbound and with no token, cast upward: 0,-2 blur 4
      spread -1 at 6%, and 0,-4 blur 20 spread -2 at 10%. */
   box-shadow: 0 -2px 4px -1px #0a0d120f, 0 -4px 20px -2px #0a0d121a;
+  transition:
+    padding var(--motion-slow) var(--ease-out),
+    border-radius var(--motion-slow) var(--ease-out),
+    box-shadow var(--motion-slow) var(--ease-out),
+    opacity var(--motion-base) var(--ease-out),
+    visibility 0ms linear 0ms;
 }
+
+/* Nothing to check out: the full Cart draws no footer (`88:16199`) and the docked one
+   carries it at opacity 0 (`88:19533`). Hidden once the fade has run, so it never
+   cuts and its buttons leave the tab order. */
+.cart[data-empty='on'] .cart__footer {
+  opacity: 0;
+  visibility: hidden;
+  transition-delay: 0ms, 0ms, 0ms, 0ms, var(--motion-base);
+}
+
+.cart__totalSlot {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows var(--motion-slow) var(--ease-out),
+    opacity var(--motion-base) var(--ease-out),
+    visibility 0ms linear 0ms;
+}
+.cart__totalClip { min-height: 0; overflow: clip; }
+
+/* --- Docked under the scanner: `88:19584` ----------------------------------------
+   The panel starts at 340 (five of the eight frames; three draw 346, #116), top
+   corners rounded as every sheet's are (the designer's 32, not the frame's 28). Its
+   title bar is 16/12 padded, 68 tall; the footer is the two buttons alone, 16/16/32
+   padded, square, under the frame's own 0,-4 blur 8 shadow at 5% (no token). */
+.cart[data-mode='docked'] {
+  top: 340px;
+  padding-top: 0;
+  border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
+}
+.cart[data-mode='docked'] .cart__titleBar { margin-top: 0; height: 68px; padding: 16px 16px 12px; }
+.cart[data-mode='docked'] .cart__scroll { padding: 16px 16px 106px; }
+.cart .bottomScrim { transition: opacity var(--motion-base) var(--ease-out); }
+.cart[data-mode='docked'] .bottomScrim { opacity: 0; }
+.cart[data-mode='docked'] .cart__footer {
+  padding: 16px 16px 32px;
+  border-radius: 0;
+  box-shadow: 0 -4px 8px 0 #0000000d;
+}
+.cart[data-mode='docked'] .cart__totalSlot {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition-delay: 0ms, 0ms, var(--motion-slow);
+}
+.cart[data-mode='docked'] .cart__actions { padding-top: 0; }
 
 /* Frame 5032: the buttons, Spacing/200 apart. The 8px above them is the collapsed
    frame's gap and the expanded frame's breakdown padding — the same 8 in both. */
@@ -333,6 +416,7 @@
   gap: var(--spacing-200);
   align-items: center;
   padding-top: 8px;
+  transition: padding-top var(--motion-slow) var(--ease-out);
 }
 
 .cart__checkout,

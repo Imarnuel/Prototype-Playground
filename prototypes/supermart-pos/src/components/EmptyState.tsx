@@ -10,7 +10,8 @@ import './EmptyState.css';
  * The gap below the rings differs per frame (24 there, 16 here), so it is the caller's.
  */
 export function EmptyState({ icon, title, body, className = '', children }: {
-  icon: IconName; title: string; body: ReactNode; className?: string; children?: ReactNode;
+  /** Absent where the frame draws the body alone — the empty Cart (`88:16199`). */
+  icon: IconName; title?: string; body: ReactNode; className?: string; children?: ReactNode;
 }) {
   return (
     <div className={`emptyState ${className}`}>
@@ -22,7 +23,7 @@ export function EmptyState({ icon, title, body, className = '', children }: {
         </div>
       </div>
       <div className="emptyState__text">
-        <p className="emptyState__title">{title}</p>
+        {title && <p className="emptyState__title">{title}</p>}
         <p className="emptyState__body">{body}</p>
       </div>
       {children}

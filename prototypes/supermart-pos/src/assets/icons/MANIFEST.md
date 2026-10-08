@@ -1,6 +1,6 @@
 # Icons
 
-All 53 are present, 50 here and 3 in `shared/src/assets/`. Band `170:8988` (queueing
+All 59 are present, 56 here and 3 in `shared/src/assets/`. Band `170:8988` (queueing
 and recalling an order) added five, each from its own instance: `layout-alt-02`
 (`88:16257`, 40, the empty Queued orders), `clock` (`88:16298`, 16), `dots-horizontal-24`
 (`88:16301` — the order card's 24 instance, not the 20 export beside it) and
@@ -10,6 +10,15 @@ toast's 20 icon in `88:16028`: a filled `#0A9645` disc — the primitive Green/6
 semantic token — unlike the card toast's outlined `check-circle`). `chevron-down` joined with
 the order total (band `115:8774`), exported from its instance `88:8718`. They are the screens' own
 Figma exports — nothing here was substituted, redrawn, or traced.
+
+Band `214:26054` (scanning) added six, each from its own instance: `scan` (`88:19370`,
+28, white, the scan button), `expand-01` (`I88:19513;2049:9449`, 20, the docked Order
+Preview's leading control), `x-close-camera` (`I88:19536;2049:9449`, 20, `#CFD0D3` — the
+camera's close, under the file's dark mode), `scan-line` (`88:19544`, the 274 green
+line with its own gradient), `toast-check-card` (`I88:20033;68:3364`, 20, the banner's
+white disc with a green tick) and `shopping-cart-40` (`88:19527`, 40, `#20293C`, the
+empty Cart and empty scanner — not the View cart button's 16 white
+`shopping-cart-01`; `88:19464` exports identically).
 
 `cellular-connection`, `wifi` and `battery` are not in this set: they are the status
 bar's glyphs, and the status bar is device chrome drawn by `DeviceFrame`, not screen

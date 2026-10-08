@@ -1,0 +1,180 @@
+/* The scanner's camera, band `214:26054`. Absolute screen coordinates, as the frames
+   place every layer; the docked Order Preview covers everything from 340 down. */
+.scanner {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  overflow: clip;
+}
+
+/* The whole visible camera is the demo's tap target (a real camera has none). */
+.scanner__camera {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 372px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.scanner__camera:disabled { cursor: default; }
+
+/* `88:19536`: 40x40 at [20,60]. See Scanner.tsx for the dark-mode fill. */
+.scanner__close {
+  position: absolute;
+  left: 20px;
+  top: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: #2c2d30;
+  cursor: pointer;
+}
+.scanner__close::after { content: ''; position: absolute; inset: -2px; }
+
+/* `88:19537`: 281x194, centred, at y 125 in five of the eight frames and 118 in the
+   other three (#117). Four 32x32 corners: a 2px white stroke on two sides, the
+   outer corner rounded Border radius/200. */
+.scanner__frame {
+  position: absolute;
+  left: 56px;
+  top: 125px;
+  width: 281px;
+  height: 194px;
+  pointer-events: none;
+}
+
+.scanner__corner {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  box-sizing: border-box;
+  border: 0 solid #fff;
+  border-top-width: 2px;
+  border-left-width: 2px;
+  border-top-left-radius: var(--radius-200);
+}
+.scanner__corner[data-at='tl'] { left: 0; top: 0; }
+.scanner__corner[data-at='tr'] { right: 0; top: 0; transform: scaleX(-1); }
+.scanner__corner[data-at='bl'] { left: 0; bottom: 0; transform: scaleY(-1); }
+.scanner__corner[data-at='br'] { right: 0; bottom: 0; transform: scale(-1); }
+
+/* `88:19544`: the 274-wide green line, drawn at the frame's middle. Not designed to
+   move; it sweeps the frame, as a scan line does, on a slow even loop composed from
+   the motion tokens. Under reduced motion it rests where the frame draws it. */
+.scanner__line {
+  position: absolute;
+  left: 3px;
+  top: 96px;
+  display: flex;
+  animation: scanner-sweep calc(var(--motion-slow) * 4) var(--ease-inOut) infinite alternate;
+}
+
+@keyframes scanner-sweep {
+  from { transform: translateY(-76px); }
+  to { transform: translateY(76px); }
+}
+
+/* Not designed: the demo's instruction, inside the frame where the eye already is. */
+.scanner__hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 64px;
+  font-size: var(--type-Body-Base-size);
+  line-height: var(--type-Body-Base-line-height);
+  letter-spacing: var(--type-Body-Base-letter-spacing);
+  color: #ffffffb3;
+  transition: opacity var(--motion-fast) var(--ease-out);
+}
+.scanner__hint[data-hidden='on'] { opacity: 0; }
+
+/* --- What is in front of the camera ---------------------------------------------
+   A drawn stand-in for a camera image, not interface: the label's white, the tag's
+   paper and the print are the objects' colours, so no token applies. The item comes
+   into the lens — a fade and a slight settle — and leaves the same way. */
+.scanScene {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 372px;
+  transition:
+    opacity var(--motion-base) var(--ease-out),
+    transform var(--motion-base) var(--ease-out);
+  pointer-events: none;
+}
+.scanScene[data-open='off'] { opacity: 0; transform: scale(1.06); }
+.scanScene[data-open='on'] { opacity: 1; transform: none; }
+
+.scanScene__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* The item fills the lens out of focus; the label or tag is what is in focus. */
+  filter: blur(10px) brightness(0.7);
+  transform: scale(1.15);
+}
+
+.scanLabel {
+  position: absolute;
+  left: 50%;
+  top: 222px;
+  display: flex;
+  padding: 12px 14px 8px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 6px 18px #0000004d;
+  transform: translate(-50%, -50%) rotate(-2deg);
+}
+.scanLabel svg { display: block; fill: #141f33; }
+.scanLabel text {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 15px;
+  fill: #141f33;
+}
+
+.scanTag {
+  position: absolute;
+  left: 50%;
+  top: 222px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 168px;
+  padding: 26px 12px 14px;
+  border-radius: 8px;
+  background: #f3efe6;
+  box-shadow: 0 6px 18px #0000004d;
+  transform: translate(-50%, -50%) rotate(3deg);
+  text-align: center;
+}
+.scanTag__hole {
+  position: absolute;
+  top: 9px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #00000059;
+}
+.scanTag__brand {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #141f33;
+}
+.scanTag__line {
+  font-size: 13px;
+  line-height: 18px;
+  color: #3d4659;
+}

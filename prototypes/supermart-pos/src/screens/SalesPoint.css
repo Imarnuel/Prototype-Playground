@@ -111,3 +111,6 @@
 .viewCart {
   bottom: 101px;
 }
+
+/* `88:19369`: 60x60 at [317,631], 12 above View cart, at the frame's right margin. */
+.salesPoint__scan { left: 317px; top: 631px; }

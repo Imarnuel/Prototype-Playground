@@ -4,9 +4,10 @@
  * (root agreement §4) — nothing here calls setTimeout.
  */
 import { request } from '@playground/shared';
-import { CATEGORY_ORDER, PRODUCTS, type Category, type Product } from '../data/catalogue';
+import { CATEGORY_ORDER, PRODUCTS, findByBarcode, type Category, type Product } from '../data/catalogue';
 import { buildReceipt, type Receipt } from '../state/sale';
 import { seedQueue, type QueuedOrder } from '../state/queue';
+import { matchText, type TextResult } from '../state/scan';
 
 export type ProductFilter = Category | 'All';
 
@@ -93,6 +94,17 @@ export function restoreQueued(order: QueuedOrder): Promise<void> {
     queue = [...queue.filter((q) => q.id !== order.id), order]
       .sort((a, b) => b.queuedAt.getTime() - a.queuedAt.getTime());
   });
+}
+
+/* --- Scanning (band `214:26054`) ----------------------------------------------------
+   What the camera read, looked up against the catalogue. A read that matches nothing
+   resolves (null, or no matches): only a failed request rejects. */
+export function lookupBarcode(code: string): Promise<Product | null> {
+  return request('scan/barcode', () => findByBarcode(code) ?? null);
+}
+
+export function matchScannedText(lines: readonly string[]): Promise<TextResult> {
+  return request('scan/text', () => matchText(lines));
 }
 
 /** Dev toolbar only: put the queue in a demo state without waiting on anything. */

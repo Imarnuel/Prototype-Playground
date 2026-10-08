@@ -25,3 +25,12 @@
     transition-duration: 0ms !important;
   }
 }
+
+/* The scanner's camera behind the docked Cart. It fades rather than cuts when the
+   Cart expands over it and when it docks again. */
+.scanStage {
+  position: absolute;
+  inset: 0;
+  transition: opacity var(--motion-slow) var(--ease-out);
+}
+.scanStage[data-open='off'] { opacity: 0; }

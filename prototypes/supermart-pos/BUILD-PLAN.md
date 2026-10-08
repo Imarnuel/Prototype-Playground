@@ -332,6 +332,17 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 112 | **Not designed**: the queue's loading and failure, a failed Queue order, a failed recall, Recall order working, a recall over a Cart that already holds a sale, the delete's confirmation | Skeleton cards and the Sales Point's message; notice toasts that keep everything as it was; a spinner in place; the designer's calls — a recall over a sale queues that sale first, a delete is immediate with Undo |
 | 113 | **POS has no frames, and Bank transfer returns to Checkout before a bank is chosen** — `88:14105` lists POS among the undesigned methods; the frames show the method picker handing back to Checkout, the bank picked separately from its row | At the designer's request: POS works exactly as Bank transfer (`paysIntoAccount`: Select bank, the account on Checkout and the receipt as "POS · {bank}", the total exactly), and picking either goes straight on to Select bank. The method lands with the bank; closing Select bank cancels, leaving Checkout as it was |
 | 114 | **Transaction success centres its mark and line on the screen** (`88:8723`: centre y 426) — at first glance they read as too low | At the designer's request, at the optical centre, 40% down (341): 85 higher. `diff-checkout` moves its two targets by the 85 |
+| 115 | **The camera shots are not this store's goods** — `88:19777` frames a drinks-carton barcode reading 01-02-01-01-11-13 (not an EAN-13 of anything), `88:19817` a hand holding a Sprite bottle | At the designer's call, drawn from the catalogue: a label carrying the product's real EAN-13 (encoded, and proved against the symbology's own rules), or a hang tag carrying its brand and name, over the product's own photo out of focus. What is scanned is always what is added |
+| 116 | **The docked Order Preview moves** — at 340 in five of the eight scanner frames, 346 in three (`88:19506`, `88:19545`, `88:19938`) | 340, the majority |
+| 117 | **The viewfinder moves too** — at 125 in five frames, 118 in three (`88:19584`, `88:19678`, `88:19938`) | 125, the majority |
+| 118 | **"Which product?" marks Oxford Shirt the best match, and the next frame adds Crew Socks** (`88:19858` → `88:19678`) | The product picked is the one added. `walk-scan` picks the third row and proves that row lands |
+| 119 | **The frame orders the matches Oxford, Cap, Rain Jacket**; nothing ranks Cap above the jacket | Ranked by what the tag says (brand 1, each name word 2); ties keep the catalogue's order: Oxford, Rain Jacket, Cap |
+| 120 | **The match sheet's thumbnails still carry the image component's 80% scrim** | The softened scrim the designer asked for on the card and the Cart, so a photo does not darken from one screen to the next |
+| 121 | **The camera's close button is the only dark-mode layer in the band** — Frame 4908 with the file's Dark mode set on the node: Color/container/neutral/default resolves to #2C2D30, its x-close to #CFD0D3 | The resolved values, as literals: the app carries no dark tokens (#103) |
+| 122 | **The docked sheet's own frame (`88:19509`) carries a blanket fill and blur, and a 280 "Background" gradient sits behind it (`88:19508`)** — both entirely covered by the sheet | Not built: neither can be seen |
+| 123 | **A "Frame 4908 → Cart" connector (`88:20036`) leaves the full Cart for nothing** | Not built: it has no destination |
+| 124 | **The empty Cart was never built as designed.** `88:16199` (queue band) and `88:19449` draw the board's empty state — the 40 cart glyph, two lines of Body/large, no title — with no customer row and no footer; the build showed "No items yet" over a customer row and a disabled footer | Built as drawn, for both bands. A customer already attached keeps their row, so they can still be removed |
+| 125 | **Not designed**: what makes a simulated camera read, the read in progress, an unknown barcode, a name that matches nothing, a failed read, a scan past the stock, a name with one match, the scanner's status bar | A tap on the camera holds up the next item (a prototype affordance, with an instruction shown only where the dev toolbar is); a read takes at least `slow`; refusals and failures in the banner's neutral fill; the grid's own stock rule; one match is added at once; the status bar turns white over the camera, as iOS does and as the frames draw it |
 
 ## Work order
 
@@ -794,6 +805,53 @@ Sampled per frame: the row menu fades in over 6-7 frames and out over 6-7, a del
 row collapses 136 → 0 over 7-8, More options hands over to Queued orders through 7-8
 positions with the backdrop at full strength throughout; under reduced motion each
 lands at once.
+
+### Band `214:26054` — "Scanning an item barcode / name in sales point"
+
+Twelve frames in two rows: the Sales Point with its green scan button (`88:19293`,
+`88:19371`), the empty Cart with the same button (`88:19449`), the scanner empty
+(`88:19506`, `88:19545`), a barcode and a tag in view (`88:19777`, `88:19817`), the
+scanner over a full Cart (`88:19584`), "Crew Socks added to cart" (`88:19938`,
+`88:19678`), "Which product?" (`88:19858`/`88:19899`) and the full Cart (`88:19119`).
+The designer's calls, asked before building: the camera is **simulated**, and what is
+in front of it is **drawn from the data** (#115).
+
+- **The scanner is the Cart, docked.** `Cart` takes `mode="docked"`: at 340 under a
+  camera, expand where the close was, no order total, the 96 footer. The same
+  component, so the lines, the customer and every sheet it opens are the Cart's own;
+  expand grows it to the full Cart as one motion (`top` 340 → 0, the camera fading
+  out), and the empty Cart's scan button docks it back. The scanner's X returns to
+  whatever opened it: the Sales Point, or the Cart it undocked from.
+- **Model** (`state/scan.ts`): a scan target is a barcode or a tag. The EAN-13 encoder
+  is checked in `cart:verify` against properties of the symbology rather than its own
+  tables, and reproduces the textbook example (5901234123457). Text matching scores a
+  brand hit 1 and each name word 2; "Best match" only marks a clear winner. Two
+  endpoints in `api/pos.ts` (`lookupBarcode`, `matchScannedText`) carry latency and
+  failure like every other read; a read that matches nothing resolves, only a failed
+  request rejects.
+- **Flow**: a tap on the camera holds up the next item of a fixed sequence that opens
+  on the frames' two (Crew Socks by barcode, a Northline tag) and reaches every
+  product. The item comes into the lens, is read for at least `slow`, then lands
+  through the grid's own add rule (`tryAdd`, one rule for a tap and a scan, stock
+  limits included) with the frame's banner; a beat later it leaves the lens. Text
+  with several matches opens "Which product?"; one match is added at once.
+- **Reused**: the Cart and its line exit, BottomSheet (with a new titled header —
+  title over subtitle, close trailing), EmptyState (title now optional), the Toast
+  (a third variant, `banner`), the press and fade rules, `usePresented`. **New**: the
+  camera, the match sheet, the scan button, 6 icons from their instances (`scan`,
+  `expand-01`, the camera's x-close, the scan line, the banner's tick, the 40 cart),
+  and a light style on the shared status bar.
+
+Verified, dev and production: `walk-scan` 38/38 — geometry against the frames (the
+button at [317,631], the docked Cart at 340 and 512 tall, its 68 title bar and 96
+footer, the banner at [20,54] 357x52, the empty states centred at 582 and 426) and
+every step by its consequence (a barcode lands as Crew Socks at ₦950, the third row
+of "Which product?" lands as Baseball Cap, refusals and a failed read add nothing,
+one tap is one line, Queue order from the scanner leaves no camera behind). Every
+earlier walk and diff unchanged; `figma:audit` 509, 0 differ; `cart:verify` +7.
+Sampled per frame: expand and dock move through 15-16 positions with the camera
+fading over 11-13 steps, the item enters and leaves over 13; under reduced motion
+each lands at once.
 
 ## Screen 1 — verification record
 

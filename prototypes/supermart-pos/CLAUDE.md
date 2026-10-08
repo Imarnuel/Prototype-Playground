@@ -16,7 +16,7 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **114** inconsistencies, including that 31 frames share the name
+anything — it records **125** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
@@ -83,6 +83,20 @@ on to Select bank when picked, name the account on Checkout and the receipt, and
 be the total (#113). Customer balance, Complimentary and Payment split are not designed
 and say so. **Open:** the
 receipt's logo is a placeholder (#97). See BUILD-PLAN, band `162:8987`.
+
+### Built — band `214:26054`, scanning a barcode or a name
+
+| Screen | Node | State |
+|---|---|---|
+| Scan button on the Sales Point and the empty Cart | `88:19369`, `88:19466` | 60x60 at [317,631]; 16/32 from the corner |
+| Scanner, empty and over a Cart | `88:19506`, `88:19584` | the Cart docked at 340 (`Cart` mode "docked") |
+| Added to cart | `88:19938` | the banner toast at [20,54] |
+| Which product? | `88:19899` | three Northline matches, best marked |
+| Empty Cart | `88:16199`, `88:19449` | built as drawn at last (#124) |
+
+`walk-scan` 38/38. The camera is simulated and the item in it drawn from the catalogue
+(the designer's calls): a tap holds up the next item, a real EAN-13 or a brand tag,
+and a read lands through the grid's own add rule. See BUILD-PLAN, band `214:26054`.
 
 ### Built — band `170:8988`, queueing and recalling an order
 
@@ -184,7 +198,7 @@ npm run dev                # iterate; open with ?dev=1 for the toolbar
 npm run build && npm run preview   # demo from here, not dev
 
 npm run catalogue:verify   # 66 invariants: check digits, units, money, totals, states, CSV
-npm run cart:verify        # 34 rules: stock, clamps, unit changes, the receipt, the queue
+npm run cart:verify        # 41 rules: stock, clamps, unit changes, the receipt, the queue, scanning
 npm run catalogue:csv      # regenerate figma/catalogue.csv from catalogue.ts
 npm run figma:spec         # every figure the Figma screens were synced to (figma/README.md)
 npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json
@@ -200,6 +214,7 @@ node scripts/walk-total.mjs      [url]   # order total: reconciles, motion both 
 node scripts/walk-discount.mjs   [url]   # More options, order discount, Clear cart + Undo
 node scripts/walk-checkout.mjs   [url]   # both checkout flows, failure, receipt, new sale
 node scripts/walk-queue.mjs      [url]   # queue, recall (and over a full Cart), delete + Undo, failures
+node scripts/walk-scan.mjs       [url]   # scan button, barcode and name scans, Which product?, expand, refusals
 node scripts/diff-queue.mjs      [url]   # Queued orders, row menu, empty, toast vs their frames
 node scripts/diff-checkout.mjs   [url]   # checkout, pickers, success, receipt vs their frames
 node scripts/diff-total.mjs      [url]   # order total vs 88:8639 / 88:9338

@@ -168,5 +168,54 @@ check('every queued line is within its shelf',
   seeded.every((q) => q.lines.every((l) => l.count >= 1 && l.count <= maxCount(byId(l.productId), l.unitId))));
 check('the frame\'s time form, "13:24, 06-03-2026"', formatQueuedAt(new Date(2026, 2, 6, 13, 24)) === '13:24, 06-03-2026');
 
+// --- Scanning (band 214:26054) ----------------------------------------------------
+const scanFile = path.join(outdir, 'scan.mjs');
+await build({
+  entryPoints: [path.join(root, 'src/state/scan.ts')],
+  bundle: true, format: 'esm', platform: 'node', outfile: scanFile, logLevel: 'error',
+});
+const scan = await import(pathToFileURL(scanFile).href);
+fs.rmSync(outdir, { recursive: true, force: true });
+/* The encoder is checked against properties of the symbology, not against its own
+   tables: every digit is 7 modules in exactly 2 bars and 2 spaces; left-hand L digits
+   carry an odd number of dark modules and G and R digits an even number; the left
+   half's odd/even pattern names the first digit. Decoded back by those rules alone. */
+const FIRST = { OOOOOO: 0, OOEOEE: 1, OOEEOE: 2, OOEEEO: 3, OEOOEE: 4, OEEOOE: 5, OEEEOO: 6, OEOEOE: 7, OEOEEO: 8, OEEOEO: 9 };
+const decodeEan = (m) => {
+  if (m.length !== 95 || !m.startsWith('101') || !m.endsWith('101') || m.slice(45, 50) !== '01010') return null;
+  const runs = (s) => s.match(/0+|1+/g).length;
+  const chunk = (from) => Array.from({ length: 6 }, (_, i) => m.slice(from + i * 7, from + i * 7 + 7));
+  const left = chunk(3), right = chunk(50);
+  if (![...left, ...right].every((c) => runs(c) === 4 && c.length === 7)) return null;
+  // Width pattern -> digit: the standard's bar/space widths, read off each 7-module symbol.
+  const WIDTHS = ['3211', '2221', '2122', '1411', '1132', '1231', '1114', '1312', '1213', '3112'];
+  const widths = (c) => c.match(/0+|1+/g).map((r) => r.length).join('');
+  const digit = (c, mirror) => { const w = widths(c); return WIDTHS.indexOf(mirror ? [...w].reverse().join('') : w); };
+  const parity = left.map((c) => ([...c].filter((b) => b === '1').length % 2 ? 'O' : 'E')).join('');
+  const first = FIRST[parity];
+  const ld = left.map((c, i) => digit(c, parity[i] === 'E'));
+  const rd = right.map((c) => digit(c, false));
+  if (first === undefined || [...ld, ...rd].some((d) => d < 0)) return null;
+  return `${first}${ld.join('')}${rd.join('')}`;
+};
+check('every product\'s barcode encodes as a 95-module EAN-13 that decodes back to itself',
+  PRODUCTS.every((p) => decodeEan(scan.ean13Modules(p.barcode)) === p.barcode),
+  PRODUCTS.map((p) => decodeEan(scan.ean13Modules(p.barcode)) === p.barcode ? '' : p.barcode).filter(Boolean).join(' '));
+check('the unknown barcode is a valid code that no product carries',
+  decodeEan(scan.ean13Modules(scan.UNKNOWN_BARCODE.code)) === scan.UNKNOWN_BARCODE.code
+  && !PRODUCTS.some((p) => p.barcode === scan.UNKNOWN_BARCODE.code));
+const north = scan.matchText(scan.tagOf(byId('tops-oxford')).lines);
+check('a Northline tag matches the three Northline products, Oxford Shirt the best (88:19899)',
+  north.detected === 'Northline' && north.matches.length === 3
+  && north.matches.every((m) => m.product.brand === 'Northline')
+  && north.matches[0].product.id === 'tops-oxford' && north.matches[0].best && north.matches.filter((m) => m.best).length === 1,
+  north.matches.map((m) => `${m.product.name}${m.best ? '*' : ''}`).join(', '));
+check('every tag in the scan sequence ranks its own product first',
+  scan.SCAN_SEQUENCE.filter((t) => t.kind === 'text').every((t) => scan.matchText(t.lines).matches[0]?.product.id === t.productId));
+check('every barcode in the scan sequence is its product\'s own',
+  scan.SCAN_SEQUENCE.filter((t) => t.kind === 'barcode').every((t) => byId(t.productId).barcode === t.code));
+check('the scan sequence reaches every product', new Set(scan.SCAN_SEQUENCE.map((t) => t.productId)).size === PRODUCTS.length);
+check('a tag from a brand the store does not sell matches nothing', scan.matchText(scan.UNKNOWN_TAG.lines).matches.length === 0);
+
 console.log(`\n${fails} failing`);
 process.exit(fails ? 1 : 0);

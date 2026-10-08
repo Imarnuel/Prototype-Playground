@@ -1,0 +1,18 @@
+/* `88:19369`: 60x60, fully round, Color/container/success/bold, a 28 `scan` glyph
+   (white, the instance's own export), Shadow/xl. The frame's 16/8 padding never binds
+   at a fixed 60 with a 28 glyph, so the glyph is simply centred. */
+.scanButton {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-container-success-bold-default);
+  box-shadow: var(--shadow-xl);
+  cursor: pointer;
+  animation: motion-rise var(--motion-base) var(--ease-out) backwards;
+}

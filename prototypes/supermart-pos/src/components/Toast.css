@@ -98,6 +98,40 @@
   letter-spacing: var(--type-Label-Base-letter-spacing);
 }
 
+/* --- Banner: the scanner's, `88:20033` ----------------------------------------------
+   357x52 at [20,54] — over the camera, clear of the docked Order Preview. 16 padding
+   and gap, Border radius/400, Color/container/success/bold, Label/Base in
+   Color/text/inverse, left-aligned. Its 20 icon is a white disc with a green tick,
+   the instance's own export. It comes down from the top, where it sits.
+   A refusal (stock) is not designed here: it takes the same banner in the pill's
+   neutral fill, with no icon, as a notice does everywhere else. */
+.toast[data-variant='banner'] {
+  top: 54px;
+  left: 20px;
+  margin-left: 0;
+  width: 357px;
+  min-height: 0;
+  box-sizing: border-box;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: var(--spacing-400);
+  padding: var(--spacing-400);
+  border-radius: var(--radius-400);
+  background: var(--color-container-success-bold-default);
+}
+.toast[data-variant='banner'][data-tone='notice'] { background: var(--color-container-neutral-bolder-default); }
+.toast[data-variant='banner'][data-open='off'] { transform: translateY(-8px); }
+.toast[data-variant='banner'] .toast__message {
+  width: auto;
+  flex: 1 1 0;
+  text-align: left;
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .toast {
     transition-duration: 0ms !important;

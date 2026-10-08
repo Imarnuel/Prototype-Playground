@@ -25,9 +25,12 @@ import battery from './assets/battery.svg';
  * board's 95 status bars are a 402pt (iPhone 16 Pro) component dropped on a 393pt
  * frame, overhanging both edges; the other 6 are 393 and are the correct ones.
  */
-export function StatusBar() {
+export function StatusBar({ appearance = 'dark' }: {
+  /** `light` over dark content — a camera, as iOS switches the bar's style. */
+  appearance?: 'dark' | 'light';
+}) {
   return (
-    <div className="statusBar" aria-hidden="true">
+    <div className="statusBar" data-appearance={appearance} aria-hidden="true">
       <div className="statusBar__row">
         <div className="statusBar__time">9:41</div>
         {/* Holds the gap the Dynamic Island occupies. 124 wide in the design against
