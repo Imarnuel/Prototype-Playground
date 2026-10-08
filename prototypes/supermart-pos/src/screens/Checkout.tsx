@@ -99,6 +99,7 @@ export function Checkout({
             <button type="button" className="checkout__methodRow checkout__methodRow--bank" onClick={onPickBank}>
               <span className="checkout__methodLabel">Bank</span>
               <span className="checkout__methodValue">
+                <img className="checkout__bankLogo" src={bankAccount(draft.bankId).logo} width={24} height={24} alt="" />
                 <span className="checkout__valueText">
                   {bankAccount(draft.bankId).short} - {bankAccount(draft.bankId).number}
                 </span>

@@ -146,7 +146,7 @@ select {
     .filterChip, .tabBar__nav, .tabBar__item,
     .device, .device__screen, .device__island,
     .saleSuccess__icon, .saleSuccess__ring, .payButton__spinner,
-    .receipt__logo, .bankPicker__logo, .toast__action
+    .receipt__logo, .bankPicker__logo, .checkout__bankLogo, .toast__action
   ) {
     corner-shape: round;
   }

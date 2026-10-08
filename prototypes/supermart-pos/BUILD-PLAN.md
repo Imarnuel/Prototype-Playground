@@ -714,6 +714,14 @@ and Print do the real thing.
   four screens, 21 icons and four bank logos, all exported from their instances or
   — for the four socials Figma would not export — built from their own path data.
 
+- **The bank's logo on Checkout's Bank row** — not in `88:13497`, added at the
+  designer's request: the picker's own logo, round, 24px (the value text's line
+  height, so the 56px row and its baseline hold), on the row's 8px gap. Measured:
+  24×24, centred on the row to 0.0px, 8px from the text, and it follows the bank
+  picked. **Open:** the account number does not fit the row's value column. It was
+  already cut for three of the four accounts (Access needs 204px of 160), and with
+  the logo all four are (128px). Left as the frame's layout; needs design input.
+
 Verified: `walk-checkout` 27/27; `diff-checkout` 0 outside 0.5px over 27 boxes;
 `figma:audit` 453 properties, 0 differ (+54); `catalogue:verify` +3 tender checks,
 `cart:verify` +7 receipt checks; every earlier gate green.
