@@ -25,17 +25,21 @@ import dots_horizontal from './dots-horizontal.svg';
 import ellipse_79 from './ellipse-79.svg';
 import filter_lines from './filter-lines.svg';
 import grid_01 from './grid-01.svg';
+import list from './list.svg';
 import menu_01 from './menu-01.svg';
 import minus from './minus.svg';
 import minus_lg from './minus-lg.svg';
+import percent_03 from './percent-03.svg';
 import plus from './plus.svg';
 import plus_circle from './plus-circle.svg';
 import plus_lg from './plus-lg.svg';
 import search_sm from './search-sm.svg';
 import shopping_cart_01 from './shopping-cart-01.svg';
+import trash_01 from './trash-01.svg';
 import trash_03 from './trash-03.svg';
 import trash_03_subtle from './trash-03-subtle.svg';
 import user_02 from './user-02.svg';
+import user_02_brand from './user-02-brand.svg';
 import users_02 from './users-02.svg';
 import x_circle from './x-circle.svg';
 import x_close from './x-close.svg';
@@ -52,17 +56,21 @@ export type IconName =
   | 'ellipse-79'
   | 'filter-lines'
   | 'grid-01'
+  | 'list'
   | 'menu-01'
   | 'minus'
   | 'minus-lg'
+  | 'percent-03'
   | 'plus'
   | 'plus-circle'
   | 'plus-lg'
   | 'search-sm'
   | 'shopping-cart-01'
+  | 'trash-01'
   | 'trash-03'
   | 'trash-03-subtle'
   | 'user-02'
+  | 'user-02-brand'
   | 'users-02'
   | 'x-circle'
   | 'x-close';
@@ -79,17 +87,21 @@ export const ICONS: Record<IconName, { src: string; width: number; height: numbe
   'ellipse-79': { src: ellipse_79, width: 3, height: 3 },
   'filter-lines': { src: filter_lines, width: 16, height: 16 },
   'grid-01': { src: grid_01, width: 20, height: 20 },
+  'list': { src: list, width: 20, height: 20 },
   'menu-01': { src: menu_01, width: 20, height: 20 },
   'minus': { src: minus, width: 16, height: 16 },
   'minus-lg': { src: minus_lg, width: 32, height: 32 },
+  'percent-03': { src: percent_03, width: 20, height: 20 },
   'plus': { src: plus, width: 16, height: 16 },
   'plus-circle': { src: plus_circle, width: 24, height: 24 },
   'plus-lg': { src: plus_lg, width: 32, height: 32 },
   'search-sm': { src: search_sm, width: 20, height: 20 },
   'shopping-cart-01': { src: shopping_cart_01, width: 16, height: 16 },
+  'trash-01': { src: trash_01, width: 20, height: 20 },
   'trash-03': { src: trash_03, width: 20, height: 20 },
   'trash-03-subtle': { src: trash_03_subtle, width: 20, height: 20 },
   'user-02': { src: user_02, width: 16, height: 16 },
+  'user-02-brand': { src: user_02_brand, width: 20, height: 20 },
   'users-02': { src: users_02, width: 40, height: 40 },
   'x-circle': { src: x_circle, width: 20, height: 20 },
   'x-close': { src: x_close, width: 20, height: 20 },

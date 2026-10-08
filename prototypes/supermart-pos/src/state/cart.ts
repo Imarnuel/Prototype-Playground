@@ -48,8 +48,9 @@ export function lineGross(line: CartLine): number {
   return lineGrossMinor(priced(line));
 }
 
-export function totals(lines: readonly CartLine[]): OrderTotals {
-  return orderTotals(lines.map(priced));
+/** The order discount lives beside the lines, not on any of them: see `orderTotals`. */
+export function totals(lines: readonly CartLine[], orderDiscount?: Discount): OrderTotals {
+  return orderTotals(lines.map(priced), orderDiscount);
 }
 
 /**

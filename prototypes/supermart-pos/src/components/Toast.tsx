@@ -24,7 +24,7 @@ export type ToastTone = 'success' | 'notice';
  * should not interrupt a screen reader mid-sentence.
  */
 export function Toast({
-  open, message, tone = 'success', shown, onDismiss, autoDismissMs = 2600,
+  open, message, tone = 'success', shown, onDismiss, action, autoDismissMs = action ? 5000 : 2600,
 }: {
   open: boolean;
   message: string;
@@ -33,6 +33,9 @@ export function Toast({
       second tap past the shelf — gets the full time again, not what was left. */
   shown: number;
   onDismiss: () => void;
+  /** Not designed: a way back from something that cannot otherwise be undone, such as
+      clearing the cart. It stays up longer, long enough to reach. */
+  action?: { label: string; onPress: () => void };
   autoDismissMs?: number;
 }) {
   const reducedMotion = useReducedMotion();
@@ -47,6 +50,7 @@ export function Toast({
     <div
       className="toast"
       data-open={open ? 'on' : 'off'}
+      data-action={action ? 'on' : 'off'}
       role="status"
       aria-live="polite"
       style={{
@@ -56,6 +60,11 @@ export function Toast({
     >
       {tone === 'success' && <Icon name="check-circle" />}
       <p className="toast__message">{message}</p>
+      {action && (
+        <button type="button" className="toast__action" onClick={action.onPress} tabIndex={open ? 0 : -1}>
+          {action.label}
+        </button>
+      )}
     </div>
   );
 }

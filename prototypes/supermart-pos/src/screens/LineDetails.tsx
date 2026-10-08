@@ -1,9 +1,11 @@
 import { AnimatedText } from '../components/AnimatedText';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { BottomSheet } from '../components/BottomSheet';
+import { DiscountInput, parseDiscount } from '../components/DiscountInput';
+import { FieldError } from '../components/FieldError';
 import { QtyInputField } from '../components/QtyInputField';
 import {
-  formatPrice, lineDiscountMinor, lineGrossMinor, maxCount, parsePercent, parseWholeNaira,
+  formatPrice, lineDiscountMinor, lineGrossMinor, maxCount, parseWholeNaira,
   unitFor, unitPriceMinor, type Discount,
 } from '../data/catalogue';
 import { productImage } from '../data/productImage';
@@ -41,10 +43,7 @@ export function LineDetails({
 
   // Empty means "no override" / "no discount"; anything else must parse strictly.
   const priceMinor = price === '' ? undefined : parseWholeNaira(price) ?? null;
-  const discount: Discount | undefined | null = off === '' ? undefined
-    : kind === 'percent'
-      ? (parsePercent(off) === null ? null : { kind, percent: parsePercent(off)! })
-      : (parseWholeNaira(off) === null ? null : { kind, minor: parseWholeNaira(off)! });
+  const discount = parseDiscount(kind, off);
 
   const draft = { product, unitId: line.unitId, count, priceOverrideMinor: priceMinor ?? undefined };
   const gross = lineGrossMinor(draft);
@@ -106,30 +105,8 @@ export function LineDetails({
         </label>
         <FieldError message={priceError} />
 
-        <div className="lineDetails__discount">
-          <label className="detailField">
-            <span className="detailField__label">Discount</span>
-            <span className="detailField__row">
-              {kind === 'amount' && <span aria-hidden="true">₦</span>}
-              <input inputMode="numeric" value={off} placeholder="0"
-                onChange={(e) => setOff(e.target.value)} aria-invalid={!!discountError} />
-              {kind === 'percent' && <span aria-hidden="true">%</span>}
-            </span>
-          </label>
-          <div className="segmented" role="radiogroup" aria-label="Discount type" data-kind={kind}>
-            {/* The chosen option's fill, as one element that slides between them. */}
-            <span className="segmented__indicator" aria-hidden="true" />
-            {(['percent', 'amount'] as const).map((k) => (
-              <button key={k} type="button" role="radio" aria-checked={kind === k}
-                aria-label={k === 'percent' ? 'Percent' : 'Naira amount'}
-                className="segmented__option"
-                // Switching clears the number: "15" means something else in the other unit.
-                onClick={() => { if (k !== kind) { setKind(k); setOff(''); } }}>
-                {k === 'percent' ? '%' : '₦'}
-              </button>
-            ))}
-          </div>
-        </div>
+        <DiscountInput kind={kind} value={off} onKindChange={setKind} onValueChange={setOff}
+          invalid={!!discountError} placeholder="0" />
         <FieldError message={discountError} />
 
         <label className="detailField detailField--tall">
@@ -138,19 +115,5 @@ export function LineDetails({
         </label>
       </div>
     </BottomSheet>
-  );
-}
-
-/** A validation message that opens and closes rather than popping. It stays mounted,
-    holding its last text through the close, and takes no space while shut. */
-function FieldError({ message }: { message: string | null }) {
-  const last = useRef(message);
-  if (message) last.current = message;
-  return (
-    <div className="fieldError" data-open={message ? 'on' : 'off'}>
-      <div className="fieldError__clip">
-        <p className="detailField__error" role={message ? 'alert' : undefined}>{last.current}</p>
-      </div>
-    </div>
   );
 }

@@ -1,6 +1,6 @@
 # Icons
 
-All 24 are present, 21 here and 3 in `shared/src/assets/`. `chevron-down` joined with
+All 28 are present, 25 here and 3 in `shared/src/assets/`. `chevron-down` joined with
 the order total (band `115:8774`), exported from its instance `88:8718`. They are the screens' own
 Figma exports — nothing here was substituted, redrawn, or traced.
 
@@ -60,6 +60,10 @@ pink avatar. No recolouring was needed or done.
 | `chevron-right.svg` | 16x16 | `white` | Checkout button | `I88:8241;2398:7606` |
 | `users-02.svg` | 40x40 | `#20293C` | Select customer — empty state | `88:11938` |
 | `add-one.svg` | 20x20 | `#2C4A8B` | Select customer — add button | `I88:12133;2481:15937` |
+| `user-02-brand.svg` | 20x20 | `#2C4A8B` | More options — Add a customer | `88:15550` |
+| `percent-03.svg` | 20x20 | `#2C4A8B` | More options — Apply discount | `88:15555` |
+| `trash-01.svg` | 20x20 | `#C2261A` | More options — Clear cart | `88:15561` |
+| `list.svg` | 20x20 | `#2C4A8B` | More options — Queued orders | `88:15567` |
 
 ## Sizes are intrinsic
 

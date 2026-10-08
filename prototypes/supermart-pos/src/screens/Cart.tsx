@@ -1,10 +1,10 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatedText } from '../components/AnimatedText';
 import { DURATION, EASING, duration, useReducedMotion } from '@playground/shared';
 import { Icon } from '../components/Icon';
 import { CloseButton } from '../components/CloseButton';
 import { QtyInputField } from '../components/QtyInputField';
-import { formatPrice, maxCount, unitFor } from '../data/catalogue';
+import { formatPrice, maxCount, unitFor, type Discount } from '../data/catalogue';
 import { productImage } from '../data/productImage';
 import type { Customer } from '../data/customers';
 import { lineGross, productFor, totals, type CartLine } from '../state/cart';
@@ -20,6 +20,8 @@ import './Cart.css';
  */
 type CartProps = {
   lines: readonly CartLine[];
+  /** Set from More options > Apply discount; on the order, not on any line. */
+  orderDiscount?: Discount;
   onClose: () => void;
   onQtyChange: (productId: string, qty: number) => void;
   /** Opens the Quantity sheet over this line. */
@@ -32,6 +34,9 @@ type CartProps = {
   onAddCustomer: () => void;
   onMoreOptions: () => void;
   onClearAll: () => void;
+  /** Bumped to clear the cart from outside — More options — through the same exit
+      the title-bar trash uses. */
+  clearRequest?: number;
   /** Set once a customer is picked in the Select customer sheet. */
   customer: Customer | null;
   onRemoveCustomer: () => void;
@@ -41,8 +46,8 @@ type CartProps = {
 };
 
 export function Cart({
-  lines, onClose, onQtyChange, onEditQuantity, onOpenDetails, onRemove, onCheckout, onQueue, onAddCustomer,
-  onMoreOptions, onClearAll, customer, onRemoveCustomer, totalOpen, onToggleTotal,
+  lines, orderDiscount, onClose, onQtyChange, onEditQuantity, onOpenDetails, onRemove, onCheckout, onQueue, onAddCustomer,
+  onMoreOptions, onClearAll, clearRequest = 0, customer, onRemoveCustomer, totalOpen, onToggleTotal,
 }: CartProps) {
   const reducedMotion = useReducedMotion();
   /* A removed line collapses before it leaves the state, so nothing cuts. Its
@@ -54,6 +59,13 @@ export function Cart({
       duration(DURATION.base, reducedMotion));
   };
   const lineRefs = useRef(new Map<string, HTMLLIElement>());
+  const clearAll = () => leave(lines.map((l) => l.productId), onClearAll);
+  const lastClear = useRef(clearRequest);
+  useEffect(() => {
+    if (clearRequest === lastClear.current) return;
+    lastClear.current = clearRequest;
+    clearAll();
+  });
   return (
     <div
       className="cart"
@@ -72,7 +84,7 @@ export function Cart({
           <button type="button" className="cart__iconButton" onClick={onMoreOptions} aria-label="More options">
             <Icon name="dots-horizontal" />
           </button>
-          <button type="button" className="cart__iconButton" onClick={() => leave(lines.map((l) => l.productId), onClearAll)} aria-label="Clear order">
+          <button type="button" className="cart__iconButton" onClick={clearAll} aria-label="Clear order">
             <Icon name="trash-03" />
           </button>
         </div>
@@ -184,7 +196,7 @@ export function Cart({
       <BottomScrim height={239} />
 
       <div className="cart__footer">
-        <OrderTotal totals={totals(lines)} open={totalOpen} onToggle={onToggleTotal} />
+        <OrderTotal totals={totals(lines, orderDiscount)} open={totalOpen} onToggle={onToggleTotal} />
         <div className="cart__actions">
           <button type="button" className="cart__checkout" onClick={onCheckout} disabled={lines.length === 0}>
             <span className="cart__checkoutLabel">Checkout (<AnimatedText value={String(lines.length)} />)</span>

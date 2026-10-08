@@ -488,6 +488,50 @@ const DETAILS = [
   ['88:9564 "₦"',           ".segmented__option[aria-checked='false']", 'lineHeight', '24px'],
 ];
 
+/* More options, `88:15543`. The rows' trailing checks are at opacity 0 and not built. */
+const MENU = [
+  ['88:15543 sheet',        '.sheetPanel.moreOptions', 'backgroundColor', 'rgb(246, 247, 249)'],
+  ['88:15543 sheet',        '.sheetPanel.moreOptions', 'borderRadius',    '28px'],
+  ['I...8087 close',        '.moreOptions .closeButton', 'backgroundColor', 'rgb(255, 255, 255)'],
+  ['88:15545 body',         '.moreOptions .modalBody', 'rowGap',          '12px'],
+  ['88:15545 body',         '.moreOptions .modalBody', 'paddingBottom',   '20px'],
+  ['88:15547 group',        '.moreOptions__group',     'backgroundColor', 'rgb(255, 255, 255)'],
+  ['88:15547 group',        '.moreOptions__group',     'borderRadius',    '16px'],
+  ['88:15547 group',        '.moreOptions__group',     'paddingLeft',     '12px'],
+  ['88:15547 group stroke', '.moreOptions__group',     'boxShadow',       'inset 0 0 0 1px rgba(37, 43, 55, 0.08)'],
+  ['88:15548 row',          '.moreOptions__row',       'height',          '60px'],
+  ['88:15549 row gap',      '.moreOptions__row',       'columnGap',       '12px'],
+  ['88:15548 row stroke',   '.moreOptions__row',       'boxShadow',       'inset 0 -1px 0 0 rgba(37, 43, 55, 0.08)'],
+  ['88:15551 label',        '.moreOptions__label',     'fontSize',        '16px'],
+  ['88:15551 label',        '.moreOptions__label',     'fontWeight',      '500'],
+  ['88:15551 label',        '.moreOptions__label',     'lineHeight',      '24px'],
+  ['88:15551 label',        '.moreOptions__label',     'letterSpacing',   '-0.2px'],
+  ['88:15551 label',        '.moreOptions__label',     'color',           'rgb(20, 31, 51)'],
+];
+
+/* Apply discount, `88:15849` (10%): the field and switch are Item details' own, so
+   only what this sheet sets differently is checked here. */
+const APPLY = [
+  ['88:15851 body',         '.applyDiscount .modalBody', 'height',        '177px'],
+  ['88:15851 body',         '.applyDiscount .modalBody', 'paddingTop',    '16px'],
+  ['88:15851 body',         '.applyDiscount .modalBody', 'paddingBottom', '32px'],
+  ['I...8087 close',        '.applyDiscount .closeButton', 'backgroundColor', 'rgba(12, 14, 24, 0.04)'],
+  ['88:15853 field',        '.applyDiscount .detailField', 'height',      '60px'],
+  ['88:15853 field',        '.applyDiscount .detailField', 'borderRadius', '12px'],
+  ['I...9590 "10%"',        '.applyDiscount .detailField input', 'fontSize', '16px'],
+  ['I...9590 "10%"',        '.applyDiscount .detailField input', 'letterSpacing', '-0.24px'],
+  ['I...9590 "10%"',        '.applyDiscount .detailField input', 'color',  'rgb(20, 31, 51)'],
+  ['88:15854 switch',       '.applyDiscount .segmented', 'width',         '128px'],
+  ['88:15854 switch',       '.applyDiscount .segmented', 'height',        '60px'],
+  ['88:15857 "%" chosen',   ".applyDiscount .segmented__option[aria-checked='true']", 'fontWeight', '500'],
+  ['88:15857 "%" chosen',   ".applyDiscount .segmented__option[aria-checked='true']", 'lineHeight', '24px'],
+  ['88:15857 "%" chosen',   ".applyDiscount .segmented__option[aria-checked='true']", 'letterSpacing', '-0.2px'],
+  ['88:15857 "%" chosen',   ".applyDiscount .segmented__option[aria-checked='true']", 'color', 'rgb(44, 74, 139)'],
+  ['88:15859 "₦"',          ".applyDiscount .segmented__option[aria-checked='false']", 'fontWeight', '400'],
+  ['88:15859 "₦"',          ".applyDiscount .segmented__option[aria-checked='false']", 'letterSpacing', '-0.32px'],
+  ['88:15859 "₦"',          ".applyDiscount .segmented__option[aria-checked='false']", 'color', 'rgb(122, 133, 153)'],
+];
+
 const browser = await pw.chromium.launch({ executablePath: EXE });
 const page = await browser.newPage({ viewport: { width: 1200, height: 1100 } });
 await page.goto(URL + '?dev=1', { waitUntil: 'networkidle' });
@@ -609,9 +653,14 @@ await pick('Quantity sheet: editing');
 fails += await run('Quantity sheet editing', QTY_EDIT);
 await pick('Item details: discount applied');
 fails += await run('Item details', DETAILS);
+await pick('More options');
+fails += await run('More options', MENU);
+await pick('Apply discount: 10%');
+fails += await run('Apply discount', APPLY);
 
 const total = SCALAR.length + COMPOUND.length + CART.length + SHEET.length + EMPTY.length + ADDED.length + TOAST.length
-  + TOTAL.length + TOTAL_OPEN.length + TOTAL_DISCOUNT.length + QTY.length + QTY_EDIT.length + DETAILS.length;
+  + TOTAL.length + TOTAL_OPEN.length + TOTAL_DISCOUNT.length + QTY.length + QTY_EDIT.length + DETAILS.length
+  + MENU.length + APPLY.length;
 console.log('-'.repeat(60));
 console.log(`${total} properties checked against Figma nodes, ${fails} differ`);
 await browser.close();

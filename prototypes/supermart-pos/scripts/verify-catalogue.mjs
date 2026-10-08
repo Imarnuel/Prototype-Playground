@@ -10,7 +10,7 @@ import path from 'node:path';
 import {
   PRODUCTS, CATEGORIES, CATEGORY_ORDER, BRANDS, CURRENCY, LOW_STOCK_AT,
   formatPrice, formatSignedPrice, fullName, lineTotalMinor, findByBarcode,
-  maxCount, unitFor, lineGrossMinor, lineDiscountMinor, lineTaxMinor, orderTotals,
+  maxCount, unitFor, lineGrossMinor, lineDiscountMinor, lineTaxMinor, orderTotals, allocateOrderDiscountMinor,
   parseCount, parseWholeNaira, parsePercent, VAT_STANDARD_RATE,
 } from '../src/data/catalogue.ts';
 
@@ -155,6 +155,36 @@ for (let net = 0; net <= 5_000_000; net += M) {
 }
 check('integer VAT agrees with the old float rule on every whole-Naira net to N50,000', vatDisagree === 0);
 
+// --- Order discount -------------------------------------------------------------
+let seed0 = 0xd15c;
+const rand0 = (n) => { seed0 = (seed0 * 1_103_515_245 + 12_345) % 2 ** 31; return seed0 % n; };
+// After line discounts, before VAT. Socks N950 + 2 tees N17,000 = N17,950; 10% off is
+// N1,795, split N95 / N1,700 by net; VAT 6413 + 114750 kobo -> N1,212; total N17,367.
+const tee = PRODUCTS.find((p) => p.id === 'tops-tee');
+const pair = [{ product: socks, unitId: 'each', count: 1 }, { product: tee, unitId: 'each', count: 2 }];
+const tenOff = orderTotals(pair, { kind: 'percent', percent: 10 });
+check('10% off the order: N1,795 off, VAT on the discounted lines N1,212, total N17,367',
+  tenOff.orderDiscount === 179_500 && tenOff.discount === 179_500 && tenOff.tax === 121_200 && tenOff.total === 1_736_700,
+  `${formatPrice(tenOff.subtotal)} - ${formatPrice(tenOff.discount)} + ${formatPrice(tenOff.tax)} = ${formatPrice(tenOff.total)}`);
+check('...and VAT is lower than without it: charged on what is collected',
+  tenOff.tax < orderTotals(pair).tax, `${formatPrice(tenOff.tax)} < ${formatPrice(orderTotals(pair).tax)}`);
+const stacked = orderTotals([socksLine], { kind: 'percent', percent: 10 });
+check('stacked: 10% off the order is taken from the N807 left after the line\'s 15%, not from N950',
+  stacked.orderDiscount === 8_100 && stacked.discount === 14_300 + 8_100, formatPrice(stacked.orderDiscount));
+const overOrder = orderTotals(pair, { kind: 'amount', minor: 9_000_000 });
+check('an amount past the order is clamped to it: total is the tax-free zero', overOrder.orderDiscount === 1_795_000 && overOrder.total === 0,
+  `${formatPrice(overOrder.orderDiscount)} off, total ${formatPrice(overOrder.total)}`);
+check('no discount and 0% are the same order', JSON.stringify(orderTotals(pair)) === JSON.stringify(orderTotals(pair, { kind: 'percent', percent: 0 })));
+let allocBad = 0;
+for (let k = 0; k < 2_000; k++) {
+  const nets = Array.from({ length: 1 + rand0(6) }, () => rand0(50_000) * M);
+  const base = nets.reduce((a, n) => a + n, 0);
+  const d = Math.min(base, rand0(60_000) * M);
+  const parts = allocateOrderDiscountMinor(d, nets);
+  if (parts.reduce((a, x) => a + x, 0) !== (base ? d : 0) || parts.some((x, i) => x % M || x < 0 || x > nets[i])) allocBad++;
+}
+check('the split sums to the discount exactly, whole Naira, never past a line, in 2,000 random orders', allocBad === 0, `${allocBad} bad`);
+
 // --- Displayed totals reconcile, across random baskets -------------------------
 // Seeded so a failure is reproducible. Overrides are odd whole-Naira prices and
 // discounts land on odd-Naira nets, so a rounding rule that only works on round
@@ -177,7 +207,8 @@ for (let b = 0; b < 500; b++) {
     lines.push(line);
   }
   baskets++;
-  const tt = orderTotals(lines);
+  const od = [undefined, { kind: 'percent', percent: 1 + rand(100) }, { kind: 'amount', minor: (1 + rand(20_000)) * M }][rand(3)];
+  const tt = orderTotals(lines, od);
   const shown = {
     lines: lines.map((l) => naira(formatPrice(lineGrossMinor(l)))),
     subtotal: naira(formatPrice(tt.subtotal)),

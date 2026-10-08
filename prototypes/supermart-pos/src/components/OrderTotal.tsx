@@ -18,7 +18,12 @@ import './OrderTotal.css';
  * - The chevron turns over when open. The design's never changes, which leaves no cue
  *   that the row is open or that tapping it again closes it.
  * - Discount shows only when there is one. The design draws the row but hides it, so
- *   "only when non-zero" is the reading; it keeps the hidden row's own styling.
+ *   "only when non-zero" is the reading; it keeps the hidden row's own styling. It
+ *   holds line and order discounts together.
+ * - "Applying discount to an order" (`88:15652`) redraws this breakdown: Label/Base in
+ *   Color/text/secondary throughout, 4px row padding, and Discount after Tax as a
+ *   plain "₦100". Not followed — this one is `88:9338`'s, audited at 0 differences,
+ *   and which supersedes is the designer's call (BUILD-PLAN).
  */
 export function OrderTotal({
   totals, open, onToggle,

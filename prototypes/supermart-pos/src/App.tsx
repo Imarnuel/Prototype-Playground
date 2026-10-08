@@ -8,12 +8,14 @@ import { Cart } from './screens/Cart';
 import { SelectCustomer } from './screens/SelectCustomer';
 import { QuantitySheet } from './screens/QuantitySheet';
 import { LineDetails } from './screens/LineDetails';
-import { PRODUCTS, maxCount, unitFor, type Product } from './data/catalogue';
+import { MoreOptions, type MoreOption } from './screens/MoreOptions';
+import { ApplyDiscount } from './screens/ApplyDiscount';
+import { PRODUCTS, maxCount, unitFor, type Discount, type Product } from './data/catalogue';
 import { CUSTOMERS, type Customer } from './data/customers';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Toast, type ToastTone } from './components/Toast';
 import { usePresented } from './hooks/usePresented';
-import { addToCart, commitDetails, commitQuantity, removeLine, setCount, type CartLine } from './state/cart';
+import { addToCart, commitDetails, commitQuantity, removeLine, setCount, totals, type CartLine } from './state/cart';
 import './App.css';
 
 type Forced = 'loading' | 'error' | 'empty' | undefined;
@@ -22,6 +24,8 @@ export function App() {
   const [forced, setForced] = useState<Forced>(undefined);
   const [resetNonce, setResetNonce] = useState(0);
   const [lines, setLines] = useState<readonly CartLine[]>([]);
+  // On the order, not on any line; see `orderTotals`.
+  const [orderDiscount, setOrderDiscount] = useState<Discount | undefined>(undefined);
 
   const [cartOpen, setCartOpen] = useState(false);
   // One hook owns presentation timing for every surface, so the entrance and exit
@@ -35,11 +39,12 @@ export function App() {
      than a screen of its own. Its copy is the frame's. */
   /* The message outlives `open` on purpose: the exit fades the toast out, and clearing
      the text with it would fade an empty box. */
-  const [toast, setToast] = useState<{ open: boolean; message: string; tone: ToastTone; shown: number }>(
+  type ToastAction = { label: string; onPress: () => void };
+  const [toast, setToast] = useState<{ open: boolean; message: string; tone: ToastTone; shown: number; action?: ToastAction }>(
     { open: false, message: '', tone: 'success', shown: 0 },
   );
-  const showToast = (message: string, tone: ToastTone = 'success') =>
-    setToast((t) => ({ open: true, message, tone, shown: t.shown + 1 }));
+  const showToast = (message: string, tone: ToastTone = 'success', action?: ToastAction) =>
+    setToast((t) => ({ open: true, message, tone, shown: t.shown + 1, action }));
   const hideToast = useCallback(() => setToast((t) => ({ ...t, open: false })), []);
   const [totalOpen, setTotalOpen] = useState(false);
   /* The line as it stood when the Quantity sheet opened. Kept after it closes, so the
@@ -58,7 +63,32 @@ export function App() {
     setQty((q) => ({ line, opening: (q?.opening ?? 0) + 1, editing }));
     setQtyOpen(true);
   };
+  const [menuOpen, setMenuOpen] = useState(false);
+  // Same snapshot-per-opening pattern: the sheet opens on the discount as it stands.
+  const [discountSheet, setDiscountSheet] = useState<{ current?: Discount; opening: number } | null>(null);
+  const [discountOpen, setDiscountOpen] = useState(false);
+  const openDiscount = (current: Discount | undefined) => {
+    setDiscountSheet((d) => ({ current, opening: (d?.opening ?? 0) + 1 }));
+    setDiscountOpen(true);
+  };
+  /* Asks the Cart to clear itself, so the lines leave through its own exit whichever
+     control asked — the title-bar trash or More options. */
+  const [clearRequest, setClearRequest] = useState(0);
   const reducedMotion = useReducedMotion();
+  const enterMs = duration(SHEET_SPRING.duration, reducedMotion);
+  const exitMs = duration(SHEET_SPRING.exitDuration, reducedMotion);
+
+  /* The user's call: clearing is immediate, with a way back (BUILD-PLAN #35). Undo
+     restores the lines and the order's discount together. */
+  const clearCart = () => {
+    if (lines.length === 0 && !orderDiscount) return;
+    const before = { lines, orderDiscount };
+    setLines([]); setOrderDiscount(undefined);
+    showToast('Cart cleared', 'notice', {
+      label: 'Undo',
+      onPress: () => { setLines(before.lines); setOrderDiscount(before.orderDiscount); hideToast(); },
+    });
+  };
 
   /* A tap the shelf can't supply returns the same lines from `addToCart`. Saying why
      beats a tap that silently does nothing. The copy is not from the design, which
@@ -72,13 +102,19 @@ export function App() {
     showToast(`Only ${maxCount(product, line.unitId)} ${unitFor(product, line.unitId).abbrev} left`, 'notice');
   };
 
+  // Drawn from the catalogue, so the lines, totals and stock ceilings are real.
+  const fourLines = () => ['acc-socks', 'tops-tee', 'btm-jeans', 'acc-beanie']
+    .map((id) => PRODUCTS.find((p) => p.id === id)!)
+    .reduce<readonly CartLine[]>((acc, p) => addToCart(acc, p), []);
+
   const resetScreens = () => {
     setForced(undefined); setCartOpen(false); setPickerOpen(false);
     setCustomer(null); setCustomers(CUSTOMERS); hideToast(); setTotalOpen(false); setQtyOpen(false); setDetailsOpen(false);
+    setMenuOpen(false); setDiscountOpen(false); setOrderDiscount(undefined);
     setResetNonce((n) => n + 1);
   };
 
-  const items: DevToolbarItem[] = [
+  const entries: DevToolbarItem[] = [
     { label: 'Sales point', group: 'Screens', onSelect: resetScreens },
     { label: 'Cart (Order Preview)', group: 'Screens', onSelect: () => setCartOpen(true) },
     { label: 'Loading (skeleton)', group: 'States', onSelect: () => { setCartOpen(false); setForced('loading'); } },
@@ -92,13 +128,7 @@ export function App() {
     {
       label: 'Cart: fill with 4 lines',
       group: 'States',
-      onSelect: () => {
-        // Drawn from the catalogue, so the lines, totals and stock ceilings are real.
-        const picks = ['acc-socks', 'tops-tee', 'btm-jeans', 'acc-beanie']
-          .map((id) => PRODUCTS.find((p) => p.id === id)!);
-        setLines(picks.reduce<readonly CartLine[]>((acc, p) => addToCart(acc, p), []));
-        setCartOpen(true);
-      },
+      onSelect: () => { setLines(fourLines()); setCartOpen(true); },
     },
     {
       label: 'Cart: total expanded',
@@ -174,10 +204,39 @@ export function App() {
         showToast('Customer has been created');
       },
     },
+    ...([
+      ['More options', 'Screens', undefined, 'menu'],
+      ['Apply discount', 'Screens', undefined, 'sheet'],
+      ['Apply discount: 10%', 'States', { kind: 'percent', percent: 10 }, 'sheet'],
+      // The frame's own ₦10.
+      ['Apply discount: ₦ amount', 'States', { kind: 'amount', minor: 1_000 }, 'sheet'],
+      ['Cart: order discount applied', 'States', { kind: 'percent', percent: 10 }, 'total'],
+      ['Clear cart: undo toast', 'States', undefined, 'clear'],
+    ] as const).map(([label, group, discount, show]): DevToolbarItem => ({
+      label,
+      group,
+      onSelect: () => {
+        setLines(fourLines()); setOrderDiscount(show === 'total' ? discount : undefined);
+        setCartOpen(true);
+        if (show === 'menu') setMenuOpen(true);
+        if (show === 'sheet') openDiscount(discount);
+        if (show === 'total') setTotalOpen(true);
+        // Through the real path, so the lines leave and the toast offers the undo.
+        if (show === 'clear') setTimeout(() => setClearRequest((n) => n + 1), enterMs);
+      },
+    })),
   ];
 
-  const enterMs = duration(SHEET_SPRING.duration, reducedMotion);
-  const exitMs = duration(SHEET_SPRING.exitDuration, reducedMotion);
+  /* Each entry presents one state, whatever was showing before it: a sheet or toast
+     left over from the last tap would stand in front of the state asked for. */
+  const items = entries.map((entry): DevToolbarItem => ({
+    ...entry,
+    onSelect: () => {
+      setMenuOpen(false); setDiscountOpen(false); setPickerOpen(false); setQtyOpen(false); setDetailsOpen(false);
+      setTotalOpen(false); hideToast();
+      entry.onSelect();
+    },
+  }));
 
   return (
     <>
@@ -204,17 +263,18 @@ export function App() {
             >
               <Cart
                 lines={lines}
+                orderDiscount={orderDiscount}
+                clearRequest={clearRequest}
                 onClose={() => setCartOpen(false)}
                 onQtyChange={(id, count) => setLines((l) => setCount(l, id, count))}
                 onEditQuantity={(id) => openQuantity(lines.find((l) => l.productId === id)!)}
                 onOpenDetails={(id) => openDetails(lines.find((l) => l.productId === id)!)}
                 onRemove={(id) => setLines((l) => removeLine(l, id))}
                 onCheckout={() => setCartOpen(false)}
-                onQueue={() => { setLines([]); setCartOpen(false); }}
+                onQueue={() => { setLines([]); setOrderDiscount(undefined); setCartOpen(false); }}
                 onAddCustomer={() => setPickerOpen(true)}
-                // "More options" is frame `88:15458`, not built yet.
-                onMoreOptions={() => setPickerOpen(true)}
-                onClearAll={() => setLines([])}
+                onMoreOptions={() => setMenuOpen(true)}
+                onClearAll={clearCart}
                 customer={customer}
                 onRemoveCustomer={() => setCustomer(null)}
                 totalOpen={totalOpen}
@@ -255,6 +315,35 @@ export function App() {
                 />
               )}
 
+              <MoreOptions
+                open={menuOpen}
+                onClose={() => setMenuOpen(false)}
+                onChoose={(option: MoreOption) => {
+                  /* One sheet at a time: the menu leaves first, then the next thing
+                     arrives, rather than two sheets crossing on screen. */
+                  setMenuOpen(false);
+                  const next = {
+                    customer: () => setPickerOpen(true),
+                    discount: () => openDiscount(orderDiscount),
+                    clear: () => setClearRequest((n) => n + 1),
+                    // The user's call: Queued orders is designed later.
+                    queued: () => showToast('Queued orders is not designed yet', 'notice'),
+                  }[option];
+                  setTimeout(next, exitMs);
+                }}
+              />
+
+              {discountSheet && (
+                <ApplyDiscount
+                  key={discountSheet.opening}
+                  open={discountOpen}
+                  current={discountSheet.current}
+                  baseMinor={(() => { const t = totals(lines); return t.subtotal - t.discount; })()}
+                  onClose={() => setDiscountOpen(false)}
+                  onCommit={(d) => { setOrderDiscount(d); setDiscountOpen(false); }}
+                />
+              )}
+
               {details && (
                 <LineDetails
                   key={details.opening}
@@ -278,6 +367,7 @@ export function App() {
             message={toast.message}
             tone={toast.tone}
             shown={toast.shown}
+            action={toast.action}
             onDismiss={hideToast}
           />
         </ErrorBoundary>

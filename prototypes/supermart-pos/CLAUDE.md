@@ -16,7 +16,7 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **74** inconsistencies, including that 31 frames share the name
+anything — it records **86** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
@@ -37,7 +37,7 @@ screen: `88:8243` is the Cart's own frame with the customer row's label at Headi
 instead of Label/Base and a trash in place of the plus-circle. `88:8402` is a
 byte-identical duplicate of it; `88:8322` is the same frame plus the toast.
 
-### In progress — band `115:8774`, "Adjusting qty & product details in cart"
+### Built — band `115:8774`, "Adjusting qty & product details in cart"
 
 Three features in dependency order: the footer order total, the Quantity sheet, the
 line-details modal.
@@ -46,10 +46,23 @@ line-details modal.
 |---|---|---|---|
 | 1 | Money model and pack units (no UI) | — | `catalogue:verify` 57/57, `cart:verify` 22/22 |
 | 2 | Order total, collapsed and expanded | `88:8639`, `88:9338` | 0 outside 0.5px over 77 measurements, 19/19 flow and motion |
-| 3 | Quantity sheet | `88:11532`, `88:11647` | next |
-| 4 | Line-details modal | `88:9439` | — |
+| 3 | Quantity sheet | `88:11532`, `88:11647` | built; `walk-quantity`, `diff-quantity` |
+| 4 | Line-details modal | `88:9439` | built; `figma:audit` "Item details" |
 
 `88:8481` and `88:11766` are byte-identical to `88:8243` and need nothing built.
+
+### Built — band `152:8774`, "Applying discount to an order"
+
+| Screen | Node | State |
+|---|---|---|
+| More options (the Cart's •••) | `88:15543` | boxes 0 outside 0.5px; `figma:audit` 17 properties |
+| Apply discount — empty, 10%, ₦10 | `88:15757`, `88:15849`, `88:15941` | boxes 0 outside 0.5px; `figma:audit` 18 properties |
+| Cart with an order discount | `88:15571` | computed, not copied: the frame's numbers don't reconcile (#81) |
+
+`walk-discount` 25/25. The order discount comes off after line discounts and before
+VAT; reopening the sheet edits it and an empty field removes it; Clear cart (menu or
+trash) clears with Undo. **Open:** the frame redraws the total's breakdown (#82), and
+Queued orders is not designed yet (#80). See BUILD-PLAN, band `152:8774`.
 
 **Hosted preview:** <https://claude.ai/artifact/LnsiYh4uBeTNY1J3XDMJHX> — rebuild and
 republish it with `npm run build:hosted`.
@@ -122,6 +135,7 @@ Seeded so every state can be demoed without editing data (root agreement §4, §
 | The Quantity frame's 1/4/8/16 | Freshvale Crew Socks — 180 in stock |
 | Sold singly only (no Measurement list) | Freshvale Canvas Tote |
 | Discounted | Freshvale Slim Denim Jeans, ₦24,000 (was ₦28,000) |
+| Order discount | dev toolbar "Cart: order discount applied" — 10% off four lines |
 | Long name (truncation) | Water-Repellent Lightweight Packable Rain Jacket — 48 chars |
 | Single-item category | Bottoms, Footwear, Bags |
 | Category that wraps | Tops — 4 items |
@@ -136,19 +150,20 @@ back to its neutral fill if one is missing.
 npm run dev                # iterate; open with ?dev=1 for the toolbar
 npm run build && npm run preview   # demo from here, not dev
 
-npm run catalogue:verify   # 57 invariants: check digits, units, money, totals, states, CSV
+npm run catalogue:verify   # 63 invariants: check digits, units, money, totals, states, CSV
 npm run cart:verify        # 22 rules for changing a line: stock, clamps, unit changes
 npm run catalogue:csv      # regenerate figma/catalogue.csv from catalogue.ts
 npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json
 npm run tokens:verify      # the generated tokens still match the Figma dump
 npm run motion:sample      # transitions animate in BOTH directions (needs a server)
-npm run figma:audit        # 274 properties read off the Figma NODES vs computed style
+npm run figma:audit        # 399 properties read off the Figma NODES vs computed style
 npm run images:manifest    # which photos are missing
 npm run images:optimise -- --box <css-px>   # --box MUST come from a measured frame
 npm run build:hosted       # publish-ready bundle for the hosted preview
 
 # Browser walks and diffs — pass a server's base URL (default the dev server, :4251)
 node scripts/walk-total.mjs      [url]   # order total: reconciles, motion both ways
+node scripts/walk-discount.mjs   [url]   # More options, order discount, Clear cart + Undo
 node scripts/diff-total.mjs      [url]   # order total vs 88:8639 / 88:9338
 node scripts/walk-stock.mjs      [url]   # stock clamp and its toast
 node scripts/walk-sheet-keys.mjs [url]   # sheet focus, Escape, Tab trap
@@ -164,8 +179,9 @@ entrance that never animates.
 
 - `search-sm` carries a non-token stroke, and the filter button has no designed
   destination (BUILD-PLAN #50, #51).
-- **The Cart's title-bar trash clears the whole order in one tap** — no confirmation
-  or undo, and none is designed in this band (BUILD-PLAN #35).
+- **The order discount's breakdown**: `88:15652` restyles the total's breakdown and
+  puts Discount after Tax; the built one keeps `88:9338`'s (BUILD-PLAN #82).
+- **Queued orders** and the **Undo** toast's action are not designed (#80, #86).
 - The sheet **exit curve** is heavily back-loaded and is deferred to `better-ui`,
   which owns motion and is not installed (BUILD-PLAN #37).
 - **No motion is authored anywhere in the Figma file** — `get_motion_context` returns

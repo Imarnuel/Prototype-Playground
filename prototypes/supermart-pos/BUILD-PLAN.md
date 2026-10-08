@@ -252,7 +252,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 32 | **The Cart shows no order total**, and its button reads "Checkout (5)" over **six** priced rows whose line prices reconcile with nothing (₦10,000 on one row, ₦1,000 on five at the same quantity) | Total added as a minimal honest addition. **Resolved** by band `115:8774`, which designs one (`88:8639` / `88:9338`) — the ad-hoc line is gone |
 | 33 | **No motion is authored anywhere in the file.** `get_motion_context` returns `{"nodes":[]}` for the Cart, the Sales Point, and all 90 frames in the section | Transitions use the project's own documented baseline, explicitly not design-derived |
 | 34 | Product names clamp to two lines in a 172px card and the longest real name still overflows. The design sets `nowrap`, which only holds for its own short placeholder names | `title` added as the minimum way to reach the full value; **a designed affordance is still needed** |
-| 35 | **The Cart's title-bar trash clears the whole order in one tap** — no confirmation, no undo, no distinct treatment. Measured: 4 lines to 0 with no dialog | **Open — needs design input.** Not invented here; the board's unbuilt "More options" frame (`88:15458`) may hold the intended pattern |
+| 35 | **The Cart's title-bar trash clears the whole order in one tap** — no confirmation, no undo, no distinct treatment. Measured: 4 lines to 0 with no dialog | **Resolved by the designer's call** (band `152:8774`): it clears at once and the toast offers **Undo**, which restores the lines and the order discount. The toast's action is not designed (#86) |
 | 36 | **The sheet's ENTRY was an instant cut.** It mounted already in its open state, so there was no rendered starting frame to transition from — measured `translateY 0.0` at every frame including t=44ms. Only the exit had ever been checked | **Fixed.** Two-phase mount; entry now measures 0% → 55.9% → 91.8% at t=20/104/204ms. `npm run motion:sample` guards it |
 | 37 | The sheet's **exit curve is heavily back-loaded**: 0.2% travelled at 25% of the duration, 2.8% at 50%, 46.8% at 90% — visually motionless for roughly the first 150ms after the tap. `EASING.in` is `cubic-bezier(0.7, 0, 0.84, 0)` | **Open — deferred to `better-ui`**, which owns motion. Measured, not retuned on taste |
 | 38 | The Cart's **Add customer row differs between frames**: `88:8164` draws a 32px pink circle with `user-02` and `Color/text/default`; `88:11845` draws a bare 20px `heroicons:user-16-solid` with `Color/text/brand` | Built as `88:8164` draws it, since that is the Cart's own frame |
@@ -292,6 +292,18 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 72 | **The chevron never changes** between collapsed and expanded, so nothing says the row is open or that tapping again closes it. The sub-rows' chevrons are hidden | Turns 180° with the panel, over the same duration and curve; `aria-expanded` carries the state for assistive tech. Hidden sub-row chevrons are not built — they would be dead affordances (§9) |
 | 73 | **The frames' numbers do not reconcile**: Subtotal ₦10,000 = Total ₦10,000 over six ₦1,000 lines, and Tax ₦0 contradicts the study's 7.5% VAT | Every figure is computed by `orderTotals`. A standard-rated basket shows its real VAT |
 | 74 | **The footer panel's fill and shadow are unbound**: `#ffffff` with no variable (its child row binds Color/surface/default, same value), and a shadow pair with no effect style — Untitled UI's shadow-md cast upward | Fill from the token holding the same value; the shadow as a literal with a comment — no token was invented for it |
+| 75 | **"Applying discount to an order" names four of its six frames "Customer added"** (`88:15677`, `88:15769`, `88:15861`, `88:15571`) | Referenced by node ID only, as everywhere on this board |
+| 76 | **Every More options row carries a trailing check at opacity 0** (`88:15552` …), and the header's check Button Icon is at opacity 0 too | Neither built. An invisible mark on a menu row says nothing, and none of the rows is a selection; the header button as #43 |
+| 77 | **Clear cart, the only row in its group, has the bottom divider** that separates rows elsewhere in the menu (`88:15559`); Queued orders, also alone, has none | Dropped: a line under the last row divides nothing |
+| 78 | **The menu's groups are 345 wide in a 349 body** (`88:15546`), 16 from the left and 20 from the right | Full width, 16 each side |
+| 79 | **More options offers "Add a customer" while a customer is attached** — the frame's own Cart shows Samuel Daudu | Label kept as drawn; the row opens the picker, which swaps the customer. **Needs design input**: "Change customer", or hide the row |
+| 80 | **Queued orders has no destination** in this band | The designer's call: designed later. Until then the row raises a notice, "Queued orders is not designed yet", so it is not a dead control |
+| 81 | **The final frame's numbers do not reconcile** (`88:15571`): Subtotal ₦10,000, Tax ₦0, Discount ₦100, Total ₦10,000 — and the sheets enter 10% and ₦10, neither of which is ₦100 | Every figure computed by `orderTotals` (as #73) |
+| 82 | **The breakdown is redrawn** in `88:15652`: Label/Base in Color/text/secondary for every label and amount, 4px row padding, and Discount after Tax as an unsigned "₦100". `88:9338` (built, audited) has Color/text/subtle labels, Heading/H4 amounts, and Discount between Subtotal and Tax, signed | **Kept `88:9338`'s.** Which frame supersedes is the designer's call. The money is the same either way: both discounts come off before VAT whatever the row order. **Needs design input** |
+| 83 | **The %/₦ switch sets its chosen option two ways**: Heading/h5 (Semi Bold 16/20) in Item details (`88:9562`), Label/large (Medium 16/24) in Apply discount (`88:15765`) | Each sheet follows its own frame, through one component with a variant |
+| 84 | **The unchosen option changes colour between states of one sheet**: Color/text/subtle in `88:15949`, Color/text/subtlest in `88:15767`, `88:15859` and Item details' `88:9564` | Subtlest throughout |
+| 85 | **The Discount field's "%" sat at the field's right edge** in Item details — the input filled the row, pushing its suffix away. Every frame writes the value and its unit as one string: "10%", "₦10" | Mine, from band `115:8774`. **Fixed**: the input sizes to what is typed, so the suffix sits 1px after it, in both sheets |
+| 86 | **Clearing has no designed way back**, and the toast has no designed action | The designer's call: Undo on the existing toast. The pill is the header confirm's colours on the toast's dark fill, the toast stays up 5s, not 2.6s, and takes taps only while it shows an action. **Needs design input** |
 
 ## Work order
 
@@ -636,6 +648,35 @@ Verified: `diff-total` 0 outside 0.5px over 77 measurements (collapsed, expanded
 collapsed again; the chevron's x replaced by the designed 8px gap, #56);
 `walk-total` 19/19; `figma:audit` 274 properties, 0 differ (+43); every earlier gate
 green on dev and production — the Cart diff retargeted to the new footer (#69).
+
+### Band `152:8774` — "Applying discount to an order"
+
+Six frames: the Cart, More options (`88:15543`), Apply discount empty / 10% / ₦10
+(`88:15757`, `88:15849`, `88:15941`), and the Cart with the discount in its total
+(`88:15571`). The designer's calls, asked before building: the order discount comes
+off **after line discounts and before VAT**; it is changed by reopening the sheet and
+**removed by an empty field**; **Clear cart clears with Undo**; Queued orders is
+designed later.
+
+- **Money**: `orderTotals(lines, orderDiscount)`. The discount is taken from what the
+  lines come to after their own discounts, by the same rounding rule as a line's,
+  and split across lines in whole Naira by largest remainder, so each line's VAT is
+  on its share of what is collected. An amount past the order is clamped at
+  computation, not stored clamped (see the function's comment).
+- **Reused**: BottomSheet chrome; the Quantity sheet's grey panel and white close;
+  the shared row press feedback in `motion.css`; the Item details text field and
+  %/₦ switch, extracted to `DiscountInput` + `FieldError` + `DetailField.css`.
+- **New**: `MoreOptions`, `ApplyDiscount`, four icons exported from their instances
+  (`user-02-brand`, `percent-03`, `trash-01`, `list`), an optional Toast action.
+- **Sequencing**: a menu row closes the menu and opens the next sheet once its exit
+  has run, so two sheets never cross. Clear cart from the menu runs through the
+  Cart's own line exit, the same path as the title-bar trash.
+
+Verified: `walk-discount` 25/25; the sheets' boxes 0 outside 0.5px against the frames
+(two label widths 0.6–0.8 narrow: Figma rounds text boxes up to whole pixels);
+`figma:audit` 399 properties, 0 differ (+35); `catalogue:verify` with five new
+order-discount checks, 2,000 random splits and 500 random baskets now carrying order
+discounts; every earlier gate green.
 
 ## Screen 1 — verification record
 

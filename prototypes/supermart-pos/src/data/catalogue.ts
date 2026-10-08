@@ -356,51 +356,98 @@ export function lineGrossMinor(line: PricedLine): number {
 }
 
 /**
- * Discount on one line, whole Naira. A percent rounds half-up using integers only:
- * floor((naira x p + 50) / 100). An amount is clamped to the line so a line can
- * never go below zero.
+ * A discount taken off `baseMinor`, whole Naira. A percent rounds half-up using
+ * integers only: floor((naira x p + 50) / 100). An amount is clamped to the base so
+ * nothing can go below zero. One rule for a line's discount and the order's.
  */
-export function lineDiscountMinor(line: PricedLine): number {
-  const d = line.discount;
-  if (!d) return 0;
-  const gross = lineGrossMinor(line);
+function discountOnMinor(baseMinor: number, d: Discount): number {
   if (d.kind === 'amount') {
     requireWholeNaira(d.minor, 'a discount');
-    return Math.min(d.minor, gross);
+    return Math.min(d.minor, baseMinor);
   }
   if (!Number.isInteger(d.percent) || d.percent < 0 || d.percent > 100) {
     throw new Error(`a percent discount must be a whole number from 0 to 100, got ${d.percent}`);
   }
-  return Math.floor(((gross / MINOR) * d.percent + 50) / 100) * MINOR;
+  return Math.floor(((baseMinor / MINOR) * d.percent + 50) / 100) * MINOR;
 }
 
-/** VAT on the line AFTER its discount, in kobo, rounded half-up per line. */
-export function lineTaxMinor(line: PricedLine): number {
-  const net = lineGrossMinor(line) - lineDiscountMinor(line);
+/** Discount on one line, off its gross. */
+export function lineDiscountMinor(line: PricedLine): number {
+  return line.discount ? discountOnMinor(lineGrossMinor(line), line.discount) : 0;
+}
+
+/** What a line comes to after its own discount: the base an order discount is taken from. */
+export function lineNetMinor(line: PricedLine): number {
+  return lineGrossMinor(line) - lineDiscountMinor(line);
+}
+
+/**
+ * VAT on the line AFTER its discount, in kobo, rounded half-up per line.
+ * `orderShareMinor` is the line's part of an order discount, which also comes off
+ * before VAT: VAT is charged on what is collected, not on the list price.
+ */
+export function lineTaxMinor(line: PricedLine, orderShareMinor = 0): number {
+  const net = lineNetMinor(line) - orderShareMinor;
   return Math.floor((net * vatBpFor(line.product) + 5_000) / 10_000);
 }
 
-export type OrderTotals = { subtotal: number; discount: number; tax: number; total: number };
+/**
+ * Splits a whole-Naira order discount across lines in proportion to each line's net,
+ * in whole Naira, by largest remainder (ties to the earlier line), so the parts sum
+ * to the discount exactly and no line's share exceeds its net.
+ */
+export function allocateOrderDiscountMinor(discountMinor: number, netsMinor: readonly number[]): number[] {
+  const base = netsMinor.reduce((a, n) => a + n, 0);
+  if (discountMinor === 0 || base === 0) return netsMinor.map(() => 0);
+  const naira = discountMinor / MINOR;
+  const parts = netsMinor.map((n, i) => ({ i, whole: Math.floor((naira * n) / base), rem: (naira * n) % base }));
+  let left = naira - parts.reduce((a, p) => a + p.whole, 0);
+  for (const p of [...parts].sort((a, b) => b.rem - a.rem || a.i - b.i)) {
+    if (left === 0) break;
+    p.whole++; left--;
+  }
+  return parts.map((p) => p.whole * MINOR);
+}
+
+export type OrderTotals = {
+  subtotal: number;
+  /** Line discounts plus the order discount: the one Discount the breakdown shows. */
+  discount: number;
+  /** The order discount's part of `discount`, as applied — after any clamp. */
+  orderDiscount: number;
+  tax: number;
+  total: number;
+};
 
 /**
  * Subtotal is the sum of line GROSS, which is what each Cart line displays, so the
  * lines visibly add up to it. Tax is summed per line in kobo and then rounded ONCE to
- * a whole Naira for the order: without that the payable total is fractional (Cola
- * ₦500 carries 3750 kobo of VAT, a total of ₦537.50 shown as "₦538", and paying ₦538
+ * a whole Naira for the order: without that the payable total is fractional (a ₦500
+ * line carries 3750 kobo of VAT, a total of ₦537.50 shown as "₦538", and paying ₦538
  * leaves 50 kobo of change shown as "₦1"). With it, subtotal - discount + tax = total
  * holds exactly, in kobo and on screen.
+ *
+ * An order discount comes off what the lines come to AFTER their own discounts, and
+ * before VAT, so each line's VAT is on its share of the money actually collected.
+ * An amount larger than that is clamped to it here, at computation, and not stored
+ * clamped: the order is still being built, and emptying it to swap one line must not
+ * quietly shrink a discount the cashier agreed. What is shown is always the clamp.
  */
-export function orderTotals(lines: readonly PricedLine[]): OrderTotals {
+export function orderTotals(lines: readonly PricedLine[], orderDiscount?: Discount): OrderTotals {
+  const nets = lines.map(lineNetMinor);
+  const base = nets.reduce((a, n) => a + n, 0);
+  const applied = orderDiscount ? discountOnMinor(base, orderDiscount) : 0;
+  const shares = allocateOrderDiscountMinor(applied, nets);
   let subtotal = 0;
-  let discount = 0;
+  let discount = applied;
   let taxKobo = 0;
-  for (const line of lines) {
+  lines.forEach((line, i) => {
     subtotal += lineGrossMinor(line);
     discount += lineDiscountMinor(line);
-    taxKobo += lineTaxMinor(line);
-  }
+    taxKobo += lineTaxMinor(line, shares[i]);
+  });
   const tax = Math.floor((taxKobo + MINOR / 2) / MINOR) * MINOR;
-  return { subtotal, discount, tax, total: subtotal - discount + tax };
+  return { subtotal, discount, orderDiscount: applied, tax, total: subtotal - discount + tax };
 }
 
 /** For amounts that can be negative, like a discount: "−₦53", never "₦-53" or "₦-0". */

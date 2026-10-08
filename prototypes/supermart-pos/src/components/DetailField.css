@@ -1,0 +1,112 @@
+/* The design's Text field, Filled=yes, and the validation message under it. Shared
+   by Item details and Apply discount; the gradient ring is in index.css. */
+/* Text field, Filled=yes: a FIXED 60 tall, radius Border radius/300, Spacing/400
+   either side, the 40px label-and-value block centred. Its nominal 12px top and
+   bottom padding never binds — 12 + 40 + 12 is 64 — so the block sits 10 from each
+   edge. The gradient ring is in index.css. */
+.detailField {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 60px;
+  box-sizing: border-box;
+  padding: 0 var(--spacing-400);
+  background: var(--color-container-input-default);
+  border-radius: var(--radius-300);
+  box-shadow: inset 0 0 0 var(--border-width-sm) var(--color-border-default);
+  flex: 1 1 auto;
+}
+
+/* Description `88:9565`: fixed 120, top-aligned, so its 12px top padding does bind. */
+.detailField--tall { height: 120px; justify-content: flex-start; padding-top: 12px; padding-bottom: 12px; }
+.detailField--tall textarea { flex: 1 1 auto; }
+
+.detailField__label {
+  font-size: var(--type-Label-Small-size);
+  font-weight: var(--type-Label-Small-weight);
+  line-height: var(--type-Label-Small-line-height);
+  color: var(--color-text-subtlest);
+}
+
+.detailField__row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.detailField__row,
+.detailField input,
+.detailField textarea {
+  font-size: var(--type-Body-Large-size);
+  line-height: var(--type-Body-Large-line-height);
+  letter-spacing: var(--type-Body-Large-letter-spacing);
+  color: var(--color-text-default);
+}
+
+.detailField input,
+.detailField textarea {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  outline: none;
+  resize: none;
+}
+
+.detailField input::placeholder,
+.detailField textarea::placeholder { color: var(--color-text-subtlest); }
+
+/* Not designed: a focused field takes the brand colour the caret uses. */
+.detailField:focus-within { box-shadow: inset 0 0 0 1.5px var(--color-icon-brand); }
+
+/* Not designed. The wrapper cancels the column's 16px gap, so a shut message takes
+   no room; open, it sits 8 below its field. */
+.fieldError {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: calc(-1 * var(--spacing-400));
+  opacity: 0;
+  transition:
+    grid-template-rows var(--motion-fast) var(--ease-inOut),
+    opacity var(--motion-fast) var(--ease-inOut);
+}
+
+.fieldError[data-open='on'] { grid-template-rows: 1fr; opacity: 1; }
+.fieldError__clip { min-height: 0; overflow: hidden; }
+
+.detailField__error {
+  margin: 0;
+  padding-top: 8px;
+  font-size: var(--type-Label-Small-size);
+  line-height: var(--type-Label-Small-line-height);
+  color: var(--color-text-danger);
+}
+
+
+/* A value that sizes to what is typed, so a suffix sits right after it: the frames
+   write "10%" and "₦10" as one string. The hidden copy sets the width, and the input
+   lies over it in the same grid cell. */
+.detailField__grow {
+  display: inline-grid;
+  min-width: 0;
+}
+.detailField__grow::after {
+  content: attr(data-value);
+  grid-area: 1 / 1;
+  visibility: hidden;
+  white-space: pre;
+  /* Room for the caret at the end of the value. */
+  padding-right: 1px;
+}
+/* A suffix sits flush, as in the frames' "10%": the row's 2px gap is for a prefix. */
+.detailField__grow + [aria-hidden] { margin-left: -2px; }
+
+/* Zero width so the input's own default (20 characters) adds nothing to the column;
+   min-width then stretches it over the copy's width. */
+.detailField .detailField__grow input {
+  grid-area: 1 / 1;
+  width: 0;
+  min-width: 100%;
+}

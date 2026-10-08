@@ -1,0 +1,16 @@
+/* Apply discount — `88:15757`. Chrome comes from BottomSheet; these are only the ways
+   this sheet differs. */
+
+/* `.Modal body` 88:15759: a FIXED 177, 16 above and 32 below a row padded 16 either
+   side. The frame's height leaves room under the field, which a validation message
+   uses rather than growing the sheet. */
+.applyDiscount .modalBody {
+  height: 177px;
+  flex: none;
+  box-sizing: border-box;
+  align-items: stretch;
+  padding: 16px var(--spacing-400) 32px;
+}
+
+/* The message sits directly under its field here, not across a column gap. */
+.applyDiscount .fieldError { margin-top: 0; }

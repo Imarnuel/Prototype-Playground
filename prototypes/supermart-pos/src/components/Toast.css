@@ -46,6 +46,25 @@
   text-align: center;
 }
 
+/* Not designed. A toast with an action takes taps while it is up, and only then; the
+   action is a pill in the header confirm's colours, which read on the dark fill. */
+.toast[data-open='on'][data-action='on'] { pointer-events: auto; }
+
+.toast__action {
+  height: 36px;
+  margin-top: var(--spacing-200);
+  padding: 0 var(--spacing-400);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-container-brand-default);
+  color: var(--color-text-brand);
+  font-size: var(--type-Label-large-size);
+  font-weight: var(--type-Label-large-weight);
+  line-height: var(--type-Label-large-line-height);
+  letter-spacing: var(--type-Label-large-letter-spacing);
+  cursor: pointer;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .toast {
     transition-duration: 0ms !important;

@@ -1,0 +1,50 @@
+/* More options — `88:15543`. Chrome comes from BottomSheet; these are only the ways
+   this sheet differs. */
+
+/* Color/surface/secondary/default with a white close circle, as the Quantity sheet. */
+.sheetPanel.moreOptions { background: var(--color-surface-secondary-default); }
+.moreOptions .closeButton { background: var(--color-icon-inverse); }
+
+/* `.Modal body` 88:15545: 16 either side, 20 below; groups 12 apart. */
+.moreOptions .modalBody {
+  gap: 12px;
+  align-items: stretch;
+  padding: 0 var(--spacing-400) 20px;
+}
+
+/* Frame 4980: Color/surface/default, radius 16, 12 either side, a 1px inside stroke
+   in Color/border/subtle. */
+.moreOptions__group {
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px;
+  flex: none;
+  background: var(--color-surface-default);
+  border-radius: var(--radius-400);
+  box-shadow: inset 0 0 0 1px var(--color-border-subtle);
+  overflow: clip;
+}
+
+/* Each row: 60 tall, a 20px icon 12 from its Label/large, and a 1px bottom stroke in
+   Color/border/subtle between rows. */
+.moreOptions__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 60px;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.moreOptions__row:not(:last-child) { box-shadow: inset 0 -1px 0 0 var(--color-border-subtle); }
+
+.moreOptions__label {
+  font-size: var(--type-Label-large-size);
+  font-weight: var(--type-Label-large-weight);
+  line-height: var(--type-Label-large-line-height);
+  letter-spacing: var(--type-Label-large-letter-spacing);
+  color: var(--color-text-default);
+}
