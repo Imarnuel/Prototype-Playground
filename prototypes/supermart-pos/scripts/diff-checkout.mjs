@@ -20,6 +20,10 @@ const pick = async (label) => {
   await page.waitForTimeout(400);
   await page.evaluate((l) => [...document.querySelectorAll('.devbar__item')].find((b) => b.textContent.trim() === l).click(), label);
   await page.waitForTimeout(1300);
+  // Success and the receipt arrive after the mock API's latency and choreograph in:
+  // measure at rest, not mid-flight. (Finite animations only — a spinner never ends.)
+  await page.waitForFunction(() => document.getAnimations()
+    .every((a) => a.playState !== 'running' || a.effect?.getTiming().iterations === Infinity), null, { timeout: 5000 });
 };
 const box = (sel, i) => page.evaluate(([s, i]) => {
   const e = document.querySelectorAll(s)[i];

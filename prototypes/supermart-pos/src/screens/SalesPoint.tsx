@@ -26,11 +26,13 @@ type SalesPointProps = {
   forceState?: 'loading' | 'error' | 'empty';
   /** Comes from the shared cart — this screen does not keep its own copy. */
   cartCount: number;
+  /** Bumped on New sale: the grid replays its entrance for the next customer. */
+  freshSale?: number;
   onAddProduct: (p: Product) => void;
   onViewCart: () => void;
 };
 
-export function SalesPoint({ forceState, cartCount, onAddProduct, onViewCart }: SalesPointProps) {
+export function SalesPoint({ forceState, cartCount, freshSale = 0, onAddProduct, onViewCart }: SalesPointProps) {
   const [filter, setFilter] = useState<ProductFilter>('All');
   const [query, setQuery] = useState('');
   const [load, setLoad] = useState<Load>({ status: 'loading' });
@@ -103,7 +105,8 @@ export function SalesPoint({ forceState, cartCount, onAddProduct, onViewCart }: 
         )}
 
         {state.status === 'ready' && visible.length > 0 && (
-          <div className="productGrid">
+          // Re-keyed on New sale, so the cards rise again — as the receipt lifts away.
+          <div className="productGrid" key={freshSale} data-fresh={freshSale > 0 ? 'on' : undefined}>
             {visible.map((p, i) => (
               <ProductCard key={p.id} product={p} onPress={onAddProduct} index={i} />
             ))}

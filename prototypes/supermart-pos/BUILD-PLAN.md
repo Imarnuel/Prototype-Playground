@@ -317,7 +317,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 97 | **The receipt's footnote and social block are 435 wide in a 305 column**, overflowing the card; its footnote is placeholder copy, and its four handles all read "Afonomicstores" | Fit to the column; the footnote and one handle are Freshvale's, invented. Store identity is Freshvale's by the designer's call; Freshvale has no logo, so the frame's slot holds a **placeholder monogram — needs design input** |
 | 98 | **The receipt's X icon is #000000**, the other three socials #5A5C63; the four sit below the frame's 852 clip, so Figma exports none of them | Built from each vector's own path data, at its position in its frame; the X matched to the others' grey |
 | 99 | **Close and New sale on the receipt** — two controls, one meaning once the sale is paid | Both end the sale: empty order, no customer or discount, back to the Sales Point |
-| 100 | **Not designed**: Pay's working state, a failed payment, change due, and the amount's validation | "Processing…" on a disabled Pay; a notice toast that keeps the draft; change under the field in Color/text/success; the field's own error line |
+| 100 | **Not designed**: Pay's working state, a failed payment, change due, and the amount's validation | A spinner on a disabled Pay, then a drawn check on green (the words "Processing…" / "Paid" for screen readers); a notice toast that keeps the draft; change under the field in Color/text/success; the field's own error line |
 | 101 | **Mine, from band 4: the empty Cart's disabled Checkout label read a token that does not exist** (`--color-text-on-disabled`), so it inherited a colour instead of Color/text/ondisabled | Fixed |
 
 ## Work order
@@ -708,7 +708,7 @@ and Print do the real thing.
   so it has latency and a forced failure.
 - **Flow**: the method and bank pickers replace Checkout on screen and hand back to it
   (the frames draw them alone over the Cart); the draft lives in the App so it
-  survives the round trip. Success gives way to the receipt after 1.6s or a tap.
+  survives the round trip. Success gives way to the receipt after 2s or a tap.
 - **Reused**: BottomSheet (now with a footer slot), the text field and FieldError,
   Select customer's search field, CloseButton, the row press feedback. **New**: the
   four screens, 21 icons and four bank logos, all exported from their instances or
@@ -776,6 +776,41 @@ the new tray rests at 345–374ms, the old one is gone by ~190ms, and the backdr
 combined dim is 0.500 on every frame (a first version dropped to 0 for one frame —
 the incoming sheet mounts a render later — fixed by holding the old fill until the
 new blanket exists). Opening from the Cart and closing with the X are unchanged.
+
+**After Pay: one choreographed moment** (the designer: "sick motion after the
+checkout"). Nothing here is designed — the frames are the static success screen and
+the receipt — so it is built only from the existing tokens, plus one new easing,
+`EASING.overshoot` (a small settle, for confirmation only, never for travel).
+
+1. **Pay works in place.** The label cross-fades up and out (fast) and a spinner
+   scales in on the same grid cell, so the button never changes width. Paid: the
+   fill turns Color/container/success and a check draws itself (`pathLength=1`,
+   dash 1 → 0), held for `slow` before anything moves.
+2. **Success grows out of the button.** A `clip-path: circle()` reveal centred on the
+   Pay button's measured centre (`origin`), over `slow` ease-inOut; Checkout and the
+   Cart close underneath it, unseen.
+3. **The mark lands.** The disc pops on the overshoot (peaks at 1.068 and settles),
+   the check strokes on, two rings ripple out staggered, the text rises, and the
+   device ticks (`navigator.vibrate(12)` where it exists) as the stroke completes.
+4. **The receipt prints.** It feeds down from under the title bar (`slow + base`)
+   while the actions rise from the bottom edge. The success screen stays opaque and
+   only its content lets go: two half-faded whites would let the Sales Point
+   through. The receipt's own white fades on `fast`, so it is fully opaque a frame
+   before the success screen unmounts (sampled: combined cover 1.000 on every frame;
+   on `base` it was 0.973 for two frames).
+5. **New sale resets the room.** The receipt lifts away and the Sales Point's cards
+   re-rise in a 40ms stagger (`.productGrid[data-fresh]`, keyed so it replays).
+
+Every delay is a `calc()` of the `--motion-*` vars, so reduced motion lands the whole
+run settled (sampled: 0 running animations; receipt at 122, footer at 748 — the same
+resting boxes). Sampled per frame on dev: spinner by ~20ms, paid ~340ms, reveal
+~830–1250ms over 12 radii, mark settled ~1490ms, text opaque ~1735ms, receipt at rest
+~3570ms; new sale settled in ~740ms. The circles drawn here (rings, spinner) join the
+`corner-shape: round` list — on the global superellipse they rendered as squircles.
+
+`walk-checkout` now checks Pay through its phases in-page (paid holds ~420ms before
+the success screen mounts); `diff-checkout` waits for finite animations to end before
+measuring, since the screens now choreograph in after the mock API's latency.
 
 ## Resolved: `Frame 4908` is `CloseButton` (#15)
 

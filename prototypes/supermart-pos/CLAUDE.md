@@ -204,6 +204,10 @@ entrance that never animates.
 - **The receipt's logo** is a placeholder: Freshvale has none (#97).
 - The sheet **exit curve** is heavily back-loaded and is deferred to `better-ui`,
   which owns motion and is not installed (BUILD-PLAN #37).
+- **The post-Pay sequence is not designed** — the spinner and check on Pay, the
+  circular reveal, the mark's pop and ripples, the receipt's print feed and the
+  grid's re-rise are choreographed from the motion tokens (BUILD-PLAN, Motion).
+  Any later Figma motion replaces it.
 - **No motion is authored anywhere in the Figma file** — `get_motion_context` returns
   `{"nodes":[]}` for all 90 frames. Transitions come from `shared/src/motion.ts`,
   documented as the project's baseline rather than design-derived.

@@ -84,6 +84,17 @@ button:active:not(:disabled):not([aria-disabled='true']):not(
   animation-delay: calc(var(--i, 0) * 25ms);
 }
 
+/* After New sale the grid comes back with more presence: a longer rise, a touch of
+   scale, staggered a little wider, and held until the receipt has started to go. */
+@keyframes motion-fresh {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+.productGrid[data-fresh='on'] .productCard {
+  animation: motion-fresh var(--motion-slow) var(--ease-out) backwards;
+  animation-delay: calc(var(--motion-fast) + var(--i, 0) * 40ms);
+}
+
 .customerEmpty,
 .customerList__none,
 .salesPoint__message { animation: motion-fade var(--motion-base) var(--ease-out) backwards; }

@@ -145,7 +145,8 @@ select {
     .addCustomer__avatar, .cart__iconButton, .salesPoint__overflow,
     .filterChip, .tabBar__nav, .tabBar__item,
     .device, .device__screen, .device__island,
-    .saleSuccess__icon, .receipt__logo, .bankPicker__logo, .toast__action
+    .saleSuccess__icon, .saleSuccess__ring, .payButton__spinner,
+    .receipt__logo, .bankPicker__logo, .toast__action
   ) {
     corner-shape: round;
   }

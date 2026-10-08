@@ -11,11 +11,33 @@
 .saleScreen[data-open='off'] { opacity: 0; }
 .saleScreen[data-open='on'] { opacity: 1; }
 
-/* --- Transaction success ---------------------------------------------------------- */
+/* --- Transaction success ----------------------------------------------------------
+   Not designed; choreographed. Every delay is built from the duration tokens, so
+   reduced motion (which zeroes them) lands everything at once, settled. */
 .saleSuccess {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  /* Opens as a circle from the Pay button. 1000px clears the far corner from any
+     origin on a 393x852 screen. */
+  clip-path: circle(0 at var(--ox) var(--oy));
+  transition:
+    clip-path var(--motion-slow) var(--ease-inOut),
+    opacity var(--motion-base) var(--ease-inOut);
+}
+.saleSuccess[data-open='off'][data-leaving='off'] { opacity: 1; }
+.saleSuccess[data-open='on'],
+.saleSuccess[data-leaving='on'] { clip-path: circle(1000px at var(--ox) var(--oy)); }
+/* Leaving for the receipt: the screen stays opaque while the receipt fades in over
+   it — two half-faded white screens would let the Sales Point show through — and
+   only its content lets go. */
+.saleSuccess[data-leaving='on'] { opacity: 1; }
+.saleSuccess[data-leaving='on'] .saleSuccess__content {
+  opacity: 0;
+  transform: scale(0.96);
+  transition:
+    opacity var(--motion-fast) var(--ease-in),
+    transform var(--motion-base) var(--ease-in);
 }
 
 /* Frame 4905: 327 wide, Spacing/500 between the icon and the line. */
@@ -27,8 +49,17 @@
   width: 327px;
 }
 
-/* Featured icon: 72 round in Color/container/success/bold, a 40 check centred. The
-   icon arrives a beat behind the screen, so the success reads as an event. */
+.saleSuccess__mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+}
+.saleSuccess__mark > * { grid-area: 1 / 1; }
+
+/* Featured icon: 72 round in Color/container/success/bold, a 40 check centred. It
+   pops in once the reveal has mostly opened. */
 .saleSuccess__icon {
   display: flex;
   align-items: center;
@@ -37,12 +68,28 @@
   height: 72px;
   border-radius: var(--radius-full);
   background: var(--color-container-success-bold-default);
-  transition: transform var(--motion-slow) var(--ease-out);
+  animation: success-pop var(--motion-slow) var(--ease-overshoot) var(--motion-fast) both;
 }
-.saleSuccess[data-open='off'] .saleSuccess__icon { transform: scale(0.6); }
-.saleSuccess[data-open='on'] .saleSuccess__icon { transform: scale(1); }
 
-/* Heading/h4, its box the column's full 327 with the line centred in it. */
+/* The check draws as the pop settles. */
+.saleSuccess__icon path {
+  stroke-dasharray: 1;
+  animation: success-draw var(--motion-base) var(--ease-out) calc(var(--motion-fast) + var(--motion-base)) both;
+}
+
+/* Two rings of the same green ripple out from the mark as the check lands. */
+.saleSuccess__ring {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-full);
+  background: var(--color-container-success-bold-default);
+  opacity: 0;
+  animation: success-ripple calc(var(--motion-slow) * 2) var(--ease-out) calc(var(--motion-fast) + var(--motion-base) * 1.5) both;
+}
+.saleSuccess__ring--late { animation-delay: calc(var(--motion-fast) * 2 + var(--motion-base) * 1.5); }
+
+/* Heading/h4, its box the column's full 327 with the line centred in it. It rises
+   last, so the eye goes mark, then words. */
 .saleSuccess__text {
   align-self: stretch;
   margin: 0;
@@ -52,10 +99,29 @@
   letter-spacing: var(--type-Heading-h4-letter-spacing);
   color: var(--color-text-default);
   text-align: center;
+  animation: motion-rise var(--motion-base) var(--ease-out) calc(var(--motion-slow) + var(--motion-fast)) both;
+}
+
+@keyframes success-pop {
+  from { transform: scale(0.3); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes success-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes success-ripple {
+  from { transform: scale(1); opacity: 0.28; }
+  to { transform: scale(2.6); opacity: 0; }
 }
 
 /* --- Receipt screen ----------------------------------------------------------------- */
 .receiptScreen { padding-top: var(--safe-top); }
+/* It arrives over the success screen's identical white, which unmounts after the
+   exit duration (base) — but this one starts fading two frames late (usePresented).
+   On base it would still be 97% when the cover beneath goes; on fast it is done with
+   a frame to spare. The receipt's own feed carries the motion, not this fade. */
+.receiptScreen[data-open='on'] { transition-duration: var(--motion-fast); }
 
 /* Title bar: 56, 16 x 12, the close leading and New sale trailing. Its "Order
    Preview" title is at opacity 0 in the frame; not built. */
@@ -93,8 +159,11 @@
   padding: 16px var(--spacing-400) 120px;
 }
 
-/* `.Modal footer`: 16 above, 40 below, a shadow cast upward; two equal buttons. */
+/* `.Modal footer`: 16 above, 40 below, a shadow cast upward; two equal buttons.
+   It rises once the receipt has fed out, and drops away on New sale. */
 .receiptScreen__footer {
+  animation: receipt-actions var(--motion-base) var(--ease-out) calc(var(--motion-slow) + var(--motion-fast)) backwards;
+  transition: transform var(--motion-base) var(--ease-in);
   position: absolute;
   left: 0;
   right: 0;
@@ -135,6 +204,12 @@
    Its greys (#353645, #bbbbc4) and black are another library's ("Omnix Neutral"),
    not this file's tokens; kept as drawn. */
 .receipt {
+  /* Printed: fed down from behind the title bar — the scroll area's top edge is the
+     slot — decelerating as the paper settles. On New sale it lifts away. */
+  animation: receipt-feed calc(var(--motion-slow) + var(--motion-base)) var(--ease-out) var(--motion-fast) backwards;
+  transition:
+    transform var(--motion-base) var(--ease-in),
+    opacity var(--motion-base) var(--ease-in);
   --r: 0.95725;
   --receipt-rule: #bbbbc4;
   display: flex;
@@ -271,8 +346,14 @@
 
 .receipt__credit { line-height: calc(28px * var(--r)); }
 
+.receiptScreen[data-leaving='on'] .receipt { transform: translateY(-32px); opacity: 0; }
+.receiptScreen[data-leaving='on'] .receiptScreen__footer { transform: translateY(100%); }
+
+@keyframes receipt-feed { from { transform: translateY(-100%); } }
+@keyframes receipt-actions { from { transform: translateY(100%); } }
+
 @media (prefers-reduced-motion: reduce) {
-  .saleScreen, .saleSuccess__icon { transition-duration: 0ms !important; }
+  .saleScreen, .saleSuccess__content, .receipt, .receiptScreen__footer { transition-duration: 0ms !important; }
 }
 
 /* Print receipt: the receipt alone, at paper width, without the phone around it. */

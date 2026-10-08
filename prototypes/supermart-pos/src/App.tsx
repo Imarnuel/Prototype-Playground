@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  DeviceFrame, DevToolbar, SHEET_SPRING, devFlagEnabled, duration, failNextRequest, useReducedMotion,
+  DURATION, DeviceFrame, DevToolbar, SHEET_SPRING, devFlagEnabled, duration, failNextRequest, useReducedMotion,
   type DevToolbarItem,
 } from '@playground/shared';
 import { SalesPoint } from './screens/SalesPoint';
@@ -84,11 +84,17 @@ export function App() {
   );
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [paymentPicker, setPaymentPicker] = useState<'method' | 'bank' | null>(null);
-  const [paying, setPaying] = useState(false);
+  const [payPhase, setPayPhase] = useState<'idle' | 'paying' | 'paid'>('idle');
+  // Bumped on New sale: the grid replays its entrance, a fresh start for the next customer.
+  const [freshSale, setFreshSale] = useState(0);
   // Once paid: the success screen, then the receipt. `hold` keeps the success screen
   // up for a presenter instead of moving on by itself.
   // `closed` keeps the record through the receipt's exit, so it fades rather than cuts.
-  const [sale, setSale] = useState<{ receipt: ReceiptRecord; stage: 'success' | 'receipt' | 'closed'; hold: boolean } | null>(null);
+  const [sale, setSale] = useState<{
+    receipt: ReceiptRecord; stage: 'success' | 'receipt' | 'closed'; hold: boolean;
+    /** Where Transaction success grows from: the Pay button, on the screen. */
+    origin?: { x: number; y: number };
+  } | null>(null);
   const sequence = useRef(0);
   /* Asks the Cart to clear itself, so the lines leave through its own exit whichever
      control asked — the title-bar trash or More options. */
@@ -115,6 +121,7 @@ export function App() {
       method: 'cash', bankId: 'access', amount: String(orderTotal() / 100), ...draft, opening: c.opening + 1,
     }));
     setPaymentPicker(null);
+    setPayPhase('idle');
     setCheckoutOpen(true);
   };
   /* One sheet hands over to the next — Checkout to a picker and back, More options to
@@ -130,8 +137,12 @@ export function App() {
     window.clearTimeout(handoffTimer.current);
     handoffTimer.current = window.setTimeout(() => setHandoff(false), exitMs + 50);
   };
+  /* After Pay, one sequence (none of it designed; the frames are stills): the button
+     spins while the payment runs, turns green and draws its check, then — a beat
+     later, once the check has landed — Transaction success opens from the button.
+     The Checkout and Cart close under it, already covered. */
   const pay = () => {
-    setPaying(true);
+    setPayPhase('paying');
     const tenderedMinor = parseWholeNaira(checkout.amount)!;
     submitPayment({
       lines, orderDiscount, customer, at: new Date(), sequence: sequence.current + 1,
@@ -140,11 +151,18 @@ export function App() {
         : { method: 'bank', bankId: checkout.bankId, tenderedMinor },
     }).then((receipt) => {
       sequence.current += 1;
-      setPaying(false);
-      setCheckoutOpen(false);
-      setSale({ receipt, stage: 'success', hold: false });
+      setPayPhase('paid');
+      const button = document.querySelector('.payButton')?.getBoundingClientRect();
+      const screen = document.querySelector('.device__screen')?.getBoundingClientRect();
+      const origin = button && screen
+        ? { x: button.left - screen.left + button.width / 2, y: button.top - screen.top + button.height / 2 }
+        : undefined;
+      setTimeout(() => {
+        setSale({ receipt, stage: 'success', hold: false, origin });
+        setTimeout(() => { setCheckoutOpen(false); setCartOpen(false); }, duration(DURATION.slow, reducedMotion));
+      }, duration(DURATION.slow, reducedMotion));
     }).catch(() => {
-      setPaying(false);
+      setPayPhase('idle');
       // Not designed: the payment did not go through, and the draft is kept.
       showToast('Payment failed. Try again.', 'notice');
     });
@@ -152,7 +170,8 @@ export function App() {
   // The success screen gives way to the receipt on its own, unless held.
   useEffect(() => {
     if (!sale || sale.stage !== 'success' || sale.hold) return undefined;
-    const t = setTimeout(() => setSale((s) => (s ? { ...s, stage: 'receipt' } : s)), 1600);
+    // Long enough for the success moment to play out (it settles ~0.9s after mount) and be read.
+    const t = setTimeout(() => setSale((s) => (s ? { ...s, stage: 'receipt' } : s)), 2000);
     return () => clearTimeout(t);
   }, [sale]);
   /* New sale and the receipt's close both end the sale: the order is paid, so there
@@ -161,6 +180,8 @@ export function App() {
     setLines([]); setOrderDiscount(undefined); setCustomer(null);
     setCartOpen(false); setTotalOpen(false); setCheckoutOpen(false); setPaymentPicker(null);
     setSale((s) => (s ? { ...s, stage: 'closed' } : s));
+    setPayPhase('idle');
+    setFreshSale((n) => n + 1);
   };
   const shareReceipt = async (receipt: ReceiptRecord) => {
     const text = receiptText(receipt);
@@ -374,6 +395,7 @@ export function App() {
             key={resetNonce}
             forceState={forced}
             cartCount={lines.length}
+            freshSale={freshSale}
             onAddProduct={addProduct}
             onViewCart={() => setCartOpen(true)}
           />
@@ -480,7 +502,7 @@ export function App() {
                 onPickBank={() => swapSheets(() => setCheckoutOpen(false), () => setPaymentPicker('bank'))}
                 onClose={() => setCheckoutOpen(false)}
                 onPay={pay}
-                paying={paying}
+                phase={payPhase}
               />
 
               <SelectPaymentMethod
@@ -528,6 +550,7 @@ export function App() {
             <>
               <TransactionSuccess
                 open={sale.stage === 'success'}
+                origin={sale.origin}
                 onContinue={() => setSale((s) => (s ? { ...s, stage: 'receipt' } : s))}
               />
               <Receipt
