@@ -63,7 +63,7 @@ for (const file of files) {
   const quality = meta.hasAlpha ? 90 : 80;
 
   const output = await sharp(input)
-    .resize(TARGET, TARGET, { fit: 'outside', withoutEnlargement: false })
+    .resize(TARGET, TARGET, { fit: 'outside', withoutEnlargement: true })
     .webp({ quality })
     .toBuffer();
 
@@ -80,11 +80,10 @@ for (const file of files) {
     srcMP: (meta.width * meta.height) / 1e6,
     outDims: `${outMeta.width}x${outMeta.height}`,
     shortSide: Math.min(outMeta.width, outMeta.height),
-    // A source shorter than the target gets upscaled, which MAE cannot detect:
-    // compared at display size both the original and the output are equally soft,
-    // so the error reads near zero while the photo is genuinely below spec.
-    // This has to be surfaced separately or it ships invisibly.
-    upscaled: Math.min(meta.width, meta.height) < TARGET,
+    // A source shorter than the target is never enlarged (it would add bytes, not
+    // detail), so it ships below 3x. MAE cannot detect that: compared at display
+    // size both are equally soft and the error reads near zero. Surfaced separately.
+    undersized: Math.min(meta.width, meta.height) < TARGET,
     srcShort: Math.min(meta.width, meta.height),
     srcKB: input.length / 1024,
     outKB: output.length / 1024,
@@ -118,10 +117,10 @@ console.log(`${rows.length} images   ${totalSrc.toFixed(0)}KB -> ${totalOut.toFi
 const lied = rows.filter((r) => r.extLies);
 if (lied.length) console.log(`extension lied about the real format on: ${lied.map((r) => r.file).join(', ')}`);
 console.log(`short side >= ${TARGET} on all: ${rows.every((r) => r.shortSide >= TARGET)}`);
-const upscaled = rows.filter((r) => r.upscaled);
-if (upscaled.length) {
-  console.log(`\nUPSCALED FROM TOO-SMALL SOURCES — re-source these, do not ship them:`);
-  for (const r of upscaled) console.log(`  ${r.file} short side ${r.srcShort}px < ${TARGET}px target`);
+const undersized = rows.filter((r) => r.undersized);
+if (undersized.length) {
+  console.log(`\nSOURCES BELOW THE ${TARGET}px TARGET — re-source these at full size:`);
+  for (const r of undersized) console.log(`  ${r.file} short side ${r.srcShort}px < ${TARGET}px target`);
 }
-console.log(`${bad} image(s) failing the short-side or MAE target, ${upscaled.length} upscaled`);
-process.exit(bad === 0 && upscaled.length === 0 ? 0 : 1);
+console.log(`${bad} image(s) failing the short-side or MAE target, ${undersized.length} undersized`);
+process.exit(bad === 0 && undersized.length === 0 ? 0 : 1);

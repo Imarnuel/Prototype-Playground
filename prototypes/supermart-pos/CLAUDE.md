@@ -196,6 +196,15 @@ resizes against a square box with `fit: 'outside'` (because `object-fit: cover` 
 driven by the short side), writes WebP q80 with metadata stripped, and reports mean
 absolute pixel error at display size.
 
-**Status:** the full-resolution downloads come from `www.figma.com`, which this
-environment's network policy blocks; it needs adding under Allowed domains. Until then
-the cards show their neutral fill.
+**Status: these are the 256px previews, not the full-size originals.** Each generation
+returns a 1024px PNG hosted on `www.figma.com`, which this environment's network policy
+blocks, plus an inline 256px preview; the previews are what ship. 256 covers the 160x108
+box at 1.6x, so the photos are slightly soft on a 2x or 3x screen, and
+`images:optimise` exits non-zero listing all 10 as undersized — correctly. It never
+enlarges a source: that would add bytes, not detail. To fix: allow `www.figma.com`,
+regenerate (the 1024px URLs expire after 7 days), drop the PNGs into
+`assets/products-src/` under the same names, and rerun the optimiser.
+
+The card's scrim (BUILD-PLAN #22) is the design's own and stays, so the lower half of
+every photo sits under up to 80% black — light garments (the tee, the sneakers) lose
+the most.
