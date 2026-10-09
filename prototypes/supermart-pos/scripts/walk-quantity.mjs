@@ -199,7 +199,9 @@ const sample = (act) => page.evaluate((a) => new Promise((done) => {
 const { out: entering } = await sample('open');
 await page.waitForTimeout(300);
 const { out: leaving, times: leaveTimes } = await sample('close');
-const travel = (a) => new Set(a.filter((v) => v !== null && v > SHEET_TOP && v < 846)).size;
+// Every position that is neither offscreen nor the rest, which includes the frames the
+// arrival spring carries the sheet past its mark and back.
+const travel = (a) => new Set(a.filter((v) => v !== null && v !== SHEET_TOP && v < 846)).size;
 check('the sheet travels in over several frames', travel(entering) > 4 && entering.at(-1) === SHEET_TOP,
   `${travel(entering)} in-between frames, ends at ${entering.at(-1)}`);
 const gone = leaving.indexOf(null);

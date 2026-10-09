@@ -14,7 +14,6 @@ for (const [k, v] of Object.entries(EASING)) root.setProperty(`--ease-${k}`, v);
 root.setProperty('--press-scale', String(PRESS_SCALE));
 root.setProperty('--motion-spring', `${SPRING.duration}ms`);
 root.setProperty('--ease-spring', SPRING.easing);
-root.setProperty('--ease-spring-firm', SPRING.firm);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
