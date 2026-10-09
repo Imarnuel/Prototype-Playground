@@ -847,6 +847,17 @@ in front of it is **drawn from the data** (#115).
   through the grid's own add rule (`tryAdd`, one rule for a tap and a scan, stock
   limits included) with the frame's banner; a beat later it leaves the lens. Text
   with several matches opens "Which product?"; one match is added at once.
+- **The scan button opens into the scanner** (the designer's request): a container
+  transform. The camera grows from the button as a circle — its size, its green,
+  deepening to black — while the glyph's four brackets fly out to become the
+  viewfinder and its dotted rule stretches into the scan line; the tray rises a beat
+  (`instant`) behind. Opening is `base` on the decelerating curve; closing is `fast`
+  on the in-out one and lands on the real button before the presentation unmounts —
+  on `base` and the accelerating curve it was still at r 412 of 747 at the unmount,
+  a cut. Sampled per frame on the production build: r 30 → 747 and the top-left
+  bracket from the glyph (6.4 wide at [337,651]) to [56,125]; back to r 30 green by
+  256ms. A `:has()` rule first used to time the status bar cost the Quantity sheet a
+  frame of its exit (5 → 4, failing `walk-quantity`); replaced by a short hold.
 - **Round shapes stay round**: the scan button, the camera's close, the match sheet's
   two pill badges and the tag's hole are on index.css's `corner-shape: round` list —
   the continuous-corner rule had made the 60 button a squircle where the frame binds

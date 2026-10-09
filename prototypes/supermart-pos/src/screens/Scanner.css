@@ -3,7 +3,8 @@
 .scanner {
   position: absolute;
   inset: 0;
-  background: #000;
+  /* No fill of its own: the black is the stage's (App.css), which is green while the
+     camera is still the scan button growing open. */
   overflow: clip;
 }
 
@@ -36,6 +37,7 @@
   cursor: pointer;
 }
 .scanner__close::after { content: ''; position: absolute; inset: -2px; }
+.scanner__close { transition: opacity var(--motion-fast) var(--ease-out); }
 
 /* `88:19537`: 281x194, centred, at y 125 in five of the eight frames and 118 in the
    other three (#117). Four 32x32 corners: a 2px white stroke on two sides, the
@@ -49,28 +51,32 @@
   pointer-events: none;
 }
 
+/* Each corner draws its own two sides rather than mirroring one, so it can be moved
+   and scaled from its outer corner — the scan button's glyph opens into these. */
 .scanner__corner {
   position: absolute;
   width: 32px;
   height: 32px;
   box-sizing: border-box;
   border: 0 solid #fff;
-  border-top-width: 2px;
-  border-left-width: 2px;
-  border-top-left-radius: var(--radius-200);
+  transition: transform var(--motion-base) var(--ease-out);
 }
-.scanner__corner[data-at='tl'] { left: 0; top: 0; }
-.scanner__corner[data-at='tr'] { right: 0; top: 0; transform: scaleX(-1); }
-.scanner__corner[data-at='bl'] { left: 0; bottom: 0; transform: scaleY(-1); }
-.scanner__corner[data-at='br'] { right: 0; bottom: 0; transform: scale(-1); }
+.scanner__corner[data-at='tl'] { left: 0; top: 0; border-width: 2px 0 0 2px; border-top-left-radius: var(--radius-200); transform-origin: 0 0; }
+.scanner__corner[data-at='tr'] { right: 0; top: 0; border-width: 2px 2px 0 0; border-top-right-radius: var(--radius-200); transform-origin: 100% 0; }
+.scanner__corner[data-at='bl'] { left: 0; bottom: 0; border-width: 0 0 2px 2px; border-bottom-left-radius: var(--radius-200); transform-origin: 0 100%; }
+.scanner__corner[data-at='br'] { right: 0; bottom: 0; border-width: 0 2px 2px 0; border-bottom-right-radius: var(--radius-200); transform-origin: 100% 100%; }
 
 /* `88:19544`: the 274-wide green line, drawn at the frame's middle. Not designed to
    move; it sweeps the frame, as a scan line does, on a slow even loop composed from
    the motion tokens. Under reduced motion it rests where the frame draws it. */
-.scanner__line {
+.scanner__lineWrap {
   position: absolute;
   left: 3px;
   top: 96px;
+  display: flex;
+  transition: transform var(--motion-base) var(--ease-out);
+}
+.scanner__line {
   display: flex;
   animation: scanner-sweep calc(var(--motion-slow) * 4) var(--ease-inOut) infinite alternate;
 }

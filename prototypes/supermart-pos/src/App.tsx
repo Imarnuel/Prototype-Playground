@@ -124,6 +124,10 @@ export function App() {
      Expand grows the docked Cart into the full one (`88:19119`). */
   const [scanning, setScanning] = useState(false);
   const scanFrom = useRef<'salesPoint' | 'cart'>('salesPoint');
+  /* Where the Sales Point's scan button is, while the scanner it opened into is up:
+     the camera grows from it and shrinks back into it (App.css). Cleared once the
+     tray expands into the Cart, which then closes like any Cart. */
+  const [scanEntry, setScanEntry] = useState<{ x: number; y: number; reach: number } | null>(null);
   const { mounted: cameraMounted, entered: cameraEntered } = usePresented(scanning);
   /* What is in front of the camera; one item at a time. A ref as well, so a second
      tap while one is being read is refused without waiting for a render. */
@@ -280,21 +284,35 @@ export function App() {
 
   const openScanner = (from: 'salesPoint' | 'cart') => {
     scanFrom.current = from;
+    const button = from === 'salesPoint' ? document.querySelector('.salesPoint__scan')?.getBoundingClientRect() : undefined;
+    const screen = document.querySelector('.device__screen')?.getBoundingClientRect();
+    if (button && screen) {
+      const x = button.left - screen.left + button.width / 2, y = button.top - screen.top + button.height / 2;
+      const reach = Math.ceil(Math.max(Math.hypot(x, y), Math.hypot(screen.width - x, y), Math.hypot(x, screen.height - y), Math.hypot(screen.width - x, screen.height - y)));
+      setScanEntry({ x, y, reach });
+    } else setScanEntry(null);
     setTotalOpen(false);
     setScanning(true);
     setCartOpen(true);
   };
   /* The scanner's X: back to whatever opened it. From the Sales Point the whole
      presentation goes down; from the Cart, the Cart grows back over the camera. */
+  /* Closing into the scan button, the camera's black stays at the top of the screen
+     for the first part of the collapse: the status bar stays white until it leaves. */
+  const [holdLight, setHoldLight] = useState(false);
   const closeScanner = () => {
     if (scanFrom.current === 'cart') { setScanning(false); return; }
+    if (scanEntry) {
+      setHoldLight(true);
+      window.setTimeout(() => setHoldLight(false), duration(DURATION.fast, reducedMotion));
+    }
     setCartOpen(false);
   };
   /* However the Cart goes — the scanner's X, Queue order, a payment — the scanner goes
      with it, once the exit has run: the next View cart opens the Cart, not a camera. */
   useEffect(() => {
     if (cartOpen) return undefined;
-    const t = window.setTimeout(() => { setScanning(false); setInView(null); reading.current = false; }, exitMs);
+    const t = window.setTimeout(() => { setScanning(false); setScanEntry(null); setInView(null); reading.current = false; }, exitMs);
     return () => window.clearTimeout(t);
   }, [cartOpen, exitMs]);
   /* The item leaves the lens a beat after its result, so the toast and the item it
@@ -595,7 +613,7 @@ export function App() {
   return (
     <>
       {/* White over the camera, as the scanner frames draw it (`88:19507`). */}
-      <DeviceFrame statusBar={scanning && cartOpen ? 'light' : 'dark'}>
+      <DeviceFrame statusBar={(scanning && cartOpen) || holdLight ? 'light' : 'dark'}>
         {/* A render failure most likely came from a cart line, so recovering also
             empties the cart rather than re-rendering the line that threw. */}
         <ErrorBoundary onReset={() => { setLines([]); resetScreens(); }}>
@@ -613,10 +631,12 @@ export function App() {
             <div
               className="sheet"
               data-open={cartEntered ? 'on' : 'off'}
+              data-entry={scanEntry ? 'button' : undefined}
               style={{
                 transitionDuration: `${cartOpen ? enterMs : exitMs}ms`,
                 transitionTimingFunction: cartOpen ? SHEET_SPRING.easing : SHEET_SPRING.exitEasing,
-              }}
+                ...(scanEntry ? { '--fx': `${scanEntry.x}px`, '--fy': `${scanEntry.y}px`, '--reach': `${scanEntry.reach}px` } : {}),
+              } as React.CSSProperties}
             >
               {cameraMounted && (
                 <div className="scanStage" data-open={cameraEntered ? 'on' : 'off'}>
@@ -626,7 +646,7 @@ export function App() {
 
               <Cart
                 mode={scanning ? 'docked' : 'full'}
-                onExpand={() => setScanning(false)}
+                onExpand={() => { setScanEntry(null); setScanning(false); }}
                 onScan={() => openScanner('cart')}
                 lines={lines}
                 orderDiscount={orderDiscount}
