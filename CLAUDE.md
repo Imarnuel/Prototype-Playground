@@ -20,7 +20,8 @@ Optimise for something that demos convincingly end to end. Don't over-engineer, 
   variables.
 - Shared components live in: `shared/src` — `DeviceFrame`, `StatusBar`, `DevToolbar`,
   `useReducedMotion`. The status bar is **device chrome**: `DeviceFrame` draws it once,
-  beside the Dynamic Island. A screen never renders one, it reserves the inset with
+  beside the Dynamic Island, and the home indicator the same way (`homeIndicator`
+  prop, `light` over a dark screen). A screen never renders one, it reserves the inset with
   `padding-top: var(--safe-top)`. Figma puts a status bar in every frame because a
   frame is the screen; that is a file convention, not the platform.
 - Mock API module: `shared/src/mockApi.ts`. Single `request()` entry point with simulated
@@ -40,6 +41,7 @@ Both are real device values, flagged rather than silently absorbed (section 2: n
 |---|---|---|
 | Display corner radius 55pt | `SCREEN_RADIUS` | The file gives the rule `outer = screen + bezel` but never the screen radius itself. |
 | Home-indicator inset 34pt | `SAFE_AREA.bottom` | The file specifies the 59pt top inset only. |
+| Home indicator 144x5pt, 8pt from the bottom | `HOME_INDICATOR` | Read off the iOS kit instance in the supermart-pos Figma file (`I88:10767;106:60994`); this file gives no figure. |
 
 ---
 

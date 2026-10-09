@@ -117,7 +117,7 @@ See BUILD-PLAN, band `170:8988`.
 The whole app, from the library's own Dark mode (`Semantic` collection, mode `255:1`):
 56 colour tokens, dark copies of 47 icons by the variable each is bound to, and a
 handful of literals that stand in for a token (`src/theme-dark.css`). The switch shows
-On/Off, keeps the toolbar open, and is remembered per viewer. `walk-dark` 33/33: 24
+On/Off, keeps the toolbar open, and is remembered per viewer. `walk-dark` 35/35: 24
 screens, 584 icon renders, no light paint left, text 3:1 or better. See BUILD-PLAN,
 "Dark mode", and #126-#129.
 

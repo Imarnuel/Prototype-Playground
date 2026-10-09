@@ -907,13 +907,13 @@ picked by eye:
   empty-state rings, and the page behind the device (`#111214`, a presentation
   backdrop, not a design value). The receipt stays a white paper slip, the camera stays
   as it is, and shadows and photo scrims are unchanged.
-- **Status bar.** Light over a dark screen — the platform's white, not the dark
-  frames' `#dddddf` text/default: it is device chrome.
+- **Status bar and home indicator.** Light over a dark screen — the platform's white,
+  not the dark frames' `#dddddf` text/default: they are device chrome.
 - **The switch.** Dev toolbar → Appearance → Dark mode. It shows On/Off and keeps
   the panel open (`DevToolbarItem.pressed`), and is remembered per viewer in
   localStorage; with storage blocked it is simply light.
 
-`walk-dark` 33/33 on the production build. Every dark token resolves to the file's
+`walk-dark` 35/35 on the production build. Every dark token resolves to the file's
 value; 24 screens are walked in dark for light-only paint (flat, border, shadow and
 gradient stops, plus any near-white fill that is not itself a dark token), text below
 3:1 on what is really behind it (disabled controls exempt: the design's own disabled
@@ -927,6 +927,17 @@ unchanged (`figma:audit` 509 / 0, every diff 0 outside 0.5px).
 the commit before this one too. Headless Chrome paints ~25-30fps here and the exit
 curve barely moves for its first half (#37), so the same 300ms exit shows 3-6. A cut
 shows 0-1, so the floor is now 3.
+
+### The home indicator is device chrome too
+
+Requested by the designer. Only the two keyboard frames (`88:10569`, `88:11166`)
+draw one, as the iOS kit's own "Home Indicator" instance: a 393 x 26 bar with a
+144 x 5 pill 13 into it, radius 100, `#000000`. `DeviceFrame` draws it once, like the
+status bar (`HOME_INDICATOR` in `shared/src/device.ts`), above every screen and sheet
+and with `pointer-events: none`, so taps reach what is under it. Measured on six
+screens and both themes: [124.5, 839, 144, 5] — true centre; Figma snaps the pill to
+x 125 because 393 - 144 is odd — round, black in light, white in dark (the file never
+draws it over dark; white is the platform's). Topmost at its centre on every screen.
 
 ## Screen 1 — verification record
 

@@ -66,6 +66,13 @@ const wrong = darkVars.filter(([, h], i) => resolved[i] !== h);
 check('every dark token resolves to the file\'s Dark mode', darkVars.length === 56 && wrong.length === 0,
   wrong.length ? wrong.map(([v, h], i) => `${v} ${resolved[darkVars.indexOf([v, h])]} != ${h}`).join(', ') : `${darkVars.length} tokens`);
 check('the status bar turns light over a dark screen', (await page.evaluate(() => document.querySelector('.statusBar')?.dataset.appearance)) === 'light');
+const home = () => page.evaluate(() => {
+  const s = document.querySelector('.device__screen').getBoundingClientRect();
+  const h = document.querySelector('.device__homeIndicator'); const r = h.getBoundingClientRect();
+  return `${r.left - s.left},${r.top - s.top},${r.width},${r.height} ${getComputedStyle(h).backgroundColor}`;
+});
+// The kit's Home Indicator, `I88:10767;106:60994`: 144x5, 8 from the bottom, centred.
+check('the home indicator turns white over a dark screen', (await home()) === '124.5,839,144,5 rgb(255, 255, 255)', await home());
 check('the device screen takes Color/surface/default', (await page.evaluate(() => getComputedStyle(document.querySelector('.device__screen')).backgroundColor)) === 'rgb(34, 35, 38)');
 
 // --- Every screen ---------------------------------------------------------------------
@@ -174,6 +181,7 @@ const back = await page.evaluate(() => ({
   status: document.querySelector('.statusBar')?.dataset.appearance,
   screen: getComputedStyle(document.querySelector('.device__screen')).backgroundColor,
 }));
+check('and black again in light', (await home()) === '124.5,839,144,5 rgb(0, 0, 0)', await home());
 check('switching off restores light', back.theme === 'light' && back.surface === '#ffffff' && back.status === 'dark' && back.screen === 'rgb(255, 255, 255)', JSON.stringify(back));
 await page.evaluate(() => { try { localStorage.removeItem('supermart-pos.theme'); } catch {} });
 

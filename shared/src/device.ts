@@ -62,6 +62,15 @@ export const BODY_RADIUS = SCREEN_RADIUS + BEZEL;
 export const SAFE_AREA = { top: 59, bottom: 34 } as const;
 
 /**
+ * Home indicator: a 144 x 5pt pill, fully rounded, 8pt above the screen's bottom edge,
+ * centred. NOT SOURCED FROM CLAUDE.md: read off the iOS kit's own "Home Indicator"
+ * instance in the supermart-pos Figma file (`I88:10767;106:60994`, a 393 x 26 bar
+ * with the pill 13 into it). Black in the file, which never draws it over dark; iOS
+ * draws it white there, as it does the status bar.
+ */
+export const HOME_INDICATOR = { width: 144, height: 5, bottom: 8 } as const;
+
+/**
  * Dynamic Island: 125 x 36.67pt, 11pt from the top, centred, fully rounded,
  * specified against a 393pt-wide screen. CLAUDE.md: scale the WIDTH by screen
  * width, keep the vertical values absolute. At 393 the scale factor is 1; the

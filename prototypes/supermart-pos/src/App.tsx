@@ -616,7 +616,8 @@ export function App() {
   return (
     <>
       {/* White over the camera, as the scanner frames draw it (`88:19507`). */}
-      <DeviceFrame statusBar={theme === 'dark' || (scanning && cartOpen) || holdLight ? 'light' : 'dark'}>
+      <DeviceFrame statusBar={theme === 'dark' || (scanning && cartOpen) || holdLight ? 'light' : 'dark'}
+        homeIndicator={theme === 'dark' ? 'light' : 'dark'}>
         {/* A render failure most likely came from a cart line, so recovering also
             empties the cart rather than re-rendering the line that threw. */}
         <ErrorBoundary onReset={() => { setLines([]); resetScreens(); }}>

@@ -83,6 +83,24 @@
   --safe-bottom: var(--device-safe-bottom);
 }
 
+/* --- iOS home indicator --- */
+
+/* Centred on the screen (Figma snaps the pill to x 125; 393 - 144 is odd, so true
+   centre is 124.5). Above the app by DOM order, like the status bar. */
+.device__screen > .device__homeIndicator {
+  position: absolute;
+  left: 50%;
+  bottom: var(--device-home-bottom);
+  width: var(--device-home-w);
+  height: var(--device-home-h);
+  margin-left: calc(var(--device-home-w) / -2);
+  border-radius: 100px;
+  background: #000;
+  pointer-events: none;
+  transition: background-color var(--motion-base, 0ms) ease-out;
+}
+.device__homeIndicator[data-appearance='light'] { background: #fff; }
+
 /* --- iOS status bar --- */
 
 /* Overlaid, not in flow: it is system chrome drawn above the app, so a screen does

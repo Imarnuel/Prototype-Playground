@@ -5,6 +5,7 @@ import {
   BODY,
   BODY_RADIUS,
   DYNAMIC_ISLAND,
+  HOME_INDICATOR,
   SAFE_AREA,
   SCREEN,
   SCREEN_RADIUS,
@@ -22,13 +23,15 @@ type DeviceFrameProps = {
   showBody?: boolean;
   /** The status bar's style: `light` while the screen under it is dark. */
   statusBar?: 'dark' | 'light';
+  /** The home indicator's style, by the same rule: `light` over a dark screen. */
+  homeIndicator?: 'dark' | 'light';
 };
 
 /**
  * iPhone 15 Pro shell. A Figma frame is the screen, not the device (CLAUDE.md:128)
  * — the body, bezel and Dynamic Island are built here, not exported from a design.
  */
-export function DeviceFrame({ children, scale = 1, showBody = true, statusBar = 'dark' }: DeviceFrameProps) {
+export function DeviceFrame({ children, scale = 1, showBody = true, statusBar = 'dark', homeIndicator = 'dark' }: DeviceFrameProps) {
   // Custom properties only. Setting --vars does not create a stacking context,
   // unlike an inline z-index or translate (CLAUDE.md:117).
   const vars = {
@@ -45,6 +48,9 @@ export function DeviceFrame({ children, scale = 1, showBody = true, statusBar = 
     '--device-island-radius': `${DYNAMIC_ISLAND.radius}px`,
     '--device-safe-top': `${SAFE_AREA.top}px`,
     '--device-safe-bottom': `${SAFE_AREA.bottom}px`,
+    '--device-home-w': `${HOME_INDICATOR.width}px`,
+    '--device-home-h': `${HOME_INDICATOR.height}px`,
+    '--device-home-bottom': `${HOME_INDICATOR.bottom}px`,
     '--device-scale': String(scale),
   } as CSSProperties;
 
@@ -57,6 +63,9 @@ export function DeviceFrame({ children, scale = 1, showBody = true, statusBar = 
               see StatusBar.tsx. Rendered whatever `showBody` is: the Figma frames
               carry a status bar, so a frame-less screenshot still needs one. */}
           <StatusBar appearance={statusBar} />
+          {/* The home indicator is chrome too, so it is drawn here once, above every
+              screen and sheet, and passes no taps through to nothing. */}
+          <div className="device__homeIndicator" data-appearance={homeIndicator} aria-hidden="true" />
           {/* The island lives inside the screen, not the body: it is a display
               feature, and CLAUDE.md:136 specifies its 11pt offset against the
               screen. Positioned against the body it resolves against the body's
