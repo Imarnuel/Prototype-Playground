@@ -51,3 +51,10 @@
 :root[data-theme='dark'] .emptyState__rings { box-shadow: inset 0 0 0 var(--border-width-sm) #37383c; }
 :root[data-theme='dark'] .emptyState__ring2 { box-shadow: inset 0 0 0 var(--border-width-sm) #5e616c; }
 :root[data-theme='dark'] .emptyState__ring3 { box-shadow: inset 0 0 0 var(--border-width-sm) #a9acb3; }
+
+/* The close circle on the grey sheets (Quantity, More options) binds Color/icon/inverse
+   (#80): white in light, but BLACK in dark, darker than the panel. Dark uses the fill
+   every other close has, Color/container/neutral/default. */
+:root[data-theme='dark'] :is(.quantitySheet, .moreOptions) .closeButton {
+  background: var(--color-container-neutral-default);
+}
