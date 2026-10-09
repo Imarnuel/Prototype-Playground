@@ -847,12 +847,14 @@ in front of it is **drawn from the data** (#115).
   through the grid's own add rule (`tryAdd`, one rule for a tap and a scan, stock
   limits included) with the frame's banner; a beat later it leaves the lens. Text
   with several matches opens "Which product?"; one match is added at once.
-- **The scan button opens into the scanner** (the designer's request): a container
-  transform. The camera grows from the button as a circle — its size, its green,
-  deepening to black — while the glyph's four brackets fly out to become the
-  viewfinder and its dotted rule stretches into the scan line; the tray rises a beat
-  (`instant`) behind. Opening is `base` on the decelerating curve; closing is `fast`
-  on the in-out one and lands on the real button before the presentation unmounts —
+- **The scan button opens into the scanner** (the designer's request): the camera
+  grows from the button as a circle — its size, its green, giving way to black — and
+  the viewfinder and close settle in where they stand; the tray rises on the firm
+  spring a beat (`instant`) behind. Made calmer on request ("so it doesn't cause
+  motion sickness"): a first version flew the glyph's brackets ~600px out to the
+  viewfinder and burst the circle open on the decelerating curve; now nothing crosses
+  the screen and the circle eases in and out on `base`. Closing is `fast` on the
+  in-out curve and lands on the real button before the presentation unmounts —
   on `base` and the accelerating curve it was still at r 412 of 747 at the unmount,
   a cut. Sampled per frame on the production build: r 30 → 747 and the top-left
   bracket from the glyph (6.4 wide at [337,651]) to [56,125]; back to r 30 green by
@@ -928,6 +930,21 @@ documented as the project's baseline rather than design-derived, and covers what
 static frame cannot express: press feedback, the presented-sheet transition and its
 exit, and the skeleton pulse. If motion is later authored in Figma, replace the values
 in that module rather than adding a second set beside it.
+
+**Arrivals land on a spring** (the designer: "a slight bounce… nothing too dramatic,
+similar to Family's"). `SPRING` in `shared/src/motion.ts` is a damped spring sampled
+from its own equation into CSS `linear()`, 480ms: `easing` (damping 0.69, 5% past the
+mark) for short travels — toasts, the receipt's actions — and `firm` (0.78, 2%) for
+everything that travels far — every sheet (`SHEET_SPRING.easing`), the Cart as a
+full-screen cover, the scanner's tray. One ratio for all was measured first and
+rejected: overshoot scales with distance, so 5% was 7px on More options but 33-43px
+on the tall sheets and the Cart, a lurch. With the two, the visible settle is 5-17px
+everywhere (tray expand 5.8, dock 6.8, More options 6.1, Select bank 9.6, Checkout
+10.5, scanner tray 10.3, Select customer 14.2, Cart 17.1). Exits keep the
+accelerating curve; fades, colours, presses, numbers and the post-Pay moment never
+bounce (the earlier `EASING.overshoot` pop there was removed for motion sickness, and
+stays removed). Anything that overshoots has white past its trailing edge so the
+screen beneath never shows. Under reduced motion `--motion-spring` is 0 like the rest.
 
 **Sheet to sheet is one motion, not two** (the designer: "slow, doesn't feel snappy").
 Swapping trays — Checkout to a picker and back, More options to what it opens — ran

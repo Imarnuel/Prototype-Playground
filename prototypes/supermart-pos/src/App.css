@@ -15,6 +15,18 @@
   opacity: 0;
 }
 
+/* Under the Cart's bottom edge: arriving on the spring it passes its mark by up to
+   2% (17px), and the Sales Point must not show beneath it. */
+.sheet::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 64px;
+  background: var(--color-surface-default);
+}
+
 .sheet[data-open='on'] {
   transform: translateY(0);
   opacity: 1;
@@ -45,52 +57,54 @@
 .scanStage[data-open='off'] > .scanner { opacity: 0; transform: scale(0.96); }
 
 /* --- The scan button opens into the scanner (designer's request) ------------------
-   A container transform: the camera is the green button growing open. From the
-   button's own centre and size, a circle widens over the screen while its green
-   deepens to the camera's black; the glyph's four brackets fly out to become the
-   viewfinder's corners and its dotted rule stretches into the scan line; a beat
-   later the Order Preview tray rises into place. Closing reverses it — on `fast` and
-   the between-two-positions curve, since it travels back into the button rather than
-   off the screen, and so that it lands on the real button (waiting underneath)
-   before the presentation unmounts at `base`. On the accelerating curve it was still
-   at r 412 of 747 when it unmounted: a cut.
-   --fx/--fy are the button's centre on the screen, --reach the circle that covers
-   the screen from it (App.tsx); the glyph's brackets span 21px around that centre.
-   Nothing here is a new duration or curve. */
+   The camera opens out of the green button: from the button's own centre and size a
+   circle widens over the screen, green for its first moments and black as it grows;
+   the viewfinder, the close and the hint then settle in where they stand; the Order
+   Preview tray rises on the arrival spring a beat behind. Closing reverses it on
+   `fast` and lands on the real button, waiting underneath, before the presentation
+   unmounts at `base`.
+   Made calmer at the designer's request ("so it doesn't cause motion sickness"):
+   nothing travels across the screen any more — the first version flew the glyph's
+   brackets ~600px out to the viewfinder and stretched the scan line from the button,
+   and burst the circle open on the decelerating curve (r 30 → 520 in ~70ms). The
+   circle now eases in and out, the green gives way to black on `fast`, and the
+   camera's chrome only fades and settles by 6% in place.
+   --fx/--fy are the button's centre on the screen, --reach the circle that covers the
+   screen from it (App.tsx). Nothing here is a new duration or curve. */
 .sheet[data-entry='button'],
 .sheet[data-entry='button'][data-open='off'] { transform: none; opacity: 1; }
 
 .sheet[data-entry='button'] .scanStage {
   clip-path: circle(var(--reach) at var(--fx) var(--fy));
   transition:
-    clip-path var(--motion-base) var(--ease-out),
-    background-color var(--motion-base) var(--ease-out);
+    clip-path var(--motion-base) var(--ease-inOut),
+    background-color var(--motion-fast) var(--ease-out);
 }
 .sheet[data-entry='button'][data-open='off'] .scanStage {
   clip-path: circle(30px at var(--fx) var(--fy));
   background-color: var(--color-container-success-bold-default);
 }
-/* The way back, for every part below. */
-.sheet[data-entry='button'][data-open='off'] :is(.scanStage, .scanner__corner, .scanner__lineWrap, .cart) {
-  transition-duration: var(--motion-fast);
-  transition-timing-function: var(--ease-inOut);
-}
 /* The camera arrives by its parts here, not by the dim-and-recede the expand uses. */
 .sheet[data-entry='button'] .scanStage > .scanner { opacity: 1; transform: none; }
 
-.sheet[data-entry='button'][data-open='off'] .scanner__corner[data-at='tl'] { transform: translate(calc(var(--fx) - 66.5px), calc(var(--fy) - 135.5px)) scale(0.2); }
-.sheet[data-entry='button'][data-open='off'] .scanner__corner[data-at='tr'] { transform: translate(calc(var(--fx) - 326.5px), calc(var(--fy) - 135.5px)) scale(0.2); }
-.sheet[data-entry='button'][data-open='off'] .scanner__corner[data-at='bl'] { transform: translate(calc(var(--fx) - 66.5px), calc(var(--fy) - 308.5px)) scale(0.2); }
-.sheet[data-entry='button'][data-open='off'] .scanner__corner[data-at='br'] { transform: translate(calc(var(--fx) - 326.5px), calc(var(--fy) - 308.5px)) scale(0.2); }
-.sheet[data-entry='button'][data-open='off'] .scanner__lineWrap { transform: translate(calc(var(--fx) - 196px), calc(var(--fy) - 222.5px)) scaleX(0.077); }
-
-/* The rest of the camera's chrome waits for the circle to open. */
-.sheet[data-entry='button'][data-open='on'] :is(.scanner__close, .scanner__hint) { transition-delay: var(--motion-instant); }
-.sheet[data-entry='button'][data-open='off'] :is(.scanner__close, .scanner__hint) { opacity: 0; }
+.sheet[data-entry='button'] :is(.scanner__frame, .scanner__close) {
+  transition:
+    opacity var(--motion-base) var(--ease-out),
+    transform var(--motion-base) var(--ease-out);
+}
+.sheet[data-entry='button'][data-open='on'] :is(.scanner__frame, .scanner__close, .scanner__hint) { transition-delay: var(--motion-fast); }
+.sheet[data-entry='button'][data-open='off'] :is(.scanner__frame, .scanner__close, .scanner__hint) { opacity: 0; }
+.sheet[data-entry='button'][data-open='off'] .scanner__frame { transform: scale(0.94); }
 
 /* The tray rises a beat behind the camera, and drops first on the way out. */
 .sheet[data-entry='button'][data-open='on'] .cart { transition-delay: var(--motion-instant); }
 .sheet[data-entry='button'][data-open='off'] .cart { transform: translateY(852px); }
+
+/* The way back, for every part above. */
+.sheet[data-entry='button'][data-open='off'] :is(.scanStage, .scanner__frame, .scanner__close, .cart) {
+  transition-duration: var(--motion-fast);
+  transition-timing-function: var(--ease-inOut);
+}
 
 /* The status bar turns white once the black has reached it. (It turns dark again only
    once the circle has drawn back off it: a hold in App.tsx, not a `:has()` here —

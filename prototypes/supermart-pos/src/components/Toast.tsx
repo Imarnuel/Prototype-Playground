@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { DURATION, EASING, duration, useReducedMotion } from '@playground/shared';
+import { DURATION, EASING, SPRING, duration, useReducedMotion } from '@playground/shared';
 import { Icon } from './Icon';
 import './Toast.css';
 
@@ -63,8 +63,9 @@ export function Toast({
       role="status"
       aria-live="polite"
       style={{
-        transitionDuration: `${duration(DURATION.base, reducedMotion)}ms`,
-        transitionTimingFunction: open ? EASING.out : EASING.in,
+        // Arrives on the spring, leaves on the accelerating curve.
+        transitionDuration: `${duration(open ? SPRING.duration : DURATION.base, reducedMotion)}ms`,
+        transitionTimingFunction: open ? SPRING.easing : EASING.in,
       }}
     >
       {tone === 'success' && <Icon name={variant === 'pill' ? 'toast-success' : variant === 'banner' ? 'toast-check-card' : 'check-circle'} />}
