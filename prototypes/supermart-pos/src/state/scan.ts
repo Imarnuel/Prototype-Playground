@@ -12,26 +12,32 @@ import { PRODUCTS, type Product } from '../data/catalogue';
     not stock: a barcode or a tag that matches nothing. */
 export type ScanTarget =
   | { kind: 'barcode'; code: string; productId?: string }
-  | { kind: 'text'; lines: readonly string[]; productId?: string };
+  | { kind: 'text'; lines: readonly string[]; productId?: string; label?: true };
 
 export const barcodeOf = (p: Product): ScanTarget => ({ kind: 'barcode', code: p.barcode, productId: p.id });
 
 /**
  * A hang tag: the brand in large print, the product's name under it. Real tags
- * print both, and OCR reads both; the brand line is what the frame's "Detected
- * text" badge shows (`88:19909`: "Northline").
+ * print both, and OCR reads both — so a tag names its product outright.
  */
 export const tagOf = (p: Product): ScanTarget => ({ kind: 'text', lines: [p.brand, p.name], productId: p.id });
 
 /**
+ * A woven neck label: the brand and nothing else, as most garments without a
+ * barcode carry. It is the read that cannot name one product — every Northline item
+ * carries it — so it is what asks "Which product?" (`88:19899`, detected "Northline").
+ */
+export const labelOf = (brand: string): ScanTarget => ({ kind: 'text', lines: [brand], label: true });
+
+/**
  * What each tap on the viewfinder holds up, in turn. It opens on the frames' own two
- * scans — Crew Socks by barcode (`88:19938`), then a Northline tag (`88:19858`) —
- * and cycles, so every product can be scanned in one demo.
+ * scans — Crew Socks by barcode (`88:19938`), then Northline text that asks "Which
+ * product?" (`88:19858`) — and cycles, so every product can be scanned in one demo.
  */
 const byId = (id: string) => PRODUCTS.find((p) => p.id === id)!;
 export const SCAN_SEQUENCE: readonly ScanTarget[] = [
   barcodeOf(byId('acc-socks')),
-  tagOf(byId('tops-oxford')),
+  labelOf('Northline'),
   barcodeOf(byId('tops-tee')),
   barcodeOf(byId('btm-jeans')),
   tagOf(byId('acc-beanie')),
@@ -40,6 +46,7 @@ export const SCAN_SEQUENCE: readonly ScanTarget[] = [
   tagOf(byId('ftw-sneakers')),
   barcodeOf(byId('tops-hoodie')),
   tagOf(byId('tops-rainjacket')),
+  tagOf(byId('tops-oxford')),
 ];
 
 /** Not stocked: a valid EAN-13 under the store's own 615 prefix that no product
@@ -72,10 +79,11 @@ export type TextResult = { detected: string; matches: readonly TextMatch[] };
 const words = (s: string) => s.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
 
 /**
- * Ranks products against what was read. A brand hit scores 1, each word of the
- * product's name 2 — so a Northline tag matches all three Northline products, and the
- * one whose name is also on the tag ranks first. "Best match" only marks a clear
- * winner; a tie marks nothing rather than guessing.
+ * Ranks products against what was read. A read carrying a product's whole name names
+ * that product: one match, added with nothing to choose. Otherwise a brand hit scores
+ * 1 and each word of a name 2 — a Northline label matches all three Northline
+ * products, and the person picks. "Best match" only marks a clear winner (part of a
+ * name read alongside the brand); a tie marks nothing rather than guessing.
  */
 export function matchText(lines: readonly string[], products: readonly Product[] = PRODUCTS): TextResult {
   const read = new Set(lines.flatMap(words));
@@ -87,6 +95,8 @@ export function matchText(lines: readonly string[], products: readonly Product[]
     })
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score);
+  const named = scored.filter((s) => words(s.product.name).every((w) => read.has(w)));
+  if (named.length === 1) return { detected: lines[0] ?? '', matches: [{ product: named[0].product, best: true }] };
   const clear = scored.length > 1 && scored[0].score > scored[1].score;
   return {
     detected: lines[0] ?? '',

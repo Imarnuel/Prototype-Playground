@@ -204,17 +204,22 @@ check('every product\'s barcode encodes as a 95-module EAN-13 that decodes back 
 check('the unknown barcode is a valid code that no product carries',
   decodeEan(scan.ean13Modules(scan.UNKNOWN_BARCODE.code)) === scan.UNKNOWN_BARCODE.code
   && !PRODUCTS.some((p) => p.barcode === scan.UNKNOWN_BARCODE.code));
-const north = scan.matchText(scan.tagOf(byId('tops-oxford')).lines);
-check('a Northline tag matches the three Northline products, Oxford Shirt the best (88:19899)',
+const north = scan.matchText(scan.labelOf('Northline').lines);
+check('a Northline label asks which: the three Northline products, none marked best (88:19899)',
   north.detected === 'Northline' && north.matches.length === 3
-  && north.matches.every((m) => m.product.brand === 'Northline')
-  && north.matches[0].product.id === 'tops-oxford' && north.matches[0].best && north.matches.filter((m) => m.best).length === 1,
+  && north.matches.every((m) => m.product.brand === 'Northline') && !north.matches.some((m) => m.best),
   north.matches.map((m) => `${m.product.name}${m.best ? '*' : ''}`).join(', '));
-check('every tag in the scan sequence ranks its own product first',
-  scan.SCAN_SEQUENCE.filter((t) => t.kind === 'text').every((t) => scan.matchText(t.lines).matches[0]?.product.id === t.productId));
+const oxford = scan.matchText(scan.tagOf(byId('tops-oxford')).lines);
+check('a tag carrying a whole name names that product: one match, nothing to choose',
+  oxford.matches.length === 1 && oxford.matches[0].product.id === 'tops-oxford',
+  oxford.matches.map((m) => m.product.name).join(', '));
+check('every tag in the scan sequence names its own product alone',
+  scan.SCAN_SEQUENCE.filter((t) => t.kind === 'text' && !t.label).every((t) => {
+    const r = scan.matchText(t.lines); return r.matches.length === 1 && r.matches[0].product.id === t.productId;
+  }));
 check('every barcode in the scan sequence is its product\'s own',
   scan.SCAN_SEQUENCE.filter((t) => t.kind === 'barcode').every((t) => byId(t.productId).barcode === t.code));
-check('the scan sequence reaches every product', new Set(scan.SCAN_SEQUENCE.map((t) => t.productId)).size === PRODUCTS.length);
+check('the scan sequence reaches every product', new Set(scan.SCAN_SEQUENCE.map((t) => t.productId).filter(Boolean)).size === PRODUCTS.length);
 check('a tag from a brand the store does not sell matches nothing', scan.matchText(scan.UNKNOWN_TAG.lines).matches.length === 0);
 
 console.log(`\n${fails} failing`);

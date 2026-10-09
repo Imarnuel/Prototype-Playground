@@ -109,7 +109,7 @@ check('the docked footer: 96 tall, the buttons at the bottom (88:19664)', near(a
 await lensClear();
 check('the item leaves the lens: the camera is dark again (88:19584)', !(await page.evaluate(() => document.querySelector('.scanScene'))));
 
-// --- A name: the second item is a Northline tag (88:19817 → 88:19858) ----------------
+// --- A brand label: the second item reads only "Northline" (88:19817 → 88:19858) -----
 await click('.scanner__camera');
 await settled();
 const sheet = await page.evaluate(() => ({
@@ -118,13 +118,14 @@ const sheet = await page.evaluate(() => ({
   detected: document.querySelector('.scanMatches__badge')?.textContent,
   rows: [...document.querySelectorAll('.scanMatches__row')].map((r) => ({ name: r.querySelector('.scanMatches__name').textContent, best: !!r.querySelector('.scanMatches__best'), price: r.querySelector('.scanMatches__price').textContent })),
 }));
-check('a Northline tag asks "Which product?": 3 matches for scanned text, detected "Northline"',
+check('a Northline label asks "Which product?": 3 matches for scanned text, detected "Northline"',
   sheet.title === 'Which product?' && sheet.sub === '3 matches for scanned text' && sheet.detected === 'Northline' && sheet.rows.length === 3, JSON.stringify(sheet));
-check('...the three Northline products, Oxford Shirt the one best match', sheet.rows[0]?.name === 'Oxford Shirt' && sheet.rows.filter((r) => r.best).length === 1 && sheet.rows[0].best);
+check('...every row carries what was read: the three Northline products, none ranked over the others',
+  sheet.rows.every((r) => r.name.startsWith('Northline ')) && sheet.rows[0]?.name === 'Northline Oxford Shirt' && !sheet.rows.some((r) => r.best), JSON.stringify(sheet.rows.map((r) => r.name)));
 await page.evaluate(() => document.querySelectorAll('.scanMatches__row')[2].click());
 await wait(900);
 const afterPick = await lines();
-check('the pick is what lands — Baseball Cap, the third row, not the best match', afterPick.some((l) => l.name === 'Baseball Cap' && l.price === '₦7,500') && afterPick.length === 2, JSON.stringify(afterPick));
+check('the pick is what lands — Baseball Cap, the third row', afterPick.some((l) => l.name === 'Baseball Cap' && l.price === '₦7,500') && afterPick.length === 2, JSON.stringify(afterPick));
 check('"Baseball Cap added to cart"', (await toast())?.message === 'Baseball Cap added to cart');
 await lensClear();
 
@@ -180,12 +181,12 @@ await pick('Scanner: past the stock');
 await settled();
 const stock = await lines();
 check('a scan past the shelf is refused as a tap is: "Only 3 ea left", still 3', (await toast())?.message === 'Only 3 ea left' && stock.length === 1, JSON.stringify(stock));
-await pick('Scanner: name with one match');
+await pick('Scanner: scan a name tag');
 await settled();
-check('a name with one match is added at once, no sheet', !(await page.evaluate(() => document.querySelector('.scanMatches'))) && (await lines()).some((l) => l.name === 'Canvas Tote'));
+check('a tag carrying the whole name is added at once, no sheet', !(await page.evaluate(() => document.querySelector('.scanMatches'))) && (await lines()).some((l) => l.name === 'Oxford Shirt'));
 
 // --- Closing "Which product?" puts the item down ----------------------------------
-await pick('Scanner: scan a product name');
+await pick('Scanner: scan a brand label');
 await settled();
 await click('.scanMatches .closeButton');
 await wait(900);

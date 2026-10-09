@@ -71,7 +71,6 @@ button:active:not(:disabled):not([aria-disabled='true']):not(
     --motion-fast: 0ms !important;
     --motion-base: 0ms !important;
     --motion-slow: 0ms !important;
-    --motion-spring: 0ms !important;
   }
   *, *::before, *::after { animation: none !important; }
   button:active { transform: none !important; }

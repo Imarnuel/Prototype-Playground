@@ -36,7 +36,9 @@ export function ScanMatches({ open, result, onClose, onChoose }: {
                     <span className="scanMatches__scrim" />
                   </span>
                   <span className="scanMatches__text">
-                    <span className="scanMatches__name">{product.name}</span>
+                    {/* Brand and name: the read is usually the brand alone, so the
+                        rows must show it, or they look unrelated to what was read. */}
+                    <span className="scanMatches__name">{product.brand} {product.name}</span>
                     <span className="scanMatches__meta">
                       <span>{product.stock} {unitFor(product, 'each').abbrev} left</span>
                       {best && <span className="scanMatches__best">Best match</span>}

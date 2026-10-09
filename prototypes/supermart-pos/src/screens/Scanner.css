@@ -184,3 +184,41 @@
   line-height: 18px;
   color: #3d4659;
 }
+
+/* The woven neck label: a dark woven strip, the brand in white thread, the folded
+   ends stitched down. The weave is a fine crosshatch of the strip's own colour. */
+.scanWoven {
+  position: absolute;
+  left: 50%;
+  top: 222px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 176px;
+  height: 52px;
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(90deg, #ffffff0a 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, #0000001f 0 1px, transparent 1px 3px),
+    #1d2a44;
+  box-shadow: 0 6px 18px #0000004d;
+  transform: translate(-50%, -50%) rotate(-2deg);
+}
+.scanWoven::before,
+.scanWoven::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  border-left: 1px dashed #ffffff4d;
+}
+.scanWoven::before { left: 10px; }
+.scanWoven::after { right: 10px; }
+.scanWoven__brand {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 22px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #f3efe6;
+}

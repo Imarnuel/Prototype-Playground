@@ -80,7 +80,7 @@ const SCREENS = ['Sales point', 'Loading (skeleton)', 'Error', 'Cart: empty', 'C
   'Quantity sheet', 'Item details: discount applied', 'Select customer', 'Select customer: empty', 'Customer added: toast',
   'More options', 'Apply discount: 10%', 'Cart: order discount applied', 'Checkout: cash with change', 'Select payment method',
   'Select bank', 'Transaction success', 'Receipt: bank transfer', 'Queued orders', 'Queued orders: empty',
-  'Order has been queued: toast', 'Scanner: with items', 'Scanner: scan a product name'];
+  'Order has been queued: toast', 'Scanner: with items', 'Scanner: scan a brand label'];
 
 const audit = () => page.evaluate(({ lightOnly, lightGlyph, darkValues }) => {
   const screen = document.querySelector('.device__screen');

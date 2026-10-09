@@ -18,7 +18,7 @@ import { Scanner } from './screens/Scanner';
 import { ScanMatches } from './screens/ScanMatches';
 import { METHODS, methodLabel, paysIntoAccount, type AccountMethod } from './data/payments';
 import { lookupBarcode, matchScannedText, queueOrder, setQueueForDemo, submitPayment } from './api/pos';
-import { SCAN_SEQUENCE, UNKNOWN_BARCODE, UNKNOWN_TAG, barcodeOf, tagOf, type ScanTarget, type TextResult } from './state/scan';
+import { SCAN_SEQUENCE, UNKNOWN_BARCODE, UNKNOWN_TAG, barcodeOf, labelOf, tagOf, type ScanTarget, type TextResult } from './state/scan';
 import { receiptText, type Receipt as ReceiptRecord } from './state/sale';
 import { PRODUCTS, maxCount, parseWholeNaira, unitFor, type Discount, type Product } from './data/catalogue';
 import { CUSTOMERS, type Customer } from './data/customers';
@@ -500,10 +500,8 @@ export function App() {
       ['Scanner', 'Screens', [], undefined],
       ['Scanner: with items', 'States', 'four', undefined],
       ['Scanner: scan a barcode', 'States', [], () => barcodeOf(byId('acc-socks'))],
-      ['Scanner: scan a product name', 'States', [], () => tagOf(byId('tops-oxford'))],
-      // Every brand sells three or more, so a brand tag never matches once; a label
-      // with the name alone does.
-      ['Scanner: name with one match', 'States', [], (): ScanTarget => ({ kind: 'text', lines: ['Canvas Tote'], productId: 'bag-tote' })],
+      ['Scanner: scan a brand label', 'States', [], () => labelOf('Northline')],
+      ['Scanner: scan a name tag', 'States', [], () => tagOf(byId('tops-oxford'))],
       ['Scanner: unknown barcode', 'States', [], () => UNKNOWN_BARCODE],
       ['Scanner: name matches nothing', 'States', [], () => UNKNOWN_TAG],
       ['Scanner: past the stock', 'States', 'beanies', () => barcodeOf(byId('acc-beanie'))],

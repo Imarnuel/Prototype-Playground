@@ -16,7 +16,7 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **129** inconsistencies, including that 31 frames share the name
+anything — it records **130** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
@@ -91,11 +91,12 @@ receipt's logo is a placeholder (#97). See BUILD-PLAN, band `162:8987`.
 | Scan button on the Sales Point and the empty Cart | `88:19369`, `88:19466` | 60x60 at [317,631]; 16/32 from the corner |
 | Scanner, empty and over a Cart | `88:19506`, `88:19584` | the Cart docked at 340 (`Cart` mode "docked") |
 | Added to cart | `88:19938` | the banner toast at [20,54] |
-| Which product? | `88:19899` | three Northline matches, best marked |
+| Which product? | `88:19899` | a Northline label: three Northline products to pick from (#130) |
 | Empty Cart | `88:16199`, `88:19449` | built as drawn at last (#124) |
 
 `walk-scan` 38/38. The camera is simulated and the item in it drawn from the catalogue
-(the designer's calls): a tap holds up the next item, a real EAN-13 or a brand tag,
+(the designer's calls): a tap holds up the next item — a real EAN-13, a name tag, or a
+brand-only label that asks "Which product?" —
 and a read lands through the grid's own add rule. See BUILD-PLAN, band `214:26054`.
 
 ### Built — band `170:8988`, queueing and recalling an order

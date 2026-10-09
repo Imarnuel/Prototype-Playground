@@ -8,11 +8,8 @@
   /* The tray (docked, below) is this whole Cart moved down, so expanding never
      re-lays-out anything: it is always the full Cart; only where it sits moves. */
   transition:
-    transform var(--motion-spring) var(--ease-spring),
-    border-radius var(--motion-spring) var(--ease-spring);
-  /* White past the bottom edge: on the spring the tray passes its mark by a few px,
-     and must not show the camera under its edge. */
-  box-shadow: 0 64px 0 0 var(--color-surface-default);
+    transform var(--motion-base) var(--ease-out),
+    border-radius var(--motion-base) var(--ease-out);
   /* See SalesPoint.css — the status bar is device chrome, so this reserves the inset
      instead of rendering one. On a real device a sheet slides UNDER the status bar;
      rendering one per screen put two clocks on screen at once mid-transition. */
@@ -36,7 +33,7 @@
   background: var(--color-surface-default);
   overflow: clip;
   box-sizing: border-box;
-  transition: transform var(--motion-spring) var(--ease-spring);
+  transition: transform var(--motion-base) var(--ease-out);
 }
 
 /* Expand (docked) and close (full) share the title bar's leading slot. */
@@ -356,7 +353,7 @@
     padding var(--motion-base) var(--ease-out),
     border-radius var(--motion-base) var(--ease-out),
     box-shadow var(--motion-base) var(--ease-out),
-    transform var(--motion-spring) var(--ease-spring),
+    transform var(--motion-base) var(--ease-out),
     opacity var(--motion-base) var(--ease-out),
     visibility 0ms linear 0ms;
 }
@@ -391,8 +388,8 @@
    title bar rides up 50 and the list 46 (and right 4) to land where the frame draws
    them — controls at 356, 16 into the tray; the list at 408, 68 in, 16 from each
    side — and the footer rides up the whole 340 to stay on the screen's bottom.
-   Expanding is all of it settling back: transforms only, on the arrival spring, so
-   the tray grows into the Cart as one surface and lands with a small settle. */
+   Expanding is all of it settling back: transforms only, so the tray grows into
+   the Cart as one surface. */
 .cart[data-mode='docked'] {
   transform: translateY(340px);
   border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
@@ -400,7 +397,7 @@
 .cart__scroll {
   position: relative;
   transition:
-    transform var(--motion-spring) var(--ease-spring),
+    transform var(--motion-base) var(--ease-out),
     padding-bottom var(--order-total-ms, 0ms) var(--order-total-easing, linear);
 }
 .cart[data-mode='docked'] .cart__titleBar { transform: translateY(-50px); }

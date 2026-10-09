@@ -70,7 +70,8 @@ function Scene({ target, entered }: { target: ScanTarget; entered: boolean }) {
   return (
     <div className="scanScene" data-open={entered ? 'on' : 'off'} aria-hidden="true">
       {photo && <img className="scanScene__photo" src={photo} alt="" />}
-      {target.kind === 'barcode' ? <BarcodeLabel code={target.code} /> : <Tag lines={target.lines} />}
+      {target.kind === 'barcode' ? <BarcodeLabel code={target.code} />
+        : target.label ? <WovenLabel brand={target.lines[0]} /> : <Tag lines={target.lines} />}
     </div>
   );
 }
@@ -93,6 +94,11 @@ function BarcodeLabel({ code }: { code: string }) {
       </svg>
     </div>
   );
+}
+
+/** A woven neck label: the brand, woven, with the fold's stitching either end. */
+function WovenLabel({ brand }: { brand: string }) {
+  return <div className="scanWoven"><span className="scanWoven__brand">{brand}</span></div>;
 }
 
 function Tag({ lines }: { lines: readonly string[] }) {

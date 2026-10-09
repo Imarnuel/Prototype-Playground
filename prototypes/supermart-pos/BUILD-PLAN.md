@@ -347,6 +347,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 127 | **Paints the file leaves unbound do not change in its own Dark mode** — the search glyph `#5b6579`, the receipt's socials `#5a5c63`, the pill toast's `#0a9645` disc, the low-stock orange `#a64907`, the chip bar's end fade `#f9fafb`, the empty state's rings (#45), the Cart's white washes | The icons and the orange are left as exported. Where a literal stands in for a token — the scrim's and tab bar's white (Color/surface/default), the chip fade (Color/surface/secondary, which it fades into) — dark uses that token. The rings take the dark frames' own values. **Needs design input**: binding them |
 | 128 | **The two dark frames disagree with each other** — the empty state's copy is Color/text/default in `88:16216` and Color/text/subtle in `88:16380`, and the Cart behind `88:16380`'s sheet still draws the LIGHT rings `#f2f2f3` / `#dfe0e2` / `#b8b9bd` | Followed the app's light build (text/default, as `88:16216`) and `88:16216`'s rings `#37383c` / `#5e616c` / `#a9acb3` |
 | 129 | **Icons are exported with their colour baked in**, so none of them follows a theme | Each glyph's light hex was matched to the variable it is bound to, read off all 4,637 vector paints on the page: each hex binds one variable, or two whose dark values agree (icon/brand and icon/selected). `gen-icons` writes a dark copy per glyph (47); white in a mask or clip-path is geometry and stays. `trash-01` / `trash-03-danger` export as `#c2261a`, one step off icon/danger/bolder, and take its dark value |
+| 130 | **"Which product?" reads "Northline" but lists names that do not carry it** — the rows show the product name alone, and the frame's scan is a tag that prints the whole name (`88:19858`), which already names one product; "Best match" then marks the product the tag named. The sheet only means something when the read fits more than one product | The designer's call: the scan that asks is a **woven neck label reading only the brand** (the sequence's second item, and "Scanner: scan a brand label"), and the rows show **brand and name**, so each visibly carries the read. A read that carries a product's whole name now adds it at once ("Scanner: scan a name tag"). With a brand alone nothing ranks, so the sheet shows no Best match; the badge stays for a partial read |
 
 ## Work order
 
@@ -853,14 +854,14 @@ in front of it is **drawn from the data** (#115).
   with several matches opens "Which product?"; one match is added at once.
 - **The scan button opens into the scanner** (the designer's request): the camera
   grows from the button as a circle — its size, its green, giving way to black — and
-  the viewfinder and close settle in where they stand; the tray rises on the arrival
-  spring a beat (`instant`) behind. Made calmer on request ("so it doesn't cause
+  the viewfinder and close settle in where they stand; the tray rises a beat
+  (`instant`) behind. Made calmer on request ("so it doesn't cause
   motion sickness"): a first version flew the glyph's brackets ~600px out to the
   viewfinder and burst the circle open on the decelerating curve; now nothing crosses
   the screen and the circle eases in and out. Then "too slow": the circle ran on
   `base`, the chrome waited `fast`, the tray a 480 spring, still at 674ms. Now the
-  circle is `fast`, the chrome and tray follow by `instant`, on the 360 spring:
-  open by 190ms, chrome by 300, tray 5px past and still by 434 (same sampler). Closing is `fast` on the
+  circle is `fast`, the chrome and tray follow by `instant`: open by 190ms, chrome
+  by 300, the tray still by ~440 (same sampler). Closing is `fast` on the
   in-out curve and lands on the real button before the presentation unmounts —
   on `base` and the accelerating curve it was still at r 412 of 747 at the unmount,
   a cut. Sampled per frame on the production build: r 30 → 747 and the top-left
@@ -987,23 +988,14 @@ static frame cannot express: press feedback, the presented-sheet transition and 
 exit, and the skeleton pulse. If motion is later authored in Figma, replace the values
 in that module rather than adding a second set beside it.
 
-**Arrivals land on a spring** (the designer: "a slight bounce… nothing too dramatic,
-similar to Family's"). `SPRING` in `shared/src/motion.ts` is a damped spring sampled
-from its own equation into CSS `linear()`: one curve, damping 0.82, 360ms — 90% of the
-way in 85ms, 1.1% past the mark at 152ms, settled by 224ms. It carries every arrival:
-the sheets (`SHEET_SPRING`), the Cart as a full-screen cover, the scanner's tray,
-toasts, the receipt's actions. The first version was two curves on 480ms (0.69 at 5%
-for short travels, 0.78 at 2% for long ones) and was "exaggerated and slow
-afterwards": it peaked past halfway and drifted back for ~200ms. One ratio at 5% had
-been rejected before that, since overshoot scales with distance (33-43px on the tall
-sheets). Measured on the production build, the visible settle is now 1.5-9.5px and
-every arrival is still within ~300ms of the tap (More options 1.5, Select bank 2.4,
-tray expand 2.9, dock 3.8, Select customer 5.1, scanner tray 5.5, Checkout 6.0, Cart
-9.5). Exits keep the
-accelerating curve; fades, colours, presses, numbers and the post-Pay moment never
-bounce (the earlier `EASING.overshoot` pop there was removed for motion sickness, and
-stays removed). Anything that overshoots has white past its trailing edge so the
-screen beneath never shows. Under reduced motion `--motion-spring` is 0 like the rest.
+**No bounce.** Arrivals ran on a damped spring for a while (the designer: "a slight
+bounce… similar to Family's"), first at 5% / 2% over 480ms, then 1.1% over 360ms, and
+the designer then took it out: "I don't think it's needed". Every arrival is back on
+the decelerating curve it used before — sheets on `slow` (`SHEET_SPRING`), the Cart
+tray, toasts and the receipt's actions on `base` — and the white fillers that hid the
+overshoot are gone. Measured on the production build: 0.0px overshoot on all eleven
+surfaces sampled. Exits keep the accelerating curve; the post-Pay moment never
+bounced (the earlier `EASING.overshoot` pop there was removed for motion sickness).
 
 **Sheet to sheet is one motion, not two** (the designer: "slow, doesn't feel snappy").
 Swapping trays — Checkout to a picker and back, More options to what it opens — ran

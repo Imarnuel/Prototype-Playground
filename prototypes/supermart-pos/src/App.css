@@ -15,18 +15,6 @@
   opacity: 0;
 }
 
-/* Under the Cart's bottom edge: arriving on the spring it passes its mark by ~10px,
-   and the Sales Point must not show beneath it. */
-.sheet::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  height: 64px;
-  background: var(--color-surface-default);
-}
-
 .sheet[data-open='on'] {
   transform: translateY(0);
   opacity: 1;
@@ -60,7 +48,7 @@
    The camera opens out of the green button: from the button's own centre and size a
    circle widens over the screen, green for its first moments and black as it grows;
    the viewfinder, the close and the hint then settle in where they stand; the Order
-   Preview tray rises on the arrival spring a beat behind. Closing reverses it on `fast` and
+   Preview tray rises a beat behind. Closing reverses it on `fast` and
    lands on the real button, waiting underneath, before the presentation unmounts.
    Made calmer at the designer's request ("so it doesn't cause motion sickness"):
    nothing travels across the screen any more — the first version flew the glyph's
@@ -68,7 +56,7 @@
    and burst the circle open on the decelerating curve (r 30 → 520 in ~70ms). The
    circle now eases in and out, the green gives way to black on `instant`, and the
    camera's chrome only fades and settles by 6% in place. Then "too slow": the parts
-   ran in turn (circle 300, chrome after 200, tray after 120 on a 480 spring); now the
+   ran in turn (circle 300, chrome after 200, tray after 120, 480 long); now the
    circle is `fast`, and the chrome and the tray follow it by `instant`.
    --fx/--fy are the button's centre on the screen, --reach the circle that covers the
    screen from it (App.tsx). Nothing here is a new duration or curve. */
