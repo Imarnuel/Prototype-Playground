@@ -23,6 +23,7 @@ import { receiptText, type Receipt as ReceiptRecord } from './state/sale';
 import { PRODUCTS, maxCount, parseWholeNaira, unitFor, type Discount, type Product } from './data/catalogue';
 import { CUSTOMERS, type Customer } from './data/customers';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { setTheme, useTheme } from './theme';
 import { Toast, type ToastAction, type ToastTone, type ToastVariant } from './components/Toast';
 import { usePresented } from './hooks/usePresented';
 import { addToCart, commitDetails, commitQuantity, removeLine, setCount, totals, type CartLine } from './state/cart';
@@ -115,6 +116,7 @@ export function App() {
      control asked — the title-bar trash or More options. */
   const [clearRequest, setClearRequest] = useState(0);
   const reducedMotion = useReducedMotion();
+  const theme = useTheme();
   const enterMs = duration(SHEET_SPRING.duration, reducedMotion);
   const exitMs = duration(SHEET_SPRING.exitDuration, reducedMotion);
 
@@ -371,6 +373,7 @@ export function App() {
   };
 
   const entries: DevToolbarItem[] = [
+    { label: 'Dark mode', group: 'Appearance', pressed: theme === 'dark', onSelect: () => setTheme(theme === 'dark' ? 'light' : 'dark') },
     { label: 'Sales point', group: 'Screens', onSelect: resetScreens },
     { label: 'Cart (Order Preview)', group: 'Screens', onSelect: () => setCartOpen(true) },
     { label: 'Loading (skeleton)', group: 'States', onSelect: () => { setCartOpen(false); setForced('loading'); } },
@@ -613,7 +616,7 @@ export function App() {
   return (
     <>
       {/* White over the camera, as the scanner frames draw it (`88:19507`). */}
-      <DeviceFrame statusBar={(scanning && cartOpen) || holdLight ? 'light' : 'dark'}>
+      <DeviceFrame statusBar={theme === 'dark' || (scanning && cartOpen) || holdLight ? 'light' : 'dark'}>
         {/* A render failure most likely came from a cart line, so recovering also
             empties the cart rather than re-rendering the line that threw. */}
         <ErrorBoundary onReset={() => { setLines([]); resetScreens(); }}>

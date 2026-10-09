@@ -1,4 +1,5 @@
 import { ICONS, type IconName } from '../assets/icons';
+import { useTheme } from '../theme';
 import './Icon.css';
 
 /**
@@ -16,10 +17,11 @@ import './Icon.css';
  */
 export function Icon({ name, className }: { name: IconName; className?: string }) {
   const icon = ICONS[name];
+  const theme = useTheme();
   return (
     <img
       className={className ? `icon ${className}` : 'icon'}
-      src={icon.src}
+      src={theme === 'dark' && icon.dark ? icon.dark : icon.src}
       width={icon.width}
       height={icon.height}
       alt=""

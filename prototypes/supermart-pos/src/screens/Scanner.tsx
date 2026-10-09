@@ -42,8 +42,9 @@ export function Scanner({ target, onClose, onHoldUp, hint = false }: {
 
       {/* `88:19536`: Frame 4908 (the board's close button) under the file's DARK
           variable mode, set explicitly on the node — Color/container/neutral/default
-          resolves to #2C2D30 and its x-close is #CFD0D3. The app carries no dark
-          tokens (#103), so the two resolved values are written as they render. */}
+          resolves to #2C2D30 and its x-close is #CFD0D3. The camera is dark in
+          both themes, so the two are written as they render rather than as tokens
+          that would follow the dark-mode switch. */}
       <button type="button" className="scanner__close" onClick={onClose} aria-label="Close scanner">
         <Icon name="x-close-camera" />
       </button>

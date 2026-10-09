@@ -66,7 +66,7 @@ export function TransactionSuccess({ open, status, retract = false, origin, onCo
           </span>
           <span className="saleSuccess__icon">
             <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-              <path d="M33.3332 10L14.9998 28.3333L6.6665 20" pathLength={1} stroke="white" strokeWidth="2.97658"
+              <path d="M33.3332 10L14.9998 28.3333L6.6665 20" pathLength={1} stroke="var(--color-icon-inverse)" strokeWidth="2.97658"
                 strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </span>

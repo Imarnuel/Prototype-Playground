@@ -8,6 +8,8 @@ export type DevToolbarItem = {
   /** Groups render as sections, so screens and states stay separable at a glance. */
   group?: string;
   onSelect: () => void;
+  /** A switch rather than a jump: shows its state, and the panel stays open. */
+  pressed?: boolean;
 };
 
 type DevToolbarProps = {
@@ -82,12 +84,14 @@ export function DevToolbar({ items, enabled = false }: DevToolbarProps) {
                       key={item.label}
                       type="button"
                       className="devbar__item"
+                      aria-pressed={item.pressed}
                       onClick={() => {
                         item.onSelect();
-                        setOpen(false);
+                        if (item.pressed === undefined) setOpen(false);
                       }}
                     >
                       {item.label}
+                      {item.pressed !== undefined && <span className="devbar__state">{item.pressed ? 'On' : 'Off'}</span>}
                     </button>
                   ))}
               </div>

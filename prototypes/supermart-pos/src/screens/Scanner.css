@@ -20,7 +20,7 @@
 }
 .scanner__camera:disabled { cursor: default; }
 
-/* `88:19536`: 40x40 at [20,60]. See Scanner.tsx for the dark-mode fill. */
+/* `88:19536`: 40x40 at [20,60]. See Scanner.tsx for why the fill is a literal. */
 .scanner__close {
   position: absolute;
   left: 20px;

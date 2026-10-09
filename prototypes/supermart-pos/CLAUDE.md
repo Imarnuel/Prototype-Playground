@@ -16,7 +16,7 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **125** inconsistencies, including that 31 frames share the name
+anything — it records **129** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
@@ -108,8 +108,18 @@ and a read lands through the grid's own add rule. See BUILD-PLAN, band `214:2605
 | Recalled Cart | `88:16115` | the Cart, with the recalled order |
 
 `walk-queue` 30/30. The queue lives behind the mock API; a recall over a full Cart
-queues that sale first; delete has Undo. The dark-mode frames are not built (#103).
+queues that sale first; delete has Undo. Its two dark-mode frames are covered by the
+app-wide dark mode below.
 See BUILD-PLAN, band `170:8988`.
+
+### Dark mode — dev toolbar → Appearance → Dark mode
+
+The whole app, from the library's own Dark mode (`Semantic` collection, mode `255:1`):
+56 colour tokens, dark copies of 47 icons by the variable each is bound to, and a
+handful of literals that stand in for a token (`src/theme-dark.css`). The switch shows
+On/Off, keeps the toolbar open, and is remembered per viewer. `walk-dark` 33/33: 24
+screens, 584 icon renders, no light paint left, text 3:1 or better. See BUILD-PLAN,
+"Dark mode", and #126-#129.
 
 ## The store
 
@@ -201,7 +211,7 @@ npm run catalogue:verify   # 66 invariants: check digits, units, money, totals, 
 npm run cart:verify        # 41 rules: stock, clamps, unit changes, the receipt, the queue, scanning
 npm run catalogue:csv      # regenerate figma/catalogue.csv from catalogue.ts
 npm run figma:spec         # every figure the Figma screens were synced to (figma/README.md)
-npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json
+npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json (+ the dark block)
 npm run tokens:verify      # the generated tokens still match the Figma dump
 npm run motion:sample      # transitions animate in BOTH directions (needs a server)
 npm run figma:audit        # 509 properties read off the Figma NODES vs computed style
@@ -215,6 +225,7 @@ node scripts/walk-discount.mjs   [url]   # More options, order discount, Clear c
 node scripts/walk-checkout.mjs   [url]   # both checkout flows, failure, receipt, new sale
 node scripts/walk-queue.mjs      [url]   # queue, recall (and over a full Cart), delete + Undo, failures
 node scripts/walk-scan.mjs       [url]   # scan button, barcode and name scans, Which product?, expand, refusals
+node scripts/walk-dark.mjs       [url]   # dark mode: the switch, every token, 24 screens for light paint and contrast
 node scripts/diff-queue.mjs      [url]   # Queued orders, row menu, empty, toast vs their frames
 node scripts/diff-checkout.mjs   [url]   # checkout, pickers, success, receipt vs their frames
 node scripts/diff-total.mjs      [url]   # order total vs 88:8639 / 88:9338
@@ -234,8 +245,10 @@ entrance that never animates.
   destination (BUILD-PLAN #50, #51).
 - **The order discount's breakdown**: `88:15652` restyles the total's breakdown and
   puts Discount after Tax; the built one keeps `88:9338`'s (BUILD-PLAN #82).
-- The **Undo** toast's action is not designed (#86). Queued orders is built (band
-  `170:8988`); its two dark-mode frames are not (#103).
+- The **Undo** toast's action is not designed (#86).
+- **Dark mode leaves the file's unbound paints as they are** (#127) — the search
+  glyph, the receipt's socials, the pill toast's disc, the low-stock orange — and the
+  two dark frames disagree on the empty state's copy colour (#128).
 - **The receipt's logo** is a placeholder: Freshvale has none (#97).
 - The sheet **exit curve** is heavily back-loaded and is deferred to `better-ui`,
   which owns motion and is not installed (BUILD-PLAN #37).

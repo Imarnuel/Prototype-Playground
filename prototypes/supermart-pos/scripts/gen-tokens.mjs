@@ -197,11 +197,33 @@ Object.entries(type).forEach(([k, s]) => {
   lines.push(`  --type-${id}-weight: ${s.weight};`);
 });
 lines.push('}', '');
+
+/* Dark mode: the library's Semantic collection carries a second mode, "Dark"
+   (`255:1`). get_variable_defs resolves only the mode a node is in, so these were read
+   through the plugin API, one line per variable — name|light|dark|the primitive dark
+   aliases — and checked against an FNV-1a sum computed in Figma (baa587f4). Only the
+   colours this app already carries get a dark value; the light column must agree with
+   the dump above or the generator stops. */
+const darkRows = fs.readFileSync(path.join(dir, 'figma-variables-dark.txt'), 'utf8').trim().split('\n').map((l) => l.split('|'));
+const darkLines = [];
+const lightDisagrees = [];
+for (const [name, light, dark] of darkRows) {
+  if (V[name] === undefined || /^-?[\d.]+$/.test(V[name])) continue;
+  if (V[name].toLowerCase() !== light) lightDisagrees.push(`${name}: dump ${V[name]}, Figma ${light}`);
+  darkLines.push(`  --color-${name.slice('Color/'.length).split('/').map(camel).join('-').toLowerCase()}: ${dark};`);
+}
+if (lightDisagrees.length) throw new Error(`light values disagree:\n${lightDisagrees.join('\n')}`);
+// A primitive (outside Semantic) has one mode and keeps its value in both themes.
+const darkNames = new Set(darkRows.map(([n]) => n));
+const singleMode = Object.entries(V).filter(([k, v]) => k.startsWith('Color/') && !/^-?[\d.]+$/.test(v) && !darkNames.has(k)).map(([k]) => k);
+const lightCount = lines.filter((l) => l.startsWith('  --color-')).length;
+if (darkLines.length + singleMode.length !== lightCount) throw new Error(`dark covers ${darkLines.length} of ${lightCount} colours`);
+lines.push(":root[data-theme='dark'] {", '  color-scheme: dark;', ...darkLines, '}', '');
 fs.writeFileSync(path.join(dir, 'tokens.css'), lines.join('\n'));
 
 const countColors = (o) => Object.values(o).reduce((a, v) => a + (typeof v === 'object' ? countColors(v) : 1), 0);
 console.log(`tokens.ts + tokens.css generated`);
-console.log(`  semantic colours : ${countColors(color)}`);
+console.log(`  semantic colours : ${countColors(color)} (dark: ${darkLines.length}; one mode, same in both: ${singleMode.join(', ')})`);
 console.log(`  legacy colours   : ${Object.keys(JSON.parse(json(Object.fromEntries(Object.entries(V).filter(([k, v]) => typeof v === 'string' && v.startsWith('#') && !k.startsWith('Color/')).map(([k, v]) => [camel(k), v]))).replace(/([a-zA-Z][a-zA-Z0-9]*):/g, '"$1":'))).length}`);
 console.log(`  spacing/radius/border-width/shadow : ${Object.keys(spacing).length}/${Object.keys(radius).length}/${Object.keys(borderWidth).length}/${Object.keys(shadow).length}`);
 console.log(`  type styles      : ${Object.keys(type).length} (${Object.values(type).filter((t) => t.composed).length} composed from primitives)`);

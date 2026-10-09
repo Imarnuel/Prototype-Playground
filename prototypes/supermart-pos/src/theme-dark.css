@@ -1,0 +1,53 @@
+/* Dark mode, for what the generated tokens cannot reach. The tokens themselves switch
+   in tokens.css (`:root[data-theme='dark']`, the library's own Dark mode); this file
+   is only for paints written as literals, each of which in light equals, or stands in
+   for, a token. Light is untouched: every rule here is scoped to the dark theme.
+
+   Left as they are, on purpose:
+   - the receipt's paper, white with black print — a printed slip, not interface;
+   - the camera (black stage, white viewfinder, the drawn label and tag);
+   - shadows, the photo scrims and the input's bottom-edge gradient strokes — black
+     at low alpha, which the file's own effect styles keep in both modes;
+   - the low-stock orange #a64907 and the paints the icons leave unbound (#127). */
+
+:root[data-theme='dark'] {
+  --device-screen-fill: var(--color-surface-default);
+}
+
+/* The page behind the device: a light grey frames a light phone and glares round a
+   dark one. Not a design value — the presentation's backdrop. */
+:root[data-theme='dark'] body {
+  background: #111214;
+}
+
+/* The scrim over the grid and the Cart's list fades content into the white below it
+   — white being Color/surface/default. Same stops, the surface's own colour. */
+:root[data-theme='dark'] .bottomScrim {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-surface-default) 0%, transparent) 33.537%,
+    color-mix(in srgb, var(--color-surface-default) 90%, transparent) 58.748%,
+    var(--color-surface-default) 122.418%
+  );
+}
+
+/* The chip bar's end fade (`88:8091`): #f9fafb, standing in for the screen's
+   Color/surface/secondary, which it fades into (#127). */
+:root[data-theme='dark'] .filterBarWrap::after {
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--color-surface-secondary-default) 0%, transparent) 14.545%,
+    var(--color-surface-secondary-default) 97.273%);
+}
+
+/* The tab bar's frosted wash: white at 50%, i.e. the surface under the bar. */
+:root[data-theme='dark'] .tabBar {
+  background: linear-gradient(to top,
+    color-mix(in srgb, var(--color-surface-default) 50%, transparent),
+    color-mix(in srgb, var(--color-surface-default) 0%, transparent));
+}
+
+/* The empty state's rings are unbound hexes (#45); the two dark frames draw them
+   #37383c / #5e616c / #a9acb3, outermost first (`88:16216`, `88:16380`). */
+:root[data-theme='dark'] .emptyState__rings { box-shadow: inset 0 0 0 var(--border-width-sm) #37383c; }
+:root[data-theme='dark'] .emptyState__ring2 { box-shadow: inset 0 0 0 var(--border-width-sm) #5e616c; }
+:root[data-theme='dark'] .emptyState__ring3 { box-shadow: inset 0 0 0 var(--border-width-sm) #a9acb3; }

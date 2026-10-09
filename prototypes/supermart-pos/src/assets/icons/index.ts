@@ -70,6 +70,53 @@ import wallet_04 from './wallet-04.svg';
 import x_circle from './x-circle.svg';
 import x_close from './x-close.svg';
 import x_close_camera from './x-close-camera.svg';
+import add_one_dark from './dark/add-one.svg';
+import bank_dark from './dark/bank.svg';
+import bank_note_02_dark from './dark/bank-note-02.svg';
+import cart_dark from './dark/cart.svg';
+import check_dark from './dark/check.svg';
+import check_24_dark from './dark/check-24.svg';
+import check_circle_dark from './dark/check-circle.svg';
+import check_selected_dark from './dark/check-selected.svg';
+import check_success_dark from './dark/check-success.svg';
+import chevron_down_dark from './dark/chevron-down.svg';
+import chevron_right_dark from './dark/chevron-right.svg';
+import chevron_right_subtle_dark from './dark/chevron-right-subtle.svg';
+import clock_dark from './dark/clock.svg';
+import credit_card_02_dark from './dark/credit-card-02.svg';
+import dot_2_dark from './dark/dot-2.svg';
+import dots_horizontal_dark from './dark/dots-horizontal.svg';
+import dots_horizontal_24_dark from './dark/dots-horizontal-24.svg';
+import ellipse_79_dark from './dark/ellipse-79.svg';
+import expand_01_dark from './dark/expand-01.svg';
+import filter_lines_dark from './dark/filter-lines.svg';
+import gift_02_dark from './dark/gift-02.svg';
+import grid_01_dark from './dark/grid-01.svg';
+import layout_alt_02_dark from './dark/layout-alt-02.svg';
+import list_dark from './dark/list.svg';
+import menu_01_dark from './dark/menu-01.svg';
+import minus_dark from './dark/minus.svg';
+import minus_lg_dark from './dark/minus-lg.svg';
+import percent_03_dark from './dark/percent-03.svg';
+import plus_dark from './dark/plus.svg';
+import plus_circle_dark from './dark/plus-circle.svg';
+import plus_lg_dark from './dark/plus-lg.svg';
+import printer_dark from './dark/printer.svg';
+import rows_03_dark from './dark/rows-03.svg';
+import scan_dark from './dark/scan.svg';
+import share_01_dark from './dark/share-01.svg';
+import shopping_cart_01_dark from './dark/shopping-cart-01.svg';
+import shopping_cart_40_dark from './dark/shopping-cart-40.svg';
+import trash_01_dark from './dark/trash-01.svg';
+import trash_03_dark from './dark/trash-03.svg';
+import trash_03_danger_dark from './dark/trash-03-danger.svg';
+import trash_03_subtle_dark from './dark/trash-03-subtle.svg';
+import user_02_dark from './dark/user-02.svg';
+import user_02_brand_dark from './dark/user-02-brand.svg';
+import users_02_dark from './dark/users-02.svg';
+import wallet_04_dark from './dark/wallet-04.svg';
+import x_circle_dark from './dark/x-circle.svg';
+import x_close_dark from './dark/x-close.svg';
 
 export type IconName =
   | 'add-one'
@@ -129,61 +176,62 @@ export type IconName =
   | 'x-close'
   | 'x-close-camera';
 
-export const ICONS: Record<IconName, { src: string; width: number; height: number }> = {
-  'add-one': { src: add_one, width: 20, height: 20 },
-  'bank': { src: bank, width: 20, height: 20 },
-  'bank-note-02': { src: bank_note_02, width: 20, height: 20 },
-  'cart': { src: cart, width: 19, height: 18 },
-  'check': { src: check, width: 20, height: 20 },
-  'check-24': { src: check_24, width: 24, height: 24 },
-  'check-circle': { src: check_circle, width: 48, height: 48 },
-  'check-selected': { src: check_selected, width: 20, height: 20 },
-  'check-success': { src: check_success, width: 40, height: 40 },
-  'chevron-down': { src: chevron_down, width: 20, height: 20 },
-  'chevron-right': { src: chevron_right, width: 16, height: 16 },
-  'chevron-right-subtle': { src: chevron_right_subtle, width: 20, height: 20 },
-  'clock': { src: clock, width: 16, height: 16 },
-  'credit-card-02': { src: credit_card_02, width: 20, height: 20 },
-  'dot-2': { src: dot_2, width: 2, height: 2 },
-  'dots-horizontal': { src: dots_horizontal, width: 20, height: 20 },
-  'dots-horizontal-24': { src: dots_horizontal_24, width: 24, height: 24 },
-  'ellipse-79': { src: ellipse_79, width: 3, height: 3 },
-  'expand-01': { src: expand_01, width: 20, height: 20 },
+/** `dark`: the same glyph in its bound variable's dark value (scripts/gen-icons.mjs). */
+export const ICONS: Record<IconName, { src: string; dark?: string; width: number; height: number }> = {
+  'add-one': { src: add_one, dark: add_one_dark, width: 20, height: 20 },
+  'bank': { src: bank, dark: bank_dark, width: 20, height: 20 },
+  'bank-note-02': { src: bank_note_02, dark: bank_note_02_dark, width: 20, height: 20 },
+  'cart': { src: cart, dark: cart_dark, width: 19, height: 18 },
+  'check': { src: check, dark: check_dark, width: 20, height: 20 },
+  'check-24': { src: check_24, dark: check_24_dark, width: 24, height: 24 },
+  'check-circle': { src: check_circle, dark: check_circle_dark, width: 48, height: 48 },
+  'check-selected': { src: check_selected, dark: check_selected_dark, width: 20, height: 20 },
+  'check-success': { src: check_success, dark: check_success_dark, width: 40, height: 40 },
+  'chevron-down': { src: chevron_down, dark: chevron_down_dark, width: 20, height: 20 },
+  'chevron-right': { src: chevron_right, dark: chevron_right_dark, width: 16, height: 16 },
+  'chevron-right-subtle': { src: chevron_right_subtle, dark: chevron_right_subtle_dark, width: 20, height: 20 },
+  'clock': { src: clock, dark: clock_dark, width: 16, height: 16 },
+  'credit-card-02': { src: credit_card_02, dark: credit_card_02_dark, width: 20, height: 20 },
+  'dot-2': { src: dot_2, dark: dot_2_dark, width: 2, height: 2 },
+  'dots-horizontal': { src: dots_horizontal, dark: dots_horizontal_dark, width: 20, height: 20 },
+  'dots-horizontal-24': { src: dots_horizontal_24, dark: dots_horizontal_24_dark, width: 24, height: 24 },
+  'ellipse-79': { src: ellipse_79, dark: ellipse_79_dark, width: 3, height: 3 },
+  'expand-01': { src: expand_01, dark: expand_01_dark, width: 20, height: 20 },
   'facebook': { src: facebook, width: 15.316, height: 15.316 },
-  'filter-lines': { src: filter_lines, width: 16, height: 16 },
-  'gift-02': { src: gift_02, width: 20, height: 20 },
-  'grid-01': { src: grid_01, width: 20, height: 20 },
+  'filter-lines': { src: filter_lines, dark: filter_lines_dark, width: 16, height: 16 },
+  'gift-02': { src: gift_02, dark: gift_02_dark, width: 20, height: 20 },
+  'grid-01': { src: grid_01, dark: grid_01_dark, width: 20, height: 20 },
   'instagram': { src: instagram, width: 15.316, height: 15.316 },
-  'layout-alt-02': { src: layout_alt_02, width: 40, height: 40 },
-  'list': { src: list, width: 20, height: 20 },
-  'menu-01': { src: menu_01, width: 20, height: 20 },
-  'minus': { src: minus, width: 16, height: 16 },
-  'minus-lg': { src: minus_lg, width: 32, height: 32 },
-  'percent-03': { src: percent_03, width: 20, height: 20 },
-  'plus': { src: plus, width: 16, height: 16 },
-  'plus-circle': { src: plus_circle, width: 24, height: 24 },
-  'plus-lg': { src: plus_lg, width: 32, height: 32 },
-  'printer': { src: printer, width: 16, height: 16 },
-  'rows-03': { src: rows_03, width: 20, height: 20 },
-  'scan': { src: scan, width: 28, height: 28 },
+  'layout-alt-02': { src: layout_alt_02, dark: layout_alt_02_dark, width: 40, height: 40 },
+  'list': { src: list, dark: list_dark, width: 20, height: 20 },
+  'menu-01': { src: menu_01, dark: menu_01_dark, width: 20, height: 20 },
+  'minus': { src: minus, dark: minus_dark, width: 16, height: 16 },
+  'minus-lg': { src: minus_lg, dark: minus_lg_dark, width: 32, height: 32 },
+  'percent-03': { src: percent_03, dark: percent_03_dark, width: 20, height: 20 },
+  'plus': { src: plus, dark: plus_dark, width: 16, height: 16 },
+  'plus-circle': { src: plus_circle, dark: plus_circle_dark, width: 24, height: 24 },
+  'plus-lg': { src: plus_lg, dark: plus_lg_dark, width: 32, height: 32 },
+  'printer': { src: printer, dark: printer_dark, width: 16, height: 16 },
+  'rows-03': { src: rows_03, dark: rows_03_dark, width: 20, height: 20 },
+  'scan': { src: scan, dark: scan_dark, width: 28, height: 28 },
   'scan-line': { src: scan_line, width: 274, height: 3 },
   'search-sm': { src: search_sm, width: 20, height: 20 },
-  'share-01': { src: share_01, width: 16, height: 16 },
-  'shopping-cart-01': { src: shopping_cart_01, width: 16, height: 16 },
-  'shopping-cart-40': { src: shopping_cart_40, width: 40, height: 40 },
+  'share-01': { src: share_01, dark: share_01_dark, width: 16, height: 16 },
+  'shopping-cart-01': { src: shopping_cart_01, dark: shopping_cart_01_dark, width: 16, height: 16 },
+  'shopping-cart-40': { src: shopping_cart_40, dark: shopping_cart_40_dark, width: 40, height: 40 },
   'tiktok': { src: tiktok, width: 15.316, height: 15.316 },
   'toast-check-card': { src: toast_check_card, width: 20, height: 20 },
   'toast-success': { src: toast_success, width: 20, height: 20 },
-  'trash-01': { src: trash_01, width: 20, height: 20 },
-  'trash-03': { src: trash_03, width: 20, height: 20 },
-  'trash-03-danger': { src: trash_03_danger, width: 16, height: 16 },
-  'trash-03-subtle': { src: trash_03_subtle, width: 20, height: 20 },
+  'trash-01': { src: trash_01, dark: trash_01_dark, width: 20, height: 20 },
+  'trash-03': { src: trash_03, dark: trash_03_dark, width: 20, height: 20 },
+  'trash-03-danger': { src: trash_03_danger, dark: trash_03_danger_dark, width: 16, height: 16 },
+  'trash-03-subtle': { src: trash_03_subtle, dark: trash_03_subtle_dark, width: 20, height: 20 },
   'twitter': { src: twitter, width: 13.08, height: 13.08 },
-  'user-02': { src: user_02, width: 16, height: 16 },
-  'user-02-brand': { src: user_02_brand, width: 20, height: 20 },
-  'users-02': { src: users_02, width: 40, height: 40 },
-  'wallet-04': { src: wallet_04, width: 20, height: 20 },
-  'x-circle': { src: x_circle, width: 20, height: 20 },
-  'x-close': { src: x_close, width: 20, height: 20 },
+  'user-02': { src: user_02, dark: user_02_dark, width: 16, height: 16 },
+  'user-02-brand': { src: user_02_brand, dark: user_02_brand_dark, width: 20, height: 20 },
+  'users-02': { src: users_02, dark: users_02_dark, width: 40, height: 40 },
+  'wallet-04': { src: wallet_04, dark: wallet_04_dark, width: 20, height: 20 },
+  'x-circle': { src: x_circle, dark: x_circle_dark, width: 20, height: 20 },
+  'x-close': { src: x_close, dark: x_close_dark, width: 20, height: 20 },
   'x-close-camera': { src: x_close_camera, width: 20, height: 20 },
 };

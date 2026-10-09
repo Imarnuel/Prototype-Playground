@@ -68,9 +68,16 @@ check('the smallest px line-height is above the ratio threshold',
   `min ${Math.min(...px.map(([, s]) => s.lineHeight))}px`);
 
 // --- CSS and TS agree ---
-const cssVars = [...css.matchAll(/^\s+(--[A-Za-z0-9-]+):/gm)].map((m) => m[1]);
-check('tokens.css has no duplicate custom properties', new Set(cssVars).size === cssVars.length,
-  `${cssVars.length} properties`);
+// Two blocks: :root, then the dark overrides. Duplicates are checked per block.
+const [lightCss, darkCss = ''] = css.split(":root[data-theme='dark']");
+const varsIn = (block) => [...block.matchAll(/^\s+(--[A-Za-z0-9-]+):/gm)].map((m) => m[1]);
+const cssVars = varsIn(lightCss);
+const darkVars = varsIn(darkCss);
+check('tokens.css has no duplicate custom properties', new Set(cssVars).size === cssVars.length && new Set(darkVars).size === darkVars.length,
+  `${cssVars.length} properties, ${darkVars.length} dark overrides`);
+check('every dark override names a light colour token',
+  darkVars.length > 0 && darkVars.every((v) => v.startsWith('--color-') && cssVars.includes(v)),
+  darkVars.filter((v) => !cssVars.includes(v)).join(', ') || `${darkVars.length} of ${cssVars.filter((v) => v.startsWith('--color-')).length}`);
 check('every semantic colour has a CSS property',
   flatten(color).every(([p]) => cssVars.includes(`--color-${p.replace(/\./g, '-').toLowerCase()}`)),
   `${flatten(color).length} colours`);

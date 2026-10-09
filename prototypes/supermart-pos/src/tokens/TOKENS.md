@@ -6,6 +6,7 @@ read off a frame. Nothing here was invented.
 | | |
 |---|---|
 | Source | `figma-variables.json` — verbatim `get_variable_defs` for section `88:7008` |
+| Dark mode | `figma-variables-dark.txt` — the `Semantic` collection's Dark mode (`255:1`), read through the plugin API: `name|light|dark|primitive`, FNV-1a `baa587f4` as computed in Figma. 56 dark overrides in `:root[data-theme='dark']`; `Color/alpha neutral/50` is a one-mode primitive (BUILD-PLAN #126) |
 | Variables recorded | 138 |
 | Semantic colours | 57 (`color.*`) |
 | Legacy colours | 11 (`legacyColor.*`) |

@@ -92,6 +92,19 @@
   background: #e5e5ea;
 }
 
+/* A switch: its state at the trailing edge, so it reads at a glance while presenting. */
+.devbar__item[aria-pressed] {
+  display: flex;
+  justify-content: space-between;
+}
+.devbar__state {
+  color: #8e8e93;
+}
+.devbar__item[aria-pressed='true'] .devbar__state {
+  color: #111;
+  font-weight: 600;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .devbar__handle,
   .devbar__panel {

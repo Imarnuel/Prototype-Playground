@@ -320,7 +320,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 100 | **Not designed**: Pay's working state, a failed payment, change due, and the amount's validation | The confirmation screen's own wait — a brand ring and "Processing payment…" — that becomes the success mark; a failure draws the screen back to Checkout; a notice toast that keeps the draft; change under the field in Color/text/success; the field's own error line |
 | 101 | **Mine, from band 4: the empty Cart's disabled Checkout label read a token that does not exist** (`--color-text-on-disabled`), so it inherited a colour instead of Color/text/ondisabled | Fixed |
 | 102 | **The Measurement card is a fixed 278 around four 56px rows** (`88:11532`, Frame 4981), leaving 54px of open card under the last rule — it read as an empty row (the designer: "remove the empty row") | Removed: the card ends at its last row, which drops its rule; the sheet is 54 shorter and docks 54 lower. `diff-quantity` and `walk-quantity` move their targets by the 54, not the frame's numbers |
-| 103 | **Two frames are dark mode** — `88:16216` (empty Cart) and `88:16380` (empty Queued orders) are the same layers as their light twins under a dark variable mode; nothing else in the file is drawn dark | Not built, by the designer's call: dark mode for two screens alone would switch themes mid-flow. Light only |
+| 103 | **Two frames are dark mode** — `88:16216` (empty Cart) and `88:16380` (empty Queued orders) are the same layers as their light twins under a dark variable mode; nothing else in the file is drawn dark | Not built as two screens, by the designer's call: dark mode for two screens alone would switch themes mid-flow. **Later built for the whole app** as a dev-toolbar switch, at the designer's request, from the library's own Dark mode (#126) |
 | 104 | **The Queued orders sheet is drawn full-bleed** (`88:16251`, `88:16280`: x 0, 393 wide) where every other sheet is inset | Inset like the rest (8, 377 wide), so its cards are 345, not 361. `diff-queue` measures against the frame relative to the sheet and card |
 | 105 | **The five queued orders are one placeholder** — Peter Obi, Seun Akindele, John Doe and two "Walk-in-customer", each "Fanta orange · Cocacola · Mirinda", ₦10,000, 13:24 06-03-2026; beverages from before the store became clothing | The store's real queue (`state/queue.ts`): four distinct orders from this catalogue and these customers, every total derived, times earlier today |
 | 106 | **Every card carries a hidden receipt number** (`#S132435346575866`) | Not built: a queued order has not been paid, so it has no receipt yet |
@@ -338,11 +338,15 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 118 | **"Which product?" marks Oxford Shirt the best match, and the next frame adds Crew Socks** (`88:19858` → `88:19678`) | The product picked is the one added. `walk-scan` picks the third row and proves that row lands |
 | 119 | **The frame orders the matches Oxford, Cap, Rain Jacket**; nothing ranks Cap above the jacket | Ranked by what the tag says (brand 1, each name word 2); ties keep the catalogue's order: Oxford, Rain Jacket, Cap |
 | 120 | **The match sheet's thumbnails still carry the image component's 80% scrim** | The softened scrim the designer asked for on the card and the Cart, so a photo does not darken from one screen to the next |
-| 121 | **The camera's close button is the only dark-mode layer in the band** — Frame 4908 with the file's Dark mode set on the node: Color/container/neutral/default resolves to #2C2D30, its x-close to #CFD0D3 | The resolved values, as literals: the app carries no dark tokens (#103) |
+| 121 | **The camera's close button is the only dark-mode layer in the band** — Frame 4908 with the file's Dark mode set on the node: Color/container/neutral/default resolves to #2C2D30, its x-close to #CFD0D3 | The resolved values, as literals: the camera is dark in both themes, so its close does not follow the dark-mode switch (#126) |
 | 122 | **The docked sheet's own frame (`88:19509`) carries a blanket fill and blur, and a 280 "Background" gradient sits behind it (`88:19508`)** — both entirely covered by the sheet | Not built: neither can be seen |
 | 123 | **A "Frame 4908 → Cart" connector (`88:20036`) leaves the full Cart for nothing** | Not built: it has no destination |
 | 124 | **The empty Cart was never built as designed.** `88:16199` (queue band) and `88:19449` draw the board's empty state — the 40 cart glyph, two lines of Body/large, no title — with no customer row and no footer; the build showed "No items yet" over a customer row and a disabled footer | Built as drawn, for both bands. A customer already attached keeps their row, so they can still be removed |
 | 125 | **Not designed**: what makes a simulated camera read, the read in progress, an unknown barcode, a name that matches nothing, a failed read, a scan past the stock, a name with one match, the scanner's status bar | A tap on the camera holds up the next item (a prototype affordance, with an instruction shown only where the dev toolbar is); a read takes at least `slow`; refusals and failures in the banner's neutral fill; the grid's own stock rule; one match is added at once; the status bar turns white over the camera, as iOS does and as the frames draw it |
+| 126 | **The library carries a Dark mode for every semantic colour** — the `Semantic` collection has two modes, Light `152:0` and Dark `255:1`, each aliasing a primitive; `get_variable_defs` only resolves the mode a node is in, which is why the dump has none | Read through the plugin API (83 variables, name / light / dark / primitive, checked against an FNV-1a sum computed in Figma), into `src/tokens/figma-variables-dark.txt`. Its Light column agrees with the dump on all 56 shared tokens. `tokens:gen` emits a `:root[data-theme='dark']` block; `Color/alpha neutral/50` is a primitive with one mode and stays as it is |
+| 127 | **Paints the file leaves unbound do not change in its own Dark mode** — the search glyph `#5b6579`, the receipt's socials `#5a5c63`, the pill toast's `#0a9645` disc, the low-stock orange `#a64907`, the chip bar's end fade `#f9fafb`, the empty state's rings (#45), the Cart's white washes | The icons and the orange are left as exported. Where a literal stands in for a token — the scrim's and tab bar's white (Color/surface/default), the chip fade (Color/surface/secondary, which it fades into) — dark uses that token. The rings take the dark frames' own values. **Needs design input**: binding them |
+| 128 | **The two dark frames disagree with each other** — the empty state's copy is Color/text/default in `88:16216` and Color/text/subtle in `88:16380`, and the Cart behind `88:16380`'s sheet still draws the LIGHT rings `#f2f2f3` / `#dfe0e2` / `#b8b9bd` | Followed the app's light build (text/default, as `88:16216`) and `88:16216`'s rings `#37383c` / `#5e616c` / `#a9acb3` |
+| 129 | **Icons are exported with their colour baked in**, so none of them follows a theme | Each glyph's light hex was matched to the variable it is bound to, read off all 4,637 vector paints on the page: each hex binds one variable, or two whose dark values agree (icon/brand and icon/selected). `gen-icons` writes a dark copy per glyph (47); white in a mask or clip-path is geometry and stays. `trash-01` / `trash-03-danger` export as `#c2261a`, one step off icon/danger/bolder, and take its dark value |
 
 ## Work order
 
@@ -885,6 +889,44 @@ Sampled per frame: the expand's edge 340 → 0 with the title row 356 → 66, th
 fading over 9-12 steps both ways, the item entering and leaving over 13; filmed at
 6x, nothing but the black stage shows above the tray at any frame; under reduced
 motion each lands at once.
+
+### Dark mode — a dev-toolbar switch
+
+At the designer's request ("a dark mode switch in the dev control so I can switch
+whenever"). Everything comes from the library's own Dark mode (#126), nothing is
+picked by eye:
+
+- **Tokens.** `tokens:gen` writes `:root[data-theme='dark']` (56 colours, plus
+  `color-scheme: dark`) from `src/tokens/figma-variables-dark.txt`; `tokens:verify`
+  checks each dark override names a light token.
+- **Icons.** `gen-icons` writes a dark copy of 47 glyphs by their bound variable
+  (#129); `Icon` picks the copy under the dark theme. Nine stay as exported (#127, and
+  the camera's own).
+- **Literals.** `src/theme-dark.css`, scoped to the dark theme so light is untouched:
+  the device screen's fill, the bottom scrim and tab-bar washes, the chip fade, the
+  empty-state rings, and the page behind the device (`#111214`, a presentation
+  backdrop, not a design value). The receipt stays a white paper slip, the camera stays
+  as it is, and shadows and photo scrims are unchanged.
+- **Status bar.** Light over a dark screen — the platform's white, not the dark
+  frames' `#dddddf` text/default: it is device chrome.
+- **The switch.** Dev toolbar → Appearance → Dark mode. It shows On/Off and keeps
+  the panel open (`DevToolbarItem.pressed`), and is remembered per viewer in
+  localStorage; with storage blocked it is simply light.
+
+`walk-dark` 33/33 on the production build. Every dark token resolves to the file's
+value; 24 screens are walked in dark for light-only paint (flat, border, shadow and
+gradient stops, plus any near-white fill that is not itself a dark token), text below
+3:1 on what is really behind it (disabled controls exempt: the design's own disabled
+pair is 1.67:1 in light too), and icons still carrying a light glyph colour: 584
+icon renders, 0 found. A/B: without `theme-dark.css` it reports the scrim, tab bar
+and rings on every screen; with `Icon` ignoring the theme it fails all 24 screens.
+Reload keeps dark; switching back restores light exactly. Every light gate is
+unchanged (`figma:audit` 509 / 0, every diff 0 outside 0.5px).
+
+`walk-quantity`'s exit check counted >4 distinct positions; it failed 2 of 5 runs on
+the commit before this one too. Headless Chrome paints ~25-30fps here and the exit
+curve barely moves for its first half (#37), so the same 300ms exit shows 3-6. A cut
+shows 0-1, so the floor is now 3.
 
 ## Screen 1 — verification record
 

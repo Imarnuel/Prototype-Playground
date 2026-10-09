@@ -1,5 +1,9 @@
 # Icons
 
+`dark/` holds a dark copy of 47 of them, written by `scripts/gen-icons.mjs`: each glyph's
+colour swapped for the dark value of the variable it is bound to in the file. The
+nine left as exported, and why, are listed in that script (BUILD-PLAN #127, #129).
+
 All 59 are present, 56 here and 3 in `shared/src/assets/`. Band `170:8988` (queueing
 and recalling an order) added five, each from its own instance: `layout-alt-02`
 (`88:16257`, 40, the empty Queued orders), `clock` (`88:16298`, 16), `dots-horizontal-24`

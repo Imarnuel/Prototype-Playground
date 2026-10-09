@@ -207,8 +207,11 @@ check('the sheet travels in over several frames', travel(entering) > 4 && enteri
 const gone = leaving.indexOf(null);
 // The shared exit curve is back-loaded (BUILD-PLAN #37), so where its last painted
 // frame lands varies run to run. What must hold is that the sheet stays mounted for
-// the whole exit — SHEET_SPRING.exitDuration, 300ms — and moves while it does.
-check('and travels out, mounted for its whole exit', travel(leaving) > 4 && gone > 0 && leaveTimes[gone] >= 290,
+// the whole exit — SHEET_SPRING.exitDuration, 300ms — and moves while it does. Headless
+// Chrome paints ~25-30fps here and the curve barely moves for its first half, so the
+// same exit shows 3 to 6 distinct positions run to run (5 runs on each of two builds:
+// 3,4,4,4,4,5,5,5,5,6). A cut shows 0 or 1; 3 is the floor that still tells them apart.
+check('and travels out, mounted for its whole exit', travel(leaving) >= 3 && gone > 0 && leaveTimes[gone] >= 290,
   `${travel(leaving)} in-between frames, unmounted at ${Math.round(leaveTimes[gone])}ms`);
 await page.close();
 

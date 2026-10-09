@@ -44,7 +44,8 @@
      is drawn by .device__screenEdge. A rounded clip here that is anything but a
      plain arc makes Chrome drop the mask on every masked backdrop blur inside it. */
   border-radius: calc(var(--device-screen-radius) * 0.7);
-  background: #fff;
+  /* A prototype with a dark theme sets this; the device itself has no opinion. */
+  background: var(--device-screen-fill, #fff);
 
   /* `clip`, not `hidden`. An overflow:hidden box is still programmatically
      scrollable (CLAUDE.md:119), which is how a focus() inside an animating sheet
