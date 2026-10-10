@@ -7,6 +7,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { adjustDark } from './dark-adjust.mjs';
 
 const dir = path.join(import.meta.dirname, '..', 'src', 'tokens');
 const { variables: V, _source } = JSON.parse(fs.readFileSync(path.join(dir, 'figma-variables.json'), 'utf8'));
@@ -210,7 +211,8 @@ const lightDisagrees = [];
 for (const [name, light, dark] of darkRows) {
   if (V[name] === undefined || /^-?[\d.]+$/.test(V[name])) continue;
   if (V[name].toLowerCase() !== light) lightDisagrees.push(`${name}: dump ${V[name]}, Figma ${light}`);
-  darkLines.push(`  --color-${name.slice('Color/'.length).split('/').map(camel).join('-').toLowerCase()}: ${dark};`);
+  // The designer's adjustments on top of the library's value (dark-adjust.mjs).
+  darkLines.push(`  --color-${name.slice('Color/'.length).split('/').map(camel).join('-').toLowerCase()}: ${adjustDark(light, dark)};`);
 }
 if (lightDisagrees.length) throw new Error(`light values disagree:\n${lightDisagrees.join('\n')}`);
 // A primitive (outside Semantic) has one mode and keeps its value in both themes.

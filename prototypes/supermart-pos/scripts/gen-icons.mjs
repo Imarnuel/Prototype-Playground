@@ -4,6 +4,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { adjustDark } from './dark-adjust.mjs';
 
 const dir = path.join(import.meta.dirname, '..', 'src', 'assets', 'icons');
 const names = fs.readdirSync(dir).filter((f) => f.endsWith('.svg')).map((f) => f.replace(/\.svg$/, '')).sort();
@@ -41,7 +42,7 @@ const ICON_VARIABLE = {
 const KEEP = new Set(['search-sm', 'instagram', 'facebook', 'tiktok', 'twitter', 'toast-success',
   'x-close-camera', 'scan-line', 'toast-check-card']);
 const darkOf = Object.fromEntries(fs.readFileSync(path.join(dir, '..', '..', 'tokens', 'figma-variables-dark.txt'), 'utf8')
-  .trim().split('\n').map((l) => l.split('|')).map(([n, , d]) => [n, d]));
+  .trim().split('\n').map((l) => l.split('|')).map(([n, l, d]) => [n, adjustDark(l, d)]));
 const darkDir = path.join(dir, 'dark');
 fs.rmSync(darkDir, { recursive: true, force: true });
 fs.mkdirSync(darkDir);
