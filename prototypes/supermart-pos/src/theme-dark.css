@@ -60,11 +60,11 @@
 }
 
 /* The scan button read too bright in dark (Color/container/success/bold resolves to
-   Color/green/300 #49e491, HSL 148/74/59). At the designer's request its lightness is
-   5 points lower (2, then 3 more), HSL 148/74/54 — a value, not a token: the file
-   imports no green between 300 and 400. The camera's circle opens from the same green,
-   so it matches. */
+   Color/green/300 #49e491, HSL 148/74/59). At the designer's request it steps down to
+   the library's next green, Color/green/400 #2acb7a (HSL 150/66/48), after 2- and
+   3-point lightness cuts still read light. The camera's circle opens from the same
+   green, so it matches. */
 :root[data-theme='dark'] .scanButton,
 :root[data-theme='dark'] .sheet[data-entry='button'][data-open='off'] .scanStage {
-  background-color: #33e184;
+  background-color: #2acb7a;
 }
