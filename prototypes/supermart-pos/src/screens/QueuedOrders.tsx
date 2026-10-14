@@ -7,6 +7,7 @@ import { Icon } from '../components/Icon';
 import { ListMessage } from '../components/ListMessage';
 import { formatPrice } from '../data/catalogue';
 import { usePresented } from '../hooks/usePresented';
+import { useDismiss } from '../hooks/useDismiss';
 import { formatQueuedAt, queuedItemNames, queuedTotal, type QueuedOrder } from '../state/queue';
 import type { ToastAction, ToastTone } from '../components/Toast';
 import './QueuedOrders.css';
@@ -230,25 +231,7 @@ function RowMenu({ open, anchor, onClose, onDelete }: {
     if (open && mounted) menu.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus({ preventScroll: true });
   }, [open, mounted]);
 
-  useEffect(() => {
-    if (!open) return undefined;
-    const outside = (e: PointerEvent) => {
-      const t = e.target as Node;
-      if (!menu.current?.contains(t) && !anchor.current?.contains(t)) onClose();
-    };
-    const key = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
-      e.stopPropagation();
-      onClose();
-      anchor.current?.focus({ preventScroll: true });
-    };
-    document.addEventListener('pointerdown', outside, true);
-    document.addEventListener('keydown', key, true);
-    return () => {
-      document.removeEventListener('pointerdown', outside, true);
-      document.removeEventListener('keydown', key, true);
-    };
-  }, [open, anchor, onClose]);
+  useDismiss(open, menu, anchor, onClose);
 
   if (!mounted) return null;
   return (

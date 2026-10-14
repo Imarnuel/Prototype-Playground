@@ -175,6 +175,12 @@ await build({
   bundle: true, format: 'esm', platform: 'node', outfile: scanFile, logLevel: 'error',
 });
 const scan = await import(pathToFileURL(scanFile).href);
+const ledgerFile = path.join(outdir, 'ledger.mjs');
+await build({
+  entryPoints: [path.join(root, 'src/state/ledger.ts')],
+  bundle: true, format: 'esm', platform: 'node', outfile: ledgerFile, logLevel: 'error',
+});
+const ledger = await import(pathToFileURL(ledgerFile).href);
 fs.rmSync(outdir, { recursive: true, force: true });
 /* The encoder is checked against properties of the symbology, not against its own
    tables: every digit is 7 modules in exactly 2 bars and 2 spaces; left-hand L digits
@@ -221,6 +227,55 @@ check('every barcode in the scan sequence is its product\'s own',
   scan.SCAN_SEQUENCE.filter((t) => t.kind === 'barcode').every((t) => byId(t.productId).barcode === t.code));
 check('the scan sequence reaches every product', new Set(scan.SCAN_SEQUENCE.map((t) => t.productId).filter(Boolean)).size === PRODUCTS.length);
 check('a tag from a brand the store does not sell matches nothing', scan.matchText(scan.UNKNOWN_TAG.lines).matches.length === 0);
+
+// --- The Dashboard's books (197:20741) ----------------------------------------------
+{
+  const near = (a, b) => Math.abs(a - b) < 1e-6;
+  const all = ledger.PERIODS.map((p) => ledger.summarise(p.id));
+  for (const d of all) {
+    const tag = `[${d.period}]`;
+    check(`${tag} the payment split adds up to Sales`, d.byTender.reduce((a, t) => a + t.amountMinor, 0) === d.salesMinor,
+      `${d.byTender.map((t) => t.amountMinor).join('+')} vs ${d.salesMinor}`);
+    check(`${tag} Top Locations add up to Sales (five branches, all listed)`, d.locations.reduce((a, l) => a + l.salesMinor, 0) === d.salesMinor);
+    check(`${tag} ...ranked by sales`, d.locations.every((l, i, a) => i === 0 || a[i - 1].salesMinor >= l.salesMinor));
+    check(`${tag} P&L profit is the Profit tile, revenue less expense`, d.pnl.profitMinor === d.profitMinor && d.pnl.revenueMinor - d.pnl.expenseMinor === d.profitMinor);
+    check(`${tag} P&L's expense is cost of goods plus expenses`, d.pnl.expenseMinor === d.cogsMinor + d.expensesMinor);
+    check(`${tag} the two shares make 100%`, near(d.pnl.revenuePct + d.pnl.expensePct, 100) && near(d.debtorsPct + d.creditorsPct, 100));
+    check(`${tag} each balance is received less spent; the current balance is both`,
+      d.cash.balanceMinor === d.cash.receivedMinor - d.cash.spentMinor && d.bank.balanceMinor === d.bank.receivedMinor - d.bank.spentMinor
+      && d.currentBalanceMinor === d.cash.balanceMinor + d.bank.balanceMinor);
+    check(`${tag} Cash Flow receives exactly the Cash, POS and Bank sales`,
+      d.cash.receivedMinor + d.bank.receivedMinor === d.byTender.filter((t) => ['cash', 'pos', 'bank'].includes(t.id)).reduce((a, t) => a + t.amountMinor, 0));
+    check(`${tag} the margin is profit over sales`, d.marginPct !== null && near(d.marginPct, (d.profitMinor / d.salesMinor) * 100));
+  }
+  const [today, week, month] = all;
+  check('today has sales, and sits inside both the week and the month', today.salesMinor > 0 && today.salesMinor <= week.salesMinor && today.salesMinor <= month.salesMinor);
+  check('the inventory is the shelf at cost and at price; mark-up and margin from those',
+    today.inventory.stockMinor === PRODUCTS.reduce((a, p) => a + p.stock * p.costMinor, 0)
+    && today.inventory.retailMinor === PRODUCTS.reduce((a, p) => a + p.stock * p.priceMinor, 0)
+    && near(today.inventory.markupPct, ((today.inventory.retailMinor - today.inventory.stockMinor) / today.inventory.stockMinor) * 100));
+  check('every product costs the store less than it sells for', PRODUCTS.every((p) => p.costMinor > 0 && p.costMinor < p.priceMinor));
+  // A branch can be down on the stretch before; the frame only draws a gain (#131).
+  const { prevFrom, prevTo } = ledger.periodRange('month', month.at);
+  check('each branch\'s change is against the same stretch of the month before',
+    month.locations.every((l) => l.changePct !== null) && prevTo.getTime() - prevFrom.getTime() === month.at.getTime() - ledger.periodRange('month', month.at).from.getTime(),
+    month.locations.map((l) => `${l.branch.id} ${l.changePct?.toFixed(1)}`).join(', '));
+  // Proved by consequence: a sale paid at this till moves today's figures by its total.
+  const line = [{ productId: 'tops-oxford', unitId: 'each', count: 2 }];
+  ledger.recordSale({ at: new Date(), tender: 'cash', lines: line });
+  const after = ledger.summarise('today');
+  const paid = totals(line).total;
+  check('a sale paid in cash raises today\'s Sales, Cash and Cash received by its total',
+    after.salesMinor - today.salesMinor === paid && after.byTender[0].amountMinor - today.byTender[0].amountMinor === paid
+    && after.cash.receivedMinor - today.cash.receivedMinor === paid, `+${after.salesMinor - today.salesMinor} vs ${paid}`);
+  check('...and puts it on this till\'s branch', after.locations.find((l) => l.branch.id === 'bodija').salesMinor - today.locations.find((l) => l.branch.id === 'bodija').salesMinor === paid);
+  check('the frame\'s formats: "₦7,477,500,000.00", "₦453,560", "+23.50%", "-500%"',
+    ledger.formatNaira(747750000000, 2) === '₦7,477,500,000.00' && ledger.formatNaira(45356000) === '₦453,560'
+    && ledger.formatPct(23.5, { sign: true }) === '+23.50%' && ledger.formatPct(-500, { digits: 0 }) === '-500%');
+  check('the frame\'s date, "7th May, 2025", and 1st / 2nd / 3rd / 11th / 22nd',
+    ledger.formatLongDate(new Date(2025, 4, 7)) === '7th May, 2025' && ['1st', '2nd', '3rd', '11th', '22nd'].every((x, i) =>
+      ledger.formatLongDate(new Date(2025, 4, [1, 2, 3, 11, 22][i])).startsWith(x + ' ')));
+}
 
 console.log(`\n${fails} failing`);
 process.exit(fails ? 1 : 0);

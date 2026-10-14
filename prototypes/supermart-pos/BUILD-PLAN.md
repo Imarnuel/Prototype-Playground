@@ -348,6 +348,7 @@ Surfaced, not silently normalised (root agreement §3). None of these are fixed.
 | 128 | **The two dark frames disagree with each other** — the empty state's copy is Color/text/default in `88:16216` and Color/text/subtle in `88:16380`, and the Cart behind `88:16380`'s sheet still draws the LIGHT rings `#f2f2f3` / `#dfe0e2` / `#b8b9bd` | Followed the app's light build (text/default, as `88:16216`) and `88:16216`'s rings `#37383c` / `#5e616c` / `#a9acb3` |
 | 129 | **Icons are exported with their colour baked in**, so none of them follows a theme | Each glyph's light hex was matched to the variable it is bound to, read off all 4,637 vector paints on the page: each hex binds one variable, or two whose dark values agree (icon/brand and icon/selected). `gen-icons` writes a dark copy per glyph (47); white in a mask or clip-path is geometry and stays. `trash-01` / `trash-03-danger` export as `#c2261a`, one step off icon/danger/bolder, and take its dark value |
 | 130 | **"Which product?" reads "Northline" but lists names that do not carry it** — the rows show the product name alone, and the frame's scan is a tag that prints the whole name (`88:19858`), which already names one product; "Best match" then marks the product the tag named. The sheet only means something when the read fits more than one product | The designer's call: the scan that asks is a **woven neck label reading only the brand** (the sequence's second item, and "Scanner: scan a brand label"), and the rows show **brand and name**, so each visibly carries the read. A read that carries a product's whole name now adds it at once ("Scanner: scan a name tag"). With a brand alone nothing ranks, so the sheet shows no Best match; the badge stays for a partial read |
+| 131 | **The Dashboard (`197:20741`) is a mock-up of figures, not a reading of books.** (a) Its figures don't reconcile: Today ₦24,000 against a payment split of ₦496,100; P&L's profit above its revenue. (b) It belongs to another business ("Emmanuel Stores", "ES"), and Top Locations repeats one placeholder ("Joy Enterprise" ×3, same address and amount). (c) Card radii differ (16 / 12 / 8 / 8); Top Locations and Cash Flow have no stroke or shadow where the others do; section titles mix Label/Large and Heading/H3. (d) The split bar is 318 inside a 325 track, and its segments aren't proportional to the amounts. (e) Markers are square in one key, round in another; "Creditors" has no colon where "Debtors:" does. (f) Cash Flow's foot is 325 against 326, its inner rule 300 against 302. (g) The bell is bound to icon/inverse. (h) The tab bar sits at bottom 0, the Sales Point's at 3. (i) An empty "Locations list container", MTD labels at opacity 0, hidden layers (`197:20860`, `197:21091`, `197:20985`). (j) Not designed: a location that fell (only the up arrow is drawn), what the Filter opens, Notifications, the More tab. (k) The inventory pill draws −500% in red beside a 1000% mark-up | **Every figure is derived from one ledger** (`src/state/ledger.ts`), seeded from sales and fed by every sale paid at Checkout, so all sections agree (`cart:verify`, `walk-dashboard`). (a) computed, not copied. (b) Freshvale / "FS"; five invented branches, this till's being Bodija at `STORE.address`. (c)-(f) kept as drawn and commented where they sit. (g) the bell takes the surface token, which holds the same white and stays legible in dark. (h) the Sales Point's 3, so the bar doesn't move between tabs. (i) not built. (j) a fall shows its signed % with no arrow; the Filter opens the file's own Dropdown (`88:16379`, the Queued orders row menu's classes) with Today / This week / This month; the bell and More say they aren't designed. (k) the pill's colour follows the sign. **Interpreted:** cost prices are invented (`costMinor`); the date is today's and "Today:" follows the period; debtors and creditors are a point in time, not a period; Comp. and Loyalty count as sales, and VAT comes off before profit |
 
 ## Work order
 
@@ -939,6 +940,44 @@ and with `pointer-events: none`, so taps reach what is under it. Measured on six
 screens and both themes: [124.5, 839, 144, 5] — true centre; Figma snaps the pill to
 x 125 because 393 - 144 is odd — round, black in light, white in dark (the file never
 draws it over dark; white is the platform's). Topmost at its centre on every screen.
+
+### Band `197:20741` — the Dashboard
+
+At the designer's request ("add to the prototype this dashboard … make it look 100%
+like it"). One 393 x 2569 frame: header, Filter and date, four tiles, Sales Analysis,
+Inventory, Profit & Loss, Top Locations, Cash Flow, Debtors/Creditors, and the tab bar
+(`197:21098`) with Dashboard selected.
+
+- **Tokens and icons.** `get_variable_defs` for the frame is kept verbatim in
+  `src/tokens/figma-variables-dashboard.json`; `tokens:gen` merges it with the main
+  dump and stops on a clash. 15 new names (two shadows, Display/D2, H/7, Body/Small,
+  accent colours), 65 colours, 64 with a dark value. 19 icons exported from the frame,
+  each checked against Figma by checksum, with dark copies by their bound variable
+  (`MANIFEST.md`); the profit and trend glyphs bind icon/accent/green where every
+  other `#038c4e` is icon/success, so they take that variable's dark value.
+- **One set of books.** `src/state/ledger.ts` seeds 60 days of sales over five
+  branches (seeded random, so every load is the same) and takes every sale paid at
+  Checkout (`submitPayment` → `recordSale`). `fetchDashboard(period)` goes through
+  the mock API like every other read, so it has latency, loading and failure. Nothing
+  on the screen is typed in: see #131.
+- **Navigation.** The tab bar now goes somewhere: Dashboard cross-fades over the Sales
+  Point (fast / ease-out in, ease-in out) and back, and the Sales Point keeps its cart
+  underneath. More is not designed and says so.
+- **Reused:** the tab bar (one `TabBar` with a `data-tab` variant for the frame's
+  16/16/24 padding and −4 overlap), `ListMessage` for the failed load, the Queued
+  orders row menu's Dropdown classes for the period menu (its dismissal moved into a
+  shared `useDismiss` hook that both now use), the toast, the tile ring recipe, the
+  skeleton. **New:** `Dashboard.tsx/.css`, `ledger.ts`, `useDismiss.ts`.
+- **Toolbar** group "Dashboard": the screen, this week, this month, the period menu,
+  loading, load fails, no sales yet today.
+
+**Verified on the production build:** `diff-dashboard` 556 boxes against the node
+coordinates, 0 outside 0.5px (where a text's width decides a box, the rule it follows
+is asserted rather than Figma's rounded width); `figma:audit` now 788 properties,
+279 of them the Dashboard's, 0 differ; `walk-dashboard` 26/26, including a cash sale
+at Checkout raising Sales, Cash, Cash received and Bodija by exactly its receipt
+total; `walk-dark` now 40/40 with five Dashboard screens; `cart:verify` adds the
+Dashboard's sums for each period. Every earlier gate is unchanged.
 
 ## Screen 1 — verification record
 

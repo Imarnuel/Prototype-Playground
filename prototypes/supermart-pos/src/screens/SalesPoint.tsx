@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { ProductCard } from '../components/ProductCard';
-import { FilterBar, SearchBar, TabBar, ViewCartButton } from '../components/SalesPointChrome';
+import { FilterBar, SearchBar, TabBar, ViewCartButton, type Tab } from '../components/SalesPointChrome';
 import { BottomScrim } from '../components/BottomScrim';
 import { fetchProducts, type ProductFilter } from '../api/pos';
 import { CATEGORY_ORDER, fullName, type Product } from '../data/catalogue';
@@ -34,9 +34,10 @@ type SalesPointProps = {
   onViewCart: () => void;
   /** The green scan button, `88:19369`: opens the scanner. */
   onScan: () => void;
+  onNavigate: (tab: Tab) => void;
 };
 
-export function SalesPoint({ forceState, cartCount, freshSale = 0, onAddProduct, onViewCart, onScan }: SalesPointProps) {
+export function SalesPoint({ forceState, cartCount, freshSale = 0, onAddProduct, onViewCart, onScan, onNavigate }: SalesPointProps) {
   const [filter, setFilter] = useState<ProductFilter>('All');
   const [query, setQuery] = useState('');
   const [load, setLoad] = useState<Load>({ status: 'loading' });
@@ -113,7 +114,7 @@ export function SalesPoint({ forceState, cartCount, freshSale = 0, onAddProduct,
       <BottomScrim height={272} />
       <ScanButton className="salesPoint__scan" onPress={onScan} />
       <ViewCartButton count={cartCount} onPress={onViewCart} />
-      <TabBar onNavigate={() => {}} />
+      <TabBar active="salesPoint" onNavigate={onNavigate} />
     </div>
   );
 }

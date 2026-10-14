@@ -15,6 +15,9 @@ import { Checkout, type CheckoutDraft } from './screens/Checkout';
 import { SelectBank, SelectPaymentMethod } from './screens/PaymentPickers';
 import { Receipt, TransactionSuccess } from './screens/SaleComplete';
 import { Scanner } from './screens/Scanner';
+import { Dashboard } from './screens/Dashboard';
+import type { Tab } from './components/SalesPointChrome';
+import { setBooksForDemo, type Period } from './state/ledger';
 import { ScanMatches } from './screens/ScanMatches';
 import { METHODS, methodLabel, paysIntoAccount, type AccountMethod } from './data/payments';
 import { lookupBarcode, matchScannedText, queueOrder, setQueueForDemo, submitPayment } from './api/pos';
@@ -53,6 +56,14 @@ export function App() {
   const [toast, setToast] = useState<{ open: boolean; message: string; tone: ToastTone; variant?: ToastVariant; shown: number; action?: ToastAction }>(
     { open: false, message: '', tone: 'success', shown: 0 },
   );
+  /* The tab bar's two screens. The Sales Point stays mounted underneath, so its scroll,
+     filter and cart survive a visit to the Dashboard; the Dashboard mounts fresh each
+     visit, so it reads the books as they are now — a sale just made included. */
+  const [tab, setTab] = useState<'salesPoint' | 'dashboard'>('salesPoint');
+  const [dashPreset, setDashPreset] = useState<{ period?: Period; forceState?: 'loading' | 'error'; menuOpen?: boolean }>({});
+  const [dashNonce, setDashNonce] = useState(0);
+  const dashboard = usePresented(tab === 'dashboard');
+  const openDashboard = (preset: typeof dashPreset = {}) => { setDashPreset(preset); setDashNonce((n) => n + 1); setTab('dashboard'); };
   const showToast = (message: string, tone: ToastTone = 'success', action?: ToastAction, variant?: ToastVariant) =>
     setToast((t) => ({ open: true, message, tone, variant, shown: t.shown + 1, action }));
   const hideToast = useCallback(() => setToast((t) => ({ ...t, open: false })), []);
@@ -363,6 +374,7 @@ export function App() {
     .reduce<readonly CartLine[]>((acc, p) => addToCart(acc, p), []);
 
   const resetScreens = () => {
+    setTab('salesPoint'); setBooksForDemo('seeded');
     setForced(undefined); setCartOpen(false); setPickerOpen(false);
     setCustomer(null); setCustomers(CUSTOMERS); hideToast(); setTotalOpen(false); setQtyOpen(false); setDetailsOpen(false);
     setMenuOpen(false); setDiscountOpen(false); setOrderDiscount(undefined);
@@ -372,10 +384,24 @@ export function App() {
     setResetNonce((n) => n + 1);
   };
 
+  const navigate = (t: Tab) => {
+    if (t === 'more') { showToast('More isn’t designed yet', 'notice'); return; }
+    if (t === 'dashboard' && tab !== 'dashboard') { openDashboard(); return; }
+    setTab(t);
+  };
+
   const entries: DevToolbarItem[] = [
     { label: 'Dark mode', group: 'Appearance', pressed: theme === 'dark', onSelect: () => setTheme(theme === 'dark' ? 'light' : 'dark') },
     { label: 'Sales point', group: 'Screens', onSelect: resetScreens },
     { label: 'Cart (Order Preview)', group: 'Screens', onSelect: () => setCartOpen(true) },
+    /* Dashboard, `197:20741`. */
+    { label: 'Dashboard', group: 'Dashboard', onSelect: () => { resetScreens(); openDashboard(); } },
+    { label: 'Dashboard: this week', group: 'Dashboard', onSelect: () => { resetScreens(); openDashboard({ period: 'week' }); } },
+    { label: 'Dashboard: this month', group: 'Dashboard', onSelect: () => { resetScreens(); openDashboard({ period: 'month' }); } },
+    { label: 'Dashboard: period menu', group: 'Dashboard', onSelect: () => { resetScreens(); openDashboard({ menuOpen: true }); } },
+    { label: 'Dashboard: loading', group: 'Dashboard', onSelect: () => { resetScreens(); openDashboard({ forceState: 'loading' }); } },
+    { label: 'Dashboard: load fails', group: 'Dashboard', onSelect: () => { resetScreens(); openDashboard({ forceState: 'error' }); } },
+    { label: 'Dashboard: no sales yet today', group: 'Dashboard', onSelect: () => { resetScreens(); setBooksForDemo('quiet-today'); openDashboard(); } },
     { label: 'Loading (skeleton)', group: 'States', onSelect: () => { setCartOpen(false); setForced('loading'); } },
     { label: 'Empty', group: 'States', onSelect: () => { setCartOpen(false); setForced('empty'); } },
     { label: 'Error', group: 'States', onSelect: () => { setCartOpen(false); setForced('error'); } },
@@ -620,6 +646,7 @@ export function App() {
             empties the cart rather than re-rendering the line that threw. */}
         <ErrorBoundary onReset={() => { setLines([]); resetScreens(); }}>
           <SalesPoint
+            onNavigate={navigate}
             key={resetNonce}
             forceState={forced}
             cartCount={lines.length}
@@ -628,6 +655,15 @@ export function App() {
             onViewCart={() => setCartOpen(true)}
             onScan={() => openScanner('salesPoint')}
           />
+
+          {/* The tab switch cross-fades on `fast`: tabs are peers, so nothing slides. */}
+          {dashboard.mounted && (
+            <div className="tabScreen" data-open={dashboard.entered ? 'on' : 'off'}>
+              <Dashboard key={dashNonce} initialPeriod={dashPreset.period} forceState={dashPreset.forceState}
+                menuOpen={dashPreset.menuOpen} onNavigate={navigate}
+                onNotDesigned={(message) => showToast(message, 'notice')} />
+            </div>
+          )}
 
           {cartMounted && (
             <div

@@ -7,7 +7,10 @@ import path from 'node:path';
 import { color, spacing, radius, borderWidth, shadow, type, legacyColor, lineHeightCss } from '../src/tokens/tokens.ts';
 
 const dir = path.join(import.meta.dirname, '..', 'src', 'tokens');
-const { variables: V } = JSON.parse(fs.readFileSync(path.join(dir, 'figma-variables.json'), 'utf8'));
+const V = {
+  ...JSON.parse(fs.readFileSync(path.join(dir, 'figma-variables.json'), 'utf8')).variables,
+  ...JSON.parse(fs.readFileSync(path.join(dir, 'figma-variables-dashboard.json'), 'utf8')).variables,
+};
 const css = fs.readFileSync(path.join(dir, 'tokens.css'), 'utf8');
 const tsSrc = fs.readFileSync(path.join(dir, 'tokens.ts'), 'utf8');
 
@@ -40,7 +43,7 @@ for (const [label, obj, prefix] of numericGroups) {
   const bad = expect.filter(([k, v]) => !Object.values(obj).includes(Number(v)));
   check(`${label} values all present`, bad.length === 0, bad.map(([k]) => k).join(', '));
 }
-check('shadow count matches the dump', Object.keys(shadow).length === Object.keys(V).filter((k) => k.startsWith('Shadow/')).length);
+check('shadow count matches the dump', Object.keys(shadow).length === Object.values(V).filter((v) => typeof v === 'string' && v.startsWith('Effect(')).length);
 
 // --- Type styles fully resolved ---
 const styleCount = Object.values(V).filter((v) => typeof v === 'string' && v.startsWith('Font(')).length;
@@ -57,7 +60,8 @@ check('no type style kept a variable path as its font family', refFamily.length 
 // --- The line-height unit split, asserted rather than assumed ---
 const ratio = Object.entries(type).filter(([, s]) => s.lineHeight < 4);
 const px = Object.entries(type).filter(([, s]) => s.lineHeight >= 4);
-check('exactly one style holds a unitless line-height ratio', ratio.length === 1,
+// H/6 (1.4) and the Dashboard's H/7 (Figma's `lineHeight: 1`, drawn as 100%).
+check('only H/6 and H/7 hold a unitless line-height ratio', ratio.map(([k]) => k).sort().join() === 'H/6,H/7',
   `${ratio.map(([k, s]) => `${k}=${s.lineHeight}`).join(', ')} vs ${px.length} in px`);
 check('the ratio style emits unitless CSS', !lineHeightCss(type[ratio[0][0]]).includes('px'),
   `${ratio[0][0]} -> ${lineHeightCss(type[ratio[0][0]])}`);
@@ -79,7 +83,7 @@ check('every dark override names a light colour token',
   darkVars.length > 0 && darkVars.every((v) => v.startsWith('--color-') && cssVars.includes(v)),
   darkVars.filter((v) => !cssVars.includes(v)).join(', ') || `${darkVars.length} of ${cssVars.filter((v) => v.startsWith('--color-')).length}`);
 check('every semantic colour has a CSS property',
-  flatten(color).every(([p]) => cssVars.includes(`--color-${p.replace(/\./g, '-').toLowerCase()}`)),
+  flatten(color).every(([p]) => cssVars.includes(`--color-${p.replace(/\._$/, '').replace(/\./g, '-').toLowerCase()}`)),
   `${flatten(color).length} colours`);
 
 // --- Upstream collisions, reported as data ---

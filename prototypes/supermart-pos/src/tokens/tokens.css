@@ -14,6 +14,7 @@
   --color-text-accent-purple: #5120ca;
   --color-text-accent-pink: #b3146c;
   --color-text-accent-indigo: #3133c4;
+  --color-text-accent-rose: #b30f43;
   --color-icon-default: #20293c;
   --color-icon-subtle: #5e6a82;
   --color-icon-subtlest: #9ea4b3;
@@ -23,9 +24,11 @@
   --color-icon-success: #038c4e;
   --color-icon-disabled: #cfd3d8;
   --color-icon-danger-bolder: #c1261a;
+  --color-icon-danger: #ef362a;
   --color-icon-accent-aqua: #0c8dbd;
   --color-icon-accent-pink: #d42189;
   --color-icon-accent-green: #038c4e;
+  --color-icon-accent-orange: #fb5b04;
   --color-border-default: #252b3724;
   --color-border-subtle: #252b3714;
   --color-border-selected: #2c4a8b;
@@ -50,9 +53,14 @@
   --color-container-success-default: #dffceb;
   --color-container-success-bold-default: #038c4e;
   --color-container-accent-aqua-default: #e2f5fd;
+  --color-container-accent-aqua-bold-default: #1aaedd;
   --color-container-accent-pink-default: #fce9f7;
+  --color-container-accent-pink-bold-default: #d42189;
   --color-container-accent-purple-default: #ecebff;
   --color-container-accent-indigo-default: #e0ebff;
+  --color-container-accent-green-default: #dffceb;
+  --color-container-accent-red-default: #fde9e7;
+  --color-container-accent-rose-default: #ffebee;
   --color-container-inverse-default: #ffffff;
   --color-container-disabled: #0c0e1805;
   --color-container-blanket: #0c0e1880;
@@ -84,6 +92,21 @@
   --shadow-xs: 0px 1px 2px 0px #0a0d120d;
   --shadow-lg: 0px 4px 6px 0px #0a0d1208, 0px 12px 16px -2px #0a0d1214, 0px 0px 1px 0.5px #00000008;
   --shadow-xl: 0px 8px 8px -2px #0a0d1208, 0px 20px 24px -2px #0a0d1214;
+  --shadow-button: 0px 1px 2px 0px #111a2c0d;
+  --shadow-dashboard: 0px 6px 5px 0px #18294f03;
+  --legacy-brand-600: #2c4a8b;
+  --legacy-brand-colour-100: #f0f3fa;
+  --legacy-green-600: #0a9645;
+  --legacy-neutral-200: #bbbbc4;
+  --legacy-neutral-400: #5a5c63;
+  --legacy-neutral-500: #353645;
+  --legacy-omnix-neutral-400: #60676e;
+  --legacy-primary-white: #ffffff;
+  --legacy-white: #ffffff;
+  --legacy-grays-black: #000000;
+  --legacy-labels-primary: #000000;
+  --legacy-orange-600: #ff6b35;
+  --legacy-yellow-600: #ffc600;
   --type-Display-D1-size: 32px;
   --type-Display-D1-line-height: 40px;
   --type-Display-D1-letter-spacing: -0.9599999785423279px;
@@ -168,6 +191,18 @@
   --type-Label-large-line-height: 24px;
   --type-Label-large-letter-spacing: -0.20000000298023224px;
   --type-Label-large-weight: 500;
+  --type-Body-Small-size: 12px;
+  --type-Body-Small-line-height: 16px;
+  --type-Body-Small-letter-spacing: -0.20000000298023224px;
+  --type-Body-Small-weight: 400;
+  --type-Display-D2-size: 28px;
+  --type-Display-D2-line-height: 36px;
+  --type-Display-D2-letter-spacing: -0.9599999785423279px;
+  --type-Display-D2-weight: 600;
+  --type-H-7-size: 16px;
+  --type-H-7-line-height: 1;
+  --type-H-7-letter-spacing: -0.16px;
+  --type-H-7-weight: 600;
 }
 
 :root[data-theme='dark'] {
@@ -178,10 +213,15 @@
   --color-border-overlay: #f5f5f508;
   --color-border-selected: #7993ce;
   --color-border-subtle: #f5f5f514;
+  --color-container-accent-aqua-bold-default: #42c4ee;
   --color-container-accent-aqua-default: #0b3246;
+  --color-container-accent-green-default: #1c3f31;
   --color-container-accent-indigo-default: #252741;
+  --color-container-accent-pink-bold-default: #f99adb;
   --color-container-accent-pink-default: #451c32;
   --color-container-accent-purple-default: #2e2546;
+  --color-container-accent-red-default: #41241f;
+  --color-container-accent-rose-default: #441d2b;
   --color-container-blanket: #0e0f16cc;
   --color-container-brand-bold-default: #7993ce;
   --color-container-brand-default: #242e42;
@@ -200,9 +240,11 @@
   --color-container-success-default: #1c3f31;
   --color-icon-accent-aqua: #42c4ee;
   --color-icon-accent-green: #49e491;
+  --color-icon-accent-orange: #fd7c2b;
   --color-icon-accent-pink: #f561c1;
   --color-icon-brand: #5275c2;
   --color-icon-danger-bolder: #fc786e;
+  --color-icon-danger: #f85a4e;
   --color-icon-default: #cfd0d3;
   --color-icon-disabled: #55585e;
   --color-icon-inverse: #000000;
@@ -218,6 +260,7 @@
   --color-text-accent-indigo: #b9cdfe;
   --color-text-accent-pink: #fbc1e9;
   --color-text-accent-purple: #ccc8fe;
+  --color-text-accent-rose: #febeca;
   --color-text-brand: #7993ce;
   --color-text-danger: #fc786e;
   --color-text-default: #dddddf;

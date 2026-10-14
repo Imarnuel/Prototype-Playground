@@ -1,0 +1,765 @@
+/* Dashboard — `197:20741`. Every value is read off its node (BUILD-PLAN, band
+   `197:20741`); radii go through the study's corner scale like every other surface. */
+.dash {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-surface-secondary-default);
+  padding-top: var(--safe-top);
+  box-sizing: border-box;
+}
+
+/* --- Header `197:21099`: 56 tall, 8/16 padded, fixed while the rest scrolls --------- */
+.dash__header {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: var(--spacing-200) var(--spacing-400);
+  box-sizing: border-box;
+  background: var(--color-surface-secondary-default);
+}
+
+/* `197:21100`: 36 square, Color/container/accent/rose, Heading/H4 in Color/text/accent/rose. */
+.dash__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: var(--spacing-100);
+  box-sizing: border-box;
+  border-radius: var(--radius-100);
+  background: var(--color-container-accent-rose-default);
+  font-size: var(--type-Heading-H4-size);
+  font-weight: var(--type-Heading-H4-weight);
+  line-height: var(--type-Heading-H4-line-height);
+  letter-spacing: var(--type-Heading-H4-letter-spacing);
+  color: var(--color-text-accent-rose);
+}
+
+/* `197:21105`: centred 8 left of the middle, as the frame places it. */
+.dash__store {
+  position: absolute;
+  left: calc(50% - 8px);
+  top: calc(50% - 12px);
+  margin: 0;
+  transform: translateX(-50%);
+  font-size: var(--type-Heading-H3-size);
+  font-weight: var(--type-Heading-H3-weight);
+  line-height: var(--type-Heading-H3-line-height);
+  letter-spacing: var(--type-Heading-H3-letter-spacing);
+  color: var(--color-text-default);
+  white-space: nowrap;
+}
+
+/* `197:21103`: 40 round, 8 padded. The frame fills it with Color/icon/inverse — an icon
+   token as a surface, black in dark mode; the surface token holds the same white, as
+   the Sales Point's ••• button does. A 0.5 white stroke fading down, at 40%. */
+.dash__bell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: var(--spacing-200);
+  border: 0;
+  border-radius: 100px;
+  background: var(--color-surface-default);
+  cursor: pointer;
+}
+
+/* The white highlight stroke the tiles, the Filter and the bell carry over their solid
+   one: a gradient from the top edge to nothing at the bottom (the paint's transform
+   maps it down the box), drawn as a ring like the input ring (index.css). */
+.dash__bell::after,
+.dash__filter::after,
+.dash__tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: var(--border-width-sm);
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(255 255 255 / 8%) 0%, rgb(255 255 255 / 0%) 100%);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+}
+.dash__bell::after {
+  padding: 0.5px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 40%) 0%, rgb(255 255 255 / 0%) 100%);
+}
+
+/* --- Scroll: `Main container` 197:20742, 8/16 padded, 16 between blocks; 103 below it
+   to the frame's end, so the last card clears the tab bar. ---------------------------- */
+.dash__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--spacing-200) var(--spacing-400) calc(var(--spacing-200) + 103px);
+  scrollbar-width: none;
+}
+.dash__scroll::-webkit-scrollbar { display: none; }
+
+.dash__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-400);
+}
+
+/* --- Filter row `197:20743` -------------------------------------------------------- */
+.dash__filterRow {
+  display: flex;
+  height: 36px;
+  align-items: center;
+  justify-content: space-between;
+}
+.dash__filterWrap { position: relative; }
+
+/* `197:20744`, the Filter: 36 tall, 12 padded, 8 between label and chevron, Border
+   radius/300, Color/border/input under the highlight ring, Button shadow. */
+.dash__filter {
+  position: relative;
+  display: flex;
+  gap: var(--spacing-200);
+  align-items: center;
+  height: 36px;
+  padding: 0 var(--spacing-300);
+  border: 0;
+  border-radius: var(--radius-300);
+  background: var(--color-container-neutral-transparent-default);
+  box-shadow: inset 0 0 0 var(--border-width-sm) var(--color-border-input), var(--shadow-button);
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.dash__date {
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  color: var(--color-text-default);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* The period menu: Queued orders' Dropdown, opening below the Filter at its left. */
+.dash__periodMenu {
+  top: 40px;
+  left: 0;
+  right: auto;
+  width: 196px;
+  transform-origin: top left;
+}
+.dash__periodMenu .rowMenu__item { justify-content: space-between; }
+.dash__periodLabel { color: var(--color-text-default); }
+
+/* --- Summary tiles `197:20746`: two rows of two, 12 apart ------------------------- */
+.dash__tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-300);
+}
+
+/* `197:20748`: 96 tall, 20/16 padded, Border radius/400, Color/border/subtle under the
+   highlight ring, Dashboard Shadow. */
+.dash__tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 20px var(--spacing-400);
+  border-radius: var(--radius-400);
+  background: var(--color-surface-default);
+  box-shadow: inset 0 0 0 var(--border-width-sm) var(--color-border-subtle), var(--shadow-dashboard);
+}
+.dash__tileDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-300);
+  align-items: flex-start;
+}
+.dash__tileLabel {
+  display: flex;
+  gap: var(--spacing-100);
+  align-items: center;
+  font-size: var(--type-Label-base-size);
+  font-weight: var(--type-Label-base-weight);
+  line-height: var(--type-Label-base-line-height);
+  letter-spacing: var(--type-Label-base-letter-spacing);
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+}
+.dash__tileValue {
+  font-size: var(--type-Heading-H2-size);
+  font-weight: var(--type-Heading-H2-weight);
+  line-height: var(--type-Heading-H2-line-height);
+  letter-spacing: var(--type-Heading-H2-letter-spacing);
+  color: var(--color-text-default);
+  white-space: nowrap;
+}
+
+/* --- Sections: a title, 8 above its card ------------------------------------------ */
+.dash__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-200);
+}
+.dash__title {
+  margin: 0;
+  color: var(--color-text-default);
+  white-space: nowrap;
+}
+.dash__title[data-style='label'] {
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  letter-spacing: var(--type-Label-Large-letter-spacing);
+}
+.dash__title[data-style='h3'] {
+  font-size: var(--type-Heading-H3-size);
+  font-weight: var(--type-Heading-H3-weight);
+  line-height: var(--type-Heading-H3-line-height);
+  letter-spacing: var(--type-Heading-H3-letter-spacing);
+}
+
+.dash__card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-default);
+  overflow: clip;
+}
+
+/* Sales Analysis `197:20780`: Border radius/400, 28/17 padded, 40 between head and chart. */
+.dash__salesCard {
+  gap: 40px;
+  padding: 28px 17px;
+  border-radius: var(--radius-400);
+  box-shadow: inset 0 0 0 var(--border-width-sm) var(--color-border-subtle), var(--shadow-dashboard);
+}
+.dash__salesHead {
+  display: flex;
+  width: 325px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.dash__salesToday,
+.dash__salesMargin {
+  display: flex;
+  gap: var(--spacing-100);
+  align-items: center;
+  font-size: var(--type-Heading-H4-size);
+  font-weight: var(--type-Heading-H4-weight);
+  line-height: var(--type-Heading-H4-line-height);
+  letter-spacing: var(--type-Heading-H4-letter-spacing);
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+}
+/* `197:20784`: 14 Semi Bold on a 100% line, -1% — not the H4 beside it. */
+.dash__salesTodayValue {
+  line-height: 14px;
+  letter-spacing: -0.14px;
+  color: var(--color-text-default);
+}
+.dash__salesTodayValue.dash__skeleton { height: 14px; }
+
+.dash__salesChart {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  width: 325px;
+}
+/* `197:20790`: six segments, 12 tall, the outer two rounded 2 on their outer side. */
+.dash__splitBar {
+  display: flex;
+  width: 325px;
+  height: 12px;
+}
+.dash__splitSeg { flex: none; height: 12px; }
+.dash__splitSeg[data-first='on'] { border-radius: 2px 0 0 2px; }
+.dash__splitSeg[data-last='on'] { border-radius: 0 2px 2px 0; }
+.dash__splitSeg[data-first='on'][data-last='on'] { border-radius: 2px; }
+/* Not designed: a period with no sales — the bar's track, empty. */
+.dash__splitEmpty {
+  width: 318px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--color-container-neutral-default);
+}
+
+.dash__methods {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.dash__methodRow {
+  display: flex;
+  gap: 31px;
+  width: 318px;
+}
+.dash__method {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-200);
+  width: 88px;
+  flex: none;
+}
+.dash__methodLabel {
+  display: flex;
+  gap: var(--spacing-100);
+  align-items: center;
+  font-size: var(--type-Body-Small-size);
+  font-weight: var(--type-Body-Small-weight);
+  line-height: var(--type-Body-Small-line-height);
+  letter-spacing: var(--type-Body-Small-letter-spacing);
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+}
+/* `197:20801`: square — the legend's markers are 6x6 rectangles; the other cards' are
+   ellipses (BUILD-PLAN #131). */
+.dash__square { width: 6px; height: 6px; flex: none; }
+.dash__methodValue {
+  font-size: var(--type-Heading-H4-size);
+  font-weight: var(--type-Heading-H4-weight);
+  line-height: var(--type-Heading-H4-line-height);
+  letter-spacing: var(--type-Heading-H4-letter-spacing);
+  color: var(--color-text-default);
+  white-space: nowrap;
+}
+
+/* --- Inventory Summary `197:20832`: Border radius/300, 28/16 padded -------------- */
+.dash__inventoryCard {
+  padding: 28px var(--spacing-400);
+  border-radius: var(--radius-300);
+  box-shadow: inset 0 0 0 var(--border-width-sm) var(--color-border-subtle), var(--shadow-dashboard);
+}
+.dash__inventoryInner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 327px;
+}
+.dash__stock {
+  display: flex;
+  gap: var(--spacing-300);
+  align-items: flex-start;
+}
+/* `197:20836`: 52 square, radius 8, the 20 glyph at 16,16. */
+.dash__stockIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: var(--radius-200);
+}
+.dash__stockIcon[data-tone='brand'] { background: var(--color-container-brand-subtle-default); }
+.dash__stockIcon[data-tone='aqua'] { background: var(--color-container-accent-aqua-default); }
+.dash__stockDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-300);
+}
+.dash__stockLabel {
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  color: var(--color-text-subtle);
+}
+.dash__stockValue {
+  font-size: var(--type-Heading-H2-size);
+  font-weight: var(--type-Heading-H2-weight);
+  line-height: var(--type-Heading-H2-line-height);
+  letter-spacing: var(--type-Heading-H2-letter-spacing);
+  color: var(--color-text-default);
+  white-space: nowrap;
+}
+
+/* A 1px Color/border/subtle line centred on a zero-height row, as Figma strokes a
+   vector: it takes no space between the blocks either side. */
+.dash__rule {
+  height: 1px;
+  margin: -0.5px 0;
+  border: 0;
+  background: var(--color-border-subtle);
+  flex: none;
+}
+
+/* `197:20849` / `197:20853`: pinned to the inner block's right edge. */
+.dash__badge {
+  position: absolute;
+  right: -0.5px;
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.dash__markup { top: -2px; }
+.dash__margin { top: 90px; }
+.dash__badgeLabel,
+.dash__pill {
+  font-size: var(--type-Label-Small-size);
+  font-weight: var(--type-Label-Small-weight);
+  line-height: var(--type-Label-Small-line-height);
+  letter-spacing: var(--type-Label-Small-letter-spacing);
+  text-align: center;
+  white-space: nowrap;
+}
+.dash__badgeLabel { color: var(--color-text-subtle); }
+.dash__pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-100) var(--spacing-200);
+  border-radius: 1000px;
+}
+.dash__pill[data-tone='gain'] { background: var(--color-container-accent-green-default); color: var(--color-icon-success); }
+.dash__pill[data-tone='loss'] { background: var(--color-container-accent-red-default); color: var(--color-icon-danger); }
+.dash__pill.dash__skeleton { height: 28px; box-sizing: border-box; }
+
+/* --- Two-share cards: Profit & Loss `197:20863`, Debtors/Creditors `197:21064` ----- */
+.dash__shareCard {
+  align-items: center;
+  padding: 28px var(--spacing-400);
+  border-radius: var(--radius-200);
+  box-shadow: inset 0 0 0 var(--border-width-sm) var(--color-border-subtle), var(--shadow-dashboard);
+}
+.dash__shareInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-600);
+  width: 318px;
+}
+.dash__shareTop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-400);
+  width: 318px;
+}
+.dash__shareLabels {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  /* The labels and the bar sit 12 apart, the amounts 16 below the bar. */
+  margin-bottom: calc(var(--spacing-300) - var(--spacing-400));
+}
+.dash__shareLabel {
+  display: flex;
+  gap: var(--spacing-100);
+  align-items: flex-start;
+}
+.dash__shareKey {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+}
+.dash__sharePct {
+  font-size: var(--type-Heading-H4-size);
+  font-weight: var(--type-Heading-H4-weight);
+  line-height: var(--type-Heading-H4-line-height);
+  letter-spacing: var(--type-Heading-H4-letter-spacing);
+  color: var(--color-text-default);
+  white-space: nowrap;
+}
+
+/* `197:20880`: the first share overlaps the second by 8, fully rounded, above it. */
+.dash__pair {
+  display: flex;
+  isolation: isolate;
+  width: 318px;
+  height: 12px;
+}
+.dash__pairLeft {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  height: 12px;
+  margin-right: -8px;
+  border-radius: 1000px;
+}
+.dash__pairRight {
+  position: relative;
+  z-index: 1;
+  flex: 1 0 0;
+  min-width: 0;
+  height: 12px;
+  border-radius: 0 1000px 1000px 0;
+}
+.dash__pairRight:only-child { border-radius: 1000px; }
+
+.dash__shareAmounts {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.dash__shareAmount {
+  display: flex;
+  gap: var(--spacing-100);
+  align-items: center;
+  font-size: var(--type-Heading-H3-size);
+  font-weight: var(--type-Heading-H3-weight);
+  line-height: var(--type-Heading-H3-line-height);
+  letter-spacing: var(--type-Heading-H3-letter-spacing);
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+}
+.dash__dot { width: 6px; height: 6px; flex: none; border-radius: 50%; }
+
+.dash__total {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-300);
+  align-items: flex-start;
+}
+.dash__totalLabel {
+  display: flex;
+  gap: var(--spacing-100);
+  align-items: center;
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  color: var(--color-text-subtle);
+}
+.dash__totalValue {
+  font-size: var(--type-Display-D2-size);
+  font-weight: var(--type-Display-D2-weight);
+  line-height: var(--type-Display-D2-line-height);
+  letter-spacing: var(--type-Display-D2-letter-spacing);
+  color: var(--color-text-default);
+  white-space: nowrap;
+}
+.dash__totalValue.dash__skeleton { height: 36px; }
+
+/* --- Top Locations `197:20901`: no stroke and no shadow, unlike the cards around it
+   (BUILD-PLAN #131); 24 / 16.5 / 24 / 15.5 padded. ----------------------------------- */
+.dash__locationsCard {
+  align-items: center;
+  padding: var(--spacing-600) 16.5px var(--spacing-600) 15.5px;
+  border-radius: var(--radius-200);
+}
+/* `197:20903`: three columns 35 / 184 / 110, radius 7, clipped. */
+.dash__table {
+  width: 329px;
+  border-collapse: collapse;
+  border-spacing: 0;
+  table-layout: fixed;
+  border-radius: calc(7px * var(--corner-scale));
+  overflow: clip;
+}
+.dash__table th,
+.dash__table td {
+  padding: 0 var(--spacing-200);
+  box-shadow: inset 0 calc(-1 * var(--border-width-sm)) 0 0 var(--color-border-subtle);
+  vertical-align: middle;
+  text-align: left;
+  white-space: nowrap;
+}
+.dash__table thead tr { height: 36px; }
+.dash__table tbody tr { height: 64px; }
+.dash__table th {
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  color: var(--color-text-subtle);
+}
+.dash__colNo { width: 35px; box-sizing: border-box; }
+.dash__colName { width: 184px; box-sizing: border-box; }
+.dash__colSales { width: 110px; box-sizing: border-box; text-align: right !important; }
+.dash__table th.dash__colSales span { padding: 0 4px; }
+td.dash__colNo {
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  letter-spacing: var(--type-Label-Large-letter-spacing);
+  color: var(--color-text-subtle);
+}
+td.dash__colName > * { display: flex; }
+.dash__locName {
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  color: var(--color-text-default);
+}
+.dash__locName.dash__skeleton { height: 20px; }
+.dash__locAddress {
+  gap: 4px;
+  align-items: center;
+  margin-top: var(--spacing-100);
+  font-size: var(--type-Body-Small-size);
+  font-weight: var(--type-Body-Small-weight);
+  line-height: var(--type-Body-Small-line-height);
+  letter-spacing: var(--type-Body-Small-letter-spacing);
+  color: var(--color-text-subtle);
+}
+/* `197:20924` is 116 wide and the frame types its own "…"; here the browser cuts it. */
+.dash__locAddress > span {
+  max-width: 116px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* The frame's cell is 5 padded, but its content (36 + 4 + 15 = 55) overflows the 54
+   that leaves and Figma centres it half a pixel high; a table row would grow to 65
+   instead. 4.5 keeps the row 64 and puts the figures where the frame does. */
+td.dash__colSales {
+  padding-top: 4.5px;
+  padding-bottom: 4.5px;
+}
+.dash__locSales {
+  display: block;
+  padding: var(--spacing-200) 4px;
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  color: var(--color-text-default);
+}
+/* `197:20954`: 12 Medium on its auto line, -1%; the 12 trend glyph 3 after, bottom-aligned. */
+.dash__locChange {
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: -0.12px;
+  color: var(--color-text-subtle);
+}
+
+/* --- Cash Flow `197:20993`: no stroke and no shadow either (#131); 24/15 padded ---- */
+.dash__flowCard {
+  gap: 36px;
+  padding: var(--spacing-600) 15px;
+  border-radius: var(--radius-200);
+}
+.dash__flowList {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+.dash__flowBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 326px;
+}
+.dash__flowHead {
+  display: flex;
+  gap: var(--spacing-100);
+  align-items: center;
+  font-size: var(--type-Label-Large-size);
+  font-weight: var(--type-Label-Large-weight);
+  line-height: var(--type-Label-Large-line-height);
+  letter-spacing: var(--type-Label-Large-letter-spacing);
+  color: var(--color-text-default);
+}
+.dash__flowBox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.dash__flowTop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-200);
+  width: 326px;
+  box-sizing: border-box;
+  padding: var(--spacing-400) var(--spacing-300);
+  border-radius: var(--radius-200) var(--radius-200) 0 0;
+  background: var(--color-surface-secondary-default);
+}
+.dash__flowKeys,
+.dash__flowAmounts {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.dash__flowKey {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  color: var(--color-text-subtle);
+}
+.dash__flowAmount {
+  display: flex;
+  gap: var(--spacing-100);
+  align-items: center;
+  font-size: var(--type-H-7-size);
+  font-weight: var(--type-H-7-weight);
+  /* H/7's line-height is Figma's `1` — 16px here, which Inter's descenders clear. */
+  line-height: 16px;
+  letter-spacing: var(--type-H-7-letter-spacing);
+  color: var(--color-text-default);
+  white-space: nowrap;
+}
+.dash__flowAmount .dash__skeleton { height: 16px; }
+/* `197:21020`: 325 wide against the top's 326, right-aligned, its inner rule 300. */
+.dash__flowFoot {
+  width: 325px;
+  box-sizing: border-box;
+  padding: 0 var(--spacing-300);
+  border-radius: 0 0 var(--radius-200) var(--radius-200);
+  background: var(--color-surface-secondary-default);
+}
+.dash__flowBalance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 300px;
+  padding: var(--spacing-400) 0;
+  box-shadow: inset 0 var(--border-width-sm) 0 0 var(--color-border-subtle);
+  font-size: var(--type-Label-Base-size);
+  font-weight: var(--type-Label-Base-weight);
+  line-height: var(--type-Label-Base-line-height);
+  letter-spacing: var(--type-Label-Base-letter-spacing);
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+}
+
+/* Debtors/Creditors: the share card, 28 between its parts. */
+.dash__debtsCard { gap: 28px; }
+
+/* --- Loading ------------------------------------------------------------------------- */
+.dash__skeleton {
+  display: inline-block;
+  height: 1lh;
+  border-radius: var(--radius-100);
+  background: var(--color-container-neutral-default);
+  animation: skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+/* --- Tab bar: the Dashboard variant (`197:21098`) — its own 16 / 16 / 24 padding,
+   where the Sales Point's is 14 / 22 / 24. --------------------------------------- */
+.tabBar[data-tab='dashboard'] .tabBar__item:not(:last-child) {
+  padding-left: var(--spacing-400);
+  padding-right: var(--spacing-400);
+  border-radius: 32px;
+}
+/* Items overlap by 4 (the nav's auto-layout gap is -4). */
+.tabBar[data-tab='dashboard'] .tabBar__item + .tabBar__item { margin-left: -4px; }

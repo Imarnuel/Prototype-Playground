@@ -34,6 +34,18 @@ const ICON_VARIABLE = {
   '#d42189': 'Color/icon/accent/pink',
   // Exported one step off Color/icon/danger/bolder #c1261a (MANIFEST); that variable.
   '#c2261a': 'Color/icon/danger/bolder',
+  // The Dashboard (`197:20741`).
+  '#0c8dbd': 'Color/icon/accent/aqua',
+  '#fb5b04': 'Color/icon/accent/orange',
+  '#ef362a': 'Color/icon/danger',
+  '#1aaedd': 'Color/container/accent/aqua/bold/default',
+};
+/* Where one hex is bound to two variables whose dark values differ, the file's own
+   binding for that instance wins: the Dashboard's profit and trend glyphs draw #038c4e
+   bound to icon/accent/green (dark #49e491), where every other #038c4e is icon/success. */
+const ICON_VARIABLE_FOR = {
+  'bar-chart-12-green': { '#038c4e': 'Color/icon/accent/green' },
+  'trend-up-01': { '#038c4e': 'Color/icon/accent/green' },
 };
 /* Left as exported, in both themes: paints the file leaves UNBOUND, so its own Dark
    mode does not change them either (search-sm #5b6579, the receipt's socials #5a5c63,
@@ -59,7 +71,7 @@ for (const n of names) {
     body = body.replace(/((?:fill|stroke)=)"white"/g, `$1"${darkOf['Color/icon/inverse']}"`);
   } else {
     for (const h of hexes) {
-      const v = ICON_VARIABLE[h];
+      const v = ICON_VARIABLE_FOR[n]?.[h] ?? ICON_VARIABLE[h];
       if (!v || !darkOf[v]) { unmapped.push(`${n} ${h}`); continue; }
       body = body.replace(new RegExp(`="${h}"`, 'gi'), `="${darkOf[v]}"`);
     }

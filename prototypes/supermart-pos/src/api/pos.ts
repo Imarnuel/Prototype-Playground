@@ -8,6 +8,7 @@ import { CATEGORY_ORDER, PRODUCTS, findByBarcode, type Category, type Product } 
 import { buildReceipt, type Receipt } from '../state/sale';
 import { seedQueue, type QueuedOrder } from '../state/queue';
 import { matchText, type TextResult } from '../state/scan';
+import { recordSale, summarise, type DashboardSummary, type Period } from '../state/ledger';
 
 export type ProductFilter = Category | 'All';
 
@@ -42,7 +43,17 @@ export function fetchProducts(filter: ProductFilter): Promise<readonly Product[]
  */
 const PAY_LATENCY_MS = 300;
 export function submitPayment(sale: Parameters<typeof buildReceipt>[0]): Promise<Receipt> {
-  return request('pay', () => buildReceipt(sale), { latency: PAY_LATENCY_MS });
+  return request('pay', () => {
+    const receipt = buildReceipt(sale);
+    // Only a payment that went through reaches the books the Dashboard reads.
+    recordSale({ at: sale.at, tender: sale.tender.method, lines: sale.lines, orderDiscount: sale.orderDiscount });
+    return receipt;
+  }, { latency: PAY_LATENCY_MS });
+}
+
+/** The Dashboard (`197:20741`): every figure, for one period, from the books. */
+export function fetchDashboard(period: Period): Promise<DashboardSummary> {
+  return request('dashboard', () => summarise(period));
 }
 
 /* --- Queued orders (band `170:8988`) ----------------------------------------------

@@ -16,7 +16,7 @@ specific to this study.
 
 The board map, the numbered work order and the running log of design
 inconsistencies live in [`BUILD-PLAN.md`](./BUILD-PLAN.md). Read it before building
-anything — it records **130** inconsistencies, including that 31 frames share the name
+anything — it records **131** inconsistencies, including that 31 frames share the name
 "Customer added", so **screens must be referenced by node ID, never by name**.
 
 ### Built so far — band 4, "Adding customer to an order"
@@ -113,13 +113,28 @@ queues that sale first; delete has Undo. Its two dark-mode frames are covered by
 app-wide dark mode below.
 See BUILD-PLAN, band `170:8988`.
 
+### Built — the Dashboard, `197:20741`
+
+| Screen | Node | State |
+|---|---|---|
+| Dashboard — Today, This week, This month | `197:20741` | 556 boxes, 0 outside 0.5px; `figma:audit` 279 properties |
+| Period menu (the Filter) | — | not designed: the file's Dropdown `88:16379` |
+| Loading, load fails, no sales yet today | — | skeletons, `ListMessage` + Retry, ₦0 with an empty bar |
+| Tab bar with Dashboard selected | `197:21098` | cross-fades over the Sales Point and back |
+
+`walk-dashboard` 26/26. **Every figure is derived from one ledger** — the frame's own
+don't reconcile (#131) — so the split, the locations, P&L and the balances all add up,
+and a sale paid at Checkout shows on the Dashboard: Sales, Cash, Cash received and
+this till's branch rise by exactly its receipt total. The bell and the More tab are
+not designed and say so. See BUILD-PLAN, band `197:20741`.
+
 ### Dark mode — dev toolbar → Appearance → Dark mode
 
 The whole app, from the library's own Dark mode (`Semantic` collection, mode `255:1`):
-56 colour tokens, dark copies of 47 icons by the variable each is bound to, and a
+64 colour tokens, dark copies of 66 icons by the variable each is bound to, and a
 handful of literals that stand in for a token (`src/theme-dark.css`). The switch shows
-On/Off, keeps the toolbar open, and is remembered per viewer. `walk-dark` 35/35: 24
-screens, 584 icon renders, no light paint left, text 3:1 or better. See BUILD-PLAN,
+On/Off, keeps the toolbar open, and is remembered per viewer. `walk-dark` 40/40: 29
+screens, 700 icon renders, no light paint left, text 3:1 or better. See BUILD-PLAN,
 "Dark mode", and #126-#129.
 
 ## The store
@@ -157,6 +172,21 @@ by retyping** — see `figma/README.md`.
   unit; a pack's price is derived. Only Crew Socks' 1/4/8/16 comes from a frame — the
   rest, and the "bdl" / "box" abbreviations, are invented (BUILD-PLAN #64). The
   frame's third unit, Carton, is **Bundle** at the designer's request.
+
+### The books — `src/state/ledger.ts`
+
+The Dashboard reads one ledger, and nothing else keeps sales figures.
+
+- **Seeded:** 60 days of orders over five branches (seeded random, so every load is
+  the same; today's run up to the current time). The branches are invented, as the
+  frame's are placeholders (#131); this till is Freshvale Bodija, at `STORE.address`.
+- **Live:** every sale paid at Checkout is recorded (`submitPayment` → `recordSale`).
+- **Cost prices are INVENTED** (`costMinor` on each product): cost of goods, mark-up
+  and margin need one and no frame gives it. Expenses and supplier bills are invented
+  too, and marked so in the ledger.
+- Profit = sales − VAT − cost of goods − expenses. Comp. and Loyalty count as sales.
+  Debtors (credit sales of the last 14 days) and creditors (bills) are a point in
+  time, not a period.
 
 ### Money
 
@@ -208,14 +238,14 @@ back to its neutral fill if one is missing.
 npm run dev                # iterate; open with ?dev=1 for the toolbar
 npm run build && npm run preview   # demo from here, not dev
 
-npm run catalogue:verify   # 66 invariants: check digits, units, money, totals, states, CSV
-npm run cart:verify        # 41 rules: stock, clamps, unit changes, the receipt, the queue, scanning
+npm run catalogue:verify   # 67 invariants: check digits, units, money, totals, states, CSV
+npm run cart:verify        # 77 rules: stock, clamps, unit changes, the receipt, the queue, scanning, the books
 npm run catalogue:csv      # regenerate figma/catalogue.csv from catalogue.ts
 npm run figma:spec         # every figure the Figma screens were synced to (figma/README.md)
 npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json (+ the dark block)
 npm run tokens:verify      # the generated tokens still match the Figma dump
 npm run motion:sample      # transitions animate in BOTH directions (needs a server)
-npm run figma:audit        # 509 properties read off the Figma NODES vs computed style
+npm run figma:audit        # 788 properties read off the Figma NODES vs computed style
 npm run images:manifest    # which photos are missing
 npm run images:optimise -- --box <css-px>   # --box MUST come from a measured frame
 npm run build:hosted       # publish-ready bundle for the hosted preview
@@ -226,16 +256,18 @@ node scripts/walk-discount.mjs   [url]   # More options, order discount, Clear c
 node scripts/walk-checkout.mjs   [url]   # both checkout flows, failure, receipt, new sale
 node scripts/walk-queue.mjs      [url]   # queue, recall (and over a full Cart), delete + Undo, failures
 node scripts/walk-scan.mjs       [url]   # scan button, barcode and name scans, Which product?, expand, refusals
-node scripts/walk-dark.mjs       [url]   # dark mode: the switch, every token, 24 screens for light paint and contrast
+node scripts/walk-dark.mjs       [url]   # dark mode: the switch, every token, 29 screens for light paint and contrast
+node scripts/walk-dashboard.mjs  [url]   # tabs both ways, the books agree, a sale lands, period menu, states
 node scripts/diff-queue.mjs      [url]   # Queued orders, row menu, empty, toast vs their frames
 node scripts/diff-checkout.mjs   [url]   # checkout, pickers, success, receipt vs their frames
 node scripts/diff-total.mjs      [url]   # order total vs 88:8639 / 88:9338
 node scripts/walk-stock.mjs      [url]   # stock clamp and its toast
 node scripts/walk-sheet-keys.mjs [url]   # sheet focus, Escape, Tab trap
 node scripts/diff-added.mjs      [url]   # Customer added vs 88:8243
+node scripts/diff-dashboard.mjs  [url]   # the Dashboard vs 197:20741, every section
 ```
 
-Run `catalogue:verify` and `cart:verify` after any edit to `catalogue.ts` or `cart.ts`. An invalid check digit or a
+Run `catalogue:verify` and `cart:verify` after any edit to `catalogue.ts`, `cart.ts` or `ledger.ts`. An invalid check digit or a
 total that stops reconciling shows up live in a demo. Run `motion:sample` after any
 change to a presented surface — checking a transition is "visible" cannot catch an
 entrance that never animates.
@@ -250,6 +282,8 @@ entrance that never animates.
 - **Dark mode leaves the file's unbound paints as they are** (#127) — the search
   glyph, the receipt's socials, the pill toast's disc, the low-stock orange — and the
   two dark frames disagree on the empty state's copy colour (#128).
+- **The Dashboard's unknowns** (#131): a location that fell, the Filter's menu,
+  Notifications and the More tab are not designed; cost prices are invented.
 - **The receipt's logo** is a placeholder: Freshvale has none (#97).
 - The sheet **exit curve** is heavily back-loaded and is deferred to `better-ui`,
   which owns motion and is not installed (BUILD-PLAN #37).

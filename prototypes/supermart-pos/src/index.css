@@ -148,7 +148,8 @@ select {
     .saleSuccess__icon, .saleSuccess__halo, .saleSuccess__burst > i, .buttonSpinner,
     .receipt__logo, .bankPicker__logo, .checkout__bankLogo, .toast__action,
     .toast[data-variant='pill'], .queueCard__dot,
-    .scanButton, .scanner__close, .scanMatches__badge, .scanMatches__best, .scanTag__hole
+    .scanButton, .scanner__close, .scanMatches__badge, .scanMatches__best, .scanTag__hole,
+    .dash__bell, .dash__pill, .dash__pairLeft, .dash__pairRight, .dash__dot
   ) {
     corner-shape: round;
   }

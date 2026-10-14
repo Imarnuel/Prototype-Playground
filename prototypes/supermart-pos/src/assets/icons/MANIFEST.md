@@ -91,6 +91,17 @@ pink avatar. No recolouring was needed or done.
 | `check-success.svg` | 40x40 | white | Transaction success | `88:8727` |
 | `share-01.svg`, `printer.svg` | 16x16 | `#2C4A8B` | Receipt — Share / Print | inside `88:8851` |
 | `instagram.svg`, `facebook.svg`, `tiktok.svg`, `twitter.svg` | 15.3 / 13.1 | `#5A5C63` | Receipt — socials | `88:8831` … `88:8847`; built from each vector's path data (below the frame's clip, so not exportable); the X recoloured from #000 (BUILD-PLAN #98) |
+| `bell-03.svg` | 20x20 | `#20293C` | Dashboard — notifications bell | inside header `197:21099` |
+| `shopping-cart-03-brand-16.svg`, `layers-three-01.svg`, `coins-stacked-04-orange.svg`, `bar-chart-12-green.svg` | 16x16 | `#2C4A8B`, `#0C8DBD`, `#FB5B04`, `#038C4E` | Dashboard — Sales, Expenses, COGS, Profit tiles | the four tiles at y166/274 |
+| `bar-chart-12-brand.svg` | 16x16 | `#2C4A8B` | Dashboard — Inventory, mark-up / margin key | Inventory card, y726 |
+| `shopping-cart-03-brand-20.svg`, `coins-stacked-04-aqua-20.svg` | 20x20 | `#2C4A8B`, `#0C8DBD` | Dashboard — stock at retail / at cost | Inventory card, y726 |
+| `marker-pin-01.svg` | 12x12 | `#5E6A82` | Dashboard — Top Locations address | Locations table, y1286 |
+| `trend-up-01.svg` | 12x12 | `#038C4E` | Dashboard — Top Locations change | Locations table; bound to icon/accent/green, not icon/success (dark copy differs) |
+| `bank-note-02-pink.svg`, `bank-brand.svg` | 20x20 | `#D42189`, `#2C4A8B` | Dashboard — Cash Flow, Cash and Bank | Cash Flow card, y1738 |
+| `arrow-circle-broken-down-left.svg`, `arrow-circle-broken-up-right.svg` | 16x16 | `#038C4E`, `#EF362A` | Dashboard — Cash Flow received / spent | Cash Flow card, y1738 |
+| `minus-circle.svg`, `plus-circle-aqua-16.svg` | 16x16 | `#D42189`, `#1AAEDD` | Dashboard — Debtors / Creditors key | Debtors card, y2286 |
+| `chevron-down-16.svg` | 16x16 | `#5E6A82` | Dashboard — Filter (period) | filter row |
+| `grid-fill-selected.svg`, `shopping-cart-03.svg` | 20x20 | `#2C4A8B`, `#20293C` | Tab bar on the Dashboard — Dashboard selected, Sales Point not | tab bar `197:21098` |
 
 Bank logos live in `src/assets/banks/`: Access, Moniepoint and Opay exported as SVG
 from `88:14801`, `88:14826`, `88:14839`; Palmpay holds a raster, so it is a 3x PNG

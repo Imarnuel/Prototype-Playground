@@ -26,7 +26,8 @@ export const color = {
       aqua: "#0e6081",
       purple: "#5120ca",
       pink: "#b3146c",
-      indigo: "#3133c4"
+      indigo: "#3133c4",
+      rose: "#b30f43"
     }
   },
   icon: {
@@ -39,12 +40,14 @@ export const color = {
     success: "#038c4e",
     disabled: "#cfd3d8",
     danger: {
-      bolder: "#c1261a"
+      bolder: "#c1261a",
+      "_": "#ef362a"
     },
     accent: {
       aqua: "#0c8dbd",
       pink: "#d42189",
-      green: "#038c4e"
+      green: "#038c4e",
+      orange: "#fb5b04"
     }
   },
   border: {
@@ -105,16 +108,31 @@ export const color = {
     },
     accent: {
       aqua: {
-        default: "#e2f5fd"
+        default: "#e2f5fd",
+        bold: {
+          default: "#1aaedd"
+        }
       },
       pink: {
-        default: "#fce9f7"
+        default: "#fce9f7",
+        bold: {
+          default: "#d42189"
+        }
       },
       purple: {
         default: "#ecebff"
       },
       indigo: {
         default: "#e0ebff"
+      },
+      green: {
+        default: "#dffceb"
+      },
+      red: {
+        default: "#fde9e7"
+      },
+      rose: {
+        default: "#ffebee"
       }
     },
     inverse: {
@@ -165,13 +183,17 @@ export const borderWidth = {
 export const shadow = {
   xs: "Effect(type: DROP_SHADOW, color: #0A0D120D, offset: (0, 1), radius: 2, spread: 0)",
   lg: "Effect(type: DROP_SHADOW, color: #0A0D1208, offset: (0, 4), radius: 6, spread: 0); Effect(type: DROP_SHADOW, color: #0A0D1214, offset: (0, 12), radius: 16, spread: -2); Effect(type: DROP_SHADOW, color: #00000008, offset: (0, 0), radius: 1, spread: 0.5)",
-  xl: "Effect(type: DROP_SHADOW, color: #0A0D1208, offset: (0, 8), radius: 8, spread: -2); Effect(type: DROP_SHADOW, color: #0A0D1214, offset: (0, 20), radius: 24, spread: -2)"
+  xl: "Effect(type: DROP_SHADOW, color: #0A0D1208, offset: (0, 8), radius: 8, spread: -2); Effect(type: DROP_SHADOW, color: #0A0D1214, offset: (0, 20), radius: 24, spread: -2)",
+  button: "Effect(type: DROP_SHADOW, color: #111A2C0D, offset: (0, 1), radius: 2, spread: 0)",
+  dashboard: "Effect(type: DROP_SHADOW, color: #18294F03, offset: (0, 6), radius: 5, spread: 0)"
 } as const;
 
 export const shadowCss = {
   xs: "0px 1px 2px 0px #0a0d120d",
   lg: "0px 4px 6px 0px #0a0d1208, 0px 12px 16px -2px #0a0d1214, 0px 0px 1px 0.5px #00000008",
-  xl: "0px 8px 8px -2px #0a0d1208, 0px 20px 24px -2px #0a0d1214"
+  xl: "0px 8px 8px -2px #0a0d1208, 0px 20px 24px -2px #0a0d1214",
+  button: "0px 1px 2px 0px #111a2c0d",
+  dashboard: "0px 6px 5px 0px #18294f03"
 } as const;
 
 export type TypeStyle = {
@@ -379,6 +401,33 @@ export const type: Record<string, TypeStyle> = {
     lineHeight: 24,
     letterSpacing: -0.20000000298023224,
     composed: true
+  },
+  "Body/Small": {
+    family: "Inter",
+    style: "Regular",
+    size: 12,
+    weight: 400,
+    lineHeight: 16,
+    letterSpacing: -0.20000000298023224,
+    composed: false
+  },
+  "Display/D2": {
+    family: "Inter",
+    style: "Semi Bold",
+    size: 28,
+    weight: 600,
+    lineHeight: 36,
+    letterSpacing: -0.9599999785423279,
+    composed: false
+  },
+  "H/7": {
+    family: "Inter",
+    style: "Semi Bold",
+    size: 16,
+    weight: 600,
+    lineHeight: 1,
+    letterSpacing: -0.16,
+    composed: false
   }
 };
 
@@ -421,5 +470,7 @@ export const legacyColor = {
   primaryWhite: "#FFFFFF",
   white: "#FFFFFF",
   graysBlack: "#000000",
-  labelsPrimary: "#000000"
+  labelsPrimary: "#000000",
+  orange600: "#FF6B35",
+  yellow600: "#FFC600"
 } as const;

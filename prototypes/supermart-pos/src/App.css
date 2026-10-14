@@ -101,3 +101,16 @@
    that rule re-matched on every change in the screen and cost the Quantity sheet a
    frame of its exit.) */
 .statusBar[data-appearance='light'] :is(.statusBar__time, .statusBar__levels img) { transition-delay: var(--motion-instant); }
+
+/* --- The tab bar's second screen ------------------------------------------------------
+   The Dashboard over the Sales Point, cross-fading on `fast`: in on the decelerating
+   curve, out on the accelerating one (motion.css's pairing). */
+.tabScreen {
+  position: absolute;
+  inset: 0;
+  transition: opacity var(--motion-fast) var(--ease-out);
+}
+.tabScreen[data-open='off'] {
+  opacity: 0;
+  transition-timing-function: var(--ease-in);
+}

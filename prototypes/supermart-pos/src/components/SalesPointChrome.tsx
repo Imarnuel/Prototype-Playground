@@ -70,22 +70,31 @@ export function FilterBar({
   );
 }
 
-export function TabBar({ onNavigate }: { onNavigate: (tab: string) => void }) {
+export type Tab = 'dashboard' | 'salesPoint' | 'more';
+
+/**
+ * The tab bar, in the variant of the tab that is open. Each variant is its own in the
+ * file, glyphs included: Sales Point open (`88:8153`) draws an outlined grid and a
+ * filled cart; Dashboard open (`197:21098`) a filled grid and an outlined cart, and
+ * its own padding. Labels take each variant's colours: the Sales Point variant has
+ * its two inactive tabs in different text colours (#23), the Dashboard one does not.
+ */
+export function TabBar({ active, onNavigate }: { active: 'dashboard' | 'salesPoint'; onNavigate: (tab: Tab) => void }) {
+  const onDashboard = active === 'dashboard';
   return (
-    <div className="tabBar">
+    <div className="tabBar" data-tab={active}>
       <div className="tabBar__nav">
-        <button type="button" className="tabBar__item" onClick={() => onNavigate('Dashboard')}>
-          <Icon name="grid-01" />
-          {/* text/default here and text/secondary on "More" — both unselected. The
-              design is inconsistent between its own two inactive tabs; followed
-              exactly rather than normalised. Logged as inconsistency #23. */}
-          <span className="tabBar__label" style={{ color: 'var(--color-text-default)' }}>Dashboard</span>
+        <button type="button" className="tabBar__item" data-active={onDashboard ? 'on' : undefined}
+          aria-current={onDashboard ? 'page' : undefined} onClick={() => onNavigate('dashboard')}>
+          <Icon name={onDashboard ? 'grid-fill-selected' : 'grid-01'} />
+          <span className="tabBar__label" style={{ color: onDashboard ? 'var(--color-text-selected)' : 'var(--color-text-default)' }}>Dashboard</span>
         </button>
-        <button type="button" className="tabBar__item" data-active="on" onClick={() => onNavigate('Sales Point')}>
-          <Icon name="cart" />
-          <span className="tabBar__label" style={{ color: 'var(--color-text-selected)' }}>Sales Point</span>
+        <button type="button" className="tabBar__item" data-active={onDashboard ? undefined : 'on'}
+          aria-current={onDashboard ? undefined : 'page'} onClick={() => onNavigate('salesPoint')}>
+          <Icon name={onDashboard ? 'shopping-cart-03' : 'cart'} />
+          <span className="tabBar__label" style={{ color: onDashboard ? 'var(--color-text-secondary)' : 'var(--color-text-selected)' }}>Sales Point</span>
         </button>
-        <button type="button" className="tabBar__item" onClick={() => onNavigate('More')}>
+        <button type="button" className="tabBar__item" onClick={() => onNavigate('more')}>
           <Icon name="menu-01" />
           <span className="tabBar__label" style={{ color: 'var(--color-text-secondary)' }}>More</span>
         </button>

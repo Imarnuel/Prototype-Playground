@@ -10,7 +10,14 @@ import path from 'node:path';
 import { adjustDark } from './dark-adjust.mjs';
 
 const dir = path.join(import.meta.dirname, '..', 'src', 'tokens');
-const { variables: V, _source } = JSON.parse(fs.readFileSync(path.join(dir, 'figma-variables.json'), 'utf8'));
+const { variables: V1, _source } = JSON.parse(fs.readFileSync(path.join(dir, 'figma-variables.json'), 'utf8'));
+/* The Dashboard (`197:20741`) binds variables the Sales Point section never did; its own
+   verbatim dump is merged in. A name in both must hold the same value, or nothing is
+   generated — two sources for one token is how a value gets guessed. */
+const { variables: V2 } = JSON.parse(fs.readFileSync(path.join(dir, 'figma-variables-dashboard.json'), 'utf8'));
+const clash = Object.keys(V2).filter((k) => V1[k] !== undefined && String(V1[k]).toLowerCase() !== String(V2[k]).toLowerCase());
+if (clash.length) throw new Error(`the two dumps disagree on: ${clash.join(', ')}`);
+const V = { ...V1, ...V2 };
 
 /** Figma name -> a JS-safe key: 'Color/text/on-disabled' -> 'onDisabled' under text. */
 const camel = (s) => s.replace(/[^a-zA-Z0-9]+(.)?/g, (_, c) => (c ? c.toUpperCase() : '')).replace(/^(.)/, (c) => c.toLowerCase());
@@ -30,11 +37,12 @@ const resolve = (raw, field, styleName) => {
   return null;
 };
 
-/* The variable dump writes letter-spacing as a bare number and drops its unit. Two
+/* The variable dump writes letter-spacing as a bare number and drops its unit. Three
    styles in this file are PERCENT, read off the style objects themselves
-   (`getStyleByIdAsync(...).letterSpacing.unit`); every other one is pixels. A bare
-   -2 taken as pixels set Body/Reg/Large six times too tight. */
-const PERCENT_LETTER_SPACING = new Set(['Body/Reg/Large', 'H/6']);
+   (`getStyleByIdAsync(...).letterSpacing.unit`; H/7 off the Dashboard's text nodes,
+   -1%); every other one is pixels. A bare -2 taken as pixels set Body/Reg/Large six
+   times too tight. */
+const PERCENT_LETTER_SPACING = new Set(['Body/Reg/Large', 'H/6', 'H/7']);
 
 const type = {};
 for (const [name, raw] of Object.entries(V)) {
@@ -72,7 +80,14 @@ for (const [k, v] of pick('Color/')) {
   if (/^-?[\d.]+$/.test(v)) continue;
   const parts = k.slice('Color/'.length).split('/').map(camel);
   let node = color;
-  parts.slice(0, -1).forEach((p) => { node[p] = node[p] ?? {}; node = node[p]; });
+  // A name can be both a leaf and a branch — Color/icon/danger and Color/icon/danger/bolder
+  // (the Dashboard brought the first). The leaf then lives under `_`, which the CSS
+  // names drop: --color-icon-danger and --color-icon-danger-bolder.
+  parts.slice(0, -1).forEach((p) => {
+    if (typeof node[p] === 'string') node[p] = { _: node[p] };
+    node[p] = node[p] ?? {}; node = node[p];
+  });
+  if (typeof node[parts.at(-1)] === 'object') { node[parts.at(-1)]._ = v; continue; }
   node[parts.at(-1)] = v;
 }
 const colorNumeric = pick('Color/').filter(([, v]) => /^-?[\d.]+$/.test(v));
@@ -84,7 +99,11 @@ const flat = (prefix, strip) => Object.fromEntries(
 const spacing = flat('Spacing/', 'Spacing/');
 const radius = flat('Border radius/', 'Border radius/');
 const borderWidth = flat('Border width/', 'Border width/');
-const shadow = Object.fromEntries(pick('Shadow/').map(([k, v]) => [camel(k.slice('Shadow/'.length)), v]));
+const shadow = Object.fromEntries([
+  ...pick('Shadow/').map(([k, v]) => [camel(k.slice('Shadow/'.length)), v]),
+  // Effect styles named outside Shadow/: "Dashboard Shadow", "Button shadow".
+  ...Object.entries(V).filter(([k, v]) => !k.startsWith('Shadow/') && /^Effect\(/.test(v)).map(([k, v]) => [camel(k.replace(/\s*shadow$/i, '')), v]),
+]);
 
 /** Figma Effect(...) -> a CSS box-shadow list. Spread maps to the 4th length. */
 const effectToCss = (raw) => raw.split('); ').map((part) => {
@@ -179,12 +198,16 @@ fs.writeFileSync(path.join(dir, 'tokens.ts'), ts);
 // CSS custom properties, from the same source.
 const lines = ['/* GENERATED from figma-variables.json by scripts/gen-tokens.mjs. Do not edit. */', ':root {'];
 const walk = (o, trail) => Object.entries(o).forEach(([k, v]) =>
-  typeof v === 'object' ? walk(v, [...trail, k]) : lines.push(`  --color-${[...trail, k].join('-').toLowerCase()}: ${v};`));
+  typeof v === 'object' ? walk(v, [...trail, k]) : lines.push(`  --color-${[...trail, k].filter((p) => p !== '_').join('-').toLowerCase()}: ${v};`));
 walk(color, []);
 Object.entries(spacing).forEach(([k, v]) => lines.push(`  --spacing-${k}: ${v}px;`));
 Object.entries(radius).forEach(([k, v]) => lines.push(`  --radius-${k}: ${v}px;`));
 Object.entries(borderWidth).forEach(([k, v]) => lines.push(`  --border-width-${k}: ${v}px;`));
 Object.entries(shadow).forEach(([k, v]) => lines.push(`  --shadow-${k}: ${effectToCss(v)};`));
+// Primitives bound directly, outside the semantic system (Orange/600, Yellow/600 on the
+// Dashboard's payment split): one mode, so the same in light and dark.
+Object.entries(V).filter(([k, v]) => typeof v === 'string' && v.startsWith('#') && !k.startsWith('Color/'))
+  .forEach(([k, v]) => lines.push(`  --legacy-${k.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}: ${v.toLowerCase()};`));
 Object.entries(type).forEach(([k, s]) => {
   // Case is PRESERVED here. Upstream has styles differing only by case with
   // different metrics (Heading/H4 is 14/20, Heading/h4 is 20/24); lowercasing

@@ -1,6 +1,6 @@
 /**
  * Dark mode, switched from the dev toolbar, proved on the DOM: the switch itself, all
- * 56 dark tokens resolved as the Figma file's Dark mode gives them, and then every
+ * 64 dark tokens resolved as the Figma file's Dark mode gives them, and then every
  * screen walked in dark for paint that stayed light — a colour that is a LIGHT value
  * and not also a dark one, on any visible element — text that falls below 3:1 on what
  * is actually behind it, and an icon still carrying its light glyph colour. Then the
@@ -28,7 +28,8 @@ const darkSet = new Set(rows.map((r) => r[2]));
 const lightOnly = [...new Set([...rows.map((r) => r[1]), '#f2f2f3', '#dfe0e2', '#f9fafb'])]
   .filter((h) => !darkSet.has(h) && !/^#[0-9a-f]{6}00$/.test(h));
 // The icon colours the dark copies replace (scripts/gen-icons.mjs).
-const lightGlyph = ['#20293c', '#2c4a8b', '#5e6a82', '#9ea4b3', '#038c4e', '#d42189', '#c2261a'];
+const lightGlyph = ['#20293c', '#2c4a8b', '#5e6a82', '#9ea4b3', '#038c4e', '#d42189', '#c2261a',
+  '#0c8dbd', '#fb5b04', '#ef362a', '#1aaedd'];
 
 const page = await browser.newPage({ viewport: { width: 1200, height: 1100 } });
 const errors = [];
@@ -63,7 +64,7 @@ await closeBar();
 
 const resolved = await page.evaluate((vars) => vars.map(([v]) => getComputedStyle(document.documentElement).getPropertyValue(v).trim()), darkVars);
 const wrong = darkVars.filter(([, h], i) => resolved[i] !== h);
-check('every dark token resolves to the file\'s Dark mode', darkVars.length === 56 && wrong.length === 0,
+check('every dark token resolves to the file\'s Dark mode', darkVars.length === 64 && wrong.length === 0,
   wrong.length ? wrong.map(([v, h], i) => `${v} ${resolved[darkVars.indexOf([v, h])]} != ${h}`).join(', ') : `${darkVars.length} tokens`);
 check('the status bar turns light over a dark screen', (await page.evaluate(() => document.querySelector('.statusBar')?.dataset.appearance)) === 'light');
 const home = () => page.evaluate(() => {
@@ -80,7 +81,8 @@ const SCREENS = ['Sales point', 'Loading (skeleton)', 'Error', 'Cart: empty', 'C
   'Quantity sheet', 'Item details: discount applied', 'Select customer', 'Select customer: empty', 'Customer added: toast',
   'More options', 'Apply discount: 10%', 'Cart: order discount applied', 'Checkout: cash with change', 'Select payment method',
   'Select bank', 'Transaction success', 'Receipt: bank transfer', 'Queued orders', 'Queued orders: empty',
-  'Order has been queued: toast', 'Scanner: with items', 'Scanner: scan a brand label'];
+  'Order has been queued: toast', 'Scanner: with items', 'Scanner: scan a brand label',
+  'Dashboard', 'Dashboard: period menu', 'Dashboard: this month', 'Dashboard: load fails', 'Dashboard: no sales yet today'];
 
 const audit = () => page.evaluate(({ lightOnly, lightGlyph, darkValues }) => {
   const screen = document.querySelector('.device__screen');

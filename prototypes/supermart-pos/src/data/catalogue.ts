@@ -36,6 +36,11 @@ export type Product = {
   size: string;
   category: Category;
   priceMinor: number;
+  /**
+   * What the store pays its supplier for one single unit. INVENTED, like the prices:
+   * the Dashboard's cost of goods, mark-up and margins need one, and no frame gives it.
+   */
+  costMinor: number;
   /** Set only when discounted; renders as a struck-through was-price. */
   wasPriceMinor?: number;
   barcode: string;
@@ -120,6 +125,7 @@ export const PRODUCTS: readonly Product[] = [
     size: 'M',
     category: "Tops",
     priceMinor: 850000,
+    costMinor: 470000,
     barcode: '6153000000014',
     taxClass: 'standard',
     stock: 40,
@@ -133,6 +139,7 @@ export const PRODUCTS: readonly Product[] = [
     size: 'L',
     category: "Tops",
     priceMinor: 1850000,
+    costMinor: 1050000,
     barcode: '6153000000021',
     taxClass: 'standard',
     stock: 22,
@@ -146,6 +153,7 @@ export const PRODUCTS: readonly Product[] = [
     size: 'M',
     category: "Tops",
     priceMinor: 2600000,
+    costMinor: 1500000,
     barcode: '6153000000038',
     taxClass: 'standard',
     stock: 14,
@@ -160,6 +168,7 @@ export const PRODUCTS: readonly Product[] = [
     size: 'M',
     category: "Tops",
     priceMinor: 3950000,
+    costMinor: 2300000,
     barcode: '6153000000045',
     taxClass: 'standard',
     stock: 9,
@@ -174,6 +183,7 @@ export const PRODUCTS: readonly Product[] = [
     size: '32W',
     category: "Bottoms",
     priceMinor: 2400000,
+    costMinor: 1450000,
     wasPriceMinor: 2800000,
     barcode: '6153000000052',
     taxClass: 'standard',
@@ -189,6 +199,7 @@ export const PRODUCTS: readonly Product[] = [
     size: 'UK 9',
     category: "Footwear",
     priceMinor: 4500000,
+    costMinor: 2700000,
     barcode: '6153000000069',
     taxClass: 'standard',
     stock: 12,
@@ -204,6 +215,7 @@ export const PRODUCTS: readonly Product[] = [
     size: 'One size',
     category: "Accessories",
     priceMinor: 95000,
+    costMinor: 48000,
     barcode: '6153000000076',
     taxClass: 'standard',
     stock: 180,
@@ -217,6 +229,7 @@ export const PRODUCTS: readonly Product[] = [
     size: 'One size',
     category: "Accessories",
     priceMinor: 750000,
+    costMinor: 410000,
     barcode: '6153000000083',
     taxClass: 'standard',
     stock: 30,
@@ -231,6 +244,7 @@ export const PRODUCTS: readonly Product[] = [
     size: 'One size',
     category: "Accessories",
     priceMinor: 600000,
+    costMinor: 330000,
     barcode: '6153000000090',
     taxClass: 'standard',
     stock: 3,
@@ -245,6 +259,7 @@ export const PRODUCTS: readonly Product[] = [
     size: 'One size',
     category: "Bags",
     priceMinor: 550000,
+    costMinor: 290000,
     barcode: '6153000000106',
     taxClass: 'standard',
     stock: 25,
