@@ -869,6 +869,27 @@ in front of it is **drawn from the data** (#115).
   bracket from the glyph (6.4 wide at [337,651]) to [56,125]; back to r 30 green by
   256ms. A `:has()` rule first used to time the status bar cost the Quantity sheet a
   frame of its exit (5 → 4, failing `walk-quantity`); replaced by a short hold.
+  **Replaced by a scale, at the designer's request** ("instead of a masked
+  transition, scale to full page, smoothly, like iOS, easy ease"): the whole
+  scanner screen — camera, chrome and docked tray together — grows out of the
+  button the way an iOS app opens from its icon. It starts as the button exactly
+  (scaled down uniformly to its width, centred on it, cropped to its square and
+  full round, with the button's green and glyph on top) and makes one move on
+  After Effects' Easy Ease, `cubic-bezier(0.33, 0, 0.67, 1)`, added to
+  `shared/src/motion.ts` as `EASING.easy` (the one new motion value): `slow` in,
+  `base` out, the green fading over the first `fast` and back over the close's
+  last two-thirds. The circle's chrome fade and the tray's delayed rise are gone:
+  nothing moves on its own inside the growing screen. Interpolating the transform
+  and the crop separately bulged the corners to a 74 radius mid-flight; everything
+  now derives from one eased `--zoom` (a registered custom property), so the
+  on-screen radius runs straight 30 → 55. The status bar's turn to white is timed
+  to the black's edge (`LIT_AT`): its fade is mid-grey as the edge passes the
+  clock, ~443ms after the tap. Sampled per frame on the production build:
+  [317,631,60,60] r 30 → [0,0,393,852] r 55 by ~474ms, 23 in-between frames, never
+  shrinking, corners only loosening (`walk-scan`); back on the button, green, at
+  ~302ms; dark mode's face `#2acb7a` like its button; reduced motion cuts.
+- **"Tap to scan" is centred among the viewfinder's four corners** (the designer's
+  request; it sat 32 below the centre): within 0.5px (`walk-scan`).
 - **Round shapes stay round**: the scan button, the camera's close, the match sheet's
   two pill badges and the tag's hole are on index.css's `corner-shape: round` list —
   the continuous-corner rule had made the 60 button a squircle where the frame binds

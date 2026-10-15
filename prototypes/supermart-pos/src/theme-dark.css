@@ -62,9 +62,9 @@
 /* The scan button read too bright in dark (Color/container/success/bold resolves to
    Color/green/300 #49e491, HSL 148/74/59). At the designer's request it steps down to
    the library's next green, Color/green/400 #2acb7a (HSL 150/66/48), after 2- and
-   3-point lightness cuts still read light. The camera's circle opens from the same
-   green, so it matches. */
+   3-point lightness cuts still read light. The scanner grows out of the same green
+   (`.scanMorph`), so it matches. */
 :root[data-theme='dark'] .scanButton,
-:root[data-theme='dark'] .sheet[data-entry='button'][data-open='off'] .scanStage {
+:root[data-theme='dark'] .scanMorph {
   background-color: #2acb7a;
 }

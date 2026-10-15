@@ -63,8 +63,35 @@ const lensClear = () => page.waitForFunction(() => !document.querySelector('.sca
 await pick('Sales point');
 check('the scan button: 60x60 at [317,631], 12 above View cart (88:19369)',
   near(await box('.salesPoint__scan'), { x: 317, y: 631, w: 60, h: 60 }), JSON.stringify(await box('.salesPoint__scan')));
-await click('.salesPoint__scan');
-await wait(1000);
+/* The scanner grows out of the button, iOS-style: one rounded rectangle from the
+   button's own box and round to the whole screen and the display's 55, its corners
+   only ever loosening, the button's green fading as the camera takes over. */
+const zoom = await page.evaluate(() => new Promise((done) => {
+  const out = []; const t0 = performance.now();
+  document.querySelector('.salesPoint__scan').click();
+  const tick = () => {
+    const sh = document.querySelector('.sheet[data-entry="button"]');
+    if (sh) {
+      const cs = getComputedStyle(sh);
+      const m = cs.transform === 'none' ? [1, 0, 0, 1, 0, 0] : cs.transform.match(/-?[\d.e-]+/g).map(Number);
+      const n = cs.clipPath.match(/-?[\d.]+/g).map(Number);
+      const top = 426 + m[3] * (n[0] - 426) + m[5], left = 196.5 + m[0] * (0 - 196.5) + m[4];
+      out.push({ x: left, y: top, w: 393 * m[0], h: (852 - 2 * n[0]) * m[3], r: n.at(-1) * m[0],
+        face: +getComputedStyle(sh.querySelector('.scanMorph')).opacity });
+    }
+    if (performance.now() - t0 < 700) requestAnimationFrame(tick); else done(out);
+  };
+  requestAnimationFrame(tick);
+}));
+const z0 = zoom[0], z1 = zoom.at(-1);
+check('the scanner starts as the button: its box, its full round, its green',
+  near(z0, { x: 317, y: 631, w: 60, h: 60 }) && Math.abs(z0.r - 30) < 0.5 && z0.face === 1, JSON.stringify(z0));
+check('...and grows to the whole screen and the display\'s 55 radius, the green gone',
+  near(z1, { x: 0, y: 0, w: 393, h: 852 }) && Math.abs(z1.r - 55) < 0.5 && z1.face === 0, JSON.stringify(z1));
+check('...in one move: never shrinking, the corners only loosening, through several frames',
+  zoom.every((f, i) => i === 0 || (f.w >= zoom[i - 1].w - 0.01 && f.r >= zoom[i - 1].r - 0.01))
+  && zoom.filter((f) => f.w > 61 && f.w < 392).length >= 8, `${zoom.filter((f) => f.w > 61 && f.w < 392).length} in-between frames`);
+await wait(400);
 check('it opens the scanner: the camera, and the Cart docked under it', await mode() === 'docked' && !!(await box('.scanner')));
 check('the docked Order Preview starts at 340, full width (88:19584)', near(await box('.cart'), { x: 0, y: 340, w: 393, h: 852 }), JSON.stringify(await box('.cart')));
 check('...its top corners exactly a sheet\'s: --sheet-radius, under the same corner shape', await page.evaluate(() => {
@@ -85,6 +112,12 @@ check('...and its footer is there at opacity 0, out of reach', await page.evalua
 }));
 check('the camera\'s close at [20,60] and the frame 281x194 at [56,125]',
   near(await box('.scanner__close'), { x: 20, y: 60, w: 40, h: 40 }) && near(await box('.scanner__frame'), { x: 56, y: 125, w: 281, h: 194 }));
+check('"Tap to scan" sits at the centre of the four corners', await page.evaluate(() => {
+  const f = document.querySelector('.scanner__frame').getBoundingClientRect(), h = document.querySelector('.scanner__hint');
+  if (!h) return false;
+  const r = document.createRange(); r.selectNodeContents(h); const t = r.getBoundingClientRect();
+  return Math.abs(t.left + t.width / 2 - (f.left + f.width / 2)) <= 0.5 && Math.abs(t.top + t.height / 2 - (f.top + f.height / 2)) <= 0.5;
+}));
 check('the status bar turns white over the camera', await page.evaluate(() => getComputedStyle(document.querySelector('.statusBar__time')).color === 'rgb(255, 255, 255)'));
 
 // --- A barcode: the camera's first item is Crew Socks' label (88:19777 → 88:19938) ----

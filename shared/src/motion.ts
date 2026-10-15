@@ -28,6 +28,12 @@ export const EASING = {
   in: 'cubic-bezier(0.7, 0, 0.84, 0)',
   /** Moving between two on-screen positions. */
   inOut: 'cubic-bezier(0.65, 0, 0.35, 1)',
+  /**
+   * After Effects' Easy Ease (33% influence both ends): a gentle in-and-out for one
+   * object changing size in place. The designer's call for the scan button growing
+   * into the scanner, iOS-style.
+   */
+  easy: 'cubic-bezier(0.33, 0, 0.67, 1)',
 } as const;
 
 /**

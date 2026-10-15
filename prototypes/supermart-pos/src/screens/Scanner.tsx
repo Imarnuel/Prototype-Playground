@@ -54,7 +54,7 @@ export function Scanner({ target, onClose, onHoldUp, hint = false }: {
         <span className="scanner__corner" data-at="tr" />
         <span className="scanner__corner" data-at="bl" />
         <span className="scanner__corner" data-at="br" />
-        {/* Wrapped: the sweep runs on the line, the arrival from the button on this. */}
+        {/* Wrapped: the sweep runs on the line, inside the frame's own box. */}
         <span className="scanner__lineWrap"><span className="scanner__line"><Icon name="scan-line" /></span></span>
         {hint && <span className="scanner__hint" data-hidden={target ? 'on' : 'off'}>Tap to scan the next item</span>}
       </div>
