@@ -84,8 +84,10 @@ const BOXES = [
   ['197:20901 card', '.dash__locationsCard', 0, { x: 16, y: 1318, w: 361, h: 404 }],
   ['197:20903 table', '.dash__table', 0, { x: 31.5, y: 1342, w: 329, h: 356 }],
   ['197:20905 # head', '.dash__table th', 0, { x: 31.5, y: 1342, w: 35, h: 36 }],
-  ['197:20918 location head', '.dash__table th', 1, { x: 66.5, y: 1342, w: 184, h: 36 }],
-  ['197:20946 sales head', '.dash__table th', 2, { x: 250.5, y: 1342, w: 110, h: 36 }],
+  // The frame's 184 / 110: Location gives 20 to Sales, so a chain's month
+  // ("₦11,403,727.00") fits; the right edge is the frame's (BUILD-PLAN #131).
+  ['197:20918 location head', '.dash__table th', 1, { x: 66.5, y: 1342, w: 164, h: 36 }],
+  ['197:20946 sales head', '.dash__table th', 2, { x: 230.5, y: 1342, w: 130, h: 36 }],
   ['197:20949 "Sales"', '.dash__table th.dash__colSales span', 0, { r: 352.5 }],
   ...[0, 1, 2, 3, 4].flatMap((i) => {
     const y = 1378 + 64 * i;

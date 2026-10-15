@@ -177,13 +177,26 @@ by retyping** — see `figma/README.md`.
 
 The Dashboard reads one ledger, and nothing else keeps sales figures.
 
-- **Seeded:** 60 days of orders over five branches (seeded random, so every load is
-  the same; today's run up to the current time). The branches are invented, as the
-  frame's are placeholders (#131); this till is Freshvale Bodija, at `STORE.address`.
+- **Seeded as a mid-size chain** (the designer's choice): 60 days over five branches,
+  about 26-40 sales a branch a day, roughly ₦100M a month. It trades like a shop:
+  8:00-20:00 (Sunday 12:00-18:00) with a lunch and an after-work peak, Saturday
+  busiest and Sunday quietest, a lift around the 25th, a gentle climb. POS leads the
+  tenders; Comp. is under 1%. Seeded random, so every load is the same; each day is
+  seeded whole and cut at now, so today compares like for like with yesterday at the
+  same hour. Like-for-like weekdays move a median 9% branch to branch.
+- **Running costs fall when a real one would**: salaries on the 25th (the Friday
+  before at a weekend), rent and fixed costs on the 1st, diesel and staff lunch daily
+  per branch, ads weekly, a 0.5% POS charge daily. So the month's margin is higher
+  before pay day than after: the books are a cash book, not accruals.
+- **Stock covers all five branches** (the designer's choice): Bodija, this till's,
+  holds the catalogue's own stock so the Sales Point's demo states hold; the others
+  hold 1.5-3 months of what they sell (`cart:verify`: 1.74 months for the chain).
+- The branches are invented, as the frame's are placeholders (#131); this till is
+  Freshvale Bodija, at `STORE.address`.
 - **Live:** every sale paid at Checkout is recorded (`submitPayment` → `recordSale`).
 - **Cost prices are INVENTED** (`costMinor` on each product): cost of goods, mark-up
-  and margin need one and no frame gives it. Expenses and supplier bills are invented
-  too, and marked so in the ledger.
+  and margin need one and no frame gives it. Volumes, costs, bills and other
+  branches' stock are invented too, and marked so in the ledger.
 - Profit = sales − VAT − cost of goods − expenses. Comp. and Loyalty count as sales.
   Debtors (credit sales of the last 14 days) and creditors (bills) are a point in
   time, not a period.
@@ -239,7 +252,7 @@ npm run dev                # iterate; open with ?dev=1 for the toolbar
 npm run build && npm run preview   # demo from here, not dev
 
 npm run catalogue:verify   # 67 invariants: check digits, units, money, totals, states, CSV
-npm run cart:verify        # 77 rules: stock, clamps, unit changes, the receipt, the queue, scanning, the books
+npm run cart:verify        # 79 rules: stock, clamps, unit changes, the receipt, the queue, scanning, the books
 npm run catalogue:csv      # regenerate figma/catalogue.csv from catalogue.ts
 npm run figma:spec         # every figure the Figma screens were synced to (figma/README.md)
 npm run tokens:gen         # regenerate tokens.ts/.css from figma-variables.json (+ the dark block)

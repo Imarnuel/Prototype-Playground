@@ -583,8 +583,13 @@
   color: var(--color-text-subtle);
 }
 .dash__colNo { width: 35px; box-sizing: border-box; }
-.dash__colName { width: 184px; box-sizing: border-box; }
-.dash__colSales { width: 110px; box-sizing: border-box; text-align: right !important; }
+/* The frame's columns are 35 / 184 / 110, sized for six-figure sales. A chain's month
+   runs to "₦11,403,727.00", 106 wide, which the 110 column (less its padding) cut off
+   at the card's edge; Location gives 20 to Sales, still 16 more than its longest name
+   needs. The right edge, and so every figure's alignment, is where the frame puts it
+   (BUILD-PLAN #131). */
+.dash__colName { width: 164px; box-sizing: border-box; }
+.dash__colSales { width: 130px; box-sizing: border-box; text-align: right !important; }
 .dash__table th.dash__colSales span { padding: 0 4px; }
 td.dash__colNo {
   font-size: var(--type-Label-Large-size);

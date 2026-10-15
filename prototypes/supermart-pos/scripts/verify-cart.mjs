@@ -250,10 +250,19 @@ check('a tag from a brand the store does not sell matches nothing', scan.matchTe
   }
   const [today, week, month] = all;
   check('today has sales, and sits inside both the week and the month', today.salesMinor > 0 && today.salesMinor <= week.salesMinor && today.salesMinor <= month.salesMinor);
-  check('the inventory is the shelf at cost and at price; mark-up and margin from those',
-    today.inventory.stockMinor === PRODUCTS.reduce((a, p) => a + p.stock * p.costMinor, 0)
-    && today.inventory.retailMinor === PRODUCTS.reduce((a, p) => a + p.stock * p.priceMinor, 0)
+  const held = ledger.stockHeld();
+  const shelf = (value) => ledger.BRANCHES.reduce((a, b) => a + PRODUCTS.reduce((x, p) => x + held[b.id][p.id] * value(p), 0), 0);
+  check('the inventory is every branch\'s shelf at cost and at price; mark-up and margin from those',
+    today.inventory.stockMinor === shelf((p) => p.costMinor)
+    && today.inventory.retailMinor === shelf((p) => p.priceMinor)
     && near(today.inventory.markupPct, ((today.inventory.retailMinor - today.inventory.stockMinor) / today.inventory.stockMinor) * 100));
+  check('this till\'s branch holds the catalogue\'s own stock, so the Sales Point\'s demo states hold',
+    PRODUCTS.every((p) => held[ledger.HOME_BRANCH][p.id] === p.stock));
+  // A month's cost of goods, from the month so far; the other branches hold 1.5-3
+  // months and this till's a few days, so the chain holds a little under that.
+  const monthCogs = (month.cogsMinor / (month.at - ledger.periodRange('month', month.at).from)) * 30 * 86400e3;
+  const months = today.inventory.stockMinor / monthCogs;
+  check('the chain holds one to three months of stock', months > 1 && months < 3, `${months.toFixed(2)} months`);
   check('every product costs the store less than it sells for', PRODUCTS.every((p) => p.costMinor > 0 && p.costMinor < p.priceMinor));
   // A branch can be down on the stretch before; the frame only draws a gain (#131).
   const { prevFrom, prevTo } = ledger.periodRange('month', month.at);

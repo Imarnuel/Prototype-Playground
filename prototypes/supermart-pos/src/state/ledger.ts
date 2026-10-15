@@ -22,10 +22,10 @@ import { productFor, totals, type CartLine } from './cart';
 export type Branch = { id: string; name: string; address: string; weight: number };
 export const BRANCHES: readonly Branch[] = [
   { id: 'bodija', name: 'Freshvale Bodija', address: STORE.address, weight: 1 },
-  { id: 'ringroad', name: 'Freshvale Ring Road', address: '22, Ring Road, Challenge, Ibadan', weight: 0.85 },
-  { id: 'dugbe', name: 'Freshvale Dugbe', address: '5, Lebanon Street, Dugbe, Ibadan', weight: 0.7 },
-  { id: 'agbowo', name: 'Freshvale Agbowo', address: '3, Oyo Road, Agbowo, Ibadan', weight: 0.6 },
-  { id: 'iworoad', name: 'Freshvale Iwo Road', address: '13, Jones Street, Iwo Road, Ibadan', weight: 0.5 },
+  { id: 'ringroad', name: 'Freshvale Ring Road', address: '22, Ring Road, Challenge, Ibadan', weight: 0.9 },
+  { id: 'dugbe', name: 'Freshvale Dugbe', address: '5, Lebanon Street, Dugbe, Ibadan', weight: 0.8 },
+  { id: 'agbowo', name: 'Freshvale Agbowo', address: '3, Oyo Road, Agbowo, Ibadan', weight: 0.72 },
+  { id: 'iworoad', name: 'Freshvale Iwo Road', address: '13, Jones Street, Iwo Road, Ibadan', weight: 0.62 },
 ];
 /** The branch this till sells from. */
 export const HOME_BRANCH = 'bodija';
@@ -58,11 +58,24 @@ export type Sale = {
 export type Expense = { at: Date; label: string; account: 'cash' | 'bank'; amountMinor: number };
 export type Bill = { supplier: string; amountMinor: number };
 
-/* --- Seed ---------------------------------------------------------------------------- */
+/* --- Seed ----------------------------------------------------------------------------
+   INVENTED, and shaped like a real mid-size chain rather than even noise: about 26-40
+   sales a branch a day, trading 8:00-20:00 (Sunday 12:00-18:00) with a lunchtime and a
+   bigger after-work peak, Saturday the busiest day and Sunday the quietest, a lift
+   around month-end pay day, and a gentle climb over the two months. */
 const DAYS = 60;
-const OPEN_HOURS = 11;
-const ORDERS_PER_DAY = 18;
+/** Sales a day at the busiest branch, on an ordinary weekday. */
+const ORDERS_PER_DAY = 40;
 const naira = (n: number) => n * CURRENCY.minorPerUnit;
+
+/** Opening hours, [open, close), by day of the week, Sunday first. */
+const HOURS: readonly (readonly [number, number])[] = [[12, 18], [8, 20], [8, 20], [8, 20], [8, 20], [8, 20], [8, 20]];
+/** How busy each day of the week is, Sunday first. */
+const WEEKDAY = [0.5, 0.85, 0.9, 0.9, 0.95, 1.1, 1.4];
+/** How busy each hour is, from 8:00 to 20:00. */
+const HOURLY = [0.4, 0.6, 0.8, 1, 1.3, 1.2, 0.9, 1, 1.3, 1.5, 1.3, 0.7];
+/** Salaries land on the 25th, or the Friday before when the 25th is a weekend. */
+const isPayday = (d: Date) => (d.getDate() === 25 && d.getDay() % 6 !== 0) || (d.getDay() === 5 && (d.getDate() === 23 || d.getDate() === 24));
 
 /** mulberry32: small, fast, and the same sequence every load. */
 function random(seed: number) {
@@ -81,22 +94,37 @@ const pick = <T,>(rnd: () => number, items: readonly T[], weights: readonly numb
 
 /* Cheap things sell often, dear things rarely. */
 const PRODUCT_WEIGHT = (p: Product) => 1 / Math.sqrt(p.priceMinor / naira(1000));
-const TENDER_WEIGHT: Record<Tender, number> = { cash: 28, pos: 24, bank: 24, credit: 9, comp: 6, loyalty: 9 };
+/* Cards lead in Nigerian retail; a complimentary sale is rare. */
+const TENDER_WEIGHT: Record<Tender, number> = { cash: 26, pos: 38, bank: 28, credit: 5, comp: 0.7, loyalty: 2.3 };
+/** A POS terminal's charge on what it takes, debited from the bank daily. INVENTED. */
+const POS_CHARGE = 0.005;
 
-/** INVENTED: the store's running costs; no frame lists one. */
-const EXPENSES: readonly { label: string; account: 'cash' | 'bank'; naira: [number, number]; perWeek: number }[] = [
-  { label: 'Diesel for the generator', account: 'cash', naira: [30000, 45000], perWeek: 4 },
-  { label: 'Staff lunch', account: 'cash', naira: [8000, 14000], perWeek: 6 },
-  { label: 'Electricity token', account: 'bank', naira: [25000, 40000], perWeek: 1 },
-  { label: 'Delivery van fuel', account: 'cash', naira: [15000, 25000], perWeek: 3 },
-  { label: 'Carrier bags and tags', account: 'bank', naira: [12000, 20000], perWeek: 1 },
+/** INVENTED: the chain's running costs, each on the days a real one falls due. */
+const EXPENSES: readonly {
+  label: string;
+  account: 'cash' | 'bank';
+  naira: readonly [number, number];
+  on: (day: Date) => boolean;
+  /** Paid by every branch, not once for the chain. */
+  perBranch?: true;
+}[] = [
+  { label: 'Staff salaries', account: 'bank', naira: [9400000, 9400000], on: isPayday },
+  { label: 'Shop rent, monthly share', account: 'bank', naira: [4200000, 4200000], on: (d) => d.getDate() === 1 },
+  { label: 'Security and cleaning', account: 'bank', naira: [1100000, 1100000], on: (d) => d.getDate() === 1 },
+  { label: 'Internet and phone lines', account: 'bank', naira: [150000, 150000], on: (d) => d.getDate() === 1 },
+  { label: 'Diesel for the generator', account: 'cash', naira: [18000, 30000], on: () => true, perBranch: true },
+  { label: 'Staff transport and lunch', account: 'cash', naira: [8000, 12000], on: () => true, perBranch: true },
+  { label: 'Electricity tokens', account: 'bank', naira: [30000, 45000], on: (d) => d.getDay() === 1, perBranch: true },
+  { label: 'Stock delivery to branches', account: 'cash', naira: [60000, 110000], on: (d) => [1, 3, 5].includes(d.getDay()) },
+  { label: 'Instagram and radio ads', account: 'bank', naira: [450000, 650000], on: (d) => d.getDay() === 4 },
+  { label: 'Carrier bags and tags', account: 'bank', naira: [90000, 140000], on: (d) => d.getDay() === 2 },
 ];
 
-/** INVENTED: what the store owes its suppliers today. */
+/** INVENTED: what the chain owes its suppliers today — a few weeks of purchases. */
 const BILLS: readonly Bill[] = [
-  { supplier: 'Northline Apparel', amountMinor: naira(1240000) },
-  { supplier: 'Kora Knitwear', amountMinor: naira(565000) },
-  { supplier: 'Freshvale Textiles', amountMinor: naira(880000) },
+  { supplier: 'Northline Apparel', amountMinor: naira(12400000) },
+  { supplier: 'Kora Knitwear', amountMinor: naira(5650000) },
+  { supplier: 'Freshvale Textiles', amountMinor: naira(8800000) },
 ];
 
 const sale = (at: Date, branch: string, tender: Tender, lines: readonly CartLine[]): Sale => {
@@ -110,24 +138,30 @@ const sale = (at: Date, branch: string, tender: Tender, lines: readonly CartLine
   };
 };
 
+/* Every day, today included, is seeded whole and then cut at `now`, so today so far
+   compares like for like with yesterday at the same hour (Top Locations), and the
+   books never fill in under a demo as the clock moves. */
 function seed(now: Date) {
   const rnd = random(20260509);
   const sales: Sale[] = [];
   const expenses: Expense[] = [];
+  /** Units each branch sold of each product over the last 30 days: its stock follows. */
+  const sold: Record<string, Record<string, number>> = Object.fromEntries(BRANCHES.map((b) => [b.id, {}]));
   const midnight = new Date(now); midnight.setHours(0, 0, 0, 0);
   for (let d = DAYS; d >= 0; d--) {
     const day = new Date(midnight); day.setDate(day.getDate() - d);
-    // Trading hours run up to now on the current day, so "today" always has a morning
-    // of sales however early the demo is opened; past days are a full 8:00-19:00.
-    const end = d === 0 ? now.getTime() : day.getTime() + (8 + OPEN_HOURS) * 3600e3;
-    const start = d === 0 ? Math.max(day.getTime(), end - OPEN_HOURS * 3600e3) : day.getTime() + 8 * 3600e3;
-    const share = d === 0 ? (end - start) / (OPEN_HOURS * 3600e3) : 1;
-    // A slow climb over the two months, so this period beats the last (Top Locations).
-    const growth = 0.85 + 0.3 * ((DAYS - d) / DAYS);
+    const [open, close] = HOURS[day.getDay()];
+    const hours = HOURLY.map((_, i) => 8 + i).filter((h) => h >= open && h < close);
+    const at = (hour?: number) => {
+      const h = hour ?? pick(rnd, hours, hours.map((x) => HOURLY[x - 8]));
+      return new Date(day.getTime() + (h + rnd()) * 3600e3);
+    };
+    const date = day.getDate();
+    const lift = (date >= 25 || date <= 2 ? 1.15 : 1) * WEEKDAY[day.getDay()] * (0.96 + 0.08 * ((DAYS - d) / DAYS));
+    let posTaken = 0;
     for (const b of BRANCHES) {
-      const n = Math.round((ORDERS_PER_DAY / 3.65) * b.weight * growth * share * (0.8 + 0.4 * rnd()));
+      const n = Math.round(ORDERS_PER_DAY * b.weight * lift * (0.95 + 0.1 * rnd()));
       for (let i = 0; i < n; i++) {
-        const at = new Date(start + rnd() * (end - start));
         const count = 1 + Math.floor(rnd() * 2.4);
         const lines: CartLine[] = [];
         for (let j = 0; j < count; j++) {
@@ -135,21 +169,34 @@ function seed(now: Date) {
           if (lines.some((l) => l.productId === p.id)) continue;
           lines.push({ productId: p.id, unitId: 'each', count: p.priceMinor < naira(2000) ? 1 + Math.floor(rnd() * 4) : 1 });
         }
-        sales.push(sale(at, b.id, pick(rnd, TENDERS.map((t) => t.id), TENDERS.map((t) => TENDER_WEIGHT[t.id])), lines));
+        const s = sale(at(), b.id, pick(rnd, TENDERS.map((t) => t.id), TENDERS.map((t) => TENDER_WEIGHT[t.id])), lines);
+        sales.push(s);
+        if (s.tender === 'pos') posTaken += s.totalMinor;
+        if (d < 30) for (const l of lines) sold[b.id][l.productId] = (sold[b.id][l.productId] ?? 0) + l.count;
       }
     }
     for (const e of EXPENSES) {
-      if (rnd() < e.perWeek / 7) {
-        const at = new Date(start + rnd() * (end - start));
+      if (!e.on(day)) continue;
+      for (let k = 0; k < (e.perBranch ? BRANCHES.length : 1); k++) {
         const amount = e.naira[0] + Math.round((rnd() * (e.naira[1] - e.naira[0])) / 500) * 500;
-        expenses.push({ at, label: e.label, account: e.account, amountMinor: naira(amount) });
+        expenses.push({ at: at(open), label: e.label, account: e.account, amountMinor: naira(amount) });
       }
     }
+    expenses.push({ at: new Date(day.getTime() + close * 3600e3 - 60e3), label: 'POS charges', account: 'bank', amountMinor: naira(Math.round((posTaken * POS_CHARGE) / CURRENCY.minorPerUnit)) });
   }
-  return { sales, expenses };
+  // This till's branch holds the catalogue's own stock (its demo states depend on it);
+  // every other branch holds one and a half to three months of what it sells.
+  const stock: Record<string, Record<string, number>> = Object.fromEntries(BRANCHES.map((b) => [b.id,
+    b.id === HOME_BRANCH
+      ? Object.fromEntries(PRODUCTS.map((p) => [p.id, p.stock]))
+      : Object.fromEntries(PRODUCTS.map((p) => [p.id, Math.max(4, Math.round(((sold[b.id][p.id] ?? 0) / 30) * (45 + rnd() * 45)))]))]));
+  return { sales: sales.filter((s) => s.at <= now), expenses: expenses.filter((e) => e.at <= now), stock };
 }
 
 let books = seed(new Date());
+
+/** What each branch holds, by product id: the Inventory card's source. */
+export const stockHeld = (): Readonly<Record<string, Readonly<Record<string, number>>>> => books.stock;
 
 /** A sale paid at this till: it lands in the books the Dashboard reads. */
 export function recordSale(args: { at: Date; tender: 'cash' | 'pos' | 'bank'; lines: readonly CartLine[]; orderDiscount?: Parameters<typeof totals>[1] }) {
@@ -233,8 +280,10 @@ export function summarise(period: Period, now = new Date()): DashboardSummary {
   const expenseMinor = cogsMinor + expensesMinor;
   const profitMinor = revenueMinor - expenseMinor;
 
-  const stockMinor = sum(PRODUCTS, (p) => p.stock * p.costMinor);
-  const retailMinor = sum(PRODUCTS, (p) => p.stock * p.priceMinor);
+  const held = (value: (p: Product) => number) =>
+    sum(BRANCHES, (b) => sum(PRODUCTS, (p) => books.stock[b.id][p.id] * value(p)));
+  const stockMinor = held((p) => p.costMinor);
+  const retailMinor = held((p) => p.priceMinor);
 
   const branchSales = (f: Date, t: Date) => (id: string) =>
     sum(books.sales.filter((s) => s.branch === id && s.at >= f && s.at <= t), (s) => s.totalMinor);
