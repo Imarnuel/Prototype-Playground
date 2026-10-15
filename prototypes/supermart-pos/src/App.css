@@ -45,40 +45,43 @@
 .scanStage[data-open='off'] > .scanner { opacity: 0; transform: scale(0.96); }
 
 /* --- The scan button opens into the scanner (designer's request) ------------------
-   iOS-style, like an app opening from its icon: the scanner screen — camera, chrome
-   and docked tray together — grows out of the button. It starts as the button
-   exactly: scaled down uniformly to the button's width, centred on it, cropped to
-   the button's square and its full round (--r0). Then one move, on Easy Ease: the
-   scale runs to 1 while the crop opens to the whole screen and its corners ease to
-   the display's own radius (--r1), so nothing inside travels or stretches on its
-   own. The button's face (`.scanMorph`, its green and glyph) rides on top and fades
-   as the camera takes over. Closing is the same move backwards, a little quicker
-   (exits run on `base`, entries on `slow`), and the face comes back as it lands on
-   the real button waiting underneath.
+   iOS-style, like an app opening from its icon, on After Effects' Easy Ease: the
+   camera grows out of the button. It starts as the button exactly — scaled down
+   uniformly to the button's width, centred on it, cropped to its square and full
+   round (--r0), with the button's face (`.scanMorph`: its green and glyph) on top —
+   and in one move on `base` becomes the whole screen, its corners easing to the
+   display's own radius (--r1). The face fades over the camera's black, so the
+   green deepens to black rather than washing out. The viewfinder, close and hint
+   fade in once the camera is large, and the Order Preview tray rises from the
+   bottom once it has filled the screen. Closing: the chrome and the tray go first
+   and quickly, and the camera shrinks back into the button, its green returning
+   as it lands on the real button waiting underneath.
+   Only the camera grows. The first pass grew the whole presentation, tray
+   included: small, it read as a shrunken white screen over the white Sales Point,
+   and the green faded to a mint wash over the tray ("the animation sucks").
    It replaces a circular reveal ("instead of a masked transition") and before that
    a fly-out of the glyph's brackets; see BUILD-PLAN, Motion. --tx/--ty/--s/--clip-y/
-   --r0 are measured off the button in App.tsx; the duration and curve are the
-   `.sheet`'s inline ones there. */
+   --r0/--r1 are measured off the button in App.tsx. */
+.sheet[data-entry='button'],
+.sheet[data-entry='button'][data-open='off'] { transform: none; opacity: 1; }
+
 /* One eased progress, 0 (the button) to 1 (the screen), and every part of the shape
-   derived from it. Interpolating the transform and the crop separately bulged the
-   corners to a 74 radius mid-flight, rounder than either end, because the crop's
-   radius is scaled with everything else; here the radius ON SCREEN runs straight
-   from the button's 30 to the display's 55. */
+   derived from it, so the radius ON SCREEN runs straight from 30 to 55. Animating
+   the transform and the crop separately bulged the corners to 74 mid-flight. */
 @property --zoom {
   syntax: '<number>';
   inherits: false;
   initial-value: 1;
 }
-.sheet[data-entry='button'] {
+.sheet[data-entry='button'] .scanStage {
   --zoom: 1;
   --scale: calc(var(--s) + (1 - var(--s)) * var(--zoom));
-  opacity: 1;
   transform: translate(calc(var(--tx) * (1 - var(--zoom))), calc(var(--ty) * (1 - var(--zoom)))) scale(var(--scale));
   clip-path: inset(calc(var(--clip-y) * (1 - var(--zoom))) 0 round calc((var(--r0) + (var(--r1) - var(--r0)) * var(--zoom)) / var(--scale)));
-  transition-property: --zoom;
+  transition: --zoom var(--motion-base) var(--ease-easy);
 }
-.sheet[data-entry='button'][data-open='off'] { --zoom: 0; }
-/* The camera arrives with the screen it is part of, not by its own dim-and-recede. */
+.sheet[data-entry='button'][data-open='off'] .scanStage { --zoom: 0; }
+/* The camera arrives with the shape it is in, not by its own dim-and-recede. */
 .sheet[data-entry='button'] .scanStage > .scanner { opacity: 1; transform: none; }
 
 .scanMorph {
@@ -89,17 +92,38 @@
   background: var(--color-container-success-bold-default);
   pointer-events: none;
   opacity: 0;
-  /* Gone by halfway through the open; back over the last two-thirds of the close
-     (held `base` - `fast`, then `fast`), so the green is whole as it lands. */
+  /* Gone by two-thirds of the open; back over the close's last two-thirds (held
+     `base` - `fast`, then `fast`), so the green is whole as it lands. */
   transition: opacity var(--motion-fast) var(--ease-easy);
 }
-.sheet[data-open='off'] > .scanMorph {
+.sheet[data-open='off'] .scanMorph {
   opacity: 1;
   transition-delay: calc(var(--motion-base) - var(--motion-fast));
 }
 /* The glyph is drawn at the button's 28 at the start, so it is counter-scaled; it
-   then grows with the screen as it fades, like an icon opening. */
+   then grows with the camera as it fades, like an icon opening. */
 .scanMorph > * { transform: scale(calc(1 / var(--s))); }
+
+/* The chrome: in a beat after the camera starts growing, out at once. */
+.sheet[data-entry='button'] :is(.scanner__frame, .scanner__close) {
+  transition: opacity var(--motion-fast) var(--ease-out);
+}
+.sheet[data-entry='button'][data-open='on'] :is(.scanner__frame, .scanner__close, .scanner__hint) { transition-delay: var(--motion-instant); }
+.sheet[data-entry='button'][data-open='off'] :is(.scanner__frame, .scanner__close, .scanner__hint) {
+  opacity: 0;
+  transition-duration: var(--motion-instant);
+}
+
+/* The tray: up on the Cart's own `base` decelerating rise once the camera has
+   all but filled the screen (~95% grown at `fast` + `instant` / 2; at `fast` a
+   full-width tray met a camera still visibly inset); down first and quickly on
+   the accelerating curve. */
+.sheet[data-entry='button'][data-open='on'] .cart { transition-delay: calc(var(--motion-fast) + var(--motion-instant) / 2); }
+.sheet[data-entry='button'][data-open='off'] .cart {
+  transform: translateY(852px);
+  transition-duration: var(--motion-fast);
+  transition-timing-function: var(--ease-in);
+}
 
 /* Opening from the Cart, the status bar turns white a beat in, once the camera's
    black has reached it. (From the scan button it is timed in App.tsx, LIT_AT.) */

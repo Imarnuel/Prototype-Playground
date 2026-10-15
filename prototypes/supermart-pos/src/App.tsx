@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  DURATION, DeviceFrame, DevToolbar, EASING, SCREEN_RADIUS, SHEET_SPRING, devFlagEnabled, duration, failNextRequest, useReducedMotion,
+  DURATION, DeviceFrame, DevToolbar, SCREEN_RADIUS, SHEET_SPRING, devFlagEnabled, duration, failNextRequest, useReducedMotion,
   type DevToolbarItem,
 } from '@playground/shared';
 import { SalesPoint } from './screens/SalesPoint';
@@ -36,11 +36,11 @@ import './App.css';
 type Forced = 'loading' | 'error' | 'empty' | undefined;
 
 /* Into the scanner from the scan button, when the status bar starts turning white,
-   as a share of the open counted from the tap: the camera's black only reaches the
-   bar at the very end of the growth (its top edge passes the clock ~410ms after the
-   tap), so the bar's `fast` fade starts here to be half done as the edge passes.
-   Measured on the DOM (BUILD-PLAN, Motion), not derived. */
-const LIT_AT = 0.74;
+   as a share of the camera's `base` growth counted from the tap: the black only
+   reaches the bar at the very end of it, so the bar's fade starts here to be about
+   half done as the edge passes the clock. Measured on the DOM (BUILD-PLAN, Motion),
+   not derived. */
+const LIT_AT = 0.67;
 
 export function App() {
   const [forced, setForced] = useState<Forced>(undefined);
@@ -325,7 +325,7 @@ export function App() {
       // The status bar stays dark until the camera's black has grown up to it.
       setLitLate(true);
       // Less the `instant` the bar's own fade already waits (App.css).
-      window.setTimeout(() => setLitLate(false), duration(DURATION.slow * LIT_AT - DURATION.instant, reducedMotion));
+      window.setTimeout(() => setLitLate(false), duration(DURATION.base * LIT_AT - DURATION.instant, reducedMotion));
     } else setScanEntry(null);
     setTotalOpen(false);
     setScanning(true);
@@ -688,7 +688,7 @@ export function App() {
               data-entry={scanEntry ? 'button' : undefined}
               style={{
                 transitionDuration: `${cartOpen ? enterMs : exitMs}ms`,
-                transitionTimingFunction: scanEntry ? EASING.easy : cartOpen ? SHEET_SPRING.easing : SHEET_SPRING.exitEasing,
+                transitionTimingFunction: cartOpen ? SHEET_SPRING.easing : SHEET_SPRING.exitEasing,
                 ...(scanEntry ? {
                   '--tx': `${scanEntry.tx}px`, '--ty': `${scanEntry.ty}px`, '--s': scanEntry.scale,
                   '--clip-y': `${scanEntry.clipY}px`, '--r0': `${scanEntry.radius}px`, '--r1': `${SCREEN_RADIUS}px`,
@@ -698,6 +698,9 @@ export function App() {
               {cameraMounted && (
                 <div className="scanStage" data-open={cameraEntered ? 'on' : 'off'}>
                   <Scanner target={inView} onClose={closeScanner} onHoldUp={() => holdUp()} hint={demoAffordances} />
+                  {/* The button's own face — its green and glyph — over the growing camera,
+                      fading as it opens and back as it lands (App.css). */}
+                  {scanEntry && <div className="scanMorph" aria-hidden="true"><Icon name="scan" /></div>}
                 </div>
               )}
 
@@ -724,10 +727,6 @@ export function App() {
                 totalOpen={totalOpen}
                 onToggleTotal={() => setTotalOpen((o) => !o)}
               />
-
-              {/* The button's own face — its green and glyph — over the growing screen,
-                  fading as the camera takes over and back as it lands (App.css). */}
-              {scanEntry && <div className="scanMorph" aria-hidden="true"><Icon name="scan" /></div>}
 
               <ScanMatches
                 open={matchesOpen}

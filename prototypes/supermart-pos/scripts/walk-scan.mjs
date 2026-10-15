@@ -63,14 +63,14 @@ const lensClear = () => page.waitForFunction(() => !document.querySelector('.sca
 await pick('Sales point');
 check('the scan button: 60x60 at [317,631], 12 above View cart (88:19369)',
   near(await box('.salesPoint__scan'), { x: 317, y: 631, w: 60, h: 60 }), JSON.stringify(await box('.salesPoint__scan')));
-/* The scanner grows out of the button, iOS-style: one rounded rectangle from the
+/* The camera grows out of the button, iOS-style: one rounded rectangle from the
    button's own box and round to the whole screen and the display's 55, its corners
    only ever loosening, the button's green fading as the camera takes over. */
 const zoom = await page.evaluate(() => new Promise((done) => {
   const out = []; const t0 = performance.now();
   document.querySelector('.salesPoint__scan').click();
   const tick = () => {
-    const sh = document.querySelector('.sheet[data-entry="button"]');
+    const sh = document.querySelector('.sheet[data-entry="button"] .scanStage');
     if (sh) {
       const cs = getComputedStyle(sh);
       const m = cs.transform === 'none' ? [1, 0, 0, 1, 0, 0] : cs.transform.match(/-?[\d.e-]+/g).map(Number);
@@ -84,7 +84,7 @@ const zoom = await page.evaluate(() => new Promise((done) => {
   requestAnimationFrame(tick);
 }));
 const z0 = zoom[0], z1 = zoom.at(-1);
-check('the scanner starts as the button: its box, its full round, its green',
+check('the camera starts as the button: its box, its full round, its green',
   near(z0, { x: 317, y: 631, w: 60, h: 60 }) && Math.abs(z0.r - 30) < 0.5 && z0.face === 1, JSON.stringify(z0));
 check('...and grows to the whole screen and the display\'s 55 radius, the green gone',
   near(z1, { x: 0, y: 0, w: 393, h: 852 }) && Math.abs(z1.r - 55) < 0.5 && z1.face === 0, JSON.stringify(z1));
