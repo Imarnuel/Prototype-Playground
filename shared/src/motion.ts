@@ -20,12 +20,12 @@ export const DURATION = {
   /** Sheets and full-screen covers travelling the height of the device. */
   slow: 420,
   /** The launch spring's whole run, to under half a pixel of rest (EASING.launch). */
-  launch: 650,
+  launch: 420,
 } as const;
 
 /**
  * A critically damped spring released from rest, sampled into a CSS `linear()`
- * curve: velocity peaks at 1/ω (~63ms at ω 15.8) and then decays exponentially, so
+ * curve: velocity peaks at 1/ω (~42ms at ω 24) and then decays exponentially, so
  * a move bursts off and spends the rest of its time settling — with no overshoot.
  */
 function criticallyDamped(omega: number, ms: number, steps = 50): string {
@@ -48,9 +48,10 @@ export const EASING = {
    * designer's call for the scan button growing into the scanner ("speed up at the
    * entrance, then slowly ease out", after Easy Ease's slow start read as lag).
    * Critically damped, because a bounce on arrivals was taken out at their call.
-   * Runs for DURATION.launch; 99% of the way by ~420ms.
+   * Runs for DURATION.launch; 99% of the way by ~280ms. Stiffened from ω 15.8 over
+   * 650ms, which read as "too slow".
    */
-  launch: criticallyDamped(15.8, 650),
+  launch: criticallyDamped(24, 420),
 } as const;
 
 /**

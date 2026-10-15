@@ -35,12 +35,6 @@ import './App.css';
 
 type Forced = 'loading' | 'error' | 'empty' | undefined;
 
-/* Into the scanner from the scan button, how long after the tap the status bar
-   starts turning white: the camera's black only reaches the bar at the very end of
-   its growth, so the bar's fade starts here to be about half done as the edge
-   passes the clock. Measured on the DOM (BUILD-PLAN, Motion), not derived. */
-const LIT_AT = 260;
-
 export function App() {
   const [forced, setForced] = useState<Forced>(undefined);
   const [resetNonce, setResetNonce] = useState(0);
@@ -152,9 +146,6 @@ export function App() {
      the camera grows from it and shrinks back into it (App.css). Cleared once the
      tray expands into the Cart, which then closes like any Cart. */
   const { mounted: cameraMounted, entered: cameraEntered } = usePresented(scanning);
-  /* Growing out of the scan button, the camera's black only reaches the status bar
-     at the very end; until then the bar stays dark (LIT_AT). */
-  const [litLate, setLitLate] = useState(false);
   /* What is in front of the camera; one item at a time. A ref as well, so a second
      tap while one is being read is refused without waiting for a render. */
   const [inView, setInView] = useState<ScanTarget | null>(null);
@@ -324,10 +315,6 @@ export function App() {
         clipY: (screen.height - button.height / scale) / 2,
         radius: button.width / 2,
       });
-      // The status bar stays dark until the camera's black has grown up to it.
-      setLitLate(true);
-      // Less the `instant` the bar's own fade already waits (App.css).
-      window.setTimeout(() => setLitLate(false), duration(LIT_AT - DURATION.instant, reducedMotion));
     } else setScanEntry(null);
     setTotalOpen(false);
     setScanning(true);
@@ -659,7 +646,7 @@ export function App() {
   return (
     <>
       {/* White over the camera, as the scanner frames draw it (`88:19507`). */}
-      <DeviceFrame statusBar={theme === 'dark' || (scanning && cartOpen && !litLate) ? 'light' : 'dark'}
+      <DeviceFrame statusBar={theme === 'dark' || (scanning && cartOpen) ? 'light' : 'dark'}
         homeIndicator={theme === 'dark' ? 'light' : 'dark'}>
         {/* A render failure most likely came from a cart line, so recovering also
             empties the cart rather than re-rendering the line that threw. */}

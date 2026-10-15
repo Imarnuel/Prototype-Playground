@@ -100,14 +100,14 @@
   background: var(--color-container-success-bold-default);
   pointer-events: none;
   opacity: 0;
-  /* Gone by the time the camera is ~80% grown; back as the close nears the button
-     (held `base` - `fast`, then `fast`: whole by 300ms, when the spring has it 95%
-     of the way down), so the green is whole as it lands. */
+  /* Gone by the time the camera is ~90% grown; back as the close nears the button
+     (held `instant` / 2, then `fast`: mostly back by the time the spring has it 90%
+     of the way down, ~160ms), so the green is whole as it lands. */
   transition: opacity var(--motion-fast) var(--ease-out);
 }
 .sheet[data-open='off'] .scanMorph {
   opacity: 1;
-  transition-delay: calc(var(--motion-base) - var(--motion-fast));
+  transition-delay: calc(var(--motion-instant) / 2);
 }
 /* The glyph is drawn at the button's 28 at the start, so it is counter-scaled; it
    then grows with the camera as it fades, like an icon opening. */
@@ -123,19 +123,23 @@
   transition-duration: var(--motion-instant);
 }
 
-/* The tray: up on the Cart's own `base` decelerating rise once the camera has
-   all but filled the screen (95% grown at `base` on the spring; earlier, a
-   full-width tray met a camera still visibly inset); down first and quickly on
-   the accelerating curve. */
-.sheet[data-entry='button'][data-open='on'] .cart { transition-delay: var(--motion-base); }
+/* The tray: up on the same launch spring, a beat behind the camera (`instant`
+   after the presentation's two-frame `entered` flip, by when the camera is ~95%
+   grown; earlier, a full-width tray met a camera still visibly inset); down first
+   and quickly on the accelerating curve. */
+.sheet[data-entry='button'][data-open='on'] .cart {
+  transition-delay: var(--motion-instant);
+  transition-duration: var(--motion-launch);
+  transition-timing-function: var(--ease-launch);
+}
 .sheet[data-entry='button'][data-open='off'] .cart {
   transform: translateY(852px);
   transition-duration: var(--motion-fast);
   transition-timing-function: var(--ease-in);
 }
 
-/* Opening from the Cart, the status bar turns white a beat in, once the camera's
-   black has reached it. (From the scan button it is timed in App.tsx, LIT_AT.) */
+/* The status bar turns white a beat in, once the camera's black has reached it:
+   from the scan button its fade is mid-grey as the black's edge passes the clock. */
 .statusBar[data-appearance='light'] :is(.statusBar__time, .statusBar__levels img) { transition-delay: var(--motion-instant); }
 
 /* --- The tab bar's second screen ------------------------------------------------------

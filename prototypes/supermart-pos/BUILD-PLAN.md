@@ -875,13 +875,14 @@ in front of it is **drawn from the data** (#115).
   (scaled down uniformly to its width, centred on it, cropped to its square and
   full round, with the button's green and glyph on top) and becomes the whole
   screen. The green fades over the camera's black on `fast`; the viewfinder, close
-  and hint fade in from `instant`; the tray rises on the Cart's own `base` once the
-  camera is 95% grown. Closing, the chrome and tray go first and quickly and the
+  and hint fade in from `instant`; the tray rises on the same spring once the
+  camera is ~95% grown. Closing, the chrome and tray go first and quickly and the
   camera springs back into the button, its green returning as it lands.
   **The curve is iOS's launch spring** (`EASING.launch`, `DURATION.launch` 650 in
   `shared/src/motion.ts`, the new motion values): a critically damped spring at
-  ω 15.8 sampled into CSS `linear()` — velocity peaks ~63ms in and the rest is a
-  long ease-out, no overshoot (bounce was taken out at the designer's call). Before
+  ω 24 over 420ms, sampled into CSS `linear()` — velocity peaks ~42ms in and the
+  rest is a long ease-out, no overshoot (bounce was taken out at the designer's
+  call). ω 15.8 over 650ms, with the tray waiting `base` behind, was "too slow". Before
   it, Easy Ease (the first ask): its slow start read as lag ("speed up at the
   entrance, then slowly ease out"). The open runs as a CSS animation so it starts
   on the first painted frame, not after the presentation's two-frame `entered`
@@ -892,11 +893,12 @@ in front of it is **drawn from the data** (#115).
   separately bulged the corners to 74 mid-flight; everything derives from one
   `--zoom` (a registered custom property), so the on-screen radius runs straight
   30 → 55. The status bar's fade is mid-grey as the black's edge passes the clock
-  (`LIT_AT`). Sampled per frame on the production build: [317,631,60,60] r 30 →
-  [0,0,393,852] r 55, 70% of the way ~90ms into the motion, within 1px by ~600ms;
-  never shrinking, corners only loosening (`walk-scan`); the close lands green on
-  the button and unmounts at 650ms with no flash (`usePresented` takes the exit's
-  length, read once so it can't restart mid-exit); reduced motion cuts.
+  on the status bar's own `instant` delay. Sampled per frame on the production
+  build: [317,631,60,60] r 30 → [0,0,393,852] r 55; motion ~50ms after the tap, 90%
+  grown by ~150ms, within 2px by ~260ms, the tray in by ~330ms; never shrinking,
+  corners only loosening (`walk-scan`); the close is near the button by ~175ms,
+  green by ~200ms, and unmounts at 420ms with no flash (`usePresented` takes the
+  exit's length, read once so it can't restart mid-exit); reduced motion cuts.
 - **"Tap to scan" is centred among the viewfinder's four corners** (the designer's
   request; it sat 32 below the centre): within 0.5px (`walk-scan`).
 - **Round shapes stay round**: the scan button, the camera's close, the match sheet's
