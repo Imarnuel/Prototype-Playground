@@ -35,12 +35,11 @@ import './App.css';
 
 type Forced = 'loading' | 'error' | 'empty' | undefined;
 
-/* Into the scanner from the scan button, when the status bar starts turning white,
-   as a share of the camera's `base` growth counted from the tap: the black only
-   reaches the bar at the very end of it, so the bar's fade starts here to be about
-   half done as the edge passes the clock. Measured on the DOM (BUILD-PLAN, Motion),
-   not derived. */
-const LIT_AT = 0.67;
+/* Into the scanner from the scan button, how long after the tap the status bar
+   starts turning white: the camera's black only reaches the bar at the very end of
+   its growth, so the bar's fade starts here to be about half done as the edge
+   passes the clock. Measured on the DOM (BUILD-PLAN, Motion), not derived. */
+const LIT_AT = 260;
 
 export function App() {
   const [forced, setForced] = useState<Forced>(undefined);
@@ -52,7 +51,11 @@ export function App() {
   const [cartOpen, setCartOpen] = useState(false);
   // One hook owns presentation timing for every surface, so the entrance and exit
   // fixes live in one place rather than being re-derived per sheet.
-  const { mounted: cartMounted, entered: cartEntered } = usePresented(cartOpen);
+  /* Grown out of the scan button, the presentation closes on the launch spring and
+     stays mounted for all of it (App.css), not a sheet's `base`. */
+  const [scanEntry, setScanEntry] = useState<{ tx: number; ty: number; scale: number; clipY: number; radius: number } | null>(null);
+  const presentExit = scanEntry ? DURATION.launch : SHEET_SPRING.exitDuration;
+  const { mounted: cartMounted, entered: cartEntered } = usePresented(cartOpen, presentExit);
 
   const [pickerOpen, setPickerOpen] = useState(false);
   const [customers, setCustomers] = useState<readonly Customer[]>(CUSTOMERS);
@@ -148,7 +151,6 @@ export function App() {
   /* Where the Sales Point's scan button is, while the scanner it opened into is up:
      the camera grows from it and shrinks back into it (App.css). Cleared once the
      tray expands into the Cart, which then closes like any Cart. */
-  const [scanEntry, setScanEntry] = useState<{ tx: number; ty: number; scale: number; clipY: number; radius: number } | null>(null);
   const { mounted: cameraMounted, entered: cameraEntered } = usePresented(scanning);
   /* Growing out of the scan button, the camera's black only reaches the status bar
      at the very end; until then the bar stays dark (LIT_AT). */
@@ -325,7 +327,7 @@ export function App() {
       // The status bar stays dark until the camera's black has grown up to it.
       setLitLate(true);
       // Less the `instant` the bar's own fade already waits (App.css).
-      window.setTimeout(() => setLitLate(false), duration(DURATION.base * LIT_AT - DURATION.instant, reducedMotion));
+      window.setTimeout(() => setLitLate(false), duration(LIT_AT - DURATION.instant, reducedMotion));
     } else setScanEntry(null);
     setTotalOpen(false);
     setScanning(true);
@@ -341,9 +343,10 @@ export function App() {
      with it, once the exit has run: the next View cart opens the Cart, not a camera. */
   useEffect(() => {
     if (cartOpen) return undefined;
-    const t = window.setTimeout(() => { setScanning(false); setScanEntry(null); setInView(null); reading.current = false; }, exitMs);
+    const t = window.setTimeout(() => { setScanning(false); setScanEntry(null); setInView(null); reading.current = false; },
+      duration(presentExit, reducedMotion));
     return () => window.clearTimeout(t);
-  }, [cartOpen, exitMs]);
+  }, [cartOpen, presentExit, reducedMotion]);
   /* The item leaves the lens a beat after its result, so the toast and the item it
      names are on screen together (`88:19938`), then the camera is dark again (`88:19584`). */
   const releaseItem = () => {

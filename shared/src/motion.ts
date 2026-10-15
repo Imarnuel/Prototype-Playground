@@ -19,7 +19,22 @@ export const DURATION = {
   base: 300,
   /** Sheets and full-screen covers travelling the height of the device. */
   slow: 420,
+  /** The launch spring's whole run, to under half a pixel of rest (EASING.launch). */
+  launch: 650,
 } as const;
+
+/**
+ * A critically damped spring released from rest, sampled into a CSS `linear()`
+ * curve: velocity peaks at 1/ω (~63ms at ω 15.8) and then decays exponentially, so
+ * a move bursts off and spends the rest of its time settling — with no overshoot.
+ */
+function criticallyDamped(omega: number, ms: number, steps = 50): string {
+  const points = Array.from({ length: steps + 1 }, (_, i) => {
+    const t = (i / steps) * (ms / 1000);
+    return i === steps ? 1 : 1 - (1 + omega * t) * Math.exp(-omega * t);
+  });
+  return `linear(${points.map((p) => +p.toFixed(4)).join(', ')})`;
+}
 
 export const EASING = {
   /** Entering the screen: decelerate into place. */
@@ -29,11 +44,13 @@ export const EASING = {
   /** Moving between two on-screen positions. */
   inOut: 'cubic-bezier(0.65, 0, 0.35, 1)',
   /**
-   * After Effects' Easy Ease (33% influence both ends): a gentle in-and-out for one
-   * object changing size in place. The designer's call for the scan button growing
-   * into the scanner, iOS-style.
+   * iOS's app launch: a spring that speeds off at once and eases out slowly — the
+   * designer's call for the scan button growing into the scanner ("speed up at the
+   * entrance, then slowly ease out", after Easy Ease's slow start read as lag).
+   * Critically damped, because a bounce on arrivals was taken out at their call.
+   * Runs for DURATION.launch; 99% of the way by ~420ms.
    */
-  easy: 'cubic-bezier(0.33, 0, 0.67, 1)',
+  launch: criticallyDamped(15.8, 650),
 } as const;
 
 /**

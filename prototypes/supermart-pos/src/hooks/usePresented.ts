@@ -14,12 +14,16 @@ import { SHEET_SPRING, duration, useReducedMotion } from '@playground/shared';
  * into a single paint, which is the instant cut again. `npm run motion:sample` guards
  * both directions.
  */
-export function usePresented(open: boolean): { mounted: boolean; entered: boolean } {
+/** `exitMs` is how long the exit runs before unmounting: a sheet's by default. */
+export function usePresented(open: boolean, exitMs: number = SHEET_SPRING.exitDuration): { mounted: boolean; entered: boolean } {
   const [mounted, setMounted] = useState(false);
   const [entered, setEntered] = useState(false);
   const reducedMotion = useReducedMotion();
   const exitTimer = useRef<number>();
   const enterFrame = useRef<number>();
+  // Read when the exit starts, so a change during it never restarts the clock.
+  const exitLength = useRef(exitMs);
+  exitLength.current = exitMs;
 
   useEffect(() => {
     if (open) {
@@ -31,7 +35,7 @@ export function usePresented(open: boolean): { mounted: boolean; entered: boolea
     }
     setEntered(false);
     if (!mounted) return;
-    const ms = duration(SHEET_SPRING.exitDuration, reducedMotion);
+    const ms = duration(exitLength.current, reducedMotion);
     exitTimer.current = window.setTimeout(() => setMounted(false), ms);
     return () => window.clearTimeout(exitTimer.current);
   }, [open, mounted, reducedMotion]);

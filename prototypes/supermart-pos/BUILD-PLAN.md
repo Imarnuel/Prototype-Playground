@@ -870,28 +870,33 @@ in front of it is **drawn from the data** (#115).
   256ms. A `:has()` rule first used to time the status bar cost the Quantity sheet a
   frame of its exit (5 → 4, failing `walk-quantity`); replaced by a short hold.
   **Replaced by a scale, at the designer's request** ("instead of a masked
-  transition, scale to full page, smoothly, like iOS, easy ease"): the camera grows
-  out of the button the way an iOS app opens from its icon. It starts as the button
-  exactly (scaled down uniformly to its width, centred on it, cropped to its square
-  and full round, with the button's green and glyph on top) and in one move on
-  `base` and After Effects' Easy Ease, `cubic-bezier(0.33, 0, 0.67, 1)` — added to
-  `shared/src/motion.ts` as `EASING.easy`, the one new motion value — becomes the
-  whole screen. The green fades over the camera's black on `fast`; the viewfinder,
-  close and hint fade in from `instant`; the tray rises on the Cart's own `base`
-  once the camera is ~95% grown (`fast` + `instant` / 2). Closing, the chrome and
-  tray go first and quickly and the camera shrinks back into the button, its green
-  returning as it lands. The first pass grew the whole presentation, tray
-  included, on `slow` ("the animation sucks"): small, it read as a shrunken white
-  screen over the white Sales Point, the green faded to a mint wash over the tray,
-  and the viewfinder appeared at thumbnail size — seen in a 10x-slowed filmstrip,
-  then fixed. Interpolating the transform and the crop separately bulged the
-  corners to 74 mid-flight; everything derives from one eased `--zoom` (a
-  registered custom property), so the on-screen radius runs straight 30 → 55. The
-  status bar's fade is mid-grey as the black's edge passes the clock (`LIT_AT`).
-  Sampled per frame on the production build: [317,631,60,60] r 30 → [0,0,393,852]
-  r 55, landing ~360ms after the tap, never shrinking, corners only loosening
-  (`walk-scan`); back on the button, green, at ~300ms; dark mode's face `#2acb7a`
-  like its button; reduced motion cuts.
+  transition, scale to full page, smoothly, like iOS"): the camera grows out of the
+  button the way an iOS app opens from its icon. It starts as the button exactly
+  (scaled down uniformly to its width, centred on it, cropped to its square and
+  full round, with the button's green and glyph on top) and becomes the whole
+  screen. The green fades over the camera's black on `fast`; the viewfinder, close
+  and hint fade in from `instant`; the tray rises on the Cart's own `base` once the
+  camera is 95% grown. Closing, the chrome and tray go first and quickly and the
+  camera springs back into the button, its green returning as it lands.
+  **The curve is iOS's launch spring** (`EASING.launch`, `DURATION.launch` 650 in
+  `shared/src/motion.ts`, the new motion values): a critically damped spring at
+  ω 15.8 sampled into CSS `linear()` — velocity peaks ~63ms in and the rest is a
+  long ease-out, no overshoot (bounce was taken out at the designer's call). Before
+  it, Easy Ease (the first ask): its slow start read as lag ("speed up at the
+  entrance, then slowly ease out"). The open runs as a CSS animation so it starts
+  on the first painted frame, not after the presentation's two-frame `entered`
+  flip: motion now begins ~50ms after the tap, not ~124. The first pass also grew
+  the whole presentation, tray included ("the animation sucks"): small, it read as
+  a shrunken white screen over the white Sales Point and washed the green to mint
+  — seen in a 10x-slowed filmstrip. Interpolating the transform and the crop
+  separately bulged the corners to 74 mid-flight; everything derives from one
+  `--zoom` (a registered custom property), so the on-screen radius runs straight
+  30 → 55. The status bar's fade is mid-grey as the black's edge passes the clock
+  (`LIT_AT`). Sampled per frame on the production build: [317,631,60,60] r 30 →
+  [0,0,393,852] r 55, 70% of the way ~90ms into the motion, within 1px by ~600ms;
+  never shrinking, corners only loosening (`walk-scan`); the close lands green on
+  the button and unmounts at 650ms with no flash (`usePresented` takes the exit's
+  length, read once so it can't restart mid-exit); reduced motion cuts.
 - **"Tap to scan" is centred among the viewfinder's four corners** (the designer's
   request; it sat 32 below the centre): within 0.5px (`walk-scan`).
 - **Round shapes stay round**: the scan button, the camera's close, the match sheet's

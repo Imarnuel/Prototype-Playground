@@ -45,23 +45,22 @@
 .scanStage[data-open='off'] > .scanner { opacity: 0; transform: scale(0.96); }
 
 /* --- The scan button opens into the scanner (designer's request) ------------------
-   iOS-style, like an app opening from its icon, on After Effects' Easy Ease: the
-   camera grows out of the button. It starts as the button exactly — scaled down
-   uniformly to the button's width, centred on it, cropped to its square and full
-   round (--r0), with the button's face (`.scanMorph`: its green and glyph) on top —
-   and in one move on `base` becomes the whole screen, its corners easing to the
-   display's own radius (--r1). The face fades over the camera's black, so the
-   green deepens to black rather than washing out. The viewfinder, close and hint
-   fade in once the camera is large, and the Order Preview tray rises from the
-   bottom once it has filled the screen. Closing: the chrome and the tray go first
-   and quickly, and the camera shrinks back into the button, its green returning
-   as it lands on the real button waiting underneath.
-   Only the camera grows. The first pass grew the whole presentation, tray
-   included: small, it read as a shrunken white screen over the white Sales Point,
-   and the green faded to a mint wash over the tray ("the animation sucks").
-   It replaces a circular reveal ("instead of a masked transition") and before that
-   a fly-out of the glyph's brackets; see BUILD-PLAN, Motion. --tx/--ty/--s/--clip-y/
-   --r0/--r1 are measured off the button in App.tsx. */
+   iOS's app launch: the camera grows out of the button on a spring that bursts off
+   and spends the rest of its run easing out (EASING.launch, DURATION.launch). It
+   starts as the button exactly — scaled down uniformly to the button's width,
+   centred on it, cropped to its square and full round (--r0), with the button's
+   face (`.scanMorph`: its green and glyph) on top — and becomes the whole screen,
+   its corners easing to the display's own radius (--r1). The face fades over the
+   camera's black, so the green deepens to black rather than washing out. The
+   viewfinder, close and hint fade in once the camera is large, and the Order
+   Preview tray rises once it has all but filled the screen. Closing, the chrome
+   and the tray go first and quickly, and the camera springs back into the button,
+   its green returning as it lands on the real button waiting underneath.
+   History (BUILD-PLAN, Motion): a fly-out of the glyph's brackets, then a circular
+   reveal ("instead of a masked transition"), then Easy Ease, whose slow start read
+   as lag ("speed up at the entrance, then slowly ease out"). Only the camera grows:
+   growing the tray too read as a shrunken white screen and washed the green to
+   mint. --tx/--ty/--s/--clip-y/--r0/--r1 are measured off the button in App.tsx. */
 .sheet[data-entry='button'],
 .sheet[data-entry='button'][data-open='off'] { transform: none; opacity: 1; }
 
@@ -78,7 +77,16 @@
   --scale: calc(var(--s) + (1 - var(--s)) * var(--zoom));
   transform: translate(calc(var(--tx) * (1 - var(--zoom))), calc(var(--ty) * (1 - var(--zoom)))) scale(var(--scale));
   clip-path: inset(calc(var(--clip-y) * (1 - var(--zoom))) 0 round calc((var(--r0) + (var(--r1) - var(--r0)) * var(--zoom)) / var(--scale)));
-  transition: --zoom var(--motion-base) var(--ease-easy);
+  transition: --zoom var(--motion-launch) var(--ease-launch);
+  /* The open runs as an animation, which starts on the first painted frame; a
+     transition waits for the presentation's two-frame `entered` flip, ~33ms of
+     nothing at exactly the moment the spring is meant to be fastest. The close
+     is the transition above. `backwards` only: once done, --zoom is the state's. */
+  animation: scan-launch var(--motion-launch) var(--ease-launch) backwards;
+}
+@keyframes scan-launch {
+  from { --zoom: 0; }
+  to { --zoom: 1; }
 }
 .sheet[data-entry='button'][data-open='off'] .scanStage { --zoom: 0; }
 /* The camera arrives with the shape it is in, not by its own dim-and-recede. */
@@ -92,9 +100,10 @@
   background: var(--color-container-success-bold-default);
   pointer-events: none;
   opacity: 0;
-  /* Gone by two-thirds of the open; back over the close's last two-thirds (held
-     `base` - `fast`, then `fast`), so the green is whole as it lands. */
-  transition: opacity var(--motion-fast) var(--ease-easy);
+  /* Gone by the time the camera is ~80% grown; back as the close nears the button
+     (held `base` - `fast`, then `fast`: whole by 300ms, when the spring has it 95%
+     of the way down), so the green is whole as it lands. */
+  transition: opacity var(--motion-fast) var(--ease-out);
 }
 .sheet[data-open='off'] .scanMorph {
   opacity: 1;
@@ -115,10 +124,10 @@
 }
 
 /* The tray: up on the Cart's own `base` decelerating rise once the camera has
-   all but filled the screen (~95% grown at `fast` + `instant` / 2; at `fast` a
+   all but filled the screen (95% grown at `base` on the spring; earlier, a
    full-width tray met a camera still visibly inset); down first and quickly on
    the accelerating curve. */
-.sheet[data-entry='button'][data-open='on'] .cart { transition-delay: calc(var(--motion-fast) + var(--motion-instant) / 2); }
+.sheet[data-entry='button'][data-open='on'] .cart { transition-delay: var(--motion-base); }
 .sheet[data-entry='button'][data-open='off'] .cart {
   transform: translateY(852px);
   transition-duration: var(--motion-fast);
