@@ -14,6 +14,7 @@ shared/              composed by every study — device frame, motion, mock API,
 prototypes/
   _template/         starting point, and the harness the frame geometry is measured against
   supermart-pos/     Freshvale Supermart POS — packaged-goods till (first study)
+  new-study/         placeholder name, no Figma file attached yet
   <case-study>/      one per study
 ```
 
