@@ -8,7 +8,6 @@
  * the rest: merchant, amount, 16 Aug, 09:00, the two real item rows, the tags and the
  * @mentions. What is derived is said so at the line.
  */
-import receiptPhoto from '../assets/figma/receipt-photo.webp';
 
 export type LineItem = {
   id: string;
@@ -19,7 +18,7 @@ export type LineItem = {
 };
 
 export type Evidence = {
-  /** The captured image. A prototype has one rendition; the product keeps three. */
+  /** The scanned document from the shot. A prototype has one rendition; the product keeps three. */
   src: string;
   pages: number;
   bytes: number;
@@ -45,8 +44,14 @@ export type PurchaseReceipt = {
   evidence: Evidence;
 };
 
-/** What extraction returns for the captured photo — the draft Review edits. */
-export function extractedDraft(): PurchaseReceipt {
+/** No image: the seed records' evidence is never shown in this flow. */
+const UNSHOWN: Evidence = { src: '', pages: 1, bytes: 0 };
+
+/**
+ * What extraction returns for the captured receipt — the draft Review edits. The paper the
+ * camera sees is printed from these same fields (receiptDocument.ts), so they agree.
+ */
+export function extractedDraft(evidence: Evidence = UNSHOWN): PurchaseReceipt {
   return {
     id: 'rcpt-0816-0900',
     merchant: 'Fresh Market Groceries',
@@ -66,8 +71,7 @@ export function extractedDraft(): PurchaseReceipt {
     tags: ['Essentials', 'Organic', 'Snacks', 'Beverages', 'Frozen'],
     sharedWith: ['@shegziebaddest', '@johnson'],
     category: 'Groceries',
-    // One capture, one page. Size is the photo shipped with the prototype.
-    evidence: { src: receiptPhoto, pages: 1, bytes: 93150 },
+    evidence,
   };
 }
 
@@ -87,7 +91,7 @@ const seed: PurchaseReceipt[] = [
     tags: ['Essentials'],
     sharedWith: [],
     category: 'Groceries',
-    evidence: { src: receiptPhoto, pages: 1, bytes: 93150 },
+    evidence: UNSHOWN,
   },
   {
     id: 'rcpt-0809-1230',
@@ -99,7 +103,7 @@ const seed: PurchaseReceipt[] = [
     tags: [],
     sharedWith: [],
     category: 'Eating out',
-    evidence: { src: receiptPhoto, pages: 1, bytes: 93150 },
+    evidence: UNSHOWN,
   },
 ];
 

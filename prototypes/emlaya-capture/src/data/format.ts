@@ -36,7 +36,8 @@ export function ordinal(n: number): string {
   return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
 }
 
+/** "1 page · 86 KB" — the row's "3 pages · 2.4 MB" shape, in KB under a megabyte. */
 export function formatPagesSize(pages: number, bytes: number): string {
-  const mb = (bytes / 1_000_000).toFixed(1);
-  return `${pages} ${pages === 1 ? 'page' : 'pages'} · ${mb} MB`;
+  const size = bytes >= 1_000_000 ? `${(bytes / 1_000_000).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1000))} KB`;
+  return `${pages} ${pages === 1 ? 'page' : 'pages'} · ${size}`;
 }

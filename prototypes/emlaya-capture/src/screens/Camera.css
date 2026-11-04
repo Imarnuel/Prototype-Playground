@@ -16,17 +16,11 @@
   right: 0;
   bottom: var(--gap-camera-feed-bottom);
   overflow: clip;
-  transform-origin: 50% calc(50% + var(--gap-camera-feed-bottom) / 2);
-  transition:
-    transform var(--motion-duration-slow) var(--motion-ease-inOut),
-    opacity var(--motion-duration-slow) var(--motion-ease-in),
-    border-radius var(--motion-duration-slow) var(--motion-ease-inOut);
 }
 .camera__photo {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
 }
 
 .camera__hint {
@@ -146,21 +140,10 @@
 .camera[data-phase='captured'] .camera__flashToggle { opacity: 0; }
 .camera[data-phase='captured'] .camera__tabBar { transform: translateY(100%); }
 
-/* --- Handoff into processing ------------------------------------------------------- */
-/* The photo shrinks toward the processing pill's centre (the centre of the area under
-   the status bar) and fades as the pill arrives; the chrome falls away around it. */
-.camera[data-leaving] { background-color: var(--color-no-fill-white); pointer-events: none; }
-.camera[data-leaving] .camera__feed {
-  transform: scale(var(--gap-handoff-scale));
-  opacity: 0;
-  border-radius: var(--border-radius-600);
-}
-.camera[data-leaving] :is(.camera__topRow, .camera__continueBar) {
-  opacity: 0;
-  transition: opacity var(--motion-duration-fast) var(--motion-ease-in);
-}
+/* --- Into processing ------------------------------------------------------------------
+   No zoom (the user's call): the shot stays put and Review rises over it as a sheet. */
+.camera[data-leaving] { pointer-events: none; }
 
-.app[data-reduced-motion='true'] .camera__feed { transform: none; }
 .app[data-reduced-motion='true'] :is(.camera__tabBar, .camera__continueBar) { transform: none; }
 .app[data-reduced-motion='true'] .camera[data-phase='live'] .camera__continueBar,
 .app[data-reduced-motion='true'] .camera[data-phase='captured'] .camera__tabBar { opacity: 0; }

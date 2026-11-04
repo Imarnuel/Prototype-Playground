@@ -5,7 +5,7 @@
  * Capture (9502:21686) → Captured (9502:21716) → Processing (4653:68091) →
  * Review (9502:21324) → Saved (9502:21212, the first MilestoneCelebration).
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   DevToolbar,
   DeviceFrame,
@@ -16,12 +16,15 @@ import {
 } from '@playground/shared';
 import starBadge from './assets/figma/star-badge.svg';
 import { Camera } from './screens/Camera';
+import { captureFontsReady, type CameraFeedHandle } from './components/capture/CameraFeed';
+import { scanDocument } from './components/capture/CaptureScene';
+import { printedLines } from './data/receiptDocument';
 import { Review, type ReviewStatus } from './screens/Review';
 import { CheckBadge, MilestoneCard, MilestoneCelebration } from './components/celebration/MilestoneCelebration';
 import { Layer } from './components/Layer';
 import { Notice } from './components/Notice';
 import { extractReceipt, saveReceipt } from './api/emlaya';
-import { extractedDraft, milestoneFor, records, resetRecords, type Milestone, type PurchaseReceipt } from './data/records';
+import { extractedDraft, milestoneFor, records, resetRecords, type Evidence, type Milestone, type PurchaseReceipt } from './data/records';
 import { formatDayMonth, formatNaira, ordinal } from './data/format';
 import { ForceReducedMotion, useReducedMotion } from './state/motion';
 import { tokenMs } from './tokens/read';
@@ -56,6 +59,9 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
   const [harness, setHarness] = useState(() => new URLSearchParams(window.location.search).get('frame') === 'figma');
   const [showDepartures, setShowDepartures] = useState(false);
   const [extractRun, setExtractRun] = useState(0);
+  const [evidence, setEvidence] = useState<Evidence | null>(null);
+  const [cameraLit, setCameraLit] = useState(true);
+  const feedRef = useRef<CameraFeedHandle>(null);
 
   const notDesigned = useCallback((what: string) => setNotice(`${what} is not part of this flow.`), []);
   const clearNotice = useCallback(() => setNotice(null), []);
@@ -66,7 +72,8 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
   useEffect(() => {
     if (screen !== 'processing') return;
     let live = true;
-    extractReceipt()
+    evidenceOrScan()
+      .then(extractReceipt)
       .then((d) => {
         if (!live) return;
         setDraft(d);
@@ -77,6 +84,22 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
       live = false;
     };
   }, [screen, extractRun]);
+
+  /** The shot's scanned document; a toolbar jump that skipped the camera scans one. */
+  const evidenceOrScan = async (): Promise<Evidence> => {
+    if (evidence) return evidence;
+    await captureFontsReady();
+    const scan = { ...scanDocument(printedLines()), pages: 1 };
+    setEvidence(scan);
+    return scan;
+  };
+
+  const shoot = () => {
+    const scan = feedRef.current?.capture();
+    if (scan) setEvidence({ ...scan, pages: 1 });
+    setShot((n) => n + 1);
+    setScreen('captured');
+  };
 
   const startProcessing = () => {
     setExtractRun((n) => n + 1);
@@ -101,17 +124,18 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
   const done = () => {
     setScreen('camera');
     setDraft(null);
+    setEvidence(null);
   };
 
   // --- Dev toolbar: every screen and state in one tap (CLAUDE.md §6) ---------------
-  const jumpReview = () => {
-    setDraft(extractedDraft());
+  const jumpReview = async () => {
+    setDraft(extractedDraft(await evidenceOrScan()));
     setScreen('review');
   };
-  const jumpSaved = () => {
+  const jumpSaved = async () => {
     // Saving is the only way into the milestone, so a jump saves too — the figures on
     // the card are then the store's, as they are at the end of the real flow.
-    const d = draft ?? extractedDraft();
+    const d = draft ?? extractedDraft(await evidenceOrScan());
     records.push(d);
     setDraft(d);
     commitSave(d);
@@ -140,9 +164,19 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
   ];
 
   const onCamera = screen === 'camera' || screen === 'captured';
+  const sheet = tokenMs('--motion-duration-slow');
+
+  // The status bar stays light until Review has fully risen over the dark camera.
+  useEffect(() => {
+    if (onCamera) {
+      setCameraLit(true);
+      return;
+    }
+    const t = window.setTimeout(() => setCameraLit(false), sheet);
+    return () => window.clearTimeout(t);
+  }, [onCamera, sheet]);
   const reviewStatus: ReviewStatus = screen === 'processing' ? 'processing' : screen === 'extractError' ? 'error' : 'ready';
   const fade = tokenMs('--motion-duration-base');
-  const handoff = tokenMs('--motion-duration-slow');
 
   return (
     <div
@@ -153,10 +187,25 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
     >
       <DeviceFrame
         showBody={!harness}
-        statusBar={onCamera ? 'light' : 'dark'}
-        homeIndicator={onCamera ? 'light' : 'dark'}
+        statusBar={cameraLit ? 'light' : 'dark'}
+        homeIndicator={cameraLit ? 'light' : 'dark'}
       >
         <div className="stage">
+          <Layer open={onCamera} exitMs={sheet} className="layer--camera">
+            <Camera
+              phase={screen === 'captured' ? 'captured' : 'live'}
+              leaving={!onCamera}
+              still={reduced}
+              feedRef={feedRef}
+              shot={shot}
+              onShutter={shoot}
+              onRetake={() => setScreen('camera')}
+              onContinue={startProcessing}
+              onNotDesigned={notDesigned}
+            />
+          </Layer>
+
+          {/* Review rises over the shot as a sheet (no zoom); it fades when it leaves. */}
           <Layer open={!onCamera} exitMs={fade} className="layer--review">
             <Review
               status={reviewStatus}
@@ -165,21 +214,6 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
               saving={saving}
               onSave={save}
               onRetry={startProcessing}
-              onNotDesigned={notDesigned}
-            />
-          </Layer>
-
-          <Layer open={onCamera} exitMs={handoff} className="layer--camera">
-            <Camera
-              phase={screen === 'captured' ? 'captured' : 'live'}
-              leaving={!onCamera}
-              shot={shot}
-              onShutter={() => {
-                setShot((n) => n + 1);
-                setScreen('captured');
-              }}
-              onRetake={() => setScreen('camera')}
-              onContinue={startProcessing}
               onNotDesigned={notDesigned}
             />
           </Layer>

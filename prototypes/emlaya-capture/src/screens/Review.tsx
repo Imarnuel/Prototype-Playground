@@ -12,10 +12,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import caretLeft from '../assets/figma/caret-left.svg';
 import dotsThree from '../assets/figma/dots-three.svg';
-import actionTag from '../assets/figma/action-tag.svg';
-import actionShare from '../assets/figma/action-share.svg';
-import actionLink from '../assets/figma/action-link.svg';
-import actionNotepad from '../assets/figma/action-notepad.svg';
 import calendarBlank from '../assets/figma/calendar-blank.svg';
 import clock from '../assets/figma/clock.svg';
 import tag16 from '../assets/figma/tag-16.svg';
@@ -101,14 +97,7 @@ function ReadyReview({ draft, onDraftChange, saving, onSave, onNotDesigned }: {
     <div className="review__layer review__layer--ready">
       <div className="review__scroll">
         <div className="review__content">
-          {/* 5359:8681 Receipt actions. Their destinations are outside this flow. */}
-          <div className="review__actions">
-            <ActionButton icon={actionTag} label="Tags" onClick={() => onNotDesigned('Tagging')} />
-            <ActionButton icon={actionShare} label="Share" share onClick={() => onNotDesigned('Sharing')} />
-            <ActionButton icon={actionLink} label="Link" onClick={() => onNotDesigned('Linking')} />
-            <ActionButton icon={actionNotepad} label="Shopping Note" onClick={() => onNotDesigned('Linking to a Shopping Note')} />
-          </div>
-
+          {/* 5359:8681, the yellow receipt-actions rail, is removed at the user's request. */}
           {/* 9502:21326 */}
           <div className="review__topCard">
             <TextField
@@ -192,14 +181,6 @@ function ReadyReview({ draft, onDraftChange, saving, onSave, onNotDesigned }: {
         </Button>
       </div>
     </div>
-  );
-}
-
-function ActionButton({ icon, label, share = false, onClick }: { icon: string; label: string; share?: boolean; onClick: () => void }) {
-  return (
-    <button type="button" className="action" aria-label={label} onClick={onClick}>
-      <img className={share ? 'action__share' : 'icon icon--20'} src={icon} alt="" />
-    </button>
   );
 }
 

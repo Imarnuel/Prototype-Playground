@@ -21,20 +21,39 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
 // --- 1. Full flow, sampling the celebration entrance ---------------------------------
 {
   const { ctx, page } = await open(false);
+  // Live capture: the feed moves (hand-held), the outline finds the paper, the shot freezes.
+  await page.waitForTimeout(1800);
+  const frameSig = () => page.evaluate(() => {
+    const c = document.querySelector('.camera__photo');
+    const g = c.getContext('2d');
+    const d = g.getImageData(0, 0, c.width, c.height).data;
+    let h = 0; for (let i = 0; i < d.length; i += 4097) h = (h * 31 + d[i]) >>> 0;
+    return h;
+  });
+  const a = await frameSig(); await page.waitForTimeout(250); const b = await frameSig();
+  check('live: the feed moves (hand-held drift)', a !== b, `frame hash ${a} → ${b}`);
   await click(page, 'button[aria-label="Take photo"]');
   await page.waitForTimeout(500);
+  const c1 = await frameSig(); await page.waitForTimeout(400); const c2 = await frameSig();
+  check('captured: the shot is frozen', c1 === c2, `frame hash ${c1} → ${c2}`);
 
-  // Handoff: the photo shrinks toward the processing pill as it leaves.
+  // Into processing: Review rises as a sheet; the shot under it does not zoom.
   await click(page, '.camera__continue');
   const mid = await page.evaluate(() => new Promise((r) => setTimeout(() => {
-    const f = document.querySelector('.camera__feed');
-    r(f ? { a: new DOMMatrix(getComputedStyle(f).transform).a, o: +getComputedStyle(f).opacity } : null);
-  }, 200)));
-  const scale = mid ? mid.a : 1;
-  check('handoff: photo mid-shrink at 200ms', mid && scale < 0.95 && scale > 0.22, `scale ${scale.toFixed(3)}, opacity ${mid?.o.toFixed(2)}`);
+    const layer = document.querySelector('.layer--review');
+    const feed = document.querySelector('.camera__feed');
+    const ty = layer ? new DOMMatrix(getComputedStyle(layer).transform).f : null;
+    const s = feed ? new DOMMatrix(getComputedStyle(feed).transform).a : 1;
+    r({ ty, s, h: layer ? layer.getBoundingClientRect().height : 0 });
+  }, 60)));
+  check('sheet: Review mid-rise, no zoom on the shot', mid.ty > 0 && mid.ty < mid.h && mid.s === 1, `translateY ${mid.ty?.toFixed(1)} of ${mid.h.toFixed(0)}, feed scale ${mid.s}`);
 
   await page.waitForSelector('.review[data-status="ready"]', { timeout: 8000 });
   await page.waitForTimeout(600);
+  const thumb = await page.evaluate(() => document.querySelector('.review__thumb img')?.getAttribute('src')?.slice(0, 23));
+  check('evidence: the shot\'s scan is the thumbnail', thumb === 'data:image/jpeg;base64,', thumb);
+  const rail = await page.evaluate(() => !!document.querySelector('.review__actions, .action'));
+  check('review: no receipt-actions rail', !rail, `rail present: ${rail}`);
 
   // Save; then read when each element's entrance animation is scheduled to start
   // (startTime + delay, from the Web Animations API — exact, unlike sampling the first
@@ -42,15 +61,16 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
   const samples = await page.evaluate(() => new Promise((resolve) => {
     document.querySelector('.review__dock .button').click();
     const sel = {
-      backdrop: '.celebration__backdrop', rays: '.rays', badge: '.celebration__badge', check: '.checkBadge__stroke',
-      title: '.celebration__title', body: '.celebration__body', card: '.celebration__card', cta: '.celebration__cta',
+      backdrop: '.celebration__backdrop', pop: '.celebration__badgePop', ring: '.celebration__ring', check: '.checkBadge__stroke',
+      settle: '.celebration__badge', rays: '.rays', word1: '.celebration__word:nth-of-type(1) .celebration__wordInner',
+      word2: '.celebration__word:nth-of-type(2) .celebration__wordInner', body: '.celebration__body', card: '.celebration__card', cta: '.celebration__cta',
     };
     let t0 = null; let frames = 0; let worst = 0; let last = 0;
     const tick = (now) => {
       if (t0 === null && document.querySelector('.celebration[data-state="open"]')) t0 = now;
       if (t0 !== null) {
         frames += 1; if (last) worst = Math.max(worst, now - last); last = now;
-        if (now - t0 > 3000) {
+        if (now - t0 > 3600) {
           const starts = {};
           for (const [k, s] of Object.entries(sel)) {
             const el = document.querySelector(s);
@@ -59,23 +79,23 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
           }
           const zero = starts.backdrop;
           const start = Object.fromEntries(Object.entries(starts).map(([k, v]) => [k, v === null ? null : Math.round(v - zero)]));
-          return resolve({ start, fps: frames / 3, worstFrame: Math.round(worst) });
+          return resolve({ start, fps: frames / 3.6, worstFrame: Math.round(worst) });
         }
       }
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
   }));
-  const expect = { backdrop: 0, rays: 80, badge: 160, check: 280, title: 360, body: 420, card: 480, cta: 600 };
+  const expect = { backdrop: 0, pop: 380, ring: 480, check: 560, settle: 1150, rays: 1200, word1: 1450, word2: 1560, body: 1800, card: 2250, cta: 2750 };
   for (const [k, ms] of Object.entries(expect)) {
     const got = samples.start[k];
     check(`entrance: ${k} starts at ${ms}ms`, got !== null && Math.abs(got - ms) <= 1, `scheduled at ${got}ms after the backdrop`);
   }
-  check('entrance: frame rate', samples.fps >= 50, `${samples.fps.toFixed(1)} fps over 3s, worst frame ${samples.worstFrame}ms`);
+  check('entrance: frame rate', samples.fps >= 50, `${samples.fps.toFixed(1)} fps over 3.6s, worst frame ${samples.worstFrame}ms`);
 
   // CTA takes taps only after it lands.
   const inertEarly = await page.evaluate(() => document.querySelector('.celebration__cta').hasAttribute('inert'));
-  check('CTA interactive after landing', !inertEarly, `inert at 3s: ${inertEarly}`);
+  check('CTA interactive after landing', !inertEarly, `inert at 3.6s: ${inertEarly}`);
 
   // Confetti: cap, fall-through, cleared by ~5s from its start.
   const conf = await page.evaluate(() => new Promise((resolve) => {
@@ -124,7 +144,21 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
   await ctx.close();
 }
 
-// --- 2. Reduced motion -----------------------------------------------------------------
+// --- 2. A dark-themed host must not darken the app -------------------------------------
+{
+  const { ctx, page } = await open(false);
+  await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+  await page.evaluate(() => document.querySelector('.devbar__handle').click());
+  await page.waitForTimeout(400);
+  await page.evaluate(() => [...document.querySelectorAll('.devbar button')].find((b) => b.textContent === 'Processing').click());
+  await page.evaluate(() => document.querySelector('.devbar__handle').click());
+  await page.waitForTimeout(1200);
+  const veil = await page.evaluate(() => getComputedStyle(document.querySelector('.review__veil')).backgroundImage);
+  check('dark host: processing veil stays light', /255, 255, 255/.test(veil) && !/34, 34, 32/.test(veil), veil.slice(0, 90));
+  await ctx.close();
+}
+
+// --- 3. Reduced motion -----------------------------------------------------------------
 {
   const { ctx, page } = await open(true);
   await page.evaluate(() => document.querySelector('.devbar__handle').click());

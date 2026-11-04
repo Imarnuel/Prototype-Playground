@@ -22,6 +22,17 @@ The rendered UI marks each departure: open the dev toolbar (`?dev=1`) → *Show 
    402×874 with Figma's 62 safe top, and every measurement below is taken there. **Departs**
    (in device mode only).
 5. **The data in the frames does not reconcile, so it is not copied.** R1–R4, R8, R9. **Departs.**
+6. **Changes at the user's request, after the first build** (all **depart**):
+   - The camera is a **live scene**, not the frame's stock photo (C12). The receipt in it is
+     printed from the record, so the evidence now agrees with the extraction (R14 resolved).
+   - Capture → Review is **a sheet rising over the shot**, not a zoom (P5).
+   - The yellow **receipt-actions rail is removed** from Review (R13).
+   - The celebration is **staged over ~2.8s**, one beat at a time (S16).
+7. **A dark-themed host darkened the app.** The hosted viewer sets `data-theme="dark"` on `<html>`;
+   the token file matched it, and gap tokens composed of semantic colours (the processing veil)
+   resolve at the root, so the light processing screen drew a dark veil (mean luminance 152 against
+   250). Theme selectors are now scoped to the app's own sections. Fixed; verified by
+   `verify:motion` ("dark host").
 
 ## Flow (F)
 
@@ -49,6 +60,7 @@ The rendered UI marks each departure: open the dev toolbar (`?dev=1`) → *Show 
 | C9 | No destination in this flow: close (live), gallery, files, flash, add a page, and all four other tabs | — | Each shows the not-designed notice | departs (notice is not in Figma) |
 | C10 | Close in Captured has no designed destination | `9502:21729` | Retake: back to the live camera. Needs design input (the "Leave without saving" frames are out of scope) | departs |
 | C11 | Shutter flash | — | Not in Figma. A 300ms white fade on capture, so the moment registers | departs |
+| C12 | The feed is a still stock photo | `9502:21690` | **User request:** a live canvas scene (`CaptureScene.ts`) — a thermal receipt printed from the record on a wood counter, seen hand-held: drift, roll and zoom breathing, an autofocus hunt and exposure settle on opening and on Retake, sensor grain, a vignette, and a document outline (brand yellow) that finds the paper after 1.1s and follows it. The shutter freezes the frame; the flattened paper becomes the evidence image. Receipt boilerplate ("RCPT", "ITEMS", "TOTAL", "THANK YOU FOR SHOPPING", the barcode) is not in Figma. Reduced motion: a still scene | departs |
 
 ## Processing — `4653:68091`
 
@@ -58,7 +70,7 @@ The rendered UI marks each departure: open the dev toolbar (`?dev=1`) → *Show 
 | P2 | Copy is "Extracting the details..."; the design-engineer handbook's settled microcopy is "Hunting for the total" | Figma copy used verbatim. Owner decision | doesn't depart |
 | P3 | The skeleton is static in Figma | It breathes (opacity 0.72↔1 on the rays' 3s token) so it reads as alive; the spinner turns | departs |
 | P4 | "Real progress states" (brief) | The file designs one state. No stages invented: processing → fields arrive staggered → ready. Extraction failure → error placeholder | — |
-| P5 | Captured photo carry-through (brief) | The frame shows no photo. A matched transform: the photo shrinks toward the pill's centre and fades as the pill arrives. The photo reappears as Review's evidence thumbnail | departs (motion) |
+| P5 | Captured photo carry-through (brief) | **User request: no zoom.** Review rises over the frozen shot as a sheet (420ms, the shared sheet curve); the shot stays still under it. The scan reappears as Review's evidence thumbnail | departs (motion) |
 
 ## Review (R) — `9502:21324`
 
@@ -76,13 +88,13 @@ The rendered UI marks each departure: open the dev toolbar (`?dev=1`) → *Show 
 | R10 | The header sits at 63, 1 below the status bar | `9502:21676` | Kept (`--gap-header-top`) | doesn't depart |
 | R11 | The title sits at calc(50% − 14px): 3 above the row's centre | `9502:21683` | Kept | doesn't depart |
 | R12 | Two "Button Icon" Size=default instances, at 40 and 44 | `9502:21681`, `9502:21682` | Kept at their instance sizes | doesn't depart |
-| R13 | The receipt-actions rail overlaps the fields' right 28 | `5359:8681` | Kept | doesn't depart |
-| R14 | **The evidence photo contradicts the record.** It is a US receipt (FRESH MARKET GROCERS, $43.26, 10/14/23). RP-07 says extraction never invents, so no extraction yields ₦15,000 / 16 Aug from it | `9502:21690` | Photo kept, record kept. Needs a Naira receipt photo from design | doesn't depart |
+| R13 | The receipt-actions rail overlaps the fields' right 28 | `5359:8681` | **User request: removed.** Its four actions had no destination in this flow | departs |
+| R14 | **The evidence photo contradicts the record.** It is a US receipt (FRESH MARKET GROCERS, $43.26, 10/14/23). RP-07 says extraction never invents, so no extraction yields ₦15,000 / 16 Aug from it | `9502:21690` | **Resolved** by C12: the receipt is printed from the record, and its scan is the evidence ("1 page · 52 KB") | departs |
 | R15 | Merchant "Fresh Market Groceries" vs "GROCERS" on the photo | — | Figma's value, used consistently everywhere | doesn't depart |
 | R16 | "Shared with" is pre-filled on a fresh extraction. PRV-01/02: saving never shares | `9502:21552` | Shown as designed. Saving stores the @mentions and creates no share. Owner decision: where these come from | doesn't depart |
 | R17 | ₦ renders as nothing in Figma: the frames read "15,000", because the file's font setup draws no glyph. The text layers contain "₦15,000" | `9502:21331` … | The text layers' content: ₦ renders | departs (render only) |
 | R18 | Hidden edit-mode layers in every row: Checkbox, Leading, Trailing, _Grabber; hidden "Add item" | `9502:21341` … | Not built (no edit mode in this flow) | doesn't depart |
-| R19 | No destination in this flow: Back, More, the four receipt actions, Tags ›, Shared with ›, date and time pickers, the evidence row | — | The not-designed notice. Tag and @mention removal, merchant and amount edits **are** live, and the celebration reads the edited draft | departs (notice) |
+| R19 | No destination in this flow: Back, More, Tags ›, Shared with ›, date and time pickers, the evidence row | — | The not-designed notice. Tag and @mention removal, merchant and amount edits **are** live, and the celebration reads the edited draft | departs (notice) |
 
 ## Receipt saved (S) — `9502:21212`
 
@@ -103,7 +115,7 @@ The rendered UI marks each departure: open the dev toolbar (`?dev=1`) → *Show 
 | S13 | The figures are derived, not typed: "2nd" and "₦55,000" come from the store (one earlier ₦40,000 purchase) | — | A second pass reads "3rd … ₦70,000" (verified) | — |
 | S14 | The close X glyph has two strokes of different width and colour (1.5 #393121, 1.8 #343330) | `9502:21304` | Export kept | doesn't depart |
 | S15 | The card slot | — | `MilestoneCelebration` takes `children`; the brief's signature is `title body icon primaryAction` | departs (API) |
-| S16 | Entrance timing for the card | — | Not in the brief's table; 480ms, between body (420) and CTA (600) | departs (motion) |
+| S16 | Entrance timing | — | **User request: "more dramatic … not everything revealing at the same time".** The brief's 0–600ms table is replaced by a staged ~2.8s sequence: the ground floods out of the Save button; the badge pops alone at the centre at 1.45x, two rings shock out of it, its check draws; it rises to its place as the rays bloom and the confetti releases; the title rises word by word; then the body, the card and Done. Rings, flood and word masks are not in Figma. MOTION.md | departs (motion) |
 | S17 | Exit easing | — | The shared exit curve (`in`) left the copy at 0.90 opacity at 170 of 200ms, so the unmount read as a cut. The exit uses `inOut`: 0.07 at 170ms | departs (motion set) |
 
 ## Components
@@ -125,6 +137,7 @@ Figma frame rebuilt; **e** not in Figma.
 | `GlassButton` | raw frames `9502:21712` … | d |
 | `MilestoneCelebration`, `MilestoneCard`, `CheckBadge` | `9502:21212`, `9502:21308`, `9502:21221` | d |
 | `Rays`, `Confetti` | brief | e |
+| `CameraFeed`, `CaptureScene` | user request (C12) | e |
 | `Notice` (not designed) | — | e, marked "Needs design input" on its face |
 | iOS status bar, home indicator | `4012:27` (remote iOS 26 kit) | the playground's `DeviceFrame` chrome |
 
@@ -151,20 +164,21 @@ under a proposed name with its node ID. In summary:
 
 | Group | Count | Examples |
 |---|---|---|
-| Colour | 23 | `--gap-color-celebration-surface` (#ffde46 → yellow/300), `--gap-color-camera-control`, `--gap-color-captured-bar` (#1b1a19), the badge green, 10 confetti colours and their palette list |
+| Colour | 24 | `--gap-color-celebration-surface` (#ffde46 → yellow/300), `--gap-color-camera-control`, `--gap-color-captured-bar` (#1b1a19), the badge green, the shock-ring white, 10 confetti colours and their palette list |
 | Gradient / mask | 5 | button gloss ×2, milestone card, processing veil, ray fade |
-| Shadow / blur / stroke | 15 | `--gap-shadow-card`, `--gap-shadow-float`, `--gap-blur-camera-control` (4), hairline 1 / 0.5, shutter ring 3 |
+| Shadow / blur / stroke | 15 | `--gap-shadow-card`, `--gap-shadow-float`, `--gap-blur-camera-control` (4), hairline 1 / 0.5, shutter ring 3, shock ring 3 |
 | Radius | 3 | `--gap-radius-pill` (100, not Border radius/full), tab item 32, frame 48 (harness) |
-| Size | 34 | every icon size, buttons 36/40/44/46/48/56, field heights 56/64, widths 176 / 290 / 330 / 355, ray length and widths |
-| Layout offset | 23 | camera row 16 / 15 / 16, celebration badge 107, copy gap 21, card gap 32, CTA 66 from the bottom, rays origin 352 |
+| Size | 32 | every icon size, buttons 40/44/46/48/56, field heights 56/64, widths 176 / 290 / 330 / 355, ray length and widths, the flood disc 1800 |
+| Layout offset | 21 | camera row 16 / 15 / 16, celebration badge 107, copy gap 21, card gap 32, CTA 66 from the bottom, rays origin 352 |
 | Spacing | 1 | `--gap-space-24` (no Spacing/600 exists) |
 | Type | 1 | "Large input" letter-spacing −0.32, raw |
-| Motion | 20 | entrance delays, rise distance, start scales, overshoot spring, ray periods and breathe, exit, spinner, field stagger, notice hold |
+| Motion | 38 | the staged entrance (13 beats), start and end scales, rise distances, the word mask, overshoot spring, ray periods and breathe, exit, spinner, field stagger, notice hold |
 | Confetti physics | 31 | gravity, drag, terminal velocity, velocity / sway / spin / flip / size ranges, counts, trickle window, clear-by |
 | Mock API | 2 | extract 2200ms, save 700ms |
+| Live capture scene | 43 | counter, paper and ink colours; paper geometry; hand-held drift; focus, exposure, detection, outline |
 | Harness | 3 | the Figma frame's 402 × 874 and 62 safe top |
 
-162 in all.
+220 in all.
 
 `npm run check:tokens` fails on any hex, rgb/hsl, px, rem, ms, s, cubic-bezier or linear()
 literal outside the two token files: **0 violations in 25 files**.

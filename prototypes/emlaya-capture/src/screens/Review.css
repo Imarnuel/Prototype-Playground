@@ -49,30 +49,6 @@
 }
 .review__headerSpacer { width: var(--gap-size-icon-button-lg); height: var(--gap-size-icon-button-lg); }
 
-/* --- Receipt actions (5359:8681) ---------------------------------------------------- */
-.review__actions {
-  position: absolute;
-  top: var(--gap-actions-offset);
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-200);
-  padding: var(--spacing-300) var(--spacing-50);
-}
-.action {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--gap-size-action);
-  height: var(--gap-size-action);
-  padding: var(--spacing-300);
-  border-radius: var(--border-radius-full);
-  background: var(--color-background-brand-bolder-default);
-  -webkit-backdrop-filter: blur(var(--gap-blur-actions));
-  backdrop-filter: blur(var(--gap-blur-actions));
-}
-.action__share { display: block; flex: none; width: var(--gap-size-share-w); height: var(--gap-size-share-h); }
-
 /* --- Top card (9502:21326) ---------------------------------------------------------- */
 .review__topCard {
   display: flex;
@@ -250,8 +226,7 @@
   animation-delay: calc(var(--i, 0) * var(--motion-delay-field-stagger));
 }
 .review__layer--ready .review__header,
-.review__layer--ready .review__dock,
-.review__layer--ready .review__actions { animation: review-fade var(--motion-duration-base) var(--motion-ease-out) both; }
+.review__layer--ready .review__dock { animation: review-fade var(--motion-duration-base) var(--motion-ease-out) both; }
 @keyframes review-rise { from { opacity: 0; transform: translateY(var(--spacing-200)); } }
 @keyframes review-fade { from { opacity: 0; } }
 

@@ -38,7 +38,6 @@ const checks = {
     ['9502:21679', '.review__layer--ready .review__headerRow'],
     ['9502:21681', '.review__layer--ready .review__headerRow > .headerButton:first-child'],
     ['9502:21682', '.review__layer--ready .review__headerRow > .headerButton:last-child'],
-    ['9502:21684', '.review__actions'],
     ['9502:21326', '.review__topCard'],
     ['9502:21331', '.review__topCard > .textField:nth-child(1)'],
     ['9502:21333', '.review__topCard > .textField:nth-child(2)'],
@@ -93,7 +92,8 @@ await page.waitForTimeout(900);
 all.push(...(await measure('review')));
 await click('.review__dock .button');
 await page.waitForSelector('.celebration[data-state="open"]', { timeout: 8000 });
-await page.waitForTimeout(1500);
+// The staged entrance lands at ~3.05s (Done: 2750 + 300).
+await page.waitForTimeout(3600);
 all.push(...(await measure('saved')));
 await browser.close();
 

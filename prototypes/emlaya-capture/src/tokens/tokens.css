@@ -118,9 +118,13 @@
   --type-letter-spacing-heading-h4: -0.1px;
 }
 
-/* --- Semantic colours: Light (mode 152:0) ---------------------------------------- */
+/* --- Semantic colours: Light (mode 152:0) ----------------------------------------
+   Scoped to the app's own sections, never a bare [data-theme]: a host page (the hosted
+   preview's viewer) sets data-theme on <html> for its own UI. Matching that turned the
+   whole root dark — and every gap token that composes a semantic colour (the processing
+   veil's gradient) resolves at :root, so the light Review screen drew a dark veil. */
 :root,
-[data-theme='light'] {
+.app [data-theme='light'] {
   --color-text-default: var(--color-neutral-900);
   --color-text-subtle: var(--color-neutral-600);
   --color-text-subtlest: var(--color-neutral-400);
@@ -168,7 +172,7 @@
 }
 
 /* --- Semantic colours: Dark ------------------------------------------------------ */
-[data-theme='dark'] {
+.app [data-theme='dark'] {
   --color-text-default: var(--color-dark-neutral-900);
   --color-text-subtle: var(--color-dark-neutral-500);
   --color-text-subtlest: var(--color-dark-neutral-400);

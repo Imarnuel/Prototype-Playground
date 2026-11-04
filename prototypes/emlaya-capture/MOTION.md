@@ -20,23 +20,27 @@ is a token in `src/tokens/tokens.gaps.css`. No value below is inlined anywhere.
 
 ## Celebration — entrance
 
-Measured in a production build by `npm run verify:motion`, from each animation's scheduled
-start (Web Animations `startTime + delay`), relative to the backdrop. All 8 are exact.
+Staged one beat at a time, at the user's request ("more dramatic … not everything revealing at
+the same time"). This replaces the brief's 0–600ms table. Measured in a production build by
+`npm run verify:motion`, from each animation's scheduled start (Web Animations
+`startTime + delay`), relative to the ground. All 11 are exact.
 
-| t | Element | Motion | Tokens |
+| t (ms) | Beat | Motion | Tokens |
 |---|---|---|---|
-| 0 | Backdrop (`.celebration__backdrop`) | fade in | `--motion-duration-fast`, `--motion-ease-out` |
-| 80 | Rays (`.rays`) | scale 0.6 → 1 + fade, soft spring, no overshoot | `--motion-delay-celebration-rays`, `--motion-scale-rays-from`, `--motion-duration-launch`, `--motion-ease-launch` |
-| 160 | Badge (`.celebration__badge`) | scale 0.4 → 1 with overshoot (peak 1.163); fade | `--motion-delay-celebration-badge`, `--motion-scale-badge-from`, `--motion-spring-overshoot`, `--motion-duration-spring-overshoot` (700ms) |
-| 280 | Check mark (`.checkBadge__stroke`) | stroke draws on | badge delay + `--motion-duration-instant`; `--motion-duration-base`, `--motion-ease-out` |
-| 300 | Confetti | first burst | `--motion-delay-celebration-confetti` |
-| 360 | Title | rise 12 + fade | `--motion-delay-celebration-title`, `--motion-rise-distance`, `--motion-duration-base`, `--motion-ease-out` |
-| 420 | Body | rise 12 + fade | `--motion-delay-celebration-body` |
-| 480 | Insight card | rise 12 + fade (not in the brief's table) | `--motion-delay-celebration-card` |
-| 600 | CTA + close | rise + fade; **inert until `animationend`** | `--motion-delay-celebration-cta` |
+| 0 | The ground floods out of the Save button | a 1800 disc centred on the docked button scales 0.03 → 1 over 650 | `--motion-delay-celebration-ground`, `--motion-duration-celebration-ground`, `--motion-scale-ground-from`, `--motion-ease-out`, `--gap-reveal-diameter` |
+| 380 | The badge pops, alone, at the screen's centre | scale 0 → 1 with overshoot (peak 1.163), held at 1.45x | `--motion-delay-celebration-badge`, `--motion-spring-overshoot` (700ms), `--motion-scale-badge-centre` |
+| 480 / 620 | Two shock rings | scale 1 → 3.2, fading, 700 each | `--motion-delay-celebration-ring`, `--motion-delay-celebration-ring-gap`, `--motion-duration-celebration-ring`, `--motion-scale-ring-to` |
+| 560 | The check draws on | stroke-dashoffset, 300 | `--motion-delay-celebration-check`, `--motion-duration-base` |
+| 1150 | The badge rises to its place | from 50cqh at 1.45x to its slot at 1x, 560, critically damped | `--motion-delay-celebration-settle`, `--motion-duration-celebration-settle`, `--motion-ease-launch` |
+| 1200 | The rays bloom | scale 0.3 → 1 + fade, 900 | `--motion-delay-celebration-rays`, `--motion-duration-celebration-rays`, `--motion-scale-rays-from` |
+| 1250 | The confetti releases | burst, then a 2.5s trickle | `--motion-delay-celebration-confetti` |
+| 1450 / 1560 | "Receipt" … "saved" | each word rises out of its own mask, 520 | `--motion-delay-celebration-title`, `--motion-delay-celebration-word-gap`, `--motion-duration-celebration-word`, `--motion-word-mask-bleed` |
+| 1800 | The body | rise 12 + fade, 300 | `--motion-delay-celebration-body`, `--motion-rise-distance` |
+| 2250 | The insight card | rise 24 + scale 0.96 → 1 + fade, 520 | `--motion-delay-celebration-card`, `--motion-duration-celebration-card`, `--motion-rise-card`, `--motion-scale-card-from` |
+| 2750 | Done and × | rise + fade; **inert until `animationend`** (~3050) | `--motion-delay-celebration-cta` |
 
-Frame rate over the first 3s: 60.7 fps, worst frame 17ms (headless Chromium on desktop — not a
-mid-range phone; on-device profiling is still to do).
+Frame rate over the first 3.6s: 60.0 fps, worst frame 33ms (headless Chromium on desktop, not
+a mid-range phone; on-device profiling is still to do).
 
 ## Celebration — exit
 
@@ -45,10 +49,12 @@ On Done (or ×): content and badge reverse, while rays, confetti and the ground 
 | Element | Motion | Tokens |
 |---|---|---|
 | Copy, card, CTA, close | sink 12 + fade | `--motion-duration-celebration-exit` (= fast, 200ms), `--motion-ease-inOut` |
-| Badge | shrink to 0.4 + fade | same |
+| Badge | shrink to 0 + fade | same |
 | Ground, rays, confetti canvas | fade | same |
 
 Copy opacity is 0.07 at 170ms of 200. The layer unmounts at 200ms (`usePresence`), so nothing cuts.
+The camera that Done returns to paints its scene only after that frame. Its setup blocked the exit:
+the copy was at 0.93 opacity at 170ms until the scene deferred and batched its token reads.
 The exit uses `inOut`, not the shared exit curve (`in`). See CORRECTIONS S17.
 
 ## Rays
@@ -84,15 +90,27 @@ tab is hidden and clamps each step to 1/30s, so a resumed tab does not teleport 
 | Spin | −6 … 6 rad/s | `--confetti-spin-*` |
 | 3D flutter | scaleY = cos(2π f t), f 1.2–3.4 Hz; brightness follows the face | `--confetti-flip-freq-*` |
 | Palette | the frame's own 10 rect fills (9502:21228 …) | `--gap-confetti-1` … `-10` |
-| Clear | pieces leave off the bottom only. Last one gone at 4.5s (target ~5s) | `--confetti-clear-by` |
+| Clear | pieces leave off the bottom only. Last one gone at 4.4s (target ~5s) | `--confetti-clear-by` |
+
+## Live capture
+
+Not in Figma (user request). `CaptureScene.ts` paints the world once and re-draws only its blit
+per frame. Verified: the live feed changes frame to frame; the captured frame does not.
+
+| Parameter | Value | Token |
+|---|---|---|
+| Hand-held drift | ±6 x, ±5 y px, ±0.7° roll, ±1.2% zoom, two incommensurate sines per axis at 0.32 Hz | `--capture-drift-*` |
+| Autofocus | blur 8 → 0 with a hunt (overshoot), exposure 1.28 → 1, over 900ms on opening and on Retake | `--capture-focus-duration`, `--capture-focus-blur`, `--capture-exposure-from` |
+| Detection | the outline fades in at 1.1s over 350ms, then follows the paper at 0.2 per frame | `--capture-detect-delay`, `--capture-detect-fade`, `--capture-track-follow` |
+| Grain | a 96 px noise tile, re-offset every frame, at 0.6 | `--capture-grain-alpha` |
+| Shutter | the frame freezes sharp, without the outline; white flash 1 → 0 over 300 | `--motion-duration-base`, `--gap-color-shutter-flash` |
 
 ## Rest of the flow
 
 | Moment | Motion | Tokens |
 |---|---|---|
-| Shutter | white flash 1 → 0 | `--motion-duration-base`, `--motion-ease-out`, `--gap-color-shutter-flash` |
 | Live → captured | tab bar slides down; Continue bar slides up; hint, flash, controls fade | base / fast, `inOut` / `out` |
-| Captured → processing | the photo shrinks toward the pill's centre (scale 0.575 at 200ms) and fades; the chrome falls away | `--motion-duration-slow`, `--gap-handoff-scale` (0.22) |
+| Captured → processing | **no zoom**: Review rises over the frozen shot as a sheet (translateY 100% → 0); the status bar turns dark once it has landed | `--motion-duration-slow`, `--motion-ease-out` |
 | Processing | pill arrives on the launch spring; spinner 900ms/turn; skeleton breathes | `--motion-duration-spinner-rev`, `--motion-ease-launch` |
 | Processing → review | skeleton and veil fade; fields rise in, 45ms apart | `--motion-delay-field-stagger` |
 | Screens | every layer cross-fades in **and out** (`Layer` + `usePresence`) | `--motion-duration-base` |
@@ -102,5 +120,6 @@ tab is hidden and clamps each step to 1/30s, so a resumed tab does not teleport 
 
 `prefers-reduced-motion`, or the dev toolbar's *Reduced motion* switch, sets
 `data-reduced-motion` on the app. Then: no confetti (never started: 0 spawned), still rays (no
-turn, no breathe), and a plain fade for all content. No scale, no rise, no stroke draw, no
-photo handoff transform. Verified by `verify:motion`.
+turn, no breathe), and a plain fade for all content. No flood, no pop, no rings, no rise, no
+word masks, no stroke draw. The capture scene is still: no drift, no focus hunt. Review fades in
+instead of rising. Verified by `verify:motion`.

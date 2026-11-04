@@ -5,6 +5,9 @@ import '@fontsource/geist/400.css';
 import '@fontsource/geist/500.css';
 import '@fontsource/geist/600.css';
 import '@fontsource/zalando-sans-semiexpanded/600.css';
+// The printed receipt in the live capture scene (not a design font: CORRECTIONS, Capture).
+import '@fontsource/geist-mono/500.css';
+import '@fontsource/geist-mono/700.css';
 import './tokens/tokens.css';
 import './tokens/tokens.gaps.css';
 import './index.css';

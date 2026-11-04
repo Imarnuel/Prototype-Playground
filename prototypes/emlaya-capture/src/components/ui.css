@@ -11,15 +11,15 @@
 button { border: 0; background: none; padding: 0; margin: 0; color: inherit; cursor: pointer; }
 
 /* --- Press feedback: every discrete control, the project's one press scale -------- */
-:is(.glassButton, .headerButton, .button, .pill__remove, .shutter, .tabItem, .action):active:not(:disabled) {
+:is(.glassButton, .headerButton, .button, .pill__remove, .shutter, .tabItem):active:not(:disabled) {
   transform: scale(var(--motion-press-scale));
 }
-:is(.glassButton, .headerButton, .button, .pill__remove, .shutter, .tabItem, .action) {
+:is(.glassButton, .headerButton, .button, .pill__remove, .shutter, .tabItem) {
   transition:
     transform var(--motion-duration-instant) var(--motion-ease-inOut),
     opacity var(--motion-duration-fast) var(--motion-ease-inOut);
 }
-.app[data-reduced-motion='true'] :is(.glassButton, .headerButton, .button, .pill__remove, .shutter, .tabItem, .action) { transition: none; }
+.app[data-reduced-motion='true'] :is(.glassButton, .headerButton, .button, .pill__remove, .shutter, .tabItem) { transition: none; }
 
 /* 44 x 44 tap targets without growing the glyph (CLAUDE.md, iOS metrics). */
 .pill__remove, .textField__value--button { position: relative; }

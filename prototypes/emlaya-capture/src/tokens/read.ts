@@ -46,3 +46,26 @@ export function tokenColorList(name: string): string[] {
   probe.remove();
   return out;
 }
+
+/**
+ * Resolves colour tokens to concrete colours a canvas can use, through ONE probe kept in
+ * the document while it is used: appending a fresh element per token invalidates the
+ * whole tree each time, and 40 of those blocked the celebration's exit for a frame.
+ */
+export function colorResolver(): { color: (name: string) => string; done: () => void } {
+  const probe = document.createElement('span');
+  probe.style.display = 'none';
+  document.body.appendChild(probe);
+  return {
+    color: (name) => {
+      probe.style.color = `var(${name})`;
+      return getComputedStyle(probe).color;
+    },
+    done: () => probe.remove(),
+  };
+}
+
+/** A raw token value (a font stack, say), unparsed. */
+export function tokenString(name: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}

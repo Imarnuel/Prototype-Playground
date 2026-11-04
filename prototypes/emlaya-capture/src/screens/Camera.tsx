@@ -6,9 +6,10 @@
  * element is what lets the capture feel retained, not replaced, and lets the same
  * element carry into processing (the handoff below).
  *
- * The camera is simulated: the feed is the frame's own photo (Frame 5117's image fill).
+ * The camera is simulated: a live canvas scene (CaptureScene) of a receipt printed from
+ * the record, in place of the frame's still stock photo — the user's call.
  */
-import receiptPhoto from '../assets/figma/receipt-photo.webp';
+import type { Ref } from 'react';
 import close from '../assets/figma/close.svg';
 import lightning from '../assets/figma/lightning.svg';
 import lightBulb from '../assets/figma/light-bulb.svg';
@@ -17,6 +18,7 @@ import folderOpen from '../assets/figma/folder-open.svg';
 import cameraAdd from '../assets/figma/camera-add.svg';
 import checkContinue from '../assets/figma/check-continue.svg';
 import { BottomTab } from '../components/BottomTab';
+import { CameraFeed, type CameraFeedHandle } from '../components/capture/CameraFeed';
 import { Button, GlassButton, Icon, inert } from '../components/ui';
 import './Camera.css';
 
@@ -24,8 +26,11 @@ export type CameraPhase = 'live' | 'captured';
 
 type CameraProps = {
   phase: CameraPhase;
-  /** True while the photo hands off into processing; the surface then unmounts. */
+  /** True while Review rises over it; the surface then unmounts. */
   leaving: boolean;
+  /** Reduced motion: a still scene, no hand-held drift or focus hunt. */
+  still: boolean;
+  feedRef: Ref<CameraFeedHandle>;
   /** Bumped on every shutter press, so the flash replays. */
   shot: number;
   onShutter: () => void;
@@ -34,7 +39,7 @@ type CameraProps = {
   onNotDesigned: (what: string) => void;
 };
 
-export function Camera({ phase, leaving, shot, onShutter, onRetake, onContinue, onNotDesigned }: CameraProps) {
+export function Camera({ phase, leaving, still, feedRef, shot, onShutter, onRetake, onContinue, onNotDesigned }: CameraProps) {
   const live = phase === 'live';
   return (
     <section
@@ -45,14 +50,9 @@ export function Camera({ phase, leaving, shot, onShutter, onRetake, onContinue, 
       aria-label={live ? 'Camera' : 'Captured receipt'}
     >
       <div className="camera__feed">
-        <img
-          className="camera__photo"
-          src={receiptPhoto}
-          alt={live ? '' : 'The captured receipt photo'}
-          draggable={false}
-        />
+        <CameraFeed ref={feedRef} phase={phase} still={still} />
 
-        <div className="camera__hint" aria-hidden={!live}>
+        <div className="camera__hint" aria-hidden={!live} data-departure="Live scene: not in Figma (user request)">
           <Icon src={lightBulb} size={20} />
           <span className="ts-body-small">Position the document in frame</span>
         </div>

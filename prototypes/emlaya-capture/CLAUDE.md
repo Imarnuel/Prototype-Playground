@@ -25,6 +25,8 @@ src/tokens/tokens.gaps.css   every raw value, with its node, and all motion; pro
 src/tokens/read.ts           JS reads tokens through getComputedStyle; never literals
 src/components/ui.tsx        Button, HeaderButton, TextField, Pill, GlassButton, Icon
 src/components/celebration/  MilestoneCelebration, CheckBadge, MilestoneCard, Rays, Confetti
+src/components/capture/      CameraFeed + CaptureScene: the live camera (not in Figma, user request)
+src/data/receiptDocument.ts  the paper receipt the camera sees, printed from the record
 src/screens/                 Camera (live + captured), Review (processing + ready + error)
 src/data/records.ts          the one record store; milestone figures are derived from it
 src/api/emlaya.ts            extract / save through shared/src/mockApi.ts
@@ -49,3 +51,8 @@ taken there. `?dev=1` turns on the dev toolbar and the "Replay celebration" cont
 every Figma note. [`MOTION.md`](./MOTION.md) holds the choreography. Several values look wrong and
 are deliberate (the 1 below the status bar, the 3-above-centre title, the 4px tab overhang).
 Check there before "fixing" one back.
+
+Changed at the user's request after the first build: a live capture scene replaces the
+Figma photo, Review rises as a sheet (no zoom), the receipt-actions rail is gone, and the
+celebration is staged over ~2.8s. Theme selectors are scoped to `.app` because the hosted
+viewer sets `data-theme` on `<html>`.

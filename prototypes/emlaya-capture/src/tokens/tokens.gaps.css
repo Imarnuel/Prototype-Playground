@@ -79,7 +79,6 @@
   --gap-shadow-tab-bar: 0 8px 6px rgb(51 41 20 / 0.02); /* 4073:1521 */
   --gap-blur-camera-control: 4px; /* 9502:21712 etc. */
   --gap-blur-tab-bar: 6px;        /* 4073:1520 */
-  --gap-blur-actions: 6px;        /* 5359:8659 etc. */
   --gap-blur-processing: 3px;     /* 4653:68317 */
   --gap-border-hairline: 1px;     /* every stroke in the flow is 1, unbound */
   --gap-border-hairline-half: 0.5px; /* 4073:1521 */
@@ -97,11 +96,8 @@
   --gap-size-icon-24: 24px;
   --gap-size-icon-28: 28px;
   --gap-size-icon-32: 32px;
-  --gap-size-share-w: 22px;       /* 5359:8662 fontisto:share-a, 22 x 18 */
-  --gap-size-share-h: 18px;
   --gap-size-badge-check: 70px;   /* 9502:21221 */
   --gap-size-badge-star: 40px;    /* 9502:21309 */
-  --gap-size-action: 36px;        /* 5359:8659 */
   --gap-size-icon-button: 40px;   /* 9502:21681, 21712 (32 + 2 x 8 padding in camera) */
   --gap-size-icon-button-lg: 44px; /* 9502:21682 */
   --gap-size-button: 48px;        /* 9502:21739, 9502:21323 */
@@ -138,13 +134,9 @@
   --gap-camera-add-right: 18px;
   /* 9502:21690 ends at 809, where the tab bar starts: 65 above the frame's bottom. */
   --gap-camera-feed-bottom: 65px;
-  /* The photo's handoff to the processing pill: how small it gets before it fades. */
-  --gap-handoff-scale: 0.22;
+
   --gap-tab-bar-bottom: -4px;     /* 9502:21688 hangs 4 below the frame */
   --gap-header-top: 1px;          /* 9502:21676 sits at 63, one below the status bar */
-  /* 5359:8681 at y 123: 8 above the content column, which starts at 131. Its 358 + 44
-     is the frame's right edge, so it overlaps the fields' right 28. As drawn. */
-  --gap-actions-offset: -8px;
   /* 9502:21683: the title sits at calc(50% - 14px) in a 44 row — 3 above centre. */
   --gap-header-title-offset: 14px;
   --gap-celebration-badge-top: 107px; /* 9502:21221 at 169 */
@@ -183,22 +175,50 @@
      (shared/src/motion.ts), published by main.tsx as --motion-duration-* and
      --motion-ease-*. What follows is only the choreography the brief adds on top. */
 
-  /* Entrance offsets (brief, Phase 4 table). */
-  --motion-delay-celebration-rays: 80ms;
-  --motion-delay-celebration-badge: 160ms;
-  --motion-delay-celebration-confetti: 300ms;
-  --motion-delay-celebration-title: 360ms;
-  --motion-delay-celebration-body: 420ms;
-  --motion-delay-celebration-card: 480ms;
-  --motion-delay-celebration-cta: 600ms;
+  /* Entrance — staged, one beat at a time (the user: "more dramatic … not everything
+     revealing at the same time"). Supersedes the brief's 0–600ms table. Beats:
+     the ground floods out of the Save button → the badge pops alone at the centre,
+     rings out, draws its check → it rises to its place as the rays bloom and the
+     confetti releases → the title, word by word → the body → the insight card → Done. */
+  --motion-delay-celebration-ground: 0ms;
+  --motion-duration-celebration-ground: 650ms;
+  --motion-scale-ground-from: 0.03;
+  --motion-delay-celebration-badge: 380ms;
+  --motion-scale-badge-from: 0;
+  --motion-scale-badge-centre: 1.45;  /* the badge's size while it holds the centre */
+  --motion-delay-celebration-ring: 480ms;
+  --motion-delay-celebration-ring-gap: 140ms;
+  --motion-duration-celebration-ring: 700ms;
+  --motion-scale-ring-to: 3.2;
+  --motion-delay-celebration-check: 560ms;
+  --motion-delay-celebration-settle: 1150ms;
+  --motion-duration-celebration-settle: 560ms;
+  --motion-delay-celebration-rays: 1200ms;
+  --motion-duration-celebration-rays: 900ms;
+  --motion-scale-rays-from: 0.3;
+  --motion-delay-celebration-confetti: 1250ms;
+  --motion-delay-celebration-title: 1450ms;
+  --motion-delay-celebration-word-gap: 110ms;
+  --motion-duration-celebration-word: 520ms;
+  --motion-delay-celebration-body: 1800ms;
+  --motion-delay-celebration-card: 2250ms;
+  --motion-duration-celebration-card: 520ms;
+  --motion-rise-card: 24px;
+  --motion-scale-card-from: 0.96;
+  --motion-delay-celebration-cta: 2750ms;
   --motion-rise-distance: 12px;
-  --motion-scale-rays-from: 0.6;
-  --motion-scale-badge-from: 0.4;
+  /* The word mask's bleed below the line, so descenders are not clipped by it. */
+  --motion-word-mask-bleed: 0.18em;
   /* Badge spring with overshoot: underdamped, zeta 0.5, omega 17, 700ms, peaks at
      1.163. The shared set has no overshoot spring (removed at the supermart designer's
      call); this one is the brief's explicit ask, so it is a proposed addition. */
   --motion-spring-overshoot: linear(0, 0.0184, 0.0683, 0.1425, 0.2337, 0.3359, 0.4432, 0.5511, 0.6555, 0.7534, 0.8424, 0.921, 0.9883, 1.0439, 1.088, 1.1209, 1.1437, 1.1572, 1.1628, 1.1615, 1.1547, 1.1437, 1.1295, 1.1132, 1.0959, 1.0783, 1.061, 1.0447, 1.0297, 1.0164, 1.0049, 0.9953, 0.9876, 0.9817, 0.9775, 0.9749, 0.9736, 0.9735, 0.9744, 0.976, 0.9782, 0.9807, 0.9835, 0.9864, 0.9892, 0.992, 0.9945, 0.9967, 0.9987, 1.0003, 1.0017, 1.0027, 1.0035, 1.004, 1.0043, 1.0043, 1.0042, 1.004, 1.0037, 1.0033, 1);
   --motion-duration-spring-overshoot: 700ms;
+  /* The shock rings around the badge. */
+  --gap-color-ring: rgb(255 255 255 / 0.75);
+  --gap-ring-stroke: 3px;
+  /* The flood: a disc grown from the Save button wide enough to cover every corner. */
+  --gap-reveal-diameter: 1800px;
   /* Ambient rays. */
   --motion-duration-rays-outer-rev: 40s;
   --motion-duration-rays-inner-rev: 60s;
@@ -252,4 +272,66 @@
   --api-latency-save: 700ms;
   /* How long a "not designed in this flow" notice stays up. */
   --motion-duration-notice-hold: 2600ms;
+}
+
+/*
+ * --- Live capture scene -----------------------------------------------------------------
+ * Not in Figma: the frames hold a static stock photo (9502:21690's image fill). At the
+ * user's request the camera is a simulated live feed instead — a receipt PRINTED FROM THE
+ * RECORD lying on a counter, seen through a hand-held phone: drift, autofocus, exposure
+ * settling, sensor grain, and a document outline that tracks the paper. All of it is
+ * drawn on a canvas (CaptureScene.ts) from these tokens.
+ */
+:root {
+  /* Counter: warm oiled wood under a top-left key light. */
+  --capture-surface: #6b4a2f;
+  --capture-surface-deep: #3d2a1a;
+  --capture-grain-dark: rgb(36 22 12 / 0.35);
+  --capture-grain-light: rgb(255 226 190 / 0.08);
+  --capture-key-light: rgb(255 240 220 / 0.22);
+  --capture-vignette: rgb(0 0 0 / 0.55);
+  --capture-noise: rgb(255 255 255 / 0.06);
+  /* Thermal paper and its ink. */
+  --capture-paper: #f4f2ec;
+  --capture-paper-shade: rgb(80 70 55 / 0.10);
+  --capture-paper-shadow: rgb(20 12 4 / 0.55);
+  --capture-ink: #2b2a28;
+  --capture-ink-faint: #6e6b66;
+  /* The detected-document outline: the brand yellow. */
+  --capture-quad: var(--color-yellow-400);
+  --capture-quad-fill: rgb(255 196 18 / 0.05);
+  --capture-font: 'Geist Mono', ui-monospace, Menlo, monospace;
+
+  /* Geometry, in CSS px of the feed. */
+  --capture-paper-width: 236;
+  --capture-paper-pad: 18;
+  --capture-paper-line: 17;
+  --capture-paper-text: 11.5;
+  --capture-paper-title: 15;
+  --capture-paper-tooth: 6;       /* the torn edge's zigzag */
+  --capture-paper-angle: -2.4;    /* degrees on the counter */
+  --capture-paper-centre-y: 0.46; /* fraction of the feed's height */
+  --capture-paper-shadow-blur: 22;
+  --capture-paper-shadow-y: 10;
+  --capture-world-overscan: 1.25; /* world drawn larger than the view, so drift never shows an edge */
+  --capture-grain-spacing: 9;
+  --capture-quad-stroke: 2;
+  --capture-quad-corner: 22;
+  --capture-quad-corner-stroke: 4;
+
+  /* Hand-held motion. */
+  --capture-drift-x: 6;           /* px */
+  --capture-drift-y: 5;
+  --capture-drift-angle: 0.7;     /* degrees */
+  --capture-drift-zoom: 0.012;
+  --capture-drift-hz: 0.32;
+  /* Autofocus and exposure on opening (and on Retake): blur hunts and settles. */
+  --capture-focus-duration: 900ms;
+  --capture-focus-blur: 8;        /* px */
+  --capture-exposure-from: 1.28;  /* brightness */
+  --capture-detect-delay: 1100ms; /* the outline finds the paper */
+  --capture-detect-fade: 350ms;
+  --capture-track-follow: 0.2;    /* per-frame catch-up of the outline */
+  --capture-grain-alpha: 0.6;
+  --capture-jpeg-quality: 0.86;
 }

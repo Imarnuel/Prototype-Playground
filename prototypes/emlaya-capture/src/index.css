@@ -27,8 +27,16 @@ p, h1, h2 { margin: 0; }
 .stage { position: absolute; inset: 0; }
 .layer { position: absolute; inset: 0; transition: opacity var(--motion-duration-base) var(--motion-ease-inOut); }
 .layer[data-state='enter'], .layer[data-state='exit'] { opacity: 0; }
-/* The camera leaves by handing its photo off (Camera.css), not by fading as a whole. */
+/* The camera stays put under Review as it rises, then unmounts. */
 .layer--camera[data-state='exit'] { opacity: 1; }
+/* Review arrives as a sheet over the shot, on the sheet spring; it leaves by fading. */
+.layer--review {
+  transition:
+    transform var(--motion-duration-slow) var(--motion-ease-out),
+    opacity var(--motion-duration-base) var(--motion-ease-inOut);
+}
+.layer--review[data-state='enter'] { opacity: 1; transform: translateY(100%); }
+.app[data-reduced-motion='true'] .layer--review[data-state='enter'] { opacity: 0; transform: none; }
 .app[data-reduced-motion='true'] .layer { transition-duration: var(--motion-duration-fast); }
 
 /* --- Figma frame harness (?frame=figma): the screen at 402 x 874, safe top 62 -------

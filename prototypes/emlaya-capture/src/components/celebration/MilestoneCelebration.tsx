@@ -6,7 +6,7 @@
  * `children` carries the optional insight card (9502:21308). The brief's signature is
  * `title body icon primaryAction`; the card is part of the frame, so it is a slot.
  */
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import close from '../../assets/figma/x.svg';
 import { Button, HeaderButton, inert } from '../ui';
 import { usePresence } from '../../state/usePresence';
@@ -87,9 +87,25 @@ export function MilestoneCelebration({ open, title, body, icon, primaryAction, o
       <HeaderButton flat className="celebration__close" icon={close} label="Close" onClick={dismiss} {...inert(!landed)} />
 
       <div className="celebration__content">
-        <div className="celebration__badge">{icon}</div>
+        {/* The badge holds the centre first, then rises to its place (the outer box);
+            the inner box is its pop. The rings are its shock waves. */}
+        <div className="celebration__badge">
+          <span className="celebration__ring" aria-hidden="true" />
+          <span className="celebration__ring celebration__ring--late" aria-hidden="true" />
+          <div className="celebration__badgePop">{icon}</div>
+        </div>
         <div className="celebration__copy">
-          <h2 id="celebration-title" ref={titleRef} tabIndex={-1} className="celebration__title ts-display-d2">{title}</h2>
+          <h2 id="celebration-title" ref={titleRef} tabIndex={-1} className="celebration__title ts-display-d2">
+            {title.split(' ').map((word, i) => (
+              // The space sits between the masks: inside an inline-block it collapses.
+              <Fragment key={i}>
+                {i > 0 && ' '}
+                <span className="celebration__word" style={{ '--w': i } as CSSProperties}>
+                  <span className="celebration__wordInner">{word}</span>
+                </span>
+              </Fragment>
+            ))}
+          </h2>
           <p className="celebration__body ts-body-base">{body}</p>
         </div>
         {children && <div className="celebration__card">{children}</div>}
