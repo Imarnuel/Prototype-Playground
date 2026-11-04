@@ -14,6 +14,9 @@ specific to this study.
 - Extraction error: `4142:9167` exists but was **not inspected** (MCP timeouts). The state is a placeholder.
 - Modes: the camera frames resolve **Dark**, the rest pin **Light** (`152:0`).
 
+**Hosted preview:** <https://claude.ai/artifact/QnBTfbHEStRmUdi2wAVu5X>. Rebuild it with
+`npm run build:hosted` and republish `dist/`. That build always shows the dev toolbar and the replay control, since a hosted page has no address bar for `?dev=1`.
+
 ## Layout
 
 ```

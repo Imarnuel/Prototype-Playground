@@ -41,7 +41,8 @@ export function App() {
 }
 
 function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; setForceReduced: (v: boolean) => void }) {
-  const dev = devFlagEnabled();
+  // The hosted preview has no address bar to add ?dev=1 to; its build sets VITE_SHOWCASE.
+  const dev = devFlagEnabled() || import.meta.env.VITE_SHOWCASE === '1';
   const reduced = useReducedMotion();
   const [screen, setScreen] = useState<Screen>('camera');
   const [shot, setShot] = useState(0);

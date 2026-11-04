@@ -10,7 +10,8 @@
     "check:tokens": "node scripts/check-tokens.mjs",
     "verify:diff": "node scripts/diff-figma.mjs",
     "verify:shots": "node scripts/shoot.mjs",
-    "verify:motion": "node scripts/verify-motion.mjs"
+    "verify:motion": "node scripts/verify-motion.mjs",
+    "build:hosted": "node scripts/build-hosted.mjs"
   },
   "dependencies": {
     "@playground/shared": "*",
