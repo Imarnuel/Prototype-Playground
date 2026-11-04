@@ -1,0 +1,149 @@
+/* All values are tokens (tokens.css) or recorded gaps (tokens.gaps.css). */
+
+.icon { display: block; flex: none; }
+.icon--12 { width: var(--gap-size-icon-12); height: var(--gap-size-icon-12); }
+.icon--16 { width: var(--gap-size-icon-16); height: var(--gap-size-icon-16); }
+.icon--20 { width: var(--gap-size-icon-20); height: var(--gap-size-icon-20); }
+.icon--24 { width: var(--gap-size-icon-24); height: var(--gap-size-icon-24); }
+.icon--28 { width: var(--gap-size-icon-28); height: var(--gap-size-icon-28); }
+.icon--32 { width: var(--gap-size-icon-32); height: var(--gap-size-icon-32); }
+
+button { border: 0; background: none; padding: 0; margin: 0; color: inherit; cursor: pointer; }
+
+/* --- Press feedback: every discrete control, the project's one press scale -------- */
+:is(.glassButton, .headerButton, .button, .pill__remove, .shutter, .tabItem, .action):active:not(:disabled) {
+  transform: scale(var(--motion-press-scale));
+}
+:is(.glassButton, .headerButton, .button, .pill__remove, .shutter, .tabItem, .action) {
+  transition:
+    transform var(--motion-duration-instant) var(--motion-ease-inOut),
+    opacity var(--motion-duration-fast) var(--motion-ease-inOut);
+}
+.app[data-reduced-motion='true'] :is(.glassButton, .headerButton, .button, .pill__remove, .shutter, .tabItem, .action) { transition: none; }
+
+/* 44 x 44 tap targets without growing the glyph (CLAUDE.md, iOS metrics). */
+.pill__remove, .textField__value--button { position: relative; }
+.pill__remove::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--spacing-300) * -1);
+}
+
+/* --- GlassButton -------------------------------------------------------------------- */
+.glassButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border-radius: var(--gap-radius-pill);
+  background: var(--gap-color-camera-control);
+  -webkit-backdrop-filter: blur(var(--gap-blur-camera-control));
+  backdrop-filter: blur(var(--gap-blur-camera-control));
+}
+.glassButton--sm { width: var(--gap-size-icon-button); height: var(--gap-size-icon-button); padding: var(--spacing-200); }
+.glassButton--add { width: var(--gap-size-button); height: var(--gap-size-button); padding: var(--spacing-200); }
+/* 9502:21696: no backdrop blur on the two 56s. */
+.glassButton--lg {
+  width: var(--gap-size-camera-control);
+  height: var(--gap-size-camera-control);
+  padding: var(--spacing-300);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* --- HeaderButton ------------------------------------------------------------------- */
+.headerButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border-radius: var(--border-radius-full);
+  background: var(--color-background-inverse-default);
+  /* Figma strokes are inside the frame: an inset shadow, so the box stays 40. */
+  box-shadow: inset 0 0 0 var(--gap-border-hairline) var(--color-button-highlight), var(--gap-shadow-icon-button);
+}
+.headerButton--40 { width: var(--gap-size-icon-button); height: var(--gap-size-icon-button); }
+.headerButton--44 { width: var(--gap-size-icon-button-lg); height: var(--gap-size-icon-button-lg); }
+/* 9502:21304 on the celebration: no fill, unspread shadow. */
+.headerButton--flat {
+  background: none;
+  box-shadow: inset 0 0 0 var(--gap-border-hairline) var(--color-button-highlight), var(--gap-shadow-icon-button-flat);
+}
+
+/* --- Button ----------------------------------------------------------------------- */
+.button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--gap-size-button);
+  padding: var(--spacing-200) var(--spacing-300);
+  gap: var(--spacing-50);
+  border-radius: var(--border-radius-full);
+  isolation: isolate;
+}
+.button--docked { width: 100%; height: var(--gap-size-button-docked); padding-block: var(--spacing-300); gap: var(--spacing-200); }
+.button--primary {
+  background: var(--gap-gloss-primary), var(--color-background-brand-bold-default);
+  box-shadow: var(--gap-shadow-button-inset), var(--shadow-xs);
+  color: var(--color-text-text-black);
+}
+.button--secondary {
+  background: var(--gap-gloss-secondary), var(--gap-color-button-secondary);
+  box-shadow: var(--gap-shadow-button-inset-secondary), var(--shadow-xs);
+  color: var(--color-text-text-white);
+  gap: var(--spacing-200);
+}
+.button:disabled { cursor: default; }
+.button[aria-busy='true'] .button__label { opacity: 0.6; }
+
+/* --- TextField -------------------------------------------------------------------- */
+.textField {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-200);
+  padding: var(--spacing-300) var(--spacing-400);
+  border-radius: var(--border-radius-300);
+  background: var(--color-background-neutral-subtle-default);
+  min-width: 0;
+}
+.textField--large { height: var(--gap-size-field-large); }
+.textField--default { height: var(--gap-size-field); }
+.textField__text { display: flex; flex-direction: column; justify-content: center; flex: 1 0 0; min-width: 0; }
+.textField__label { color: var(--color-text-subtle); white-space: nowrap; }
+.textField__value {
+  color: var(--color-text-default);
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: none;
+  min-width: 0;
+  width: 100%;
+  text-align: left;
+  outline: none;
+}
+.textField:focus-within { box-shadow: inset 0 0 0 var(--gap-border-hairline) var(--color-border-brand); }
+
+/* --- Pill --------------------------------------------------------------------------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-50);
+  padding: var(--spacing-50) var(--spacing-200);
+  border-radius: var(--border-radius-full);
+  flex: none;
+}
+.pill--tag {
+  height: var(--gap-size-tag);
+  background: var(--color-background-brand-default);
+  box-shadow: inset 0 0 0 var(--gap-border-hairline) var(--color-border-brand-subtle);
+  color: var(--color-text-default);
+}
+.pill--mention {
+  height: var(--gap-size-share-pill);
+  background: var(--color-background-neutral-subtle-default);
+  box-shadow: inset 0 0 0 var(--gap-border-hairline) var(--color-background-neutral-subtle-default);
+  color: var(--color-text-secondary);
+}
+.pill__text { white-space: nowrap; }
+.pill__remove { display: flex; }

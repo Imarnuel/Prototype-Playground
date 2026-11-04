@@ -1,0 +1,167 @@
+/* 9502:21686 (live) and 9502:21716 (captured). Dark mode, as both frames resolve. */
+.camera {
+  position: absolute;
+  inset: 0;
+  background: var(--color-black);
+  overflow: clip;
+  transition: background-color var(--motion-duration-slow) var(--motion-ease-inOut);
+}
+
+/* The feed fills the frame's width. Figma's is 400 in a 402 frame (Frame 5259), which
+   leaves a 2px black strip down the right edge — normalised, see CORRECTIONS.md. */
+.camera__feed {
+  position: absolute;
+  top: var(--safe-top);
+  left: 0;
+  right: 0;
+  bottom: var(--gap-camera-feed-bottom);
+  overflow: clip;
+  transform-origin: 50% calc(50% + var(--gap-camera-feed-bottom) / 2);
+  transition:
+    transform var(--motion-duration-slow) var(--motion-ease-inOut),
+    opacity var(--motion-duration-slow) var(--motion-ease-in),
+    border-radius var(--motion-duration-slow) var(--motion-ease-inOut);
+}
+.camera__photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera__hint {
+  position: absolute;
+  top: var(--gap-camera-hint-top);
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-100);
+  padding: var(--spacing-200) var(--spacing-300);
+  border-radius: var(--gap-radius-pill);
+  background: var(--gap-color-camera-hint);
+  -webkit-backdrop-filter: blur(var(--gap-blur-camera-control));
+  backdrop-filter: blur(var(--gap-blur-camera-control));
+  color: var(--color-white);
+  white-space: nowrap;
+}
+
+/* Symmetric about the frame's centre. Figma's row is centred in the 400 feed, which
+   puts the shutter 1.5 left of the screen's centre. */
+.camera__controls {
+  position: absolute;
+  left: var(--gap-camera-controls-inset);
+  right: var(--gap-camera-controls-inset);
+  bottom: var(--gap-camera-controls-bottom);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shutter {
+  display: flex;
+  padding: var(--spacing-50);
+  border-radius: var(--border-radius-full);
+  /* 9502:21698 hugs: 48 core + 2 x 4 padding + 2 x 3 ring = 62. A real border here,
+     because the frame's size includes its stroke. */
+  border: var(--gap-border-shutter) solid var(--color-icon-default);
+}
+.shutter__core {
+  display: block;
+  width: var(--gap-size-shutter-core);
+  height: var(--gap-size-shutter-core);
+  border-radius: var(--border-radius-full);
+  background: var(--gap-color-shutter-core);
+}
+
+.camera__flash {
+  position: absolute;
+  inset: 0;
+  background: var(--gap-color-shutter-flash);
+  opacity: 0;
+  pointer-events: none;
+  animation: camera-flash var(--motion-duration-base) var(--motion-ease-out);
+}
+@keyframes camera-flash {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.camera__topRow {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--gap-camera-row-top));
+  left: var(--gap-camera-row-left);
+  right: var(--gap-camera-row-right);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* --- Bottom: tab bar (live) ↔ Continue bar (captured) --------------------------------- */
+.camera__tabBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--gap-tab-bar-bottom);
+  transition: transform var(--motion-duration-base) var(--motion-ease-inOut);
+}
+
+.camera__continueBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-300);
+  padding: var(--spacing-300) var(--spacing-400);
+  background: var(--gap-color-captured-bar);
+  transition: transform var(--motion-duration-base) var(--motion-ease-out);
+}
+.camera__continue { width: var(--gap-size-continue); }
+/* The Continue label has its own 4 of left padding in 9502:21741. */
+.camera__continue .button__label { padding-left: var(--spacing-50); }
+.camera__addPage {
+  position: absolute;
+  right: var(--gap-camera-add-right);
+  bottom: calc(100% + var(--spacing-400));
+  transition: opacity var(--motion-duration-base) var(--motion-ease-out);
+}
+
+/* Things that belong to one phase cross-fade; none cut. */
+.camera__hint,
+.camera__controls,
+.camera__flashToggle {
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-inOut);
+}
+
+/* live */
+.camera[data-phase='live'] .camera__continueBar { transform: translateY(100%); }
+.camera[data-phase='live'] .camera__addPage { opacity: 0; }
+
+/* captured: 9502:21720 (hint) and 9502:21730 (flash) are at opacity 0 in the frame. */
+.camera[data-phase='captured'] .camera__hint,
+.camera[data-phase='captured'] .camera__controls,
+.camera[data-phase='captured'] .camera__flashToggle { opacity: 0; }
+.camera[data-phase='captured'] .camera__tabBar { transform: translateY(100%); }
+
+/* --- Handoff into processing ------------------------------------------------------- */
+/* The photo shrinks toward the processing pill's centre (the centre of the area under
+   the status bar) and fades as the pill arrives; the chrome falls away around it. */
+.camera[data-leaving] { background-color: var(--color-no-fill-white); pointer-events: none; }
+.camera[data-leaving] .camera__feed {
+  transform: scale(var(--gap-handoff-scale));
+  opacity: 0;
+  border-radius: var(--border-radius-600);
+}
+.camera[data-leaving] :is(.camera__topRow, .camera__continueBar) {
+  opacity: 0;
+  transition: opacity var(--motion-duration-fast) var(--motion-ease-in);
+}
+
+.app[data-reduced-motion='true'] .camera__feed { transform: none; }
+.app[data-reduced-motion='true'] :is(.camera__tabBar, .camera__continueBar) { transform: none; }
+.app[data-reduced-motion='true'] .camera[data-phase='live'] .camera__continueBar,
+.app[data-reduced-motion='true'] .camera[data-phase='captured'] .camera__tabBar { opacity: 0; }
+.app[data-reduced-motion='true'] .camera__flash { animation: none; }

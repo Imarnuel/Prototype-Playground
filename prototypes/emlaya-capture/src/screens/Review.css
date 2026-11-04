@@ -1,0 +1,294 @@
+/* 9502:21324 (review) and 4653:68091 (processing). Light mode, as both frames pin. */
+.review {
+  position: absolute;
+  inset: 0;
+  background: var(--color-surface-secondary-default);
+  color: var(--color-text-default);
+}
+.review__layer { position: absolute; inset: 0; }
+.review__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* 9502:21325 starts at 131: status bar, the header's 1 below it, the 68 header. */
+  padding-top: calc(var(--safe-top) + var(--gap-header-top) + var(--spacing-300) * 2 + var(--gap-size-icon-button-lg));
+  /* Clears the docked button: 16 + 46 + 24, plus the column's own 12. */
+  padding-bottom: calc(var(--spacing-400) + var(--gap-size-button-docked) + var(--gap-space-24) + var(--spacing-300));
+  scrollbar-width: none;
+}
+.review__scroll::-webkit-scrollbar { display: none; }
+
+.review__content { position: relative; display: flex; flex-direction: column; gap: var(--spacing-300); }
+.review__sections { display: flex; flex-direction: column; gap: var(--spacing-400); }
+
+/* --- Header ------------------------------------------------------------------------ */
+.review__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-top: calc(var(--safe-top) + var(--gap-header-top));
+  background: var(--color-surface-default);
+}
+.review__headerRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-300) var(--spacing-400);
+}
+.review__title {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - var(--gap-header-title-offset));
+  translate: -50% 0;
+  margin: 0;
+  white-space: nowrap;
+  color: var(--color-text-default);
+}
+.review__headerSpacer { width: var(--gap-size-icon-button-lg); height: var(--gap-size-icon-button-lg); }
+
+/* --- Receipt actions (5359:8681) ---------------------------------------------------- */
+.review__actions {
+  position: absolute;
+  top: var(--gap-actions-offset);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-200);
+  padding: var(--spacing-300) var(--spacing-50);
+}
+.action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--gap-size-action);
+  height: var(--gap-size-action);
+  padding: var(--spacing-300);
+  border-radius: var(--border-radius-full);
+  background: var(--color-background-brand-bolder-default);
+  -webkit-backdrop-filter: blur(var(--gap-blur-actions));
+  backdrop-filter: blur(var(--gap-blur-actions));
+}
+.action__share { display: block; flex: none; width: var(--gap-size-share-w); height: var(--gap-size-share-h); }
+
+/* --- Top card (9502:21326) ---------------------------------------------------------- */
+.review__topCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-400);
+  padding: var(--spacing-200) var(--spacing-400) var(--gap-space-24);
+  background: var(--color-surface-default);
+  border-radius: 0 0 var(--border-radius-600) var(--border-radius-600);
+}
+.review__row { display: flex; gap: var(--spacing-200); }
+.review__half { flex: 1 0 0; }
+
+/* --- Cards --------------------------------------------------------------------------- */
+.card {
+  background: var(--color-surface-default);
+  border-radius: var(--border-radius-600);
+  box-shadow: var(--gap-shadow-card);
+  overflow: clip;
+}
+
+.review__items { display: flex; flex-direction: column; gap: var(--spacing-200); padding-inline: var(--spacing-300); }
+.review__sectionTitle { margin: 0; color: var(--color-text-subtle); }
+.review__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+
+/* Lists (9502:21343). The frame strokes rows 1–2 with border/subtler and rows 3–7 with
+   border/subtle; subtler, the first and the skeleton's, is used for all. */
+.itemRow { display: flex; align-items: center; gap: var(--spacing-300); min-height: var(--gap-size-row-min); padding-inline: var(--spacing-400); }
+.itemRow__content {
+  display: flex;
+  flex: 1 0 0;
+  align-self: stretch;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  padding: var(--spacing-300) 0 var(--spacing-200);
+  box-shadow: inset 0 calc(var(--gap-border-hairline) * -1) 0 0 var(--color-border-subtler);
+}
+.itemRow__left { display: flex; flex-direction: column; justify-content: center; gap: var(--spacing-25); width: var(--gap-size-item-left); overflow: clip; }
+.itemRow__name { display: flex; white-space: nowrap; color: var(--color-text-default); }
+.itemRow__qtyRow { display: flex; align-items: center; gap: var(--spacing-100); color: var(--color-text-subtle); }
+.itemRow__qty { width: var(--gap-size-qty); padding: var(--spacing-50); white-space: nowrap; }
+.itemRow__unit { padding: var(--spacing-50); white-space: nowrap; }
+.itemRow__x { white-space: nowrap; }
+.itemRow__total { text-align: right; white-space: nowrap; color: var(--color-text-default); font-variant-numeric: tabular-nums; }
+
+.review__meta { padding-inline: var(--spacing-300); }
+.review__metaCard { display: flex; flex-direction: column; padding: var(--spacing-400) 0 var(--spacing-200); }
+.metaBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-300);
+  padding: 0 var(--spacing-400) var(--spacing-300);
+  box-shadow: inset 0 calc(var(--gap-border-hairline) * -1) 0 0 var(--color-border-subtler);
+}
+.metaBlock[data-last] { padding-block: var(--spacing-200); }
+.metaBlock__head { display: flex; align-items: center; justify-content: space-between; width: 100%; color: var(--color-text-subtle); }
+.metaBlock__title { display: flex; align-items: center; gap: var(--spacing-100); }
+.metaBlock__pills { display: flex; flex-wrap: wrap; align-content: flex-start; gap: var(--spacing-200); }
+
+.review__evidence { padding-inline: var(--spacing-400); }
+.review__evidenceCard {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-400);
+  width: 100%;
+  padding: var(--spacing-300) var(--spacing-400);
+  text-align: left;
+  color: var(--color-text-default);
+}
+.review__thumb {
+  flex: none;
+  width: var(--gap-size-thumb);
+  height: var(--gap-size-thumb);
+  border-radius: var(--border-radius-200);
+  background: var(--color-white);
+  overflow: clip;
+}
+.review__thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.review__evidenceText { display: flex; flex-direction: column; gap: var(--spacing-25); white-space: nowrap; }
+.review__evidenceMeta { color: var(--color-text-subtle); }
+
+/* --- Docked button (9502:21685) ---------------------------------------------------- */
+.review__dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--spacing-400) var(--spacing-400) var(--gap-space-24);
+  background: var(--color-surface-default);
+}
+
+/* --- Processing skeleton (4653:68091) ---------------------------------------------- */
+.review__scroll--skeleton { padding: 0; overflow: clip; display: flex; flex-direction: column; gap: var(--spacing-400); }
+.review__skTop {
+  background: var(--color-surface-default);
+  border-radius: 0 0 var(--border-radius-600) var(--border-radius-600);
+  overflow: clip;
+}
+.review__skTop .review__header { position: static; padding-top: var(--safe-top); background: none; }
+.review__skFields { display: flex; flex-direction: column; gap: var(--spacing-500); padding-inline: var(--spacing-400); margin-top: var(--spacing-25); }
+.review__skSections { display: flex; flex-direction: column; gap: var(--spacing-400); }
+.review__items--skeleton, .review__meta--skeleton { padding-inline: var(--spacing-400); }
+
+.itemRow[data-skeleton] .itemRow__text { opacity: 0; }
+.itemRow[data-skeleton] .itemRow__name {
+  height: var(--gap-size-skeleton-line);
+  align-items: center;
+  padding-block: var(--spacing-25);
+  border-radius: var(--border-radius-200);
+  background: var(--color-background-neutral-subtle-default);
+}
+.itemRow[data-skeleton] .itemRow__qtyRow {
+  align-self: flex-start;
+  border-radius: var(--border-radius-200);
+  background: var(--color-background-neutral-subtle-default);
+}
+.itemRow[data-skeleton] :is(.itemRow__qty, .itemRow__unit) { padding: var(--spacing-25) var(--spacing-50); }
+.itemRow[data-skeleton] .itemRow__total {
+  display: flex;
+  align-items: center;
+  height: var(--gap-size-skeleton-line);
+  border-radius: var(--border-radius-200);
+  background: var(--color-background-neutral-default);
+}
+.metaBlock__pills[data-skeleton] { border-radius: var(--border-radius-50); background: var(--color-background-neutral-default); }
+.review__skPill { opacity: 0; }
+
+/* The shimmer is the skeleton breathing — "clearly alive" while extraction runs. */
+.review[data-status='processing'] .review__layer--skeleton :is(.review__skField, .itemRow__name, .itemRow__qtyRow, .itemRow__total, .metaBlock__pills) {
+  animation: review-breathe var(--motion-duration-rays-breathe) var(--motion-ease-inOut) infinite alternate;
+}
+@keyframes review-breathe { to { opacity: var(--motion-rays-breathe-min); } }
+
+/* 4653:68317 + 4653:68318 */
+.review__veil {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: calc(var(--safe-top) + var(--gap-processing-veil-top));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gap-gradient-processing-veil);
+  -webkit-backdrop-filter: blur(var(--gap-blur-processing));
+  backdrop-filter: blur(var(--gap-blur-processing));
+  transition: opacity var(--motion-duration-base) var(--motion-ease-inOut);
+}
+.review__pill {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-200);
+  padding: var(--spacing-300);
+  border-radius: var(--border-radius-600);
+  background: var(--color-surface-overlay-default);
+  box-shadow: var(--gap-shadow-float);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  transition:
+    opacity var(--motion-duration-base) var(--motion-ease-out),
+    transform var(--motion-duration-slow) var(--motion-ease-launch);
+}
+.review__spinner { animation: review-spin var(--motion-duration-spinner-rev) linear infinite; }
+@keyframes review-spin { to { transform: rotate(1turn); } }
+
+/* --- Processing → ready ------------------------------------------------------------- */
+.review__layer--skeleton { transition: opacity var(--motion-duration-base) var(--motion-ease-inOut); }
+.review:not([data-status='processing']) .review__veil { opacity: 0; pointer-events: none; }
+.review[data-status='ready'] .review__layer--skeleton { opacity: 0; }
+.review[data-status='processing'] .review__pill { animation: review-arrive var(--motion-duration-slow) var(--motion-ease-launch) both; }
+@keyframes review-arrive { from { opacity: 0; transform: scale(0.92); } }
+
+.review__layer--ready .stagger {
+  animation: review-rise var(--motion-duration-base) var(--motion-ease-out) both;
+  animation-delay: calc(var(--i, 0) * var(--motion-delay-field-stagger));
+}
+.review__layer--ready .review__header,
+.review__layer--ready .review__dock,
+.review__layer--ready .review__actions { animation: review-fade var(--motion-duration-base) var(--motion-ease-out) both; }
+@keyframes review-rise { from { opacity: 0; transform: translateY(var(--spacing-200)); } }
+@keyframes review-fade { from { opacity: 0; } }
+
+/* --- Error placeholder ---------------------------------------------------------------- */
+.review__error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-400);
+  animation: review-fade var(--motion-duration-base) var(--motion-ease-out) both;
+}
+.review__errorCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-300);
+  padding: var(--gap-space-24) var(--spacing-500) var(--spacing-500);
+  border-radius: var(--border-radius-600);
+  background: var(--color-surface-default);
+  box-shadow: var(--gap-shadow-float);
+  text-align: center;
+}
+.review__errorCard :is(h2, p) { margin: 0; }
+.review__errorCard p { color: var(--color-text-subtle); }
+.review__errorCard .button { width: 100%; }
+.review__errorBadge { color: var(--color-text-brand); }
+
+.review__announce {
+  position: absolute;
+  width: var(--gap-border-hairline);
+  height: var(--gap-border-hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.app[data-reduced-motion='true'] .review * { animation: none !important; }
+.app[data-reduced-motion='true'] .review__layer--ready .stagger { animation: review-fade var(--motion-duration-fast) linear both !important; }

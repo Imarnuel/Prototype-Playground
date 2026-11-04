@@ -14,6 +14,7 @@ shared/              composed by every study — device frame, motion, mock API,
 prototypes/
   _template/         starting point, and the harness the frame geometry is measured against
   supermart-pos/     Freshvale Supermart POS — packaged-goods till (first study)
+  emlaya-capture/    Emlaya — receipt capture → "Receipt saved" milestone celebration
   <case-study>/      one per study
 ```
 
@@ -27,6 +28,9 @@ npm run dev --workspace @playground/supermart-pos
 ```
 
 Then open **<http://localhost:5173/?dev=1>**.
+
+The Emlaya study runs the same way: `npm run dev --workspace @playground/emlaya-capture`.
+See `prototypes/emlaya-capture/CLAUDE.md` for its verification scripts.
 
 `?dev=1` is not optional if you want to see more than one screen: the dev toolbar is
 off by default, and it is how every screen and state is reached in one tap.

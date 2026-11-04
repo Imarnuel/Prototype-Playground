@@ -1,0 +1,196 @@
+/*
+ * 9502:21212 "Receipt saved". Choreography (MOTION.md): every delay, duration and
+ * easing is a token — the project's shared set, plus the celebration's own offsets
+ * in tokens.gaps.css. Only transform and opacity animate; the confetti is a canvas.
+ */
+.celebration {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  color: var(--color-text-text-black);
+  outline: none;
+}
+
+.celebration__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--gap-color-celebration-surface);
+}
+
+.celebration__confetti {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.celebration__close {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--gap-celebration-close-top));
+  left: var(--gap-celebration-close-left);
+}
+
+.celebration__content {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--gap-celebration-badge-top));
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.celebration__badge { width: var(--gap-size-badge-check); height: var(--gap-size-badge-check); }
+.celebration__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-celebration-copy-stack);
+  width: var(--gap-size-celebration-copy);
+  margin-top: var(--gap-celebration-copy-gap);
+  text-align: center;
+}
+.celebration__title { margin: 0; outline: none; }
+.celebration__body { margin: 0; }
+.celebration__card { margin-top: var(--gap-celebration-card-gap); width: var(--gap-size-milestone); max-width: calc(100% - var(--spacing-400) * 2); }
+
+/* 9502:21323 sits at x 40 in the 402 frame — 40 left, 32 right. Centred here. */
+.celebration__cta {
+  position: absolute;
+  left: 50%;
+  bottom: var(--gap-celebration-cta-bottom);
+  translate: -50% 0;
+  width: var(--gap-size-done);
+}
+.celebration__cta .button { width: 100%; }
+
+/* --- Badge -------------------------------------------------------------------------- */
+.checkBadge { display: block; width: 100%; height: 100%; }
+.checkBadge__stroke { stroke-dasharray: 1; stroke-dashoffset: 0; }
+
+/* --- Insight card (9502:21308) ------------------------------------------------------ */
+.milestoneCard {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-300);
+  padding: var(--spacing-400);
+  border-radius: var(--border-radius-600);
+  background: var(--gap-gradient-milestone), var(--color-white);
+  box-shadow: var(--gap-shadow-milestone-inset);
+  text-align: left;
+}
+.milestoneCard__icon { flex: none; width: var(--gap-size-badge-star); height: var(--gap-size-badge-star); }
+.milestoneCard__text { display: flex; flex-direction: column; gap: var(--gap-milestone-text-stack); flex: 1 0 0; min-width: 0; }
+.milestoneCard__headline { margin: 0; color: var(--color-text-default); }
+.milestoneCard__detail { margin: 0; color: var(--color-text-subtle); }
+.milestoneCard__emphasis { color: var(--gap-color-milestone-emphasis); }
+.milestoneCard__figure { color: var(--gap-color-milestone-figure); }
+
+/* --- Rays ------------------------------------------------------------------------------ */
+.rays {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--safe-top) + var(--gap-rays-origin-y));
+  width: 0;
+  height: 0;
+}
+.rays__layer {
+  position: absolute;
+  left: calc(var(--gap-ray-length) * -1);
+  top: calc(var(--gap-ray-length) * -1);
+  width: calc(var(--gap-ray-length) * 2);
+  height: calc(var(--gap-ray-length) * 2);
+  /* Each ray fades along its length: a radial mask on the layer, centred on the origin. */
+  -webkit-mask-image: var(--gap-mask-ray-fade);
+  mask-image: var(--gap-mask-ray-fade);
+}
+.ray {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  height: var(--gap-ray-length);
+  transform-origin: 50% 100%;
+  translate: -50% 0;
+  /* A wedge: apex at the origin, widest at the end. */
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+}
+.ray--wide { width: var(--gap-ray-width-wide); background: var(--gap-color-ray); }
+.ray--narrow { width: var(--gap-ray-width-narrow); background: var(--gap-color-ray-bright); }
+
+.rays__layer--wide {
+  animation:
+    rays-turn var(--motion-duration-rays-outer-rev) linear infinite,
+    rays-breathe var(--motion-duration-rays-breathe) var(--motion-ease-inOut) infinite alternate;
+}
+.rays__layer--narrow {
+  animation:
+    rays-turn var(--motion-duration-rays-inner-rev) linear infinite reverse,
+    rays-breathe var(--motion-duration-rays-breathe) var(--motion-ease-inOut) calc(var(--motion-duration-rays-breathe) / -2) infinite alternate;
+}
+@keyframes rays-turn { to { transform: rotate(1turn); } }
+@keyframes rays-breathe { to { opacity: var(--motion-rays-breathe-min); } }
+.rays[data-still] .rays__layer { animation: none; }
+
+/* --- Entrance ---------------------------------------------------------------------------- */
+/* t 0: backdrop. 80: rays. 160: badge (+ check draw). 300: confetti (JS). 360: title.
+   420: body. 480: card. 600: CTA — which takes taps from animationend. */
+.celebration[data-state='open'] .celebration__backdrop {
+  animation: celebration-fade var(--motion-duration-fast) var(--motion-ease-out) both;
+}
+.celebration[data-state='open'] .rays {
+  animation: celebration-rays var(--motion-duration-launch) var(--motion-ease-launch) var(--motion-delay-celebration-rays) both;
+}
+.celebration[data-state='open'] .celebration__badge {
+  animation:
+    celebration-pop var(--motion-duration-spring-overshoot) var(--motion-spring-overshoot) var(--motion-delay-celebration-badge) both,
+    celebration-fade var(--motion-duration-fast) var(--motion-ease-out) var(--motion-delay-celebration-badge) both;
+}
+.celebration[data-state='open'] .checkBadge__stroke {
+  animation: celebration-draw var(--motion-duration-base) var(--motion-ease-out) calc(var(--motion-delay-celebration-badge) + var(--motion-duration-instant)) both;
+}
+.celebration[data-state='open'] .celebration__title { animation: celebration-rise var(--motion-duration-base) var(--motion-ease-out) var(--motion-delay-celebration-title) both; }
+.celebration[data-state='open'] .celebration__body { animation: celebration-rise var(--motion-duration-base) var(--motion-ease-out) var(--motion-delay-celebration-body) both; }
+.celebration[data-state='open'] .celebration__card { animation: celebration-rise var(--motion-duration-base) var(--motion-ease-out) var(--motion-delay-celebration-card) both; }
+.celebration[data-state='open'] .celebration__cta { animation: celebration-rise var(--motion-duration-base) var(--motion-ease-out) var(--motion-delay-celebration-cta) both; }
+.celebration[data-state='open'] .celebration__close { animation: celebration-fade var(--motion-duration-base) var(--motion-ease-out) var(--motion-delay-celebration-cta) both; }
+
+/* The one frame before `open`, so nothing flashes at rest. */
+.celebration[data-state='enter'] :is(.celebration__backdrop, .rays, .celebration__badge, .celebration__copy, .celebration__card, .celebration__cta, .celebration__close) { opacity: 0; }
+
+@keyframes celebration-fade { from { opacity: 0; } }
+@keyframes celebration-rays { from { opacity: 0; transform: scale(var(--motion-scale-rays-from)); } }
+@keyframes celebration-pop { from { transform: scale(var(--motion-scale-badge-from)); } }
+@keyframes celebration-draw { from { stroke-dashoffset: 1; } }
+@keyframes celebration-rise { from { opacity: 0; transform: translateY(var(--motion-rise-distance)); } }
+
+/* --- Exit ------------------------------------------------------------------------------- */
+/* Content and badge reverse quickly; rays, confetti and the ground fade together.
+   On the in-out curve, not the shared exit curve (`in`): that one is so back-loaded that
+   at 200ms the copy was still at 0.90 opacity at 170ms and the unmount read as a cut. */
+.celebration[data-state='exit'] { pointer-events: none; }
+.celebration[data-state='exit'] :is(.celebration__copy, .celebration__card, .celebration__cta, .celebration__close) {
+  animation: celebration-sink var(--motion-duration-celebration-exit) var(--motion-ease-inOut) both;
+}
+.celebration[data-state='exit'] .celebration__badge {
+  animation: celebration-shrink var(--motion-duration-celebration-exit) var(--motion-ease-inOut) both;
+}
+.celebration[data-state='exit'] :is(.celebration__backdrop, .rays, .celebration__confetti) {
+  animation: celebration-out var(--motion-duration-celebration-exit) var(--motion-ease-inOut) both;
+}
+@keyframes celebration-sink { to { opacity: 0; transform: translateY(var(--motion-rise-distance)); } }
+@keyframes celebration-shrink { to { opacity: 0; transform: scale(var(--motion-scale-badge-from)); } }
+@keyframes celebration-out { to { opacity: 0; } }
+
+/* --- Reduced motion: no confetti (not mounted), still rays, a plain fade ------------- */
+.app[data-reduced-motion='true'] .celebration[data-state='open'] :is(.rays, .celebration__badge, .celebration__title, .celebration__body, .celebration__card, .celebration__cta, .celebration__close) {
+  animation: celebration-fade var(--motion-duration-fast) var(--motion-ease-out) both;
+}
+.app[data-reduced-motion='true'] .celebration[data-state='open'] .checkBadge__stroke { animation: none; }
+.app[data-reduced-motion='true'] .celebration[data-state='exit'] :is(.celebration__copy, .celebration__card, .celebration__cta, .celebration__close, .celebration__badge) {
+  animation: celebration-out var(--motion-duration-celebration-exit) linear both;
+}
+
+/* 9502:21322 sets "₦55,000" at 13 inside a 15/18 line. An inline box of another size
+   shifts its baseline and grows the line box by 1px; taking the span out of the line
+   height calculation keeps Figma's 18 per line. */
+.milestoneCard__figure { line-height: 0; }

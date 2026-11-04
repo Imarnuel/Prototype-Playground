@@ -1,0 +1,72 @@
+@import '@playground/shared/device-frame.css';
+@import '@playground/shared/dev-toolbar.css';
+
+* { box-sizing: border-box; }
+
+/* The showcase page around the device. Not a design surface: neutral, from tokens. */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-neutral-100);
+  font-family: var(--type-font-family-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* All four need it, not just button (CLAUDE.md). */
+button, input, textarea, select { font: inherit; }
+p, h1, h2 { margin: 0; }
+
+.app {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--spacing-500);
+  padding: var(--gap-space-24) var(--spacing-400);
+}
+
+.stage { position: absolute; inset: 0; }
+.layer { position: absolute; inset: 0; transition: opacity var(--motion-duration-base) var(--motion-ease-inOut); }
+.layer[data-state='enter'], .layer[data-state='exit'] { opacity: 0; }
+/* The camera leaves by handing its photo off (Camera.css), not by fading as a whole. */
+.layer--camera[data-state='exit'] { opacity: 1; }
+.app[data-reduced-motion='true'] .layer { transition-duration: var(--motion-duration-fast); }
+
+/* --- Figma frame harness (?frame=figma): the screen at 402 x 874, safe top 62 -------
+   Overrides the device's custom properties on the elements that consume them, which
+   beats the values inherited from DeviceFrame's inline style. */
+.app[data-harness] .device__body,
+.app[data-harness] .device__screen {
+  --device-screen-w: var(--gap-figma-frame-w);
+  --device-screen-h: var(--gap-figma-frame-h);
+  --device-safe-top: var(--gap-figma-safe-top);
+  --device-screen-radius: var(--gap-radius-device-frame);
+}
+
+/* --- Presenter overlay: every departure from Figma, outlined and named ------------- */
+.app[data-show-departures] [data-departure] { outline: var(--gap-border-shutter) dashed var(--color-orange-600); outline-offset: calc(var(--gap-border-hairline) * -3); }
+.app[data-show-departures] [data-departure]::after {
+  content: attr(data-departure);
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  padding: var(--spacing-25) var(--spacing-100);
+  background: var(--color-orange-600);
+  color: var(--color-white);
+  font: var(--type-font-weight-label) var(--type-font-size-body-xsmall) / var(--type-line-height-label-small) var(--type-font-family-label);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* --- Showcase chrome, outside the device ------------------------------------------- */
+.showcase { position: sticky; top: var(--gap-space-24); display: flex; flex-direction: column; gap: var(--spacing-200); }
+.showcase__button {
+  padding: var(--spacing-300) var(--spacing-400);
+  border: 0;
+  border-radius: var(--border-radius-full);
+  background: var(--gap-gloss-secondary), var(--gap-color-button-secondary);
+  box-shadow: var(--gap-shadow-button-inset-secondary), var(--shadow-xs);
+  color: var(--color-text-text-white);
+  cursor: pointer;
+  white-space: nowrap;
+}

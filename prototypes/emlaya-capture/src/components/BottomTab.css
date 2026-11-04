@@ -1,0 +1,37 @@
+/* 4073:1520 Active=capture. Dark mode. */
+.bottomTab {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: var(--color-surface-translucent-default);
+  -webkit-backdrop-filter: blur(var(--gap-blur-tab-bar));
+  backdrop-filter: blur(var(--gap-blur-tab-bar));
+  box-shadow: inset 0 var(--gap-border-hairline) 0 0 var(--color-border-subtler);
+  padding-top: var(--gap-border-hairline);
+}
+/* 4073:1521 Navigation bar. */
+.bottomTab__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-200);
+  box-shadow: inset 0 var(--gap-border-hairline-half) 0 0 var(--color-border-inverse-subtlest), var(--gap-shadow-tab-bar);
+}
+.tabItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-25);
+  padding: var(--spacing-300) var(--spacing-500);
+  border-radius: var(--gap-radius-tab-item);
+}
+/* 4073:1525 / 4073:1526: a 48 circle inside 12 of padding. */
+.tabItem__captureSlot { display: flex; padding-inline: var(--spacing-300); }
+.tabItem--capture {
+  width: var(--gap-size-tab-capture);
+  height: var(--gap-size-tab-capture);
+  justify-content: center;
+  padding: var(--spacing-300) var(--spacing-400);
+  border-radius: var(--gap-radius-pill);
+  cursor: default;
+}

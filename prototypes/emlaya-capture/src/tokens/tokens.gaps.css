@@ -1,0 +1,255 @@
+/*
+ * Token GAPS — values the design uses that no Figma variable supplies.
+ *
+ * Each one is a raw value on a node (unbound), or a value the brief needs that the file
+ * never defines (all motion: get_motion_context returns no data for any frame). They are
+ * collected here, under proposed names, so no component inlines a literal. Every entry
+ * names the node it was read from and is logged in CORRECTIONS.md ("Token gaps"). When
+ * the design system adds a variable for one, move it to tokens.css and delete it here.
+ *
+ * Where a raw value equals a primitive's value exactly, the gap aliases that primitive
+ * and says so — the colour is right, the binding is what is missing.
+ */
+
+:root {
+  /* --- Colour --------------------------------------------------------------------- */
+  /* 9502:21212 frame fill #ffde46, unbound. Equals Color/yellow/300. */
+  --gap-color-celebration-surface: var(--color-yellow-300);
+  /* 9502:21712, 21714, 21696, 21700, 21724 — camera control glass, rgba(48,48,48,.6). */
+  --gap-color-camera-control: rgb(48 48 48 / 0.6);
+  /* 9502:21691 — the "Position the document in frame" hint, rgba(48,48,48,.7). */
+  --gap-color-camera-hint: rgb(48 48 48 / 0.7);
+  /* 9502:21732 — the Continue bar under a captured photo, #1b1a19. Close to, but not,
+     Color/dark alpha neutral/25 (#1d1c1b). */
+  --gap-color-captured-bar: #1b1a19;
+  /* 9502:21699 — the shutter's core, `white`, unbound. Equals Color/white. */
+  --gap-color-shutter-core: var(--color-white);
+  /* 9502:21323 Done button base rgb(24,17,2), unbound. Equals Color/neutral/950. */
+  --gap-color-button-secondary: var(--color-neutral-950);
+  /* 9502:21321/21322 — "2nd" and "Groceries" #e58800, unbound. Equals Color/yellow/600
+     (= Color/text/brand in Light). "₦55,000" #524a37 = Color/text/secondary in Light. */
+  --gap-color-milestone-emphasis: var(--color-text-brand);
+  --gap-color-milestone-figure: var(--color-text-secondary);
+  /* 9502:21214–21219 — the six rays: white at 20%. */
+  --gap-color-ray: rgb(255 255 255 / 0.2);
+  /* Inner ray layer, brighter (brief: "8 narrow, brighter rays"). Not in Figma. */
+  --gap-color-ray-bright: rgb(255 255 255 / 0.34);
+  /* Shutter flash — not in Figma: the capture moment needs a beat. */
+  --gap-color-shutter-flash: rgb(255 255 255 / 0.7);
+
+  /* Confetti palette: the fills of the 13 rectangle pieces in 9502:21227 ("Confetti
+     Frame"), as drawn. Not brand tokens — the brief asks for brand tokens only, but on
+     a yellow ground the brand yellows vanish; the frame's own palette is followed. */
+  --gap-confetti-1: rgb(154 245 252 / 0.9);  /* 9502:21228 */
+  --gap-confetti-2: rgb(220 188 250 / 0.65); /* 9502:21229 */
+  --gap-confetti-3: rgb(246 37 132 / 0.9);   /* 9502:21230 */
+  --gap-confetti-4: #ffed36;                 /* 9502:21233 */
+  --gap-confetti-5: rgb(3 163 245 / 0.85);   /* 9502:21234 */
+  --gap-confetti-6: rgb(157 237 26 / 0.65);  /* 9502:21235 */
+  --gap-confetti-7: rgb(255 33 251 / 0.75);  /* 9502:21236 */
+  --gap-confetti-8: rgb(75 200 239 / 0.75);  /* 9502:21237 */
+  --gap-confetti-9: #ba3e03;                 /* 9502:21240 */
+  --gap-confetti-10: rgb(72 12 167 / 0.45);  /* 9502:21241 */
+  --gap-confetti-palette: var(--gap-confetti-1), var(--gap-confetti-2), var(--gap-confetti-3),
+    var(--gap-confetti-4), var(--gap-confetti-5), var(--gap-confetti-6), var(--gap-confetti-7),
+    var(--gap-confetti-8), var(--gap-confetti-9), var(--gap-confetti-10);
+
+  /* --- Gradients ------------------------------------------------------------------- */
+  /* 9502:21739, I9502:21685;4018:1211 — the primary button's gloss over its fill. */
+  --gap-gloss-primary: linear-gradient(180deg, rgb(255 255 255 / 0.15) 0%, rgb(255 255 255 / 0) 87.5%);
+  /* 9502:21323 — the secondary (Done) button's gloss. */
+  --gap-gloss-secondary: linear-gradient(180deg, rgb(255 255 255 / 0.1) 0%, rgb(255 255 255 / 0) 87.5%);
+  /* 9502:21308 — the milestone card: surface/secondary → surface/default at 20%, over white. */
+  --gap-gradient-milestone: linear-gradient(0deg, rgb(246 243 239 / 0.2) 0%, rgb(255 255 255 / 0.2) 100%);
+  /* 4653:68317 — the processing veil, no-fill white → surface/default. */
+  --gap-gradient-processing-veil: linear-gradient(180deg, var(--color-no-fill-white) 0%, var(--color-surface-default) 100%);
+
+  /* --- Shadows and blur -------------------------------------------------------------- */
+  --gap-shadow-button-inset: inset 0 -1.5px 0 0 rgb(0 0 0 / 0.07); /* 9502:21739 */
+  --gap-shadow-button-inset-secondary: inset 0 -1.5px 0 0 var(--color-black); /* 9502:21323 */
+  /* 9502:21681/21682 — header icon buttons. */
+  --gap-shadow-icon-button: 0 2px 4px 2px rgb(44 39 27 / 0.02), 0 4px 8px 3px rgb(51 41 20 / 0.05);
+  /* 9502:21304 — the same button on the celebration, without spread. */
+  --gap-shadow-icon-button-flat: 0 2px 4px 0 rgb(44 39 27 / 0.02), 0 4px 8px 0 rgb(51 41 20 / 0.05);
+  /* 9502:21342, 21507, 21645 — every white card. */
+  --gap-shadow-card: 0 8px 28px -20px rgb(61 51 29 / 0.08);
+  /* 4653:68318 — the "Extracting the details..." pill. */
+  --gap-shadow-float: 0 0 0.5px 0.5px rgb(0 0 0 / 0.09), 0 4px 12px -4px rgb(61 51 29 / 0.15), 0 16px 32px 0 rgb(61 51 29 / 0.15);
+  --gap-shadow-milestone-inset: inset 0 0 16px 0 rgb(57 49 33 / 0.1); /* 9502:21308 */
+  --gap-shadow-tab-bar: 0 8px 6px rgb(51 41 20 / 0.02); /* 4073:1521 */
+  --gap-blur-camera-control: 4px; /* 9502:21712 etc. */
+  --gap-blur-tab-bar: 6px;        /* 4073:1520 */
+  --gap-blur-actions: 6px;        /* 5359:8659 etc. */
+  --gap-blur-processing: 3px;     /* 4653:68317 */
+  --gap-border-hairline: 1px;     /* every stroke in the flow is 1, unbound */
+  --gap-border-hairline-half: 0.5px; /* 4073:1521 */
+  --gap-border-shutter: 3px;      /* 9502:21698 */
+
+  /* --- Radius ---------------------------------------------------------------------- */
+  --gap-radius-pill: 100px;       /* 9502:21691, 21712 — not Border radius/full */
+  --gap-radius-tab-item: 32px;    /* 4073:1522 */
+  --gap-radius-device-frame: 48px; /* every frame; device chrome, used by the harness */
+
+  /* --- Sizes (fixed in Figma, unbound) ------------------------------------------------ */
+  --gap-size-icon-12: 12px;
+  --gap-size-icon-16: 16px;
+  --gap-size-icon-20: 20px;
+  --gap-size-icon-24: 24px;
+  --gap-size-icon-28: 28px;
+  --gap-size-icon-32: 32px;
+  --gap-size-share-w: 22px;       /* 5359:8662 fontisto:share-a, 22 x 18 */
+  --gap-size-share-h: 18px;
+  --gap-size-badge-check: 70px;   /* 9502:21221 */
+  --gap-size-badge-star: 40px;    /* 9502:21309 */
+  --gap-size-action: 36px;        /* 5359:8659 */
+  --gap-size-icon-button: 40px;   /* 9502:21681, 21712 (32 + 2 x 8 padding in camera) */
+  --gap-size-icon-button-lg: 44px; /* 9502:21682 */
+  --gap-size-button: 48px;        /* 9502:21739, 9502:21323 */
+  --gap-size-button-docked: 46px; /* I9502:21685;4018:1211 */
+  --gap-size-camera-control: 56px; /* 9502:21696 */
+  --gap-size-shutter-core: 48px;  /* 9502:21699 */
+  --gap-size-tab-capture: 48px;   /* 4073:1526 */
+  --gap-size-field: 56px;         /* Text field Size=default */
+  --gap-size-field-large: 64px;   /* Text field Size=large */
+  --gap-size-row-min: 44px;       /* 9502:21343 Lists */
+  --gap-size-qty: 23px;           /* 9502:21352 */
+  --gap-size-item-left: 230px;    /* 9502:21347 */
+  --gap-size-skeleton-line: 32px; /* 4653:68120 */
+  --gap-size-tag: 36px;           /* 9502:21534 */
+  --gap-size-share-pill: 32px;    /* 9502:21559 */
+  --gap-size-thumb: 48px;         /* 9502:21667 */
+  --gap-size-continue: 176px;     /* 9502:21739 */
+  --gap-size-done: 330px;         /* 9502:21323 */
+  --gap-size-milestone: 355px;    /* 9502:21308 */
+  --gap-size-celebration-copy: 290px; /* 9502:21223 */
+
+  /* 24 of padding, raw: 9502:21326 bottom, 9502:21685 bottom. No Spacing/600 exists. */
+  --gap-space-24: 24px;
+
+  /* --- Layout offsets, measured from the safe-area top (Figma's status bar is 62) ---- */
+  --gap-camera-row-top: 16px;     /* 9502:21711 at y 78 */
+  --gap-camera-row-left: 15px;    /* 9502:21711 x 15; right inset is 16 (371 wide) */
+  --gap-camera-row-right: 16px;
+  --gap-camera-hint-top: 18px;    /* 9502:21691 */
+  --gap-camera-controls-bottom: 13px; /* 9502:21695 */
+  --gap-camera-controls-inset: 25px;
+  /* 9502:21724 at x 336 in the 400 feed, 48 wide: 18 from the 402 frame's edge, and
+     16 above the Continue bar (ends 786; the bar starts at 802). */
+  --gap-camera-add-right: 18px;
+  /* 9502:21690 ends at 809, where the tab bar starts: 65 above the frame's bottom. */
+  --gap-camera-feed-bottom: 65px;
+  /* The photo's handoff to the processing pill: how small it gets before it fades. */
+  --gap-handoff-scale: 0.22;
+  --gap-tab-bar-bottom: -4px;     /* 9502:21688 hangs 4 below the frame */
+  --gap-header-top: 1px;          /* 9502:21676 sits at 63, one below the status bar */
+  /* 5359:8681 at y 123: 8 above the content column, which starts at 131. Its 358 + 44
+     is the frame's right edge, so it overlaps the fields' right 28. As drawn. */
+  --gap-actions-offset: -8px;
+  /* 9502:21683: the title sits at calc(50% - 14px) in a 44 row — 3 above centre. */
+  --gap-header-title-offset: 14px;
+  --gap-celebration-badge-top: 107px; /* 9502:21221 at 169 */
+  --gap-celebration-copy-gap: 21px;   /* badge ends 239, copy at 260 */
+  --gap-celebration-card-gap: 32px;   /* copy ends 322, card at 354 */
+  --gap-celebration-cta-bottom: 66px; /* 9502:21323 at 760, 48 tall, in 874 */
+  /* 9502:21304 at y 77: 12 of header padding plus 2, centred in a row the hidden 44
+     check button (9502:21305, opacity 0) makes 44 tall. */
+  --gap-celebration-close-top: 15px;
+  --gap-celebration-close-left: 14px;
+  --gap-celebration-copy-stack: 12px; /* 9502:21223 gap */
+  --gap-milestone-text-stack: 6px;    /* 9502:21320 gap */
+  --gap-processing-veil-top: 0px;     /* 4653:68317: 812 tall at the bottom of 874 = from 62 */
+  /* Rays: 9502:21213's six wedges converge near the group's centre, (201, 414). */
+  --gap-rays-origin-y: 352px;     /* 414 - 62 */
+  --gap-ray-length: 640px;        /* long enough to reach every corner from the origin */
+  /* 9502:21214 is 200 wide at 411 long, a 27.3° wedge; at 640 long that is 311. */
+  --gap-ray-width-wide: 311px;
+  --gap-ray-width-narrow: 110px;  /* brief: narrow inner rays. Not in Figma */
+  /* Brief: "each ray tapers and fades along its length (radial mask)". Figma's are flat. */
+  --gap-mask-ray-fade: radial-gradient(circle closest-side, rgb(0 0 0) 8%, rgb(0 0 0 / 0.55) 55%, rgb(0 0 0 / 0) 100%);
+  /* 9502:21221's export: the badge green. Its check is a cut-out over white. */
+  --gap-color-badge: #1f9a2c;
+
+  /* --- Type ------------------------------------------------------------------------ */
+  /* "Large input" style: letter-spacing -0.32, raw. Equals heading/h2's value. */
+  --gap-type-letter-spacing-large-input: var(--type-letter-spacing-heading-h2);
+
+  /* --- The Figma frame, for the verification harness (?frame=figma) ---------------- */
+  --gap-figma-frame-w: 402px;
+  --gap-figma-frame-h: 874px;
+  --gap-figma-safe-top: 62px;
+
+  /* --- Motion -------------------------------------------------------------------------
+     The file defines none. Durations and easings are the project's one set
+     (shared/src/motion.ts), published by main.tsx as --motion-duration-* and
+     --motion-ease-*. What follows is only the choreography the brief adds on top. */
+
+  /* Entrance offsets (brief, Phase 4 table). */
+  --motion-delay-celebration-rays: 80ms;
+  --motion-delay-celebration-badge: 160ms;
+  --motion-delay-celebration-confetti: 300ms;
+  --motion-delay-celebration-title: 360ms;
+  --motion-delay-celebration-body: 420ms;
+  --motion-delay-celebration-card: 480ms;
+  --motion-delay-celebration-cta: 600ms;
+  --motion-rise-distance: 12px;
+  --motion-scale-rays-from: 0.6;
+  --motion-scale-badge-from: 0.4;
+  /* Badge spring with overshoot: underdamped, zeta 0.5, omega 17, 700ms, peaks at
+     1.163. The shared set has no overshoot spring (removed at the supermart designer's
+     call); this one is the brief's explicit ask, so it is a proposed addition. */
+  --motion-spring-overshoot: linear(0, 0.0184, 0.0683, 0.1425, 0.2337, 0.3359, 0.4432, 0.5511, 0.6555, 0.7534, 0.8424, 0.921, 0.9883, 1.0439, 1.088, 1.1209, 1.1437, 1.1572, 1.1628, 1.1615, 1.1547, 1.1437, 1.1295, 1.1132, 1.0959, 1.0783, 1.061, 1.0447, 1.0297, 1.0164, 1.0049, 0.9953, 0.9876, 0.9817, 0.9775, 0.9749, 0.9736, 0.9735, 0.9744, 0.976, 0.9782, 0.9807, 0.9835, 0.9864, 0.9892, 0.992, 0.9945, 0.9967, 0.9987, 1.0003, 1.0017, 1.0027, 1.0035, 1.004, 1.0043, 1.0043, 1.0042, 1.004, 1.0037, 1.0033, 1);
+  --motion-duration-spring-overshoot: 700ms;
+  /* Ambient rays. */
+  --motion-duration-rays-outer-rev: 40s;
+  --motion-duration-rays-inner-rev: 60s;
+  --motion-duration-rays-breathe: 3s;
+  --motion-rays-breathe-min: 0.72;
+  /* Exit. */
+  --motion-duration-celebration-exit: var(--motion-duration-fast);
+  /* Processing: one turn of the CircleNotch spinner. */
+  --motion-duration-spinner-rev: 900ms;
+  --motion-delay-field-stagger: 45ms;
+
+  /* Confetti physics. Lengths in CSS px, time in ms; per-particle values are drawn
+     uniformly from each [min, max] range. */
+  --confetti-max-particles: 150;
+  --confetti-burst-count: 90;
+  --confetti-trickle-count: 60;
+  --confetti-trickle-duration: 2500ms;
+  --confetti-clear-by: 5000ms;
+  --confetti-gravity: 1400;        /* px/s² */
+  --confetti-drag: 1.6;            /* 1/s, linear air drag */
+  --confetti-burst-vy-min: 60;     /* px/s, downward on spawn */
+  --confetti-burst-vy-max: 420;
+  --confetti-trickle-vy-min: 40;
+  --confetti-trickle-vy-max: 160;
+  --confetti-terminal-vy: 520;     /* px/s, so pieces drift rather than plummet */
+  --confetti-sway-amp-min: 10;     /* px */
+  --confetti-sway-amp-max: 34;
+  --confetti-sway-freq-min: 0.8;   /* Hz */
+  --confetti-sway-freq-max: 2.2;
+  --confetti-spin-min: -6;         /* rad/s */
+  --confetti-spin-max: 6;
+  --confetti-flip-freq-min: 1.2;   /* Hz, the scaleY flutter */
+  --confetti-flip-freq-max: 3.4;
+  /* Sizes from the frame's own pieces: rects 5.2–24.7 x 6.2–12.4, dots 4–9.3. */
+  --confetti-rect-w-min: 6;
+  --confetti-rect-w-max: 13;
+  --confetti-rect-h-min: 6;
+  --confetti-rect-h-max: 12;
+  --confetti-ribbon-w-min: 16;
+  --confetti-ribbon-w-max: 25;
+  --confetti-ribbon-h-min: 4;
+  --confetti-ribbon-h-max: 7;
+  --confetti-dot-min: 4;
+  --confetti-dot-max: 9;
+  --confetti-spawn-above: 24;      /* px above the top edge */
+}
+
+:root {
+  /* --- Mock API latency (prototype only; not design values) ----------------------- */
+  --api-latency-extract: 2200ms;
+  --api-latency-save: 700ms;
+  /* How long a "not designed in this flow" notice stays up. */
+  --motion-duration-notice-hold: 2600ms;
+}
