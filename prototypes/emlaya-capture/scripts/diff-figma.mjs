@@ -15,6 +15,20 @@ const manual = {
   '9502:21698': { x: 168.5, y: 734, w: 62, h: 62, note: 'shutter: centred in the 400 feed' },
   '9502:21724': { x: 336, y: 738, w: 48, h: 48, note: 'add page: 336,676 in the feed' },
 };
+// Receipt Details (9564:21987), frame-relative from get_metadata. Boxes below the item
+// list are compared by size only: the list is 4 real rows, not the frame's 7.
+Object.assign(manual, {
+  '9564:21994': { x: 17, y: 74, w: 40, h: 40, note: 'back: the header sits at x 1 in the frame' },
+  '9564:21995': { x: 346, y: 74, w: 40, h: 40 },
+  '9564:21999': { x: 16, y: 134, w: 370, h: 90 },
+  '9564:22001': { x: 32, y: 150, w: 338, h: 32 },
+  '9564:22016': { x: 12, y: 266, w: 378, h: 70 },
+  '9564:22209': { w: 370, h: 132 },
+  '9564:22214': { w: 378, h: 226 },
+  '9564:22277': { w: 370, h: 72 },
+  '9564:22311': { w: 370, h: 152 },
+  '9564:22333': { w: 370, h: 48 },
+});
 const box = (id) => ({ ...nodes[id], ...manual[id] });
 
 const checks = {
@@ -46,6 +60,18 @@ const checks = {
     ['9502:21338', '.review__layer--ready .review__items'],
     ['9502:21343', '.review__layer--ready .itemRow:nth-child(1)'],
     ['9502:21364', '.review__layer--ready .itemRow:nth-child(2)'],
+  ],
+  details: [
+    ['9564:21994', '.details__headerRow > .headerButton:first-child'],
+    ['9564:21995', '.details__headerRow > .headerButton:last-child'],
+    ['9564:21999', '.details__summaryCard'],
+    ['9564:22001', '.details__amount'],
+    ['9564:22016', '.details .itemRow'],
+    ['9564:22209', '.details__otherCard', ['w', 'h']],
+    ['9564:22214', '.details__metaCard', ['w', 'h']],
+    ['9564:22277', '.details .evidenceRow', ['w', 'h']],
+    ['9564:22311', '.suggestion', ['w', 'h']],
+    ['9564:22333', '.linkRow', ['w', 'h']],
   ],
   saved: [
     ['9502:21304', '.celebration__close'],
@@ -95,6 +121,10 @@ await page.waitForSelector('.celebration[data-state="open"]', { timeout: 8000 })
 // The staged entrance lands at ~3.05s (Done: 2750 + 300).
 await page.waitForTimeout(3600);
 all.push(...(await measure('saved')));
+await click('.celebration__cta .button');
+await page.waitForSelector('.details', { timeout: 4000 });
+await page.waitForTimeout(800);
+all.push(...(await measure('details')));
 await browser.close();
 
 for (const r of all) console.log(`${r.max <= 0.5 ? 'ok  ' : 'DIFF'} ${r.screen.padEnd(8)} ${r.id.padEnd(11)} figma ${r.figma.padEnd(22)} dom ${r.dom.padEnd(30)} max ${r.max}`);

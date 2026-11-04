@@ -45,13 +45,16 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
     const ty = layer ? new DOMMatrix(getComputedStyle(layer).transform).f : null;
     const s = feed ? new DOMMatrix(getComputedStyle(feed).transform).a : 1;
     r({ ty, s, h: layer ? layer.getBoundingClientRect().height : 0 });
-  }, 60)));
+  }, 150)));
   check('sheet: Review mid-rise, no zoom on the shot', mid.ty > 0 && mid.ty < mid.h && mid.s === 1, `translateY ${mid.ty?.toFixed(1)} of ${mid.h.toFixed(0)}, feed scale ${mid.s}`);
 
   await page.waitForSelector('.review[data-status="ready"]', { timeout: 8000 });
   await page.waitForTimeout(600);
-  const thumb = await page.evaluate(() => document.querySelector('.review__thumb img')?.getAttribute('src')?.slice(0, 23));
+  const thumb = await page.evaluate(() => document.querySelector('.review .evidenceRow__thumb img')?.getAttribute('src')?.slice(0, 23));
   check('evidence: the shot\'s scan is the thumbnail', thumb === 'data:image/jpeg;base64,', thumb);
+  // An edit on Review, to prove later that Receipt Details reads the same record.
+  await page.evaluate(() => document.querySelector('.review button[aria-label="Remove Organic"]').click());
+  await page.waitForTimeout(100);
   const rail = await page.evaluate(() => !!document.querySelector('.review__actions, .action'));
   check('review: no receipt-actions rail', !rail, `rail present: ${rail}`);
 
@@ -86,7 +89,7 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
     };
     requestAnimationFrame(tick);
   }));
-  const expect = { backdrop: 0, pop: 380, ring: 480, check: 560, settle: 1150, rays: 1200, word1: 1450, word2: 1560, body: 1800, card: 2250, cta: 2750 };
+  const expect = { backdrop: 0, pop: 80, ring: 140, check: 180, settle: 850, rays: 900, word1: 1150, word2: 1260, body: 1500, card: 1950, cta: 2450 };
   for (const [k, ms] of Object.entries(expect)) {
     const got = samples.start[k];
     check(`entrance: ${k} starts at ${ms}ms`, got !== null && Math.abs(got - ms) <= 1, `scheduled at ${got}ms after the backdrop`);
@@ -125,11 +128,28 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
     setTimeout(() => {
       const c = document.querySelector('.celebration');
       const mid = c ? +getComputedStyle(c.querySelector('.celebration__copy')).opacity : 0;
-      setTimeout(() => resolve({ mid, gone: !document.querySelector('.celebration'), camera: !!document.querySelector('.camera') }), 400);
+      setTimeout(() => resolve({ mid, gone: !document.querySelector('.celebration'), details: !!document.querySelector('.details') }), 400);
     }, 170);
   }));
   check('exit: content fading at 170ms of 200', exit.mid >= 0 && exit.mid < 0.2, `copy opacity ${exit.mid.toFixed(2)} at 170ms`);
-  check('exit: celebration gone, camera back', exit.gone && exit.camera, JSON.stringify(exit));
+  check('exit: Done lands on Receipt Details', exit.gone && exit.details, JSON.stringify(exit));
+
+  // Receipt Details reads the saved record: the tag removed on Review is gone here too.
+  const det = await page.evaluate(() => ({
+    title: document.querySelector('.details__title')?.textContent,
+    amount: document.querySelector('.details__amount')?.textContent,
+    tags: [...document.querySelectorAll('.details .pill--tag .pill__text')].map((e) => e.textContent),
+    when: document.querySelector('.details__kind')?.textContent,
+  }));
+  check('details: the saved record, with Review\'s edit', det.amount === '₦15,000' && !det.tags.includes('Organic') && det.tags.includes('Essentials'), JSON.stringify(det));
+  check('details: weekday computed (16 Aug 2026 is a Sunday)', /Sun 16 Aug, 9:00 am/.test(det.when ?? ''), det.when);
+  await click(page, '.details .smallButton--quiet');
+  await page.waitForTimeout(500);
+  const sug = await page.evaluate(() => ({ card: !!document.querySelector('.suggestion'), rows: document.querySelectorAll('.linkRow').length }));
+  check('details: "Not this" folds the suggestion away', !sug.card && sug.rows === 2, JSON.stringify(sug));
+  await click(page, '.details__headerRow > .headerButton:first-child');
+  await page.waitForSelector('.camera', { timeout: 3000 });
+  await page.waitForTimeout(600);
 
   // Second pass: the milestone counts the first save.
   await click(page, 'button[aria-label="Take photo"]');

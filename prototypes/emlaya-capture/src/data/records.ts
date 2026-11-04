@@ -27,6 +27,8 @@ export type Evidence = {
 export type PurchaseReceipt = {
   id: string;
   merchant: string;
+  /** As printed on the receipt. 9564:21987's Other details shows it. */
+  address: string;
   /** The document's total, as extracted — not recomputed from items (RP-07). */
   amount: number;
   /** ISO date and 24h time, as extracted. */
@@ -55,6 +57,7 @@ export function extractedDraft(evidence: Evidence = UNSHOWN): PurchaseReceipt {
   return {
     id: 'rcpt-0816-0900',
     merchant: 'Fresh Market Groceries',
+    address: '12B Opebi Road, Ikeja, Lagos',
     amount: 15000,
     date: '2026-08-16',
     time: '09:00',
@@ -84,6 +87,7 @@ const seed: PurchaseReceipt[] = [
   {
     id: 'rcpt-0802-1814',
     merchant: 'Fresh Market Groceries',
+    address: '12B Opebi Road, Ikeja, Lagos',
     amount: 40000,
     date: '2026-08-02',
     time: '18:14',
@@ -96,6 +100,7 @@ const seed: PurchaseReceipt[] = [
   {
     id: 'rcpt-0809-1230',
     merchant: 'Chicken Republic',
+    address: 'Allen Avenue, Ikeja, Lagos',
     amount: 9500,
     date: '2026-08-09',
     time: '12:30',
@@ -111,6 +116,8 @@ export const records: PurchaseReceipt[] = [...seed];
 
 export function resetRecords(): void {
   records.splice(0, records.length, ...seed);
+  links.clear();
+  dismissedSuggestions.clear();
 }
 
 export type Milestone = {
@@ -131,4 +138,33 @@ export function milestoneFor(saved: PurchaseReceipt): Milestone {
     merchantTotal: atMerchant.reduce((sum, r) => sum + r.amount, 0),
     topCategory,
   };
+}
+
+/**
+ * Payment proofs already in Emlaya. One matches the new purchase — same amount, same day,
+ * minutes after the till — which is what 9564:22311 suggests linking: "GTBank Transfer ·
+ * ₦15,000 · 16 Aug, 9:11 am".
+ */
+export type PaymentProof = { id: string; name: string; amount: number; date: string; time: string };
+
+export const payments: PaymentProof[] = [
+  { id: 'pay-0816-0911', name: 'GTBank Transfer', amount: 15000, date: '2026-08-16', time: '09:11' },
+  { id: 'pay-0809-1233', name: 'Opay Transfer', amount: 9500, date: '2026-08-09', time: '12:33' },
+];
+
+/** Links made on Receipt Details, and suggestions turned down with "Not this". */
+export const links = new Map<string, string>();
+export const dismissedSuggestions = new Set<string>();
+
+/**
+ * The suggested link (RP-13): the payment proof with the same amount on the same day,
+ * not already linked to anything and not turned down for this receipt.
+ */
+export function suggestedPaymentFor(r: PurchaseReceipt): PaymentProof | null {
+  const linked = new Set(links.values());
+  return (
+    payments.find(
+      (p) => p.amount === r.amount && p.date === r.date && !linked.has(p.id) && !dismissedSuggestions.has(`${r.id}:${p.id}`),
+    ) ?? null
+  );
 }

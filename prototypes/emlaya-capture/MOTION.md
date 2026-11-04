@@ -21,23 +21,25 @@ is a token in `src/tokens/tokens.gaps.css`. No value below is inlined anywhere.
 ## Celebration — entrance
 
 Staged one beat at a time, at the user's request ("more dramatic … not everything revealing at
-the same time"). This replaces the brief's 0–600ms table. Measured in a production build by
+the same time"). This replaces the brief's 0–600ms table. The badge was then brought forward
+twice ("the success icon appearance is too slow"): 380 → 160 → 80ms, on a quicker spring that
+reaches full size 96ms after it starts (it was ~180). Later beats moved 300ms earlier. Measured in a production build by
 `npm run verify:motion`, from each animation's scheduled start (Web Animations
 `startTime + delay`), relative to the ground. All 11 are exact.
 
 | t (ms) | Beat | Motion | Tokens |
 |---|---|---|---|
 | 0 | The ground floods out of the Save button | a 1800 disc centred on the docked button scales 0.03 → 1 over 650 | `--motion-delay-celebration-ground`, `--motion-duration-celebration-ground`, `--motion-scale-ground-from`, `--motion-ease-out`, `--gap-reveal-diameter` |
-| 380 | The badge pops, alone, at the screen's centre | scale 0 → 1 with overshoot (peak 1.163), held at 1.45x | `--motion-delay-celebration-badge`, `--motion-spring-overshoot` (700ms), `--motion-scale-badge-centre` |
-| 480 / 620 | Two shock rings | scale 1 → 3.2, fading, 700 each | `--motion-delay-celebration-ring`, `--motion-delay-celebration-ring-gap`, `--motion-duration-celebration-ring`, `--motion-scale-ring-to` |
-| 560 | The check draws on | stroke-dashoffset, 300 | `--motion-delay-celebration-check`, `--motion-duration-base` |
-| 1150 | The badge rises to its place | from 50cqh at 1.45x to its slot at 1x, 560, critically damped | `--motion-delay-celebration-settle`, `--motion-duration-celebration-settle`, `--motion-ease-launch` |
-| 1200 | The rays bloom | scale 0.3 → 1 + fade, 900 | `--motion-delay-celebration-rays`, `--motion-duration-celebration-rays`, `--motion-scale-rays-from` |
-| 1250 | The confetti releases | burst, then a 2.5s trickle | `--motion-delay-celebration-confetti` |
-| 1450 / 1560 | "Receipt" … "saved" | each word rises out of its own mask, 520 | `--motion-delay-celebration-title`, `--motion-delay-celebration-word-gap`, `--motion-duration-celebration-word`, `--motion-word-mask-bleed` |
-| 1800 | The body | rise 12 + fade, 300 | `--motion-delay-celebration-body`, `--motion-rise-distance` |
-| 2250 | The insight card | rise 24 + scale 0.96 → 1 + fade, 520 | `--motion-delay-celebration-card`, `--motion-duration-celebration-card`, `--motion-rise-card`, `--motion-scale-card-from` |
-| 2750 | Done and × | rise + fade; **inert until `animationend`** (~3050) | `--motion-delay-celebration-cta` |
+| 80 | The badge pops, alone, at the screen's centre | scale 0 → 1 with overshoot (full size at +96ms, peak 1.162), held at 1.45x | `--motion-delay-celebration-badge`, `--motion-spring-overshoot` (480ms), `--motion-scale-badge-centre` |
+| 140 / 280 | Two shock rings | scale 1 → 3.2, fading, 700 each | `--motion-delay-celebration-ring`, `--motion-delay-celebration-ring-gap`, `--motion-duration-celebration-ring`, `--motion-scale-ring-to` |
+| 180 | The check draws on | stroke-dashoffset, 300 | `--motion-delay-celebration-check`, `--motion-duration-base` |
+| 850 | The badge rises to its place | from 50cqh at 1.45x to its slot at 1x, 560, critically damped | `--motion-delay-celebration-settle`, `--motion-duration-celebration-settle`, `--motion-ease-launch` |
+| 900 | The rays bloom | scale 0.3 → 1 + fade, 900 | `--motion-delay-celebration-rays`, `--motion-duration-celebration-rays`, `--motion-scale-rays-from` |
+| 950 | The confetti releases | burst, then a 2.5s trickle | `--motion-delay-celebration-confetti` |
+| 1150 / 1260 | "Receipt" … "saved" | each word rises out of its own mask, 520 | `--motion-delay-celebration-title`, `--motion-delay-celebration-word-gap`, `--motion-duration-celebration-word`, `--motion-word-mask-bleed` |
+| 1500 | The body | rise 12 + fade, 300 | `--motion-delay-celebration-body`, `--motion-rise-distance` |
+| 1950 | The insight card | rise 24 + scale 0.96 → 1 + fade, 520 | `--motion-delay-celebration-card`, `--motion-duration-celebration-card`, `--motion-rise-card`, `--motion-scale-card-from` |
+| 2450 | Done and × | rise + fade; **inert until `animationend`** (~2750) | `--motion-delay-celebration-cta` |
 
 Frame rate over the first 3.6s: 60.0 fps, worst frame 33ms (headless Chromium on desktop, not
 a mid-range phone; on-device profiling is still to do).
@@ -113,6 +115,8 @@ per frame. Verified: the live feed changes frame to frame; the captured frame do
 | Captured → processing | **no zoom**: Review rises over the frozen shot as a sheet (translateY 100% → 0); the status bar turns dark once it has landed | `--motion-duration-slow`, `--motion-ease-out` |
 | Processing | pill arrives on the launch spring; spinner 900ms/turn; skeleton breathes | `--motion-duration-spinner-rev`, `--motion-ease-launch` |
 | Processing → review | skeleton and veil fade; fields rise in, 45ms apart | `--motion-delay-field-stagger` |
+| Celebration → Receipt Details | Done: the celebration exits (200) over Receipt Details, which fades in beneath it | `--motion-duration-celebration-exit`, `--motion-duration-base` |
+| "Not this" | the suggestion folds away: rows collapse (grid 1fr → 0fr), fade, scale to 0.96 | `--motion-duration-base`, `--motion-ease-inOut` |
 | Screens | every layer cross-fades in **and out** (`Layer` + `usePresence`) | `--motion-duration-base` |
 | Press | 0.97 scale on every discrete control | `--motion-press-scale`, `--motion-duration-instant` |
 

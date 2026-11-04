@@ -41,8 +41,16 @@
   --color-orange-600: #fb5b04;
   --color-cyan-400: #00bef3;
   --color-cyan-600: #008ab8;
+  --color-blue-50: #dbeafe;
+  --color-blue-200: #99cbff;
+  --color-blue-300: #51a2ff;
   --color-blue-400: #51a2ff;
   --color-blue-600: #1b5ff6;
+  --color-blue-700: #1849e2;
+  --color-blue-950: #162456;
+  --color-alpha-neutral-300: #2c271b24;
+  --color-dark-neutral-50: #181716;
+  --color-dark-alpha-neutral-300: #e0dedc3d;
   --color-alpha-neutral-100: #362a120f;
   --color-alpha-neutral-200: #2c271b1a;
   --color-alpha-neutral-500: #2a261d99;
@@ -73,6 +81,7 @@
   --border-radius-50: 4px;
   --border-radius-200: 8px;
   --border-radius-300: 12px;
+  --border-radius-400: 16px;
   --border-radius-600: 24px;
   --border-radius-650: 28px;
   --border-radius-full: 9999px;
@@ -132,6 +141,8 @@
   --color-text-brand: var(--color-yellow-600);
   --color-text-text-black: var(--color-neutral-900);
   --color-text-text-white: var(--color-neutral-50);
+  --color-text-inverse: var(--color-neutral-50);
+  --color-text-accent-blue: var(--color-blue-600);
 
   --color-icon-default: var(--color-neutral-800);
   --color-icon-subtle: var(--color-neutral-600);
@@ -140,6 +151,7 @@
   --color-icon-inverse: var(--color-neutral-50);
   --color-icon-black: var(--color-neutral-800);
   --color-icon-accent-orange: var(--color-orange-600);
+  --color-icon-accent-blue: var(--color-blue-600);
 
   --color-surface-default: var(--color-white);
   /* Light only. Two variables share this name; the one bound here (code syntax
@@ -155,8 +167,12 @@
   --color-background-neutral-default: var(--color-alpha-neutral-200);
   --color-background-neutral-subtle-default: var(--color-alpha-neutral-100);
   --color-background-inverse-default: var(--color-white);
+  --color-background-info-default: var(--color-blue-50);
 
-  --color-border-default: #252b3724;
+  /* Two values for Color/border/default: #252b3724 bound in 9502:21986, and
+     alpha neutral/300 (#2c271b24) bound in 9564:21987. The later screen's is used. */
+  --color-border-default: var(--color-alpha-neutral-300);
+  --color-border-info-subtle: var(--color-blue-200);
   --color-border-subtle: var(--color-alpha-neutral-200);
   --color-border-subtler: var(--color-alpha-neutral-100);
   --color-border-bolder: var(--color-alpha-neutral-500);
@@ -180,6 +196,8 @@
   --color-text-brand: var(--color-yellow-300);
   --color-text-text-black: var(--color-neutral-900);
   --color-text-text-white: var(--color-neutral-50);
+  --color-text-inverse: var(--color-dark-neutral-50);
+  --color-text-accent-blue: var(--color-blue-300);
 
   --color-icon-default: var(--color-dark-alpha-neutral-800);
   --color-icon-subtle: var(--color-dark-alpha-neutral-600);
@@ -188,6 +206,7 @@
   --color-icon-inverse: var(--color-neutral-950);
   --color-icon-black: var(--color-neutral-800);
   --color-icon-accent-orange: var(--color-orange-500);
+  --color-icon-accent-blue: var(--color-blue-300);
 
   --color-surface-default: var(--color-dark-neutral-100);
   --color-surface-translucent-default: rgb(34 34 32 / 0.85);
@@ -199,8 +218,10 @@
   --color-background-neutral-default: var(--color-dark-alpha-neutral-200);
   --color-background-neutral-subtle-default: #222220f2;
   --color-background-inverse-default: var(--color-dark-alpha-neutral-25);
+  --color-background-info-default: var(--color-blue-950);
 
-  --color-border-default: #f5f5f524;
+  --color-border-default: var(--color-dark-alpha-neutral-300);
+  --color-border-info-subtle: var(--color-blue-700);
   --color-border-subtle: var(--color-dark-alpha-neutral-200);
   --color-border-subtler: var(--color-dark-alpha-neutral-100);
   --color-border-bolder: var(--color-dark-alpha-neutral-500);

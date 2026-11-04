@@ -23,6 +23,7 @@ export function printedLines(r: PurchaseReceipt = extractedDraft()): PrintLine[]
   const units = r.items.reduce((n, i) => n + i.quantity, 0);
   return [
     { kind: 'title', text: r.merchant.toUpperCase() },
+    { kind: 'text', text: r.address, faint: true, centre: true },
     { kind: 'gap' },
     { kind: 'rule' },
     { kind: 'pair', left: formatFieldDate(r.date), right: r.time },

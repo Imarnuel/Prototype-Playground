@@ -27,7 +27,10 @@ The rendered UI marks each departure: open the dev toolbar (`?dev=1`) → *Show 
      printed from the record, so the evidence now agrees with the extraction (R14 resolved).
    - Capture → Review is **a sheet rising over the shot**, not a zoom (P5).
    - The yellow **receipt-actions rail is removed** from Review (R13).
-   - The celebration is **staged over ~2.8s**, one beat at a time (S16).
+   - The celebration is **staged over ~2.75s**, one beat at a time (S16). The badge appears at
+     80ms on a quicker spring, full size by ~180ms (it was 380 + ~180: "the success icon
+     appearance is too slow", asked twice).
+   - Done leads to **Receipt Details** (`9564:21987`), section D.
 7. **A dark-themed host darkened the app.** The hosted viewer sets `data-theme="dark"` on `<html>`;
    the token file matched it, and gap tokens composed of semantic colours (the processing veil)
    resolve at the root, so the light processing screen drew a dark veil (mean luminance 152 against
@@ -115,8 +118,31 @@ The rendered UI marks each departure: open the dev toolbar (`?dev=1`) → *Show 
 | S13 | The figures are derived, not typed: "2nd" and "₦55,000" come from the store (one earlier ₦40,000 purchase) | — | A second pass reads "3rd … ₦70,000" (verified) | — |
 | S14 | The close X glyph has two strokes of different width and colour (1.5 #393121, 1.8 #343330) | `9502:21304` | Export kept | doesn't depart |
 | S15 | The card slot | — | `MilestoneCelebration` takes `children`; the brief's signature is `title body icon primaryAction` | departs (API) |
-| S16 | Entrance timing | — | **User request: "more dramatic … not everything revealing at the same time".** The brief's 0–600ms table is replaced by a staged ~2.8s sequence: the ground floods out of the Save button; the badge pops alone at the centre at 1.45x, two rings shock out of it, its check draws; it rises to its place as the rays bloom and the confetti releases; the title rises word by word; then the body, the card and Done. Rings, flood and word masks are not in Figma. MOTION.md | departs (motion) |
+| S16 | Entrance timing | — | **User request: "more dramatic … not everything revealing at the same time".** The brief's 0–600ms table is replaced by a staged ~2.8s sequence: the ground floods out of the Save button; the badge pops alone at the centre at 1.45x, two rings shock out of it, its check draws; it rises to its place as the rays bloom and the confetti releases; the title rises word by word; then the body, the card and Done. Rings, flood and word masks are not in Figma. The badge was then brought forward to 80ms on a quicker spring, at the user's request. MOTION.md | departs (motion) |
 | S17 | Exit easing | — | The shared exit curve (`in`) left the copy at 0.90 opacity at 170 of 200ms, so the unmount read as a cut. The exit uses `inOut`: 0.07 at 170ms | departs (motion set) |
+
+## Receipt Details (D) — `9564:21987`
+
+Reached from the celebration's Done (and ×), at the user's request. It reads the record that
+was saved, so edits made on Review show here (verified: a tag removed on Review is absent).
+
+| # | Finding | Node | Handling | |
+|---|---|---|---|---|
+| D1 | Same data problems as Review: 7 item rows including "Macbook pro M5 Max 2026" 2 × ₦2,000 = ₦4,000,000, four duplicate "Whole milk" rows, a text cursor after ₦4,000,000, tag "S", attachment "Shoprite 16 Aug · 3 pages · 2.4 MB" | `9564:22015`, `9564:22078`, `9564:22248`, `9564:22301` | The saved record: 4 items summing to ₦15,000, tags as saved, this capture's scan | departs |
+| D2 | "Sat 16 Aug, 9:04 am": 16 Aug 2026 is a **Sunday**, and the record's time is 09:00 | `9564:22008` | Computed from the record: "Sun 16 Aug, 9:00 am" | departs |
+| D3 | Other details' Date says "21 Aug, 2026, 9:06 am", a third date for the same purchase | `9564:22211` | "16 Aug, 2026, 9:00 am", from the record | departs |
+| D4 | Merchant "Fresh market Groceries" (lower-case m) in Other details | `9564:22210` | The record's "Fresh Market Groceries" | departs |
+| D5 | The address "12B Opebi Road, Ikeja, Lagos" exists only here | `9564:22212` | Added to the record, and printed on the receipt the camera sees, so the two agree | doesn't depart |
+| D6 | The header sits at x 1 (its .Modal header is 401 wide), putting Back at 17 and More at 346: 17 left, 16 right | `9564:21989` | Back at 16, symmetric (1px, the one box outside 0.5 in `verify:diff`) | departs |
+| D7 | The header has no fill | `9564:21989` | Takes the frame's ground, so content scrolled under it does not pass behind the buttons | departs |
+| D8 | Other details rows draw their stroke on top, the first row included | `9564:22210` | Kept | doesn't depart |
+| D9 | The Tags block and the Inline message include their strokes in layout (123 = 18+12+80+12+1; 152 = 150+2) | `9564:22234`, `9564:22311` | Real borders there. Also corrects Review's Tags card, which shares the block | — |
+| D10 | Two values for Color/border/default: #252b3724 (bound in the flow node) and alpha neutral/300 #2c271b24 (bound here) | `9564:22333` | The later screen's | doesn't depart |
+| D11 | The suggested payment "GTBank Transfer · ₦15,000 · 16 Aug, 9:11 am" | `9564:22311` | Derived (RP-13): the payment proof with the same amount on the same day. Seeded as a payment record | doesn't depart |
+| D12 | "Not this" and "Link" | `9564:22330`, `9564:22331` | "Not this" turns the suggestion down: the card folds away and stays dismissed for this receipt. "Link" shows the not-designed notice; the linked state exists elsewhere in the file (`4729:26790`), not in what was given | departs (Link) |
+| D13 | "Link shopping notes": the terminology lock's form is "Link to … Shopping Note" | `9564:22338` | Figma copy kept; flagged | doesn't depart |
+| D14 | No destination in this flow: More, Tags ›, Shared with ›, the evidence row, Link payment, Link shopping notes | — | The not-designed notice. Tag and @mention removal are live and write the saved record | departs (notice) |
+| D15 | Back has no designed destination (a Receipts list is not in the flow) | `9564:21994` | Starts the flow over at the camera | departs |
 
 ## Components
 
@@ -138,6 +164,8 @@ Figma frame rebuilt; **e** not in Figma.
 | `MilestoneCelebration`, `MilestoneCard`, `CheckBadge` | `9502:21212`, `9502:21308`, `9502:21221` | d |
 | `Rays`, `Confetti` | brief | e |
 | `CameraFeed`, `CaptureScene` | user request (C12) | e |
+| `ItemRow`, `MetaBlock`, `EvidenceRow` (shared by Review and Receipt Details) | "Lists", tag/@mention blocks, `9564:22297` | d |
+| Suggested link, small buttons, link rows | `9564:22311` "Inline message", `9564:22330` / `22331` Button, `9564:22333` | d |
 | `Notice` (not designed) | — | e, marked "Needs design input" on its face |
 | iOS status bar, home indicator | `4012:27` (remote iOS 26 kit) | the playground's `DeviceFrame` chrome |
 

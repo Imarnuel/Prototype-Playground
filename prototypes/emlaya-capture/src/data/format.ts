@@ -41,3 +41,32 @@ export function formatPagesSize(pages: number, bytes: number): string {
   const size = bytes >= 1_000_000 ? `${(bytes / 1_000_000).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1000))} KB`;
   return `${pages} ${pages === 1 ? 'page' : 'pages'} · ${size}`;
 }
+
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+function clock(time: string): string {
+  const [h, m] = time.split(':').map(Number);
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${String(m).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'}`;
+}
+
+/**
+ * "Sun 16 Aug, 9:00 am" — 9564:22008's shape. The weekday is computed: the frame says
+ * "Sat 16 Aug", but 16 Aug 2026 is a Sunday.
+ */
+export function formatWeekdayDateTime(iso: string, time: string): string {
+  const [y, m, d] = parts(iso);
+  const day = DAYS[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
+  return `${day} ${d} ${MONTHS[m - 1]}, ${clock(time)}`;
+}
+
+/** "16 Aug, 2026, 9:00 am" — 9564:22211's shape. */
+export function formatLongDateTime(iso: string, time: string): string {
+  const [y, m, d] = parts(iso);
+  return `${d} ${MONTHS[m - 1]}, ${y}, ${clock(time)}`;
+}
+
+/** "16 Aug, 9:11 am" — 9564:22326's shape. */
+export function formatDayMonthTime(iso: string, time: string): string {
+  return `${formatDayMonth(iso)}, ${clock(time)}`;
+}

@@ -1,0 +1,173 @@
+/* 9564:21987 Receipt Details. Light mode. Tokens only. */
+.details {
+  position: absolute;
+  inset: 0;
+  background: var(--color-surface-secondary-default);
+  color: var(--color-text-default);
+}
+.details__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* 9564:21997 starts at 134: the 62 status bar, the 64 header, 8. */
+  padding-top: calc(var(--safe-top) + var(--spacing-300) * 2 + var(--gap-size-icon-button) + var(--gap-details-content-gap));
+  padding-bottom: calc(var(--safe-bottom) + var(--gap-space-24));
+  scrollbar-width: none;
+}
+.details__scroll::-webkit-scrollbar { display: none; }
+.details__content { display: flex; flex-direction: column; gap: var(--spacing-400); }
+
+/* 9564:21989. The frame gives the header no fill; it takes the frame's ground here so
+   content scrolled under it does not pass behind the buttons. Placed at x 16, where the
+   frame's sits at 17 (its .Modal header is 401 wide at x 1). */
+.details__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-top: var(--safe-top);
+  background: var(--color-surface-secondary-default);
+}
+.details__headerRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-300) var(--spacing-400);
+}
+.details__title {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - var(--gap-header-title-offset));
+  translate: -50% 0;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* --- Summary (9564:21998) -------------------------------------------------------------- */
+.details__summary { padding-inline: var(--spacing-400); }
+.details__summaryCard { display: flex; flex-direction: column; gap: var(--spacing-200); padding: var(--spacing-400); }
+.details__amount { margin: 0; color: var(--color-text-default); font-variant-numeric: tabular-nums; }
+.details__kind { display: flex; align-items: center; gap: var(--spacing-100); margin: 0; color: var(--color-text-subtle); white-space: nowrap; }
+.details__kindType { display: flex; align-items: center; gap: var(--spacing-100); }
+.details__dot { display: block; width: var(--gap-size-dot); height: var(--gap-size-dot); }
+
+/* --- Items (9564:22011) ----------------------------------------------------------------- */
+.details__items { display: flex; flex-direction: column; gap: var(--spacing-200); padding-inline: var(--spacing-300); }
+.details__sectionTitle { margin: 0; color: var(--color-text-subtle); }
+.details__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+
+/* --- Other details (9564:22206) ------------------------------------------------------- */
+.details__other { padding-inline: var(--spacing-400); }
+.details__otherCard { display: flex; flex-direction: column; margin: 0; }
+/* "Lists" (4274:5809): the stroke is on each row's TOP, the first included. */
+.detailRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-300);
+  min-height: var(--gap-size-row-min);
+  margin-inline: var(--spacing-400);
+  padding: var(--spacing-300) 0 var(--spacing-200);
+  box-shadow: inset 0 var(--gap-border-hairline) 0 0 var(--color-border-subtler);
+}
+.detailRow[data-last] { padding-block: var(--spacing-300); }
+.detailRow dt { color: var(--color-text-default); white-space: nowrap; }
+.detailRow__value { margin: 0; color: var(--color-text-subtle); text-align: right; min-width: 0; }
+
+/* --- Tags, Shared with (9564:22213), the original (9564:22276) ------------------------ */
+.details__meta { padding-inline: var(--spacing-300); }
+.details__metaCard { display: flex; flex-direction: column; padding: var(--spacing-400) 0 var(--spacing-200); }
+.details__evidence { padding-inline: var(--spacing-400); }
+
+/* --- Linked records (9564:22307) ------------------------------------------------------- */
+.details__links { display: flex; flex-direction: column; gap: var(--spacing-200); padding-inline: var(--spacing-400); }
+.details__linkRows { display: flex; flex-direction: column; gap: var(--spacing-200); }
+
+/* "Inline message" 9564:22311: 152 tall = 16 + 18 + 100 + 16 + its two 1px strokes, so
+   its stroke is in layout — a real (dashed) border, on top of the 16 of padding. */
+.suggestion {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-400);
+  border: var(--gap-dash) var(--color-border-info-subtle);
+  border-radius: var(--border-radius-600);
+  background: var(--color-background-info-default);
+}
+.suggestion__head { display: flex; align-items: center; gap: var(--spacing-50); color: var(--color-text-accent-blue); }
+.suggestion__body { display: flex; flex-direction: column; gap: var(--spacing-200); }
+.suggestion__record { display: flex; align-items: center; gap: var(--spacing-300); }
+.suggestion__tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--gap-size-icon-tile);
+  height: var(--gap-size-icon-tile);
+  border-radius: var(--border-radius-200);
+  background: var(--color-icon-inverse);
+}
+.suggestion__text { display: flex; flex-direction: column; justify-content: center; min-height: var(--gap-size-suggestion-row); padding-block: var(--spacing-300); min-width: 0; }
+.suggestion__name { color: var(--color-text-default); }
+.suggestion__meta { color: var(--color-text-subtle); white-space: nowrap; }
+.suggestion__actions { display: flex; gap: var(--spacing-200); }
+
+/* 9564:22330 / 9564:22331 */
+.smallButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--gap-size-button-sm);
+  padding: var(--spacing-100) var(--spacing-300);
+  border-radius: var(--border-radius-full);
+  white-space: nowrap;
+  transition: transform var(--motion-duration-instant) var(--motion-ease-inOut);
+}
+.smallButton:active { transform: scale(var(--motion-press-scale)); }
+.smallButton--quiet {
+  background: var(--gap-gloss-light), var(--color-white);
+  box-shadow: inset 0 0 0 var(--gap-border-hairline) var(--color-border-subtle), var(--gap-shadow-button-sm-inset);
+  color: var(--color-text-default);
+}
+.smallButton--strong {
+  background: var(--gap-gloss-secondary), var(--gap-color-button-secondary);
+  box-shadow: var(--gap-shadow-button-sm-raised-inset), var(--gap-shadow-button-sm-raised);
+  color: var(--color-text-inverse);
+}
+
+/* "Not this": the card folds away and the rows below close up. */
+.suggestion__collapse {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows var(--motion-duration-base) var(--motion-ease-inOut),
+    margin-bottom var(--motion-duration-base) var(--motion-ease-inOut),
+    opacity var(--motion-duration-fast) var(--motion-ease-out),
+    transform var(--motion-duration-base) var(--motion-ease-inOut);
+}
+.suggestion__collapse > .suggestion { min-height: 0; overflow: clip; }
+.suggestion__collapse[data-state='exit'] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transform: scale(var(--motion-scale-card-from));
+}
+/* The column's gap would hold 8 open under a folded card. */
+.suggestion__collapse[data-state='exit'] { margin-bottom: calc(var(--spacing-200) * -1); }
+
+/* 9564:22333 / 9564:22336 */
+.linkRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-200);
+  width: 100%;
+  height: var(--gap-size-link-row);
+  padding: var(--spacing-300) calc(var(--spacing-200) - var(--gap-border-hairline));
+  border: var(--gap-dash) var(--color-border-default);
+  border-radius: var(--border-radius-400);
+  color: var(--color-text-secondary);
+  text-align: left;
+}
+
+.app[data-reduced-motion='true'] .suggestion__collapse { transition-property: opacity; }
+.app[data-reduced-motion='true'] .suggestion__collapse[data-state='exit'] { transform: none; }

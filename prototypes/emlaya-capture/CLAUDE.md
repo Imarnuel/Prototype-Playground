@@ -12,6 +12,7 @@ specific to this study.
   `9502:21212` receipt saved
 - Processing: `4653:68091`, from sibling section `4810:31333`. The flow node has none.
 - Extraction error: `4142:9167` exists but was **not inspected** (MCP timeouts). The state is a placeholder.
+- Receipt Details: `9564:21987`, reached from the celebration's Done (the user's call).
 - Modes: the camera frames resolve **Dark**, the rest pin **Light** (`152:0`).
 
 **Hosted preview:** <https://claude.ai/artifact/QnBTfbHEStRmUdi2wAVu5X>. Rebuild it with
@@ -27,7 +28,8 @@ src/components/ui.tsx        Button, HeaderButton, TextField, Pill, GlassButton,
 src/components/celebration/  MilestoneCelebration, CheckBadge, MilestoneCard, Rays, Confetti
 src/components/capture/      CameraFeed + CaptureScene: the live camera (not in Figma, user request)
 src/data/receiptDocument.ts  the paper receipt the camera sees, printed from the record
-src/screens/                 Camera (live + captured), Review (processing + ready + error)
+src/screens/                 Camera (live + captured), Review (processing + ready + error), ReceiptDetails
+src/components/record/       ItemRow, MetaBlock, EvidenceRow: shared by Review and Receipt Details
 src/data/records.ts          the one record store; milestone figures are derived from it
 src/api/emlaya.ts            extract / save through shared/src/mockApi.ts
 figma/nodes.json             frame-relative boxes for every node in 9502:21986 (get_metadata)
@@ -54,5 +56,5 @@ Check there before "fixing" one back.
 
 Changed at the user's request after the first build: a live capture scene replaces the
 Figma photo, Review rises as a sheet (no zoom), the receipt-actions rail is gone, and the
-celebration is staged over ~2.8s. Theme selectors are scoped to `.app` because the hosted
+celebration is staged over ~2.75s (badge at 80ms), and Done leads to Receipt Details. Theme selectors are scoped to `.app` because the hosted
 viewer sets `data-theme` on `<html>`.

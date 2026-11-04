@@ -20,6 +20,7 @@ import { captureFontsReady, type CameraFeedHandle } from './components/capture/C
 import { scanDocument } from './components/capture/CaptureScene';
 import { printedLines } from './data/receiptDocument';
 import { Review, type ReviewStatus } from './screens/Review';
+import { ReceiptDetails } from './screens/ReceiptDetails';
 import { CheckBadge, MilestoneCard, MilestoneCelebration } from './components/celebration/MilestoneCelebration';
 import { Layer } from './components/Layer';
 import { Notice } from './components/Notice';
@@ -29,7 +30,7 @@ import { formatDayMonth, formatNaira, ordinal } from './data/format';
 import { ForceReducedMotion, useReducedMotion } from './state/motion';
 import { tokenMs } from './tokens/read';
 
-type Screen = 'camera' | 'captured' | 'processing' | 'review' | 'extractError' | 'saved';
+type Screen = 'camera' | 'captured' | 'processing' | 'review' | 'extractError' | 'saved' | 'details';
 
 /** How long extraction is held when the presenter wants to talk over it. */
 const HOLD_SCALE = 1000;
@@ -121,10 +122,21 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
       .finally(() => setSaving(false));
   };
 
-  const done = () => {
+  /** Done (and ×) on the celebration: on to the saved receipt (9564:21987). */
+  const done = () => setScreen('details');
+
+  /** Back from Receipt Details: the flow starts over at the camera. */
+  const restart = () => {
     setScreen('camera');
     setDraft(null);
     setEvidence(null);
+  };
+
+  /** Edits on Receipt Details write the saved record itself (one source of truth). */
+  const updateSaved = (next: PurchaseReceipt) => {
+    const i = records.findIndex((r) => r.id === next.id && r === saved);
+    if (i >= 0) records[i] = next;
+    setSaved(next);
   };
 
   // --- Dev toolbar: every screen and state in one tap (CLAUDE.md §6) ---------------
@@ -141,6 +153,10 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
     commitSave(d);
     setReplay((n) => n + 1);
   };
+  const jumpDetails = async () => {
+    if (!saved) await jumpSaved();
+    setScreen('details');
+  };
   const replayCelebration = () => {
     if (screen === 'saved') setReplay((n) => n + 1);
     else jumpSaved();
@@ -152,6 +168,7 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
     { group: 'Screens', label: 'Processing', onSelect: startProcessing },
     { group: 'Screens', label: 'Review', onSelect: jumpReview },
     { group: 'Screens', label: 'Receipt saved', onSelect: jumpSaved },
+    { group: 'Screens', label: 'Receipt details', onSelect: jumpDetails },
     { group: 'States', label: 'Extraction error', onSelect: () => setScreen('extractError') },
     { group: 'States', label: 'Fail next request', onSelect: failNextRequest },
     { group: 'States', label: 'Hold processing', pressed: hold, onSelect: () => setHold((v) => !v) },
@@ -175,6 +192,7 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
     const t = window.setTimeout(() => setCameraLit(false), sheet);
     return () => window.clearTimeout(t);
   }, [onCamera, sheet]);
+  const onReview = screen === 'processing' || screen === 'review' || screen === 'extractError' || screen === 'saved';
   const reviewStatus: ReviewStatus = screen === 'processing' ? 'processing' : screen === 'extractError' ? 'error' : 'ready';
   const fade = tokenMs('--motion-duration-base');
 
@@ -206,7 +224,7 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
           </Layer>
 
           {/* Review rises over the shot as a sheet (no zoom); it fades when it leaves. */}
-          <Layer open={!onCamera} exitMs={fade} className="layer--review">
+          <Layer open={onReview} exitMs={fade} className="layer--review">
             <Review
               status={reviewStatus}
               draft={draft}
@@ -216,6 +234,11 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
               onRetry={startProcessing}
               onNotDesigned={notDesigned}
             />
+          </Layer>
+
+          {/* Under the celebration, so Done's exit reveals it. */}
+          <Layer open={screen === 'details' && saved !== null} exitMs={fade} className="layer--details">
+            {saved && <ReceiptDetails key={saved.id} record={saved} onRecordChange={updateSaved} onBack={restart} onNotDesigned={notDesigned} />}
           </Layer>
 
           {saved && milestone && (

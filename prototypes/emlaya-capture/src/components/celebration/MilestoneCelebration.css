@@ -165,12 +165,12 @@
 /* --- Entrance ---------------------------------------------------------------------------- */
 /* Staged, one beat at a time (tokens.gaps.css, "Entrance"):
      0     the ground floods out of the Save button
-     380   the badge pops alone at the centre, 1.45x; 480/620 two rings shock out of it
-     560   its check draws on
-     1150  it rises to its place and settles to 1x — as the rays bloom (1200) and the
-           confetti releases (1250, JS)
-     1450  the title, word by word, out of masks
-     1800  the body     2250  the insight card     2750  Done and × (Done takes taps on landing) */
+     80    the badge pops alone at the centre, 1.45x, full size by ~180; 140/280 two rings shock out
+     180   its check draws on
+     850   it rises to its place and settles to 1x — as the rays bloom (900) and the
+           confetti releases (950, JS)
+     1150  the title, word by word, out of masks
+     1500  the body     1950  the insight card     2450  Done and × (Done takes taps on landing) */
 .celebration[data-state='open'] .celebration__backdrop {
   animation: celebration-flood var(--motion-duration-celebration-ground) var(--motion-ease-out) var(--motion-delay-celebration-ground) both;
 }

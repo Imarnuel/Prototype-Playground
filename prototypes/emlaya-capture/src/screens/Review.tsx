@@ -9,21 +9,21 @@
  * The skeleton is drawn the way the frame draws it: the real layout with its text at
  * opacity 0 inside filled boxes, so its geometry is the review's own.
  */
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties } from 'react';
 import caretLeft from '../assets/figma/caret-left.svg';
 import dotsThree from '../assets/figma/dots-three.svg';
 import calendarBlank from '../assets/figma/calendar-blank.svg';
 import clock from '../assets/figma/clock.svg';
 import tag16 from '../assets/figma/tag-16.svg';
 import user16 from '../assets/figma/user-16.svg';
-import caretRight16 from '../assets/figma/caret-right-16.svg';
 import minusCircleTag from '../assets/figma/minus-circle-tag.svg';
 import minusCircleShare from '../assets/figma/minus-circle-share.svg';
 import xClose12 from '../assets/figma/x-close-12.svg';
 import circleNotch from '../assets/figma/circle-notch.svg';
 import { Button, HeaderButton, Icon, Pill, TextField, inert } from '../components/ui';
+import { EvidenceRow, ItemRow, MetaBlock } from '../components/record/RecordParts';
 import type { LineItem, PurchaseReceipt } from '../data/records';
-import { formatFieldDate, formatDayMonth, formatNaira, formatPagesSize } from '../data/format';
+import { formatFieldDate, formatNaira } from '../data/format';
 import './Review.css';
 
 export type ReviewStatus = 'processing' | 'ready' | 'error';
@@ -156,17 +156,9 @@ function ReadyReview({ draft, onDraftChange, saving, onSave, onNotDesigned }: {
             {/* 9502:21644 — the original evidence. 9502:21569, a second Tags/Shared card
                 with tag names in the @mention row, is a duplicated placeholder: omitted. */}
             <div className="review__evidence stagger" style={stagger(5)}>
-              <button type="button" className="card review__evidenceCard" onClick={() => onNotDesigned('Viewing the original')}>
-                <span className="review__thumb">
-                  <img src={draft.evidence.src} alt="" />
-                </span>
-                <span className="review__evidenceText">
-                  {/* "Shoprite 16 Aug · 3 pages · 2.4 MB" in the frame describes another
-                      document; these are this capture's. */}
-                  <span className="ts-label-base">{draft.merchant} {formatDayMonth(draft.date)}</span>
-                  <span className="review__evidenceMeta ts-body-small">{formatPagesSize(draft.evidence.pages, draft.evidence.bytes)}</span>
-                </span>
-              </button>
+              {/* "Shoprite 16 Aug · 3 pages · 2.4 MB" in the frame describes another
+                  document; these are this capture's. */}
+              <EvidenceRow record={draft} onOpen={() => onNotDesigned('Viewing the original')} />
             </div>
           </div>
         </div>
@@ -198,46 +190,6 @@ function ReviewHeader({ more, onNotDesigned }: { more: boolean; onNotDesigned?: 
         )}
       </div>
     </header>
-  );
-}
-
-function ItemRow({ item, skeleton = false }: { item: LineItem; skeleton?: boolean }) {
-  return (
-    <li className="itemRow" data-skeleton={skeleton || undefined}>
-      <div className="itemRow__content">
-        <div className="itemRow__left">
-          <span className="itemRow__name ts-label-large"><span className="itemRow__text">{item.name}</span></span>
-          <span className="itemRow__qtyRow">
-            <span className="itemRow__qty ts-body-base"><span className="itemRow__text">{item.quantity}</span></span>
-            <span className="itemRow__x ts-body-small"><span className="itemRow__text">x</span></span>
-            <span className="itemRow__unit ts-body-base"><span className="itemRow__text">{formatNaira(item.unitPrice)}</span></span>
-          </span>
-        </div>
-        <span className="itemRow__total ts-label-large"><span className="itemRow__text">{formatNaira(item.quantity * item.unitPrice)}</span></span>
-      </div>
-    </li>
-  );
-}
-
-function MetaBlock({ icon, title, onOpen, last = false, skeleton = false, children }: {
-  icon: string;
-  title: string;
-  onOpen?: () => void;
-  last?: boolean;
-  skeleton?: boolean;
-  children: ReactNode;
-}) {
-  return (
-    <div className="metaBlock" data-last={last || undefined}>
-      <button type="button" className="metaBlock__head" onClick={onOpen} tabIndex={skeleton ? -1 : undefined}>
-        <span className="metaBlock__title">
-          <Icon src={icon} size={16} />
-          <span className="ts-body-base">{title}</span>
-        </span>
-        <Icon src={caretRight16} size={16} />
-      </button>
-      <div className="metaBlock__pills" data-skeleton={skeleton || undefined}>{children}</div>
-    </div>
   );
 }
 

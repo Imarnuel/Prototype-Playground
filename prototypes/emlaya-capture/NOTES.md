@@ -61,3 +61,12 @@ constraint-bearing description (Checkbox) applies to a hidden state.
 - The brief's "Showcase rules" section is an unfilled placeholder (`[PASTE SHOWCASE PROTOTYPE RULES HERE]`).
   The repository's working agreement (`/CLAUDE.md`) was applied as those rules.
 - The "component ladder (levels a–e)" is not defined anywhere available. Interpreted in CORRECTIONS.md, "Components".
+
+## Receipt Details — `9564:21987` (added after the first build)
+
+Swept the same way (`use_figma` over the subtree): **0 annotations, 0 prototype reactions**,
+no layer descriptions; Light mode pinned (`152:0`). Component descriptions are the same Phosphor
+keyword lists as above, plus MoneyWavy (`4022:68375`: "\*new\*, cash, dollars, paper bills,
+payment, paying, purchase, commerce") and PlusCircle (`4022:55643`). Hidden layers not built:
+the edit-mode row controls, a "Tags & people" label, an "Item Total" / V.A.T / Total breakdown
+(`9564:22156`, `9564:22179`, with "Paracetamol 50mg" and "₦14,,000" placeholders), and "Add a tag".
