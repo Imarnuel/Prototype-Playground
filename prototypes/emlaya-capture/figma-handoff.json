@@ -487,9 +487,9 @@
       },
       {
         "t": 1400,
-        "el": "card (+ star at 1540)",
-        "anim": "rise 24 + scale 0.96→1; star scale 0.5→1, -30°→0",
-        "easing": "--motion-spring-gentle, --motion-spring-overshoot"
+        "el": "card (+ star at 1600)",
+        "anim": "rise 24 + scale 0.96→1; star spins in: scale 0.5→1 critically damped, 400; rotate -160°→0 decelerating, 640; no overshoot",
+        "easing": "--motion-spring-gentle; star --motion-ease-launch, --motion-ease-natural-out"
       },
       {
         "t": 1800,

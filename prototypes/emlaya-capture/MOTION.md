@@ -29,7 +29,8 @@ the badge lost its squash, stretch, dip and every overshoot, and its hold at the
 from 850 to 500ms, with the rise from 600 to 400. Everything after it moved up by ~600ms, and
 the sequence now ends at ~2.4s (it was ~2.85). Then "the success icon is now too quick":
 the pop went from 300 to 400ms and the spin from 480 to 640ms, so the badge finishes turning in
-the first moments of its rise. Nothing else moved. Measured in a production build by
+the first moments of its rise. Nothing else moved. Then the card's star ("the badge inside of the message") was given the
+same moderate spin; it had turned only 30°, on an overshoot spring. Measured in a production build by
 `npm run verify:motion`, from each animation's scheduled start (Web Animations
 `startTime + delay`), relative to the ground. All 11 are exact.
 
@@ -44,7 +45,7 @@ the first moments of its rise. Nothing else moved. Measured in a production buil
 | 560 | The confetti releases | burst, then a 2.5s trickle | `--motion-delay-celebration-confetti` |
 | 800 / 910 | "Receipt" … "saved" | each word rises out of its mask, 4% follow-through, 620 | `--motion-delay-celebration-title`, `--motion-spring-gentle` |
 | 1050 | The body | rise 12 (gentle spring) + fade | `--motion-delay-celebration-body` |
-| 1400 / 1540 | The insight card, then its star | card: rise 24 + scale 0.96 → 1 (gentle spring); star: scale 0.5 → 1, −30° → 0 (overshoot spring) | `--motion-delay-celebration-card`, `--motion-delay-celebration-star` |
+| 1400 / 1600 | The insight card, then its star **spinning in** | card: rise 24 + scale 0.96 → 1 (gentle spring); star: the badge's own motion, `scale` 0.5 → 1 critically damped, 400, and `rotate` −160° → 0 on the natural ease-out, 640, level by 2240 and never past it. It starts once the card is ~85% opaque, so the turn is seen | `--motion-delay-celebration-card`, `--motion-delay-celebration-star`, `--motion-spin-from`, `--motion-duration-badge-pop`, `--motion-duration-badge-spin` |
 | 1800 | Done and × | rise (gentle spring) + fade; **inert until `animationend`** | `--motion-delay-celebration-cta` |
 
 ## The 12 principles, where each is used
@@ -63,7 +64,7 @@ animation at set times and reads the badge's pose.
 | Follow-through / overlapping | not on the badge: the spin decelerates into level and stops there. Overlap carries it instead: the check draws while the disc still turns, the spin finishes during the rise, the rays bloom while it rises, words and Done settle with a 4% follow-through, and the star lands after its card | badge spin max 0.00°, scale max 1.00 |
 | Slow in / slow out | the spin and the flood decelerate (cubic ease-out); the rise is a sine in-out; springs for the later arrivals | — |
 | Arcs | the rise bows 8px to the side | x −8 at 700ms |
-| Secondary action | the shock rings; the star; the rays' slow turn | — |
+| Secondary action | the shock rings; the card's star, spinning in after its card; the rays' slow turn | star −160° at 1600ms, 0° by 2240ms, max 0.00° |
 | Timing | unhurried where it should be seen (the pop, 400; the spin, 640), quick where it travels (the rise, 400); the badge is in its slot by 900ms | scale 0.96 at 280ms; −8.8° at 480ms; at rest by 900ms |
 | Exaggeration | the 1.45x hold at the centre; a moderate −160° spin | — |
 | Solid drawing | the badge keeps its proportions; its shading is the export's | — |
@@ -82,7 +83,9 @@ On Done (or ×): content and badge reverse, while rays, confetti and the ground 
 | Badge | turns 90° away as it shrinks to 0 and fades; no swell before it | same, `--motion-badge-exit-turn` |
 | Ground, rays, confetti canvas | fade | same |
 
-Copy opacity is 0.14 at 170ms of 200 (wall clock from the tap). The layer unmounts at 200ms
+Copy opacity is 0.05 at 170ms of 200 on the exit's own clock, and the fade starts 11–12ms after
+the tap (checked separately: at most 2 frames). A wall-clock read at 170ms swung 0.14–0.37 with
+0–2 frames of headless frame jitter, so it is no longer used. The layer unmounts at 200ms
 (`usePresence`), so nothing cuts. Whatever Done reveals must not render in the exit's own commit:
 the camera scene once held the copy at 0.93 opacity at 170ms until it deferred and batched its
 token reads, and Receipt Details, rendered in the same commit as the exit, started the fade 36ms

@@ -124,8 +124,8 @@ The rendered UI marks each departure: open the dev toolbar (`?dev=1`) → *Show 
 | S13 | The figures are derived, not typed: "2nd" and "₦55,000" come from the store (one earlier ₦40,000 purchase) | — | A second pass reads "3rd … ₦70,000" (verified) | — |
 | S14 | The close X glyph has two strokes of different width and colour (1.5 #393121, 1.8 #343330) | `9502:21304` | Export kept | doesn't depart |
 | S15 | The card slot | — | `MilestoneCelebration` takes `children`; the brief's signature is `title body icon primaryAction` | departs (API) |
-| S16 | Entrance timing | — | **User request: "more dramatic … not everything revealing at the same time".** The brief's 0–600ms table is replaced by a staged ~2.4s sequence: the ground floods out of the Save button; the badge pops alone at the centre at 1.45x, two rings shock out of it, its check draws; it rises to its place as the rays bloom and the confetti releases; the title rises word by word; then the body, the card and Done. Rings, flood and word masks are not in Figma. The badge was then brought forward to 80ms, then made to spin in; then, at the user's request, its squash, stretch, dip and overshoots were removed and its hold cut from 850 to 500ms (rise 600 → 400), which moved every later beat up ~600ms. Then "the success icon is now too quick": the pop went 300 → 400ms and the spin 480 → 640ms, with no other beat moved. MOTION.md | departs (motion) |
-| S17 | Exit easing | — | The shared exit curve (`in`) left the copy at 0.90 opacity at 170 of 200ms, so the unmount read as a cut. The exit uses the sine in-out (`--motion-ease-natural`), and Receipt Details mounts two frames after Done so its render does not hold the exit back: 0.14 at 170ms | departs (motion set) |
+| S16 | Entrance timing | — | **User request: "more dramatic … not everything revealing at the same time".** The brief's 0–600ms table is replaced by a staged ~2.4s sequence: the ground floods out of the Save button; the badge pops alone at the centre at 1.45x, two rings shock out of it, its check draws; it rises to its place as the rays bloom and the confetti releases; the title rises word by word; then the body, the card and Done. Rings, flood and word masks are not in Figma. The badge was then brought forward to 80ms, then made to spin in; then, at the user's request, its squash, stretch, dip and overshoots were removed and its hold cut from 850 to 500ms (rise 600 → 400), which moved every later beat up ~600ms. Then "the success icon is now too quick": the pop went 300 → 400ms and the spin 480 → 640ms, with no other beat moved. The card's star ("the badge inside of the message") then got the badge's moderate spin, −160° → 0 with no overshoot, from 1600ms (it turned −30° on an overshoot spring at 1540). MOTION.md | departs (motion) |
+| S17 | Exit easing | — | The shared exit curve (`in`) left the copy at 0.90 opacity at 170 of 200ms, so the unmount read as a cut. The exit uses the sine in-out (`--motion-ease-natural`), and Receipt Details mounts two frames after Done so its render does not hold the exit back: 0.05 at 170ms of the exit, starting 11–12ms after the tap | departs (motion set) |
 
 ## Receipt Details (D) — `9564:21987`
 
@@ -206,13 +206,13 @@ under a proposed name with its node ID. In summary:
 | Layout offset | 21 | camera row 16 / 15 / 16, celebration badge 107, copy gap 21, card gap 32, CTA 66 from the bottom, rays origin 352 |
 | Spacing | 1 | `--gap-space-24` (no Spacing/600 exists) |
 | Type | 1 | "Large input" letter-spacing −0.32, raw |
-| Motion | 49 | the staged entrance (13 beats), start and end scales, rise distances, the word mask, natural curves, the gentle and overshoot springs, the badge's spin, pop, arc and exit turn, the star, ray periods and breathe, exit, spinner, field stagger, notice hold |
+| Motion | 46 | the staged entrance (13 beats), start and end scales, rise distances, the word mask, natural curves, the gentle spring, the badge's spin, pop, arc and exit turn, the star, ray periods and breathe, exit, spinner, field stagger, notice hold |
 | Confetti physics | 31 | gravity, drag, terminal velocity, velocity / sway / spin / flip / size ranges, counts, trickle window, clear-by |
 | Mock API | 2 | extract 2200ms, save 700ms |
 | Live capture scene | 43 | counter, paper and ink colours; paper geometry; hand-held drift; focus, exposure, detection, outline |
 | Harness | 3 | the Figma frame's 402 × 874 and 62 safe top |
 
-239 in all (116 `--gap-*`, 49 `--motion-*`, 43 `--capture-*`, 31 `--confetti-*`). The non-motion rows were counted before Receipt Details (section D) added its layout gaps, so they sum short of 239.
+236 in all (116 `--gap-*`, 46 `--motion-*`, 43 `--capture-*`, 31 `--confetti-*`). The non-motion rows were counted before Receipt Details (section D) added its layout gaps, so they sum short of 236.
 
 `npm run check:tokens` fails on any hex, rgb/hsl, px, rem, ms, s, cubic-bezier or linear()
 literal outside the two token files: **0 violations in 32 files**.

@@ -216,8 +216,13 @@
     celebration-fade var(--motion-duration-base) var(--motion-ease-natural-out) var(--motion-delay-celebration-card) both;
 }
 .celebration[data-state='open'] .milestoneCard__icon {
-  animation: celebration-star var(--motion-duration-spring-overshoot) var(--motion-spring-overshoot)
-    calc(var(--motion-delay-celebration-card) + var(--motion-delay-celebration-star)) both;
+  /* The card's star spins in, moderately (the user: "the badge inside of the message").
+     Same turn and curves as the success badge, so the two read as one family: it grows
+     critically damped and the spin decelerates into level, never past it. */
+  --star-at: calc(var(--motion-delay-celebration-card) + var(--motion-delay-celebration-star));
+  animation:
+    celebration-star var(--motion-duration-badge-pop) var(--motion-ease-launch) var(--star-at) both,
+    celebration-spin var(--motion-duration-badge-spin) var(--motion-ease-natural-out) var(--star-at) both;
 }
 .celebration[data-state='open'] .celebration__cta {
   animation:
@@ -256,7 +261,7 @@
 @keyframes celebration-lift { from { transform: translateY(var(--motion-rise-distance)); } }
 @keyframes celebration-rise { from { opacity: 0; transform: translateY(var(--motion-rise-distance)); } }
 @keyframes celebration-card { from { transform: translateY(var(--motion-rise-card)) scale(var(--motion-scale-card-from)); } }
-@keyframes celebration-star { from { scale: var(--motion-scale-star-from); rotate: var(--motion-star-turn-from); } }
+@keyframes celebration-star { from { scale: var(--motion-scale-star-from); } }
 
 /* --- Exit ------------------------------------------------------------------------------- */
 /* Content and badge reverse quickly; rays, confetti and the ground fade together.

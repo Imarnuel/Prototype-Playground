@@ -123,15 +123,27 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
 
   // Exit: Done reverses the content and fades the rest within the exit token, then lands
   // on the camera — and the record it saved is in the store (prove by consequence).
+  // Measured on the exit's own clock (Web Animations currentTime), with the tap-to-start lag
+  // checked on its own: a wall-clock read at 170ms swung 0.14–0.37 with 0–2 frames of
+  // headless frame jitter, which is not what this guards against (a late or missing fade).
   const exit = await page.evaluate(() => new Promise((resolve) => {
+    const t0 = performance.now();
     document.querySelector('.celebration__cta .button').click();
-    setTimeout(() => {
+    const poll = () => {
       const c = document.querySelector('.celebration');
-      const mid = c ? +getComputedStyle(c.querySelector('.celebration__copy')).opacity : 0;
-      setTimeout(() => resolve({ mid, gone: !document.querySelector('.celebration'), details: !!document.querySelector('.details') }), 400);
-    }, 170);
+      const copy = c && c.querySelector('.celebration__copy');
+      const a = copy && copy.getAnimations().find((x) => x.animationName === 'celebration-sink');
+      if (!a || a.startTime === null) return requestAnimationFrame(poll);
+      const lag = a.startTime - t0;
+      a.pause(); a.currentTime = 170;
+      const mid = +getComputedStyle(copy).opacity;
+      a.play();
+      setTimeout(() => resolve({ lag: Math.round(lag), mid, gone: !document.querySelector('.celebration'), details: !!document.querySelector('.details') }), 500);
+    };
+    poll();
   }));
-  check('exit: content fading at 170ms of 200', exit.mid >= 0 && exit.mid < 0.2, `copy opacity ${exit.mid.toFixed(2)} at 170ms`);
+  check('exit: content fading at 170ms of 200', exit.mid >= 0 && exit.mid < 0.2, `copy opacity ${exit.mid.toFixed(2)} at 170ms of the exit`);
+  check('exit: starts within 2 frames of the tap', exit.lag <= 34, `${exit.lag}ms from tap to the fade's start`);
   check('exit: Done lands on Receipt Details', exit.gone && exit.details, JSON.stringify(exit));
 
   // Receipt Details reads the saved record: the tag removed on Review is gone here too.
@@ -220,6 +232,23 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
   check('badge: one smooth rise — never dips, never passes its slot', monotonic && rise.every((p) => p.y >= -0.01), `y ${rise[0].y} → ${rise[rise.length - 1].y}, monotonic ${monotonic}`);
   check('badge: rises on a slight arc', P[700].x < -4, `x ${P[700].x} at 700ms`);
   check('badge: in its slot by 900ms', P[900].y === 0 && P[900].x === 0 && P[900].sx === 1 && P[900].spin === 0, JSON.stringify(P[900]));
+  // The card's star ("the badge inside of the message"): spins in moderately, no bounce.
+  const star = await page.evaluate(() => {
+    const anims = document.querySelector('.celebration').getAnimations({ subtree: true });
+    const icon = document.querySelector('.milestoneCard__icon');
+    const out = [];
+    for (let t = 1600; t <= 2300; t += 10) {
+      anims.forEach((a) => { a.currentTime = t; });
+      const cs = getComputedStyle(icon);
+      out.push({ t, spin: parseFloat(cs.rotate) || 0, scale: parseFloat(cs.scale) });
+    }
+    return out;
+  });
+  const S0 = star[0], S1 = star[star.length - 1];
+  const starMax = Math.max(...star.map((p) => p.spin));
+  const starScale = Math.max(...star.map((p) => (Number.isNaN(p.scale) ? 1 : p.scale)));
+  check('card star: spins in from -160° at 1600ms', S0.spin <= -150, `rotate ${S0.spin}° at 1600ms`);
+  check('card star: no bounce, lands level', starMax <= 0.01 && starScale <= 1.0001 && S1.spin === 0, `max ${starMax.toFixed(2)}°, max scale ${starScale}, ${S1.spin}° at 2300ms`);
   await ctx.close();
 }
 
