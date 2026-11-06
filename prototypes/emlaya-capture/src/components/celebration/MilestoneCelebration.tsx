@@ -87,12 +87,16 @@ export function MilestoneCelebration({ open, title, body, icon, primaryAction, o
       <HeaderButton flat className="celebration__close" icon={close} label="Close" onClick={dismiss} {...inert(!landed)} />
 
       <div className="celebration__content">
-        {/* The badge holds the centre first, then rises to its place (the outer box);
-            the inner box is its pop. The rings are its shock waves. */}
+        {/* Three boxes, one motion each, so no animation overwrites another's transform:
+            the outer box travels (anticipation, arc, follow-through); the middle one pops
+            and spins (individual `scale` and `rotate`); the inner one squashes and
+            stretches. The rings are its shock waves (secondary action). */}
         <div className="celebration__badge">
           <span className="celebration__ring" aria-hidden="true" />
           <span className="celebration__ring celebration__ring--late" aria-hidden="true" />
-          <div className="celebration__badgePop">{icon}</div>
+          <div className="celebration__badgePop">
+            <div className="celebration__badgeBody">{icon}</div>
+          </div>
         </div>
         <div className="celebration__copy">
           <h2 id="celebration-title" ref={titleRef} tabIndex={-1} className="celebration__title ts-display-d2">

@@ -434,39 +434,42 @@
         "t": 0,
         "el": "ground",
         "anim": "disc from the Save button, scale 0.03→1",
-        "duration": "--motion-duration-celebration-ground",
-        "easing": "--motion-ease-out"
+        "easing": "--motion-ease-natural-out"
       },
       {
         "t": 80,
-        "el": "badge (pop)",
-        "anim": "scale 0→1 overshoot, at the centre, 1.45x",
-        "easing": "--motion-spring-overshoot"
+        "el": "badge (pop + spin)",
+        "anim": "scale 0→1 overshoot; rotate -160°→0 spin spring (+17° follow-through)",
+        "easing": "--motion-spring-overshoot, --motion-spring-spin"
+      },
+      {
+        "t": 130,
+        "el": "check stroke",
+        "anim": "draw while the disc turns",
+        "easing": "--motion-ease-natural-out"
       },
       {
         "t": 140,
         "el": "rings",
-        "anim": "2 shock rings, scale 1→3.2, 140ms apart",
-        "duration": "--motion-duration-celebration-ring"
+        "anim": "2 shock rings, scale 1→3.2, 140ms apart"
       },
       {
-        "t": 180,
-        "el": "check stroke",
-        "anim": "draw",
-        "duration": "--motion-duration-base"
+        "t": 176,
+        "el": "badge (squash)",
+        "anim": "1.1×0.9 → 0.94×1.07 → rest",
+        "easing": "--motion-ease-natural"
       },
       {
         "t": 850,
-        "el": "badge (settle)",
-        "anim": "centre 1.45x → slot 1x",
-        "duration": "--motion-duration-celebration-settle",
-        "easing": "--motion-ease-launch"
+        "el": "badge (rise)",
+        "anim": "anticipation dip → arc rise, stretched → past the slot, squashed → settle",
+        "duration": "--motion-duration-celebration-settle"
       },
       {
         "t": 900,
         "el": "rays",
         "anim": "scale 0.3→1 + fade",
-        "duration": "--motion-duration-celebration-rays"
+        "easing": "--motion-ease-launch"
       },
       {
         "t": 950,
@@ -474,26 +477,28 @@
         "anim": "burst then 2.5s trickle"
       },
       {
-        "t": 1150,
+        "t": 1400,
         "el": "title",
-        "anim": "word by word out of masks, 110ms apart",
-        "duration": "--motion-duration-celebration-word"
+        "anim": "word by word out of masks",
+        "easing": "--motion-spring-gentle"
       },
       {
-        "t": 1500,
+        "t": 1700,
         "el": "body",
-        "anim": "rise 12 + fade"
+        "anim": "rise 12 + fade",
+        "easing": "--motion-spring-gentle"
       },
       {
-        "t": 1950,
-        "el": "card",
-        "anim": "rise 24 + scale 0.96→1 + fade",
-        "duration": "--motion-duration-celebration-card"
+        "t": 2100,
+        "el": "card (+ star at 2240)",
+        "anim": "rise 24 + scale 0.96→1; star scale 0.5→1, -30°→0",
+        "easing": "--motion-spring-gentle, --motion-spring-overshoot"
       },
       {
-        "t": 2450,
+        "t": 2550,
         "el": "cta + close",
-        "anim": "rise + fade; interactive on land"
+        "anim": "rise + fade; interactive on land",
+        "easing": "--motion-spring-gentle"
       }
     ],
     "celebrationExit": {
@@ -534,6 +539,7 @@
     },
     "reducedMotion": "no confetti, still rays, plain fade",
     "captureToReview": "sheet: Review rises translateY 100%→0 over the frozen shot (--motion-duration-slow, --motion-ease-out); no zoom",
-    "liveCapture": "CaptureScene: --capture-* tokens (drift, focus, detection, grain)"
+    "liveCapture": "CaptureScene: --capture-* tokens (drift, focus, detection, grain)",
+    "principles": "12 principles mapped in MOTION.md"
   }
 }

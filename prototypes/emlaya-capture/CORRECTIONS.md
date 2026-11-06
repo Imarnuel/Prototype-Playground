@@ -27,10 +27,13 @@ The rendered UI marks each departure: open the dev toolbar (`?dev=1`) → *Show 
      printed from the record, so the evidence now agrees with the extraction (R14 resolved).
    - Capture → Review is **a sheet rising over the shot**, not a zoom (P5).
    - The yellow **receipt-actions rail is removed** from Review (R13).
-   - The celebration is **staged over ~2.75s**, one beat at a time (S16). The badge appears at
+   - The celebration is **staged over ~2.85s**, one beat at a time (S16). The badge appears at
      80ms on a quicker spring, full size by ~180ms (it was 380 + ~180: "the success icon
      appearance is too slow", asked twice).
    - Done leads to **Receipt Details** (`9564:21987`), section D.
+   - The badge **spins in** (−160°, overshooting ~17°), and every celebration motion follows
+     the 12 principles on natural curves: squash and stretch, anticipation, an arced rise,
+     follow-through. MOTION.md maps each principle.
 7. **A dark-themed host darkened the app.** The hosted viewer sets `data-theme="dark"` on `<html>`;
    the token file matched it, and gap tokens composed of semantic colours (the processing veil)
    resolve at the root, so the light processing screen drew a dark veil (mean luminance 152 against
