@@ -213,12 +213,13 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
   const monotonic = rise.every((p, i) => i === 0 || p.y <= rise[i - 1].y + 0.01);
   const uniform = poses.every((p) => Math.abs(p.sx - p.sy) < 0.001);
   check('badge: spins in from -160°', P[80].spin <= -150, `rotate ${P[80].spin}° at 80ms`);
-  check('badge: no bounce — the spin never passes level', maxSpin <= 0.01 && Math.abs(P[560].spin) < 0.5, `max ${maxSpin.toFixed(2)}°, ${P[560].spin.toFixed(2)}° at 560ms`);
+  check('badge: reveal paced (pop 400, spin 640)', P[280].scale < 0.995 && P[480].spin < -1, `scale ${P[280].scale} at 280ms, spin ${P[480].spin}° at 480ms`);
+  check('badge: no bounce — the spin never passes level', maxSpin <= 0.01 && Math.abs(P[730].spin) < 0.5, `max ${maxSpin.toFixed(2)}°, ${P[730].spin.toFixed(2)}° at 730ms`);
   check('badge: no bounce — the pop never grows past full size', maxScale <= 1.0001, `max scale ${maxScale}`);
   check('badge: no squash or stretch at any frame', uniform, uniform ? 'scaleX = scaleY throughout' : 'non-uniform scale found');
   check('badge: one smooth rise — never dips, never passes its slot', monotonic && rise.every((p) => p.y >= -0.01), `y ${rise[0].y} → ${rise[rise.length - 1].y}, monotonic ${monotonic}`);
   check('badge: rises on a slight arc', P[700].x < -4, `x ${P[700].x} at 700ms`);
-  check('badge: in its slot by 900ms', P[900].y === 0 && P[900].x === 0 && P[900].sx === 1, JSON.stringify(P[900]));
+  check('badge: in its slot by 900ms', P[900].y === 0 && P[900].x === 0 && P[900].sx === 1 && P[900].spin === 0, JSON.stringify(P[900]));
   await ctx.close();
 }
 
@@ -244,7 +245,7 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
   results.review = await clash();
   await click(page, '.review__dock .button');
   await page.waitForSelector('.celebration[data-state="open"]');
-  await page.waitForTimeout(2600);
+  await page.waitForTimeout(3000);
   results.saved = await clash();
   await click(page, '.celebration__cta .button');
   await page.waitForSelector('.details');

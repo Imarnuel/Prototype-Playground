@@ -27,14 +27,16 @@ in, and the whole sequence moved onto natural curves (below). Last, at the user'
 don't want the success icon stretching and bouncing … the success icon wastes too much time"),
 the badge lost its squash, stretch, dip and every overshoot, and its hold at the centre was cut
 from 850 to 500ms, with the rise from 600 to 400. Everything after it moved up by ~600ms, and
-the sequence now ends at ~2.4s (it was ~2.85). Measured in a production build by
+the sequence now ends at ~2.4s (it was ~2.85). Then "the success icon is now too quick":
+the pop went from 300 to 400ms and the spin from 480 to 640ms, so the badge finishes turning in
+the first moments of its rise. Nothing else moved. Measured in a production build by
 `npm run verify:motion`, from each animation's scheduled start (Web Animations
 `startTime + delay`), relative to the ground. All 11 are exact.
 
 | t (ms) | Beat | Motion | Tokens |
 |---|---|---|---|
 | 0 | The ground floods out of the Save button | a 1800 disc centred on the docked button scales 0.03 → 1 over 650, decelerating | `--motion-duration-celebration-ground`, `--motion-ease-natural-out`, `--gap-reveal-diameter` |
-| 80 | The badge pops, alone, at the screen's centre, **spinning in** | `scale` 0 → 1, critically damped (no overshoot), 300; `rotate` −160° → 0 on the natural ease-out, 480, decelerating into level and never past it; held at 1.45x. Scale stays uniform throughout | `--motion-delay-celebration-badge`, `--motion-ease-launch`, `--motion-ease-natural-out`, `--motion-spin-from`, `--motion-duration-badge-pop`, `--motion-duration-badge-spin` |
+| 80 | The badge pops, alone, at the screen's centre, **spinning in** | `scale` 0 → 1, critically damped (no overshoot), 400; `rotate` −160° → 0 on the natural ease-out, 640 (still turning as the rise begins), decelerating into level and never past it; held at 1.45x. Scale stays uniform throughout | `--motion-delay-celebration-badge`, `--motion-ease-launch`, `--motion-ease-natural-out`, `--motion-spin-from`, `--motion-duration-badge-pop`, `--motion-duration-badge-spin` |
 | 130 | The check draws on — while the disc still turns, so the spin reads | stroke-dashoffset, 300 | `--motion-delay-celebration-check`, `--motion-ease-natural-out` |
 | 140 / 280 | Two shock rings | scale 1 → 3.2, fading, 700 each | `--motion-delay-celebration-ring`, `--motion-scale-ring-to` |
 | 500 | The rise | one smooth move to its slot on a slight arc (8 to the side at the midpoint), 1.45x → 1, sine in-out, 400. No dip before it, nothing past the slot | `--motion-delay-celebration-settle`, `--motion-duration-celebration-settle`, `--motion-badge-arc` |
@@ -58,11 +60,11 @@ animation at set times and reads the badge's pose.
 | Anticipation | **removed from the badge** (it dipped before the rise and swelled before the exit). The flood out of the Save button still leads the eye to where the badge appears | — |
 | Staging | one beat at a time; the title waits until the badge has cleared its line | — |
 | Straight ahead / pose to pose | the rise is pose to pose (from the centre to the slot, through the arc's midpoint); the confetti is straight ahead (simulated) | — |
-| Follow-through / overlapping | not on the badge: the spin decelerates into level and stops there. Overlap carries it instead: the check draws while the disc still turns, the rays bloom while it rises, words and Done settle with a 4% follow-through, and the star lands after its card | badge spin max 0.00°, scale max 1.00 |
+| Follow-through / overlapping | not on the badge: the spin decelerates into level and stops there. Overlap carries it instead: the check draws while the disc still turns, the spin finishes during the rise, the rays bloom while it rises, words and Done settle with a 4% follow-through, and the star lands after its card | badge spin max 0.00°, scale max 1.00 |
 | Slow in / slow out | the spin and the flood decelerate (cubic ease-out); the rise is a sine in-out; springs for the later arrivals | — |
 | Arcs | the rise bows 8px to the side | x −8 at 700ms |
 | Secondary action | the shock rings; the star; the rays' slow turn | — |
-| Timing | fast where it is light (the pop, 300), quick where it carries weight (the rise, 400); the badge is in its slot by 900ms | at rest by 900ms |
+| Timing | unhurried where it should be seen (the pop, 400; the spin, 640), quick where it travels (the rise, 400); the badge is in its slot by 900ms | scale 0.96 at 280ms; −8.8° at 480ms; at rest by 900ms |
 | Exaggeration | the 1.45x hold at the centre; a moderate −160° spin | — |
 | Solid drawing | the badge keeps its proportions; its shading is the export's | — |
 | Appeal | one clear focal object, then reading order | — |

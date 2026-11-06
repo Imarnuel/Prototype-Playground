@@ -441,7 +441,7 @@
       {
         "t": 80,
         "el": "badge (pop + spin)",
-        "anim": "scale 0→1 critically damped, 300; rotate -160°→0 decelerating, 480; no overshoot, uniform scale",
+        "anim": "scale 0→1 critically damped, 400; rotate -160°→0 decelerating, 640; no overshoot, uniform scale",
         "easing": "--motion-ease-launch, --motion-ease-natural-out"
       },
       {

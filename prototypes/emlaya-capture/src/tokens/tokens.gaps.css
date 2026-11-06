@@ -363,8 +363,8 @@
   --motion-ease-natural-out: cubic-bezier(0.33, 1, 0.68, 1);
   /* The badge's spin and pop: no overshoot (the user: no stretching or bouncing). The spin
      decelerates into place on the natural ease-out; the pop is critically damped. */
-  --motion-duration-badge-spin: 480ms;
-  --motion-duration-badge-pop: 300ms;
+  --motion-duration-badge-spin: 640ms;  /* 480 → 640: "the success icon is now too quick"; it finishes turning early in the rise */
+  --motion-duration-badge-pop: 400ms;  /* 300 → 400, the same request */
   /* Gentle arrivals (words, body, card, Done): zeta 0.72, omega 16 — a 4% follow-through. */
   --motion-spring-gentle: linear(0, 0.0179, 0.0648, 0.132, 0.2121, 0.2992, 0.3886, 0.4766, 0.5606, 0.6388, 0.7098, 0.7731, 0.8284, 0.8758, 0.9157, 0.9485, 0.975, 0.9957, 1.0114, 1.0228, 1.0306, 1.0355, 1.0379, 1.0384, 1.0375, 1.0355, 1.0328, 1.0297, 1.0263, 1.0229, 1.0195, 1.0163, 1.0134, 1.0107, 1.0083, 1.0062, 1.0045, 1.003, 1.0018, 1.0008, 1, 0.9995, 0.9991, 0.9988, 0.9986, 0.9985, 0.9985, 0.9986, 0.9987, 0.9988, 1);
   --motion-duration-spring-gentle: 620ms;
