@@ -56,5 +56,5 @@ Check there before "fixing" one back.
 
 Changed at the user's request after the first build: a live capture scene replaces the
 Figma photo, Review rises as a sheet (no zoom), the receipt-actions rail is gone, and the
-celebration is staged over ~2.85s (the badge spins in at 80ms; 12-principle motion, MOTION.md), and Done leads to Receipt Details. Theme selectors are scoped to `.app` because the hosted
+celebration is staged over ~2.4s (the badge spins in at 80ms with no bounce or squash and is in its slot by 900ms; MOTION.md), Done leads to Receipt Details, and the camera bars clear the home indicator (C13). Theme selectors are scoped to `.app` because the hosted
 viewer sets `data-theme` on `<html>`.

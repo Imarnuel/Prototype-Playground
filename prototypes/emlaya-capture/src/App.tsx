@@ -125,6 +125,15 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
   /** Done (and ×) on the celebration: on to the saved receipt (9564:21987). */
   const done = () => setScreen('details');
 
+  // Receipt Details mounts two frames after Done, not in the same commit: rendering it
+  // there held the celebration's exit back ~36ms, so the 200ms fade ran late (MOTION.md).
+  const [detailsMounted, setDetailsMounted] = useState(false);
+  useEffect(() => {
+    if (screen !== 'details') return setDetailsMounted(false);
+    let id = requestAnimationFrame(() => { id = requestAnimationFrame(() => setDetailsMounted(true)); });
+    return () => cancelAnimationFrame(id);
+  }, [screen]);
+
   /** Back from Receipt Details: the flow starts over at the camera. */
   const restart = () => {
     setScreen('camera');
@@ -237,7 +246,7 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
           </Layer>
 
           {/* Under the celebration, so Done's exit reveals it. */}
-          <Layer open={screen === 'details' && saved !== null} exitMs={fade} className="layer--details">
+          <Layer open={screen === 'details' && detailsMounted && saved !== null} exitMs={fade} className="layer--details">
             {saved && <ReceiptDetails key={saved.id} record={saved} onRecordChange={updateSaved} onBack={restart} onNotDesigned={notDesigned} />}
           </Layer>
 

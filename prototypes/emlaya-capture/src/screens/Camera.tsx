@@ -88,7 +88,7 @@ export function Camera({ phase, leaving, still, feedRef, shot, onShutter, onReta
 
       <BottomTab className="camera__tabBar" inert={!live} onNotDesigned={onNotDesigned} />
 
-      <div className="camera__continueBar" {...inert(live)}>
+      <div className="camera__continueBar" {...inert(live)} data-departure="Padded clear of the home indicator (C13)">
         <GlassButton
           variant="add"
           className="camera__addPage"

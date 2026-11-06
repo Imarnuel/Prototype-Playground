@@ -73,7 +73,7 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
       if (t0 === null && document.querySelector('.celebration[data-state="open"]')) t0 = now;
       if (t0 !== null) {
         frames += 1; if (last) worst = Math.max(worst, now - last); last = now;
-        if (now - t0 > 3700) {
+        if (now - t0 > 3000) {
           const starts = {};
           for (const [k, s] of Object.entries(sel)) {
             const el = document.querySelector(s);
@@ -82,23 +82,23 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
           }
           const zero = starts.backdrop;
           const start = Object.fromEntries(Object.entries(starts).map(([k, v]) => [k, v === null ? null : Math.round(v - zero)]));
-          return resolve({ start, fps: frames / 3.7, worstFrame: Math.round(worst) });
+          return resolve({ start, fps: frames / 3, worstFrame: Math.round(worst) });
         }
       }
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
   }));
-  const expect = { backdrop: 0, pop: 80, ring: 140, check: 130, settle: 850, rays: 900, word1: 1400, word2: 1510, body: 1700, card: 2100, cta: 2550 };
+  const expect = { backdrop: 0, pop: 80, ring: 140, check: 130, settle: 500, rays: 520, word1: 800, word2: 910, body: 1050, card: 1400, cta: 1800 };
   for (const [k, ms] of Object.entries(expect)) {
     const got = samples.start[k];
     check(`entrance: ${k} starts at ${ms}ms`, got !== null && Math.abs(got - ms) <= 1, `scheduled at ${got}ms after the backdrop`);
   }
-  check('entrance: frame rate', samples.fps >= 50, `${samples.fps.toFixed(1)} fps over 3.7s, worst frame ${samples.worstFrame}ms`);
+  check('entrance: frame rate', samples.fps >= 50, `${samples.fps.toFixed(1)} fps over 3s, worst frame ${samples.worstFrame}ms`);
 
   // CTA takes taps only after it lands.
   const inertEarly = await page.evaluate(() => document.querySelector('.celebration__cta').hasAttribute('inert'));
-  check('CTA interactive after landing', !inertEarly, `inert at 3.7s: ${inertEarly}`);
+  check('CTA interactive after landing', !inertEarly, `inert at 3s: ${inertEarly}`);
 
   // Confetti: cap, fall-through, cleared by ~5s from its start.
   const conf = await page.evaluate(() => new Promise((resolve) => {
@@ -190,33 +190,68 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
     const anims = document.querySelector('.celebration').getAnimations({ subtree: true });
     anims.forEach((a) => a.pause());
     const pop = document.querySelector('.celebration__badgePop');
-    const body = document.querySelector('.celebration__badgeBody');
     const badge = document.querySelector('.celebration__badge');
     const at = (t) => {
       anims.forEach((a) => { a.currentTime = t; });
       const m = new DOMMatrix(getComputedStyle(badge).transform);
-      const b = new DOMMatrix(getComputedStyle(body).transform);
+      const arc = parseFloat(getComputedStyle(badge).translate) || 0;
       return {
         t,
         spin: parseFloat(getComputedStyle(pop).rotate) || 0,
-        scale: parseFloat(getComputedStyle(pop).scale) || 0,
-        x: +m.e.toFixed(1), y: +m.f.toFixed(1), sx: +m.a.toFixed(3), sy: +m.d.toFixed(3),
-        bodySx: +b.a.toFixed(3), bodySy: +b.d.toFixed(3),
+        scale: parseFloat(getComputedStyle(pop).scale),
+        x: +(m.e + arc).toFixed(1), y: +m.f.toFixed(1), sx: +m.a.toFixed(3), sy: +m.d.toFixed(3),
       };
     };
-    const ts = [80, 120, 176, 250, 330, 450, 700, 850, 960, 1180, 1340, 1500];
+    const ts = [];
+    for (let t = 80; t <= 1000; t += 10) ts.push(t);
     return ts.map(at);
   });
   const P = Object.fromEntries(poses.map((p) => [p.t, p]));
-  const maxSpin = Math.max(...poses.filter((p) => p.t >= 120 && p.t <= 700).map((p) => p.spin));
+  const maxSpin = Math.max(...poses.map((p) => p.spin));
+  const maxScale = Math.max(...poses.map((p) => (Number.isNaN(p.scale) ? 1 : p.scale)));
+  const rise = poses.filter((p) => p.t >= 500 && p.t <= 900);
+  const monotonic = rise.every((p, i) => i === 0 || p.y <= rise[i - 1].y + 0.01);
+  const uniform = poses.every((p) => Math.abs(p.sx - p.sy) < 0.001);
   check('badge: spins in from -160°', P[80].spin <= -150, `rotate ${P[80].spin}° at 80ms`);
-  check('badge: spin follows through past level, then settles', maxSpin > 5 && Math.abs(P[850].spin) < 3, `peak +${maxSpin.toFixed(1)}°, ${P[850].spin.toFixed(1)}° at 850ms`);
-  check('badge: squashes on reaching full size', P[250].bodySx > 1.04 && P[250].bodySy < 0.96, `scale ${P[250].bodySx} × ${P[250].bodySy} at 250ms`);
-  check('badge: anticipation — dips before it rises', P[960].y > P[850].y, `y ${P[850].y} → ${P[960].y} (down) at 850 → 960ms`);
-  check('badge: rises on an arc (sideways mid-rise)', P[1180].x < -4, `x ${P[1180].x} at 1180ms`);
-  check('badge: stretches along the rise', P[1180].sy > P[1180].sx, `scale ${P[1180].sx} × ${P[1180].sy} at 1180ms`);
-  check('badge: carries past its slot, squashed', P[1340].y < 0 && P[1340].sx > P[1340].sy, `y ${P[1340].y}, scale ${P[1340].sx} × ${P[1340].sy} at 1340ms`);
-  check('badge: at rest in its slot', P[1500].y === 0 && P[1500].x === 0 && P[1500].sx === 1, JSON.stringify(P[1500]));
+  check('badge: no bounce — the spin never passes level', maxSpin <= 0.01 && Math.abs(P[560].spin) < 0.5, `max ${maxSpin.toFixed(2)}°, ${P[560].spin.toFixed(2)}° at 560ms`);
+  check('badge: no bounce — the pop never grows past full size', maxScale <= 1.0001, `max scale ${maxScale}`);
+  check('badge: no squash or stretch at any frame', uniform, uniform ? 'scaleX = scaleY throughout' : 'non-uniform scale found');
+  check('badge: one smooth rise — never dips, never passes its slot', monotonic && rise.every((p) => p.y >= -0.01), `y ${rise[0].y} → ${rise[rise.length - 1].y}, monotonic ${monotonic}`);
+  check('badge: rises on a slight arc', P[700].x < -4, `x ${P[700].x} at 700ms`);
+  check('badge: in its slot by 900ms', P[900].y === 0 && P[900].x === 0 && P[900].sx === 1, JSON.stringify(P[900]));
+  await ctx.close();
+}
+
+// --- 2c. Nothing tappable under the home indicator, on any screen (device mode) ------------
+{
+  const { ctx, page } = await open(false);
+  const clash = () => page.evaluate(() => {
+    const hi = document.querySelector('.device__homeIndicator').getBoundingClientRect();
+    return [...document.querySelectorAll('button, input, [role="button"]')]
+      .filter((e) => !e.closest('.devbar') && !e.closest('[inert]') && e.offsetParent !== null)
+      .map((e) => [e, e.getBoundingClientRect()])
+      .filter(([, r]) => r.width && r.left < hi.right && r.right > hi.left && r.top < hi.bottom && r.bottom > hi.top)
+      .map(([e]) => (e.getAttribute('aria-label') || e.textContent || e.className).trim().slice(0, 30));
+  });
+  const results = {};
+  results.camera = await clash();
+  await click(page, 'button[aria-label="Take photo"]');
+  await page.waitForTimeout(600);
+  results.captured = await clash();
+  await click(page, '.camera__continue');
+  await page.waitForSelector('.review[data-status="ready"]', { timeout: 8000 });
+  await page.waitForTimeout(600);
+  results.review = await clash();
+  await click(page, '.review__dock .button');
+  await page.waitForSelector('.celebration[data-state="open"]');
+  await page.waitForTimeout(2600);
+  results.saved = await clash();
+  await click(page, '.celebration__cta .button');
+  await page.waitForSelector('.details');
+  await page.waitForTimeout(600);
+  results.details = await clash();
+  const bad = Object.entries(results).filter(([, v]) => v.length);
+  check('home indicator: clear of every control', bad.length === 0, bad.length ? JSON.stringify(Object.fromEntries(bad)) : 'camera, captured, review, saved, details');
   await ctx.close();
 }
 

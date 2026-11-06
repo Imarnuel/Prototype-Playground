@@ -27,13 +27,15 @@ The rendered UI marks each departure: open the dev toolbar (`?dev=1`) → *Show 
      printed from the record, so the evidence now agrees with the extraction (R14 resolved).
    - Capture → Review is **a sheet rising over the shot**, not a zoom (P5).
    - The yellow **receipt-actions rail is removed** from Review (R13).
-   - The celebration is **staged over ~2.85s**, one beat at a time (S16). The badge appears at
-     80ms on a quicker spring, full size by ~180ms (it was 380 + ~180: "the success icon
-     appearance is too slow", asked twice).
+   - The celebration is **staged over ~2.4s**, one beat at a time (S16). The badge appears at
+     80ms (it was 380: "the success icon appearance is too slow", asked twice), holds the centre
+     until 500ms and is in its slot by 900ms (it was 1450: "the success icon wastes too much time").
    - Done leads to **Receipt Details** (`9564:21987`), section D.
-   - The badge **spins in** (−160°, overshooting ~17°), and every celebration motion follows
-     the 12 principles on natural curves: squash and stretch, anticipation, an arced rise,
-     follow-through. MOTION.md maps each principle.
+   - The badge **spins in** (−160°), and every celebration motion is on natural curves, mapped
+     to the 12 principles in MOTION.md. The badge then lost its squash, stretch, anticipation dip
+     and every overshoot ("i don't want the success icon stretching and bouncing"): its spin
+     decelerates into level and stops, its scale never passes 1 and stays uniform.
+   - Both camera bars sit **clear of the home indicator** (C13), which cut through Continue.
 7. **A dark-themed host darkened the app.** The hosted viewer sets `data-theme="dark"` on `<html>`;
    the token file matched it, and gap tokens composed of semantic colours (the processing veil)
    resolve at the root, so the light processing screen drew a dark veil (mean luminance 152 against
@@ -67,6 +69,7 @@ The rendered UI marks each departure: open the dev toolbar (`?dev=1`) → *Show 
 | C10 | Close in Captured has no designed destination | `9502:21729` | Retake: back to the live camera. Needs design input (the "Leave without saving" frames are out of scope) | departs |
 | C11 | Shutter flash | — | Not in Figma. A 300ms white fade on capture, so the moment registers | departs |
 | C12 | The feed is a still stock photo | `9502:21690` | **User request:** a live canvas scene (`CaptureScene.ts`) — a thermal receipt printed from the record on a wood counter, seen hand-held: drift, roll and zoom breathing, an autofocus hunt and exposure settle on opening and on Retake, sensor grain, a vignette, and a document outline (brand yellow) that finds the paper after 1.1s and follows it. The shutter freezes the frame; the flattened paper becomes the evidence image. Receipt boilerplate ("RCPT", "ITEMS", "TOTAL", "THANK YOU FOR SHOPPING", the barcode) is not in Figma. Reduced motion: a still scene | departs |
+| C13 | The Continue bar (12 of padding all round) and the tab bar (8, hanging 4 below the frame) put their controls where the home indicator draws on the device. A Figma frame has no indicator; on the device it sits 8–13 above the bottom and cut through Continue, and the Capture disc ended 6 above the edge | `9502:21732`, `9502:21739`, `9502:21688` | **User request.** Both bars grow by 22 (the Continue bar's bottom padding becomes the 34 safe-area inset; the tab bar's gains the same), and the feed and shutter row rise with them. `verify:diff` reports exactly these, each off by 22: `9502:21688`, `9502:21689`, `9502:21695`, `9502:21698`, `9502:21724`, `9502:21732`, `9502:21739`. `verify:motion` checks nothing tappable crosses the indicator on any screen | departs |
 
 ## Processing — `4653:68091`
 
@@ -121,8 +124,8 @@ The rendered UI marks each departure: open the dev toolbar (`?dev=1`) → *Show 
 | S13 | The figures are derived, not typed: "2nd" and "₦55,000" come from the store (one earlier ₦40,000 purchase) | — | A second pass reads "3rd … ₦70,000" (verified) | — |
 | S14 | The close X glyph has two strokes of different width and colour (1.5 #393121, 1.8 #343330) | `9502:21304` | Export kept | doesn't depart |
 | S15 | The card slot | — | `MilestoneCelebration` takes `children`; the brief's signature is `title body icon primaryAction` | departs (API) |
-| S16 | Entrance timing | — | **User request: "more dramatic … not everything revealing at the same time".** The brief's 0–600ms table is replaced by a staged ~2.8s sequence: the ground floods out of the Save button; the badge pops alone at the centre at 1.45x, two rings shock out of it, its check draws; it rises to its place as the rays bloom and the confetti releases; the title rises word by word; then the body, the card and Done. Rings, flood and word masks are not in Figma. The badge was then brought forward to 80ms on a quicker spring, at the user's request. MOTION.md | departs (motion) |
-| S17 | Exit easing | — | The shared exit curve (`in`) left the copy at 0.90 opacity at 170 of 200ms, so the unmount read as a cut. The exit uses `inOut`: 0.07 at 170ms | departs (motion set) |
+| S16 | Entrance timing | — | **User request: "more dramatic … not everything revealing at the same time".** The brief's 0–600ms table is replaced by a staged ~2.4s sequence: the ground floods out of the Save button; the badge pops alone at the centre at 1.45x, two rings shock out of it, its check draws; it rises to its place as the rays bloom and the confetti releases; the title rises word by word; then the body, the card and Done. Rings, flood and word masks are not in Figma. The badge was then brought forward to 80ms, then made to spin in; then, at the user's request, its squash, stretch, dip and overshoots were removed and its hold cut from 850 to 500ms (rise 600 → 400), which moved every later beat up ~600ms. MOTION.md | departs (motion) |
+| S17 | Exit easing | — | The shared exit curve (`in`) left the copy at 0.90 opacity at 170 of 200ms, so the unmount read as a cut. The exit uses the sine in-out (`--motion-ease-natural`), and Receipt Details mounts two frames after Done so its render does not hold the exit back: 0.14 at 170ms | departs (motion set) |
 
 ## Receipt Details (D) — `9564:21987`
 
@@ -203,13 +206,13 @@ under a proposed name with its node ID. In summary:
 | Layout offset | 21 | camera row 16 / 15 / 16, celebration badge 107, copy gap 21, card gap 32, CTA 66 from the bottom, rays origin 352 |
 | Spacing | 1 | `--gap-space-24` (no Spacing/600 exists) |
 | Type | 1 | "Large input" letter-spacing −0.32, raw |
-| Motion | 38 | the staged entrance (13 beats), start and end scales, rise distances, the word mask, overshoot spring, ray periods and breathe, exit, spinner, field stagger, notice hold |
+| Motion | 49 | the staged entrance (13 beats), start and end scales, rise distances, the word mask, natural curves, the gentle and overshoot springs, the badge's spin, pop, arc and exit turn, the star, ray periods and breathe, exit, spinner, field stagger, notice hold |
 | Confetti physics | 31 | gravity, drag, terminal velocity, velocity / sway / spin / flip / size ranges, counts, trickle window, clear-by |
 | Mock API | 2 | extract 2200ms, save 700ms |
 | Live capture scene | 43 | counter, paper and ink colours; paper geometry; hand-held drift; focus, exposure, detection, outline |
 | Harness | 3 | the Figma frame's 402 × 874 and 62 safe top |
 
-220 in all.
+239 in all (116 `--gap-*`, 49 `--motion-*`, 43 `--capture-*`, 31 `--confetti-*`). The non-motion rows were counted before Receipt Details (section D) added its layout gaps, so they sum short of 239.
 
 `npm run check:tokens` fails on any hex, rgb/hsl, px, rem, ms, s, cubic-bezier or linear()
-literal outside the two token files: **0 violations in 25 files**.
+literal outside the two token files: **0 violations in 32 files**.

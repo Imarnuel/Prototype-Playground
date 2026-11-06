@@ -22,47 +22,49 @@ is a token in `src/tokens/tokens.gaps.css`. No value below is inlined anywhere.
 
 Staged one beat at a time, at the user's request ("more dramatic … not everything revealing at
 the same time"). This replaces the brief's 0–600ms table. The badge was then brought forward
-twice ("the success icon appearance is too slow"): 380 → 160 → 80ms, on a quicker spring that
-reaches full size 96ms after it starts (it was ~180). Then it was made to spin in, and the
-whole sequence moved onto natural curves (below); the title now waits for the badge to clear
-its line (1400), which ends the sequence at ~2.85s. Measured in a production build by
+twice ("the success icon appearance is too slow"): 380 → 160 → 80ms. Then it was made to spin
+in, and the whole sequence moved onto natural curves (below). Last, at the user's request ("i
+don't want the success icon stretching and bouncing … the success icon wastes too much time"),
+the badge lost its squash, stretch, dip and every overshoot, and its hold at the centre was cut
+from 850 to 500ms, with the rise from 600 to 400. Everything after it moved up by ~600ms, and
+the sequence now ends at ~2.4s (it was ~2.85). Measured in a production build by
 `npm run verify:motion`, from each animation's scheduled start (Web Animations
 `startTime + delay`), relative to the ground. All 11 are exact.
 
 | t (ms) | Beat | Motion | Tokens |
 |---|---|---|---|
 | 0 | The ground floods out of the Save button | a 1800 disc centred on the docked button scales 0.03 → 1 over 650, decelerating | `--motion-duration-celebration-ground`, `--motion-ease-natural-out`, `--gap-reveal-diameter` |
-| 80 | The badge pops, alone, at the screen's centre, **spinning in** | `scale` 0 → 1 (overshoot spring, full size at +96) and `rotate` −160° → 0 (spin spring: +17° past level, settled by 850), held at 1.45x | `--motion-delay-celebration-badge`, `--motion-spring-overshoot`, `--motion-spring-spin`, `--motion-spin-from` |
+| 80 | The badge pops, alone, at the screen's centre, **spinning in** | `scale` 0 → 1, critically damped (no overshoot), 300; `rotate` −160° → 0 on the natural ease-out, 480, decelerating into level and never past it; held at 1.45x. Scale stays uniform throughout | `--motion-delay-celebration-badge`, `--motion-ease-launch`, `--motion-ease-natural-out`, `--motion-spin-from`, `--motion-duration-badge-pop`, `--motion-duration-badge-spin` |
 | 130 | The check draws on — while the disc still turns, so the spin reads | stroke-dashoffset, 300 | `--motion-delay-celebration-check`, `--motion-ease-natural-out` |
 | 140 / 280 | Two shock rings | scale 1 → 3.2, fading, 700 each | `--motion-delay-celebration-ring`, `--motion-scale-ring-to` |
-| 176 | It squashes as it reaches full size | 1.10 × 0.90 → 0.94 × 1.07 → rest, 420 | `--motion-delay-badge-squash`, `--motion-squash-*`, `--motion-stretch-*` |
-| 850 | Anticipation, then the rise | dips 10 and squashes (18%) → rises on an arc 10 to the side, stretched along the motion (55%) → carries 5 past its slot, squashed (82%) → settles, 600 | `--motion-delay-celebration-settle`, `--motion-badge-dip`, `--motion-badge-arc`, `--motion-badge-overshoot` |
-| 900 | The rays bloom | scale 0.3 → 1 + fade, critically damped, 900 | `--motion-delay-celebration-rays`, `--motion-ease-launch` |
-| 950 | The confetti releases | burst, then a 2.5s trickle | `--motion-delay-celebration-confetti` |
-| 1400 / 1510 | "Receipt" … "saved" | each word rises out of its mask, 4% follow-through, 620 | `--motion-delay-celebration-title`, `--motion-spring-gentle` |
-| 1700 | The body | rise 12 (gentle spring) + fade | `--motion-delay-celebration-body` |
-| 2100 / 2240 | The insight card, then its star | card: rise 24 + scale 0.96 → 1 (gentle spring); star: scale 0.5 → 1, −30° → 0 (overshoot spring) | `--motion-delay-celebration-card`, `--motion-delay-celebration-star` |
-| 2550 | Done and × | rise (gentle spring) + fade; **inert until `animationend`** | `--motion-delay-celebration-cta` |
+| 500 | The rise | one smooth move to its slot on a slight arc (8 to the side at the midpoint), 1.45x → 1, sine in-out, 400. No dip before it, nothing past the slot | `--motion-delay-celebration-settle`, `--motion-duration-celebration-settle`, `--motion-badge-arc` |
+| 520 | The rays bloom | scale 0.3 → 1 + fade, critically damped, 900 | `--motion-delay-celebration-rays`, `--motion-ease-launch` |
+| 560 | The confetti releases | burst, then a 2.5s trickle | `--motion-delay-celebration-confetti` |
+| 800 / 910 | "Receipt" … "saved" | each word rises out of its mask, 4% follow-through, 620 | `--motion-delay-celebration-title`, `--motion-spring-gentle` |
+| 1050 | The body | rise 12 (gentle spring) + fade | `--motion-delay-celebration-body` |
+| 1400 / 1540 | The insight card, then its star | card: rise 24 + scale 0.96 → 1 (gentle spring); star: scale 0.5 → 1, −30° → 0 (overshoot spring) | `--motion-delay-celebration-card`, `--motion-delay-celebration-star` |
+| 1800 | Done and × | rise (gentle spring) + fade; **inert until `animationend`** | `--motion-delay-celebration-cta` |
 
 ## The 12 principles, where each is used
 
 Asked for by the user ("natural motion curves following the 12 principles of motion, for the
-badge especially, and for every motion there"). Verified by `verify:motion`, which freezes every
+badge especially, and for every motion there"), then narrowed by "i don't want the success icon
+stretching and bouncing". Verified by `verify:motion`, which freezes every
 animation at set times and reads the badge's pose.
 
 | Principle | Where | Measured |
 |---|---|---|
-| Squash and stretch | the badge squashes reaching full size, stretches along its rise, squashes on arrival; volume kept (factors multiply to ~1) | 1.05 × 0.95 at 250ms; 1.11 × 1.26 mid-rise; 1.10 × 0.90 on arrival |
-| Anticipation | a dip and squash before the rise; on exit, a swell and counter-turn before it spins away | +9px down at 960ms |
+| Squash and stretch | **not on the badge**, at the user's request: its scale stays uniform at every sampled frame. It survives nowhere else either; the words and card only rise | x = y at all 93 samples, 80–1000ms |
+| Anticipation | **removed from the badge** (it dipped before the rise and swelled before the exit). The flood out of the Save button still leads the eye to where the badge appears | — |
 | Staging | one beat at a time; the title waits until the badge has cleared its line | — |
-| Straight ahead / pose to pose | the rise is pose to pose (4 keyed poses); the confetti is straight ahead (simulated) | — |
-| Follow-through / overlapping | the spin overshoots and settles; the rise carries past its slot; words and Done overshoot 4%; the check draws while the disc still turns; the star lands after its card | spin +17°; −4px past the slot |
-| Slow in / slow out | sine in-out between poses and for anything that breathes; springs for arrivals | — |
-| Arcs | the rise bows 10px to the side | −10px at 1180ms |
+| Straight ahead / pose to pose | the rise is pose to pose (from the centre to the slot, through the arc's midpoint); the confetti is straight ahead (simulated) | — |
+| Follow-through / overlapping | not on the badge: the spin decelerates into level and stops there. Overlap carries it instead: the check draws while the disc still turns, the rays bloom while it rises, words and Done settle with a 4% follow-through, and the star lands after its card | badge spin max 0.00°, scale max 1.00 |
+| Slow in / slow out | the spin and the flood decelerate (cubic ease-out); the rise is a sine in-out; springs for the later arrivals | — |
+| Arcs | the rise bows 8px to the side | x −8 at 700ms |
 | Secondary action | the shock rings; the star; the rays' slow turn | — |
-| Timing | fast where it is light (pop 96ms to full size), slower where it carries weight (rise 600) | — |
+| Timing | fast where it is light (the pop, 300), quick where it carries weight (the rise, 400); the badge is in its slot by 900ms | at rest by 900ms |
 | Exaggeration | the 1.45x hold at the centre; a moderate −160° spin | — |
-| Solid drawing | volume-preserving squash; the badge's own shading is the export's | — |
+| Solid drawing | the badge keeps its proportions; its shading is the export's | — |
 | Appeal | one clear focal object, then reading order | — |
 
 Frame rate over the first 3.7s: 60.0 fps, worst frame 33ms (headless Chromium on desktop, not
@@ -75,13 +77,15 @@ On Done (or ×): content and badge reverse, while rays, confetti and the ground 
 | Element | Motion | Tokens |
 |---|---|---|
 | Copy, card, CTA, close | sink 12 + fade | `--motion-duration-celebration-exit` (= fast, 200ms), `--motion-ease-natural` |
-| Badge | anticipation (swell 1.08, turn −10°), then spins away 90° and shrinks to 0 | same, `--motion-badge-exit-*` |
+| Badge | turns 90° away as it shrinks to 0 and fades; no swell before it | same, `--motion-badge-exit-turn` |
 | Ground, rays, confetti canvas | fade | same |
 
-Copy opacity is 0.07 at 170ms of 200. The layer unmounts at 200ms (`usePresence`), so nothing cuts.
-The camera that Done returns to paints its scene only after that frame. Its setup blocked the exit:
-the copy was at 0.93 opacity at 170ms until the scene deferred and batched its token reads.
-The exit uses `inOut`, not the shared exit curve (`in`). See CORRECTIONS S17.
+Copy opacity is 0.14 at 170ms of 200 (wall clock from the tap). The layer unmounts at 200ms
+(`usePresence`), so nothing cuts. Whatever Done reveals must not render in the exit's own commit:
+the camera scene once held the copy at 0.93 opacity at 170ms until it deferred and batched its
+token reads, and Receipt Details, rendered in the same commit as the exit, started the fade 36ms
+late (0.37 at 170ms). Details now mounts two frames after Done. The exit uses the sine in-out
+(`--motion-ease-natural`), not the shared exit curve (`in`). See CORRECTIONS S17.
 
 ## Rays
 

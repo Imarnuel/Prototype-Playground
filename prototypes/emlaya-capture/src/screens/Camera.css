@@ -5,6 +5,10 @@
   background: var(--color-black);
   overflow: clip;
   transition: background-color var(--motion-duration-slow) var(--motion-ease-inOut);
+  /* How far both bottom bars grow to clear the home indicator: the Continue bar's 12 of
+     bottom padding becomes the 34 safe-area inset, and the tab bar gains the same. The
+     feed (and the shutter row inside it) rises by it too. CORRECTIONS C13. */
+  --camera-bar-lift: calc(max(var(--spacing-300), var(--safe-bottom)) - var(--spacing-300));
 }
 
 /* The feed fills the frame's width. Figma's is 400 in a 402 frame (Frame 5259), which
@@ -14,7 +18,7 @@
   top: var(--safe-top);
   left: 0;
   right: 0;
-  bottom: var(--gap-camera-feed-bottom);
+  bottom: calc(var(--gap-camera-feed-bottom) + var(--camera-bar-lift));
   overflow: clip;
 }
 .camera__photo {
@@ -92,6 +96,9 @@
 }
 
 /* --- Bottom: tab bar (live) ↔ Continue bar (captured) --------------------------------- */
+/* The tab bar's items crossed the indicator too (the Capture disc ended 6 above the screen
+   edge, the indicator's top is 13 above it): its bottom padding gains the lift. C13. */
+.camera__tabBar .bottomTab__bar { padding-bottom: calc(var(--spacing-200) + var(--camera-bar-lift)); }
 .camera__tabBar {
   position: absolute;
   left: 0;
@@ -110,6 +117,11 @@
   justify-content: center;
   gap: var(--spacing-300);
   padding: var(--spacing-300) var(--spacing-400);
+  /* Clear of the home indicator. The frame (9502:21732) pads 12 all round because a Figma
+     frame has no home indicator; on the device the indicator sits 8–13 from the bottom and
+     cut through Continue. The bottom padding takes the safe-area inset, as iOS lays out a
+     bottom bar. CORRECTIONS C13. */
+  padding-bottom: calc(var(--spacing-300) + var(--camera-bar-lift));
   background: var(--gap-color-captured-bar);
   transition: transform var(--motion-duration-base) var(--motion-ease-out);
 }

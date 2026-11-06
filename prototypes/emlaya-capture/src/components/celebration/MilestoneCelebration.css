@@ -53,7 +53,7 @@
   align-items: center;
 }
 .celebration__badge { position: relative; width: var(--gap-size-badge-check); height: var(--gap-size-badge-check); }
-.celebration__badgePop, .celebration__badgeBody { width: 100%; height: 100%; }
+.celebration__badgePop { width: 100%; height: 100%; }
 .celebration__ring {
   position: absolute;
   inset: 0;
@@ -164,33 +164,29 @@
 
 /* --- Entrance ---------------------------------------------------------------------------- */
 /* Staged, one beat at a time (tokens.gaps.css, "Entrance"), on natural curves
-   ("Natural motion"; MOTION.md maps the 12 principles):
+   ("Natural motion"; MOTION.md):
      0     the ground floods out of the Save button
-     80    the badge pops alone at the centre, 1.45x, SPINNING in from -160° (overshoots ~17°,
-           settles); it squashes as it reaches full size (176); 140/280 two rings shock out
-     130   its check draws on while the disc still turns — so the spin reads
-     850   anticipation: it dips and squashes — then rises on an arc, stretching as it moves,
-           carries past its slot and squashes on arrival — as the rays bloom (900) and the
-           confetti releases (950, JS)
-     1400  the title, word by word, out of masks, each with a 4% follow-through, once the
-           badge has cleared its line
-     1700  the body     2100  the insight card, its star landing after it
-     2550  Done and × (Done takes taps on landing) */
+     80    the badge pops alone at the centre, 1.45x, spinning in from -160° — no overshoot,
+           no squash or stretch (the user); 140/280 two rings shock out
+     130   its check draws on while the disc still turns, so the spin reads
+     500   it rises to its place on a slight arc, in one smooth move (400) — as the rays bloom
+           (520) and the confetti releases (560, JS)
+     800   the title, word by word, out of masks
+     1050  the body     1400  the insight card, its star landing after it
+     1800  Done and × (Done takes taps on landing) */
 .celebration[data-state='open'] .celebration__backdrop {
   animation: celebration-flood var(--motion-duration-celebration-ground) var(--motion-ease-natural-out) var(--motion-delay-celebration-ground) both;
 }
 .celebration[data-state='open'] .celebration__badgePop {
   animation:
-    celebration-grow var(--motion-duration-spring-overshoot) var(--motion-spring-overshoot) var(--motion-delay-celebration-badge) both,
-    celebration-spin var(--motion-duration-spring-spin) var(--motion-spring-spin) var(--motion-delay-celebration-badge) both,
+    celebration-grow var(--motion-duration-badge-pop) var(--motion-ease-launch) var(--motion-delay-celebration-badge) both,
+    celebration-spin var(--motion-duration-badge-spin) var(--motion-ease-natural-out) var(--motion-delay-celebration-badge) both,
     celebration-fade var(--motion-duration-instant) var(--motion-ease-natural-out) var(--motion-delay-celebration-badge) both;
 }
-.celebration[data-state='open'] .celebration__badgeBody {
-  animation: celebration-squash var(--motion-duration-badge-squash) var(--motion-ease-natural)
-    calc(var(--motion-delay-celebration-badge) + var(--motion-delay-badge-squash)) both;
-}
 .celebration[data-state='open'] .celebration__badge {
-  animation: celebration-settle var(--motion-duration-celebration-settle) linear var(--motion-delay-celebration-settle) both;
+  animation:
+    celebration-settle var(--motion-duration-celebration-settle) var(--motion-ease-natural) var(--motion-delay-celebration-settle) both,
+    celebration-arc var(--motion-duration-celebration-settle) var(--motion-ease-natural) var(--motion-delay-celebration-settle) both;
 }
 .celebration[data-state='open'] .celebration__ring {
   /* `forwards`, not `both`: filled backwards, the ring would show before the badge. */
@@ -238,44 +234,15 @@
 /* Individual properties, so the pop and the spin run on their own springs, together. */
 @keyframes celebration-grow { from { scale: var(--motion-scale-badge-from); } }
 @keyframes celebration-spin { from { rotate: var(--motion-spin-from); } }
-/* Squash as it reaches full size, rebound into a stretch, settle. */
-@keyframes celebration-squash {
-  0% { transform: none; }
-  35% { transform: scale(var(--motion-squash-wide), var(--motion-squash-short)); }
-  70% { transform: scale(var(--motion-stretch-narrow), var(--motion-stretch-tall)); }
-  100% { transform: none; }
-}
-/* Pose to pose, each segment on its own natural curve:
-   rest at the centre (1.45x) → anticipation: dip and squash → rise on an arc, stretched
-   along the motion → past the slot, squashed on arrival → settle into place at 1x. */
+/* From the screen's centre, larger, to its place at 1x — one smooth move. */
 @keyframes celebration-settle {
-  0% {
-    transform: translate(0, var(--badge-travel)) scale(var(--motion-scale-badge-centre));
-    animation-timing-function: var(--motion-ease-natural);
-  }
-  18% {
-    transform:
-      translate(0, calc(var(--badge-travel) + var(--motion-badge-dip)))
-      scale(calc(var(--motion-scale-badge-centre) * var(--motion-squash-wide)), calc(var(--motion-scale-badge-centre) * var(--motion-squash-short)));
-    animation-timing-function: var(--motion-ease-natural-in);
-  }
-  55% {
-    transform:
-      translate(var(--motion-badge-arc), calc(var(--badge-travel) * var(--motion-badge-midway)))
-      scale(calc(var(--badge-mid-scale) * var(--motion-stretch-narrow)), calc(var(--badge-mid-scale) * var(--motion-stretch-tall)));
-    animation-timing-function: var(--motion-ease-natural-out);
-  }
-  82% {
-    transform: translate(0, var(--motion-badge-overshoot)) scale(var(--motion-squash-wide), var(--motion-squash-short));
-    animation-timing-function: var(--motion-ease-natural);
-  }
-  100% { transform: none; }
+  from { transform: translate(0, var(--badge-travel)) scale(var(--motion-scale-badge-centre)); }
 }
+/* The arc: an individual `translate`, so it bows the path without touching the travel. */
+@keyframes celebration-arc { 50% { translate: var(--motion-badge-arc) 0; } }
 .celebration__badge {
   /* From the badge's slot to the screen's centre: where it is held before the rise. */
   --badge-travel: calc(50cqh - var(--safe-top) - var(--gap-celebration-badge-top) - var(--gap-size-badge-check) / 2);
-  /* Its size at the mid-rise pose: that far from 1x toward 1.45x. */
-  --badge-mid-scale: calc(1 + (var(--motion-scale-badge-centre) - 1) * var(--motion-badge-midway));
 }
 @keyframes celebration-ring {
   0% { opacity: 1; transform: scale(1); }
@@ -295,7 +262,7 @@
 /* Content and badge reverse quickly; rays, confetti and the ground fade together.
    On natural curves that do not hold their change to the last frames (the shared `in` left
    the copy at 0.90 opacity at 170 of 200ms, so the unmount read as a cut). The badge
-   anticipates — a small swell and counter-turn — then spins away and shrinks. */
+   turns away as it shrinks. */
 .celebration[data-state='exit'] { pointer-events: none; }
 .celebration[data-state='exit'] :is(.celebration__copy, .celebration__card, .celebration__cta, .celebration__close) {
   animation: celebration-sink var(--motion-duration-celebration-exit) var(--motion-ease-natural) both;
@@ -307,17 +274,14 @@
   animation: celebration-out var(--motion-duration-celebration-exit) var(--motion-ease-natural) both;
 }
 @keyframes celebration-sink { to { opacity: 0; transform: translateY(var(--motion-rise-distance)); } }
-@keyframes celebration-shrink {
-  30% { transform: scale(var(--motion-badge-exit-swell)) rotate(var(--motion-badge-exit-wind)); opacity: 1; }
-  100% { transform: scale(0) rotate(var(--motion-badge-exit-turn)); opacity: 0; }
-}
+@keyframes celebration-shrink { to { transform: scale(0) rotate(var(--motion-badge-exit-turn)); opacity: 0; } }
 @keyframes celebration-out { to { opacity: 0; } }
 
 /* --- Reduced motion: no confetti (not mounted), still rays, a plain fade ------------- */
 .app[data-reduced-motion='true'] .celebration[data-state='open'] :is(.celebration__backdrop, .rays, .celebration__badge, .celebration__title, .celebration__body, .celebration__card, .celebration__cta, .celebration__close) {
   animation: celebration-fade var(--motion-duration-fast) var(--motion-ease-out) both;
 }
-.app[data-reduced-motion='true'] .celebration[data-state='open'] :is(.checkBadge__stroke, .celebration__badgePop, .celebration__badgeBody, .celebration__ring, .celebration__wordInner, .milestoneCard__icon) { animation: none; }
+.app[data-reduced-motion='true'] .celebration[data-state='open'] :is(.checkBadge__stroke, .celebration__badgePop, .celebration__ring, .celebration__wordInner, .milestoneCard__icon) { animation: none; }
 .app[data-reduced-motion='true'] .celebration[data-state='exit'] :is(.celebration__copy, .celebration__card, .celebration__cta, .celebration__close, .celebration__badge) {
   animation: celebration-out var(--motion-duration-celebration-exit) linear both;
 }
