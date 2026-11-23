@@ -24,13 +24,21 @@ import { ReceiptDetails } from './screens/ReceiptDetails';
 import { CheckBadge, MilestoneCard, MilestoneCelebration } from './components/celebration/MilestoneCelebration';
 import { Layer } from './components/Layer';
 import { Notice } from './components/Notice';
-import { extractReceipt, saveReceipt } from './api/emlaya';
+import { EXTRACT_PACES, extractPaceMs, extractReceipt, saveReceipt, setExtractPace, type ExtractPace } from './api/emlaya';
+import type { LoaderVariant } from './components/processing/ProcessingLoader';
+import type { GlowPalette } from './components/processing/GlowShader';
 import { extractedDraft, milestoneFor, records, resetRecords, type Evidence, type Milestone, type PurchaseReceipt } from './data/records';
 import { formatDayMonth, formatNaira, ordinal } from './data/format';
 import { ForceReducedMotion, useReducedMotion } from './state/motion';
 import { tokenMs } from './tokens/read';
 
-type Screen = 'camera' | 'captured' | 'processing' | 'review' | 'extractError' | 'saved' | 'details';
+type Screen = 'camera' | 'captured' | 'processing' | 'resolving' | 'review' | 'extractError' | 'saved' | 'details';
+
+/** Which processing loader the page opens on: `?loader=b`, or the hosted build's VITE_LOADER. */
+function initialLoader(): LoaderVariant {
+  const v = new URLSearchParams(window.location.search).get('loader') ?? import.meta.env.VITE_LOADER;
+  return v === 'b' ? 'b' : 'a';
+}
 
 /** How long extraction is held when the presenter wants to talk over it. */
 const HOLD_SCALE = 1000;
@@ -62,6 +70,9 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
   const [extractRun, setExtractRun] = useState(0);
   const [evidence, setEvidence] = useState<Evidence | null>(null);
   const [cameraLit, setCameraLit] = useState(true);
+  const [loader, setLoader] = useState<LoaderVariant>(initialLoader);
+  const [palette, setPalette] = useState<GlowPalette>('reference');
+  const [pace, setPace] = useState<ExtractPace>('typical');
   const feedRef = useRef<CameraFeedHandle>(null);
 
   const notDesigned = useCallback((what: string) => setNotice(`${what} is not part of this flow.`), []);
@@ -78,7 +89,8 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
       .then((d) => {
         if (!live) return;
         setDraft(d);
-        setScreen('review');
+        // The loader plays its finish first; it moves the flow on to review (onSettled).
+        setScreen('resolving');
       })
       .catch(() => live && setScreen('extractError'));
     return () => {
@@ -106,6 +118,9 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
     setExtractRun((n) => n + 1);
     setScreen('processing');
   };
+
+  /** The loader's finish has played: on to the extracted fields (unless the flow has moved on). */
+  const settleExtraction = useCallback(() => setScreen((s) => (s === 'resolving' ? 'review' : s)), []);
 
   const commitSave = (record: PurchaseReceipt) => {
     setSaved(record);
@@ -178,6 +193,20 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
     { group: 'Screens', label: 'Review', onSelect: jumpReview },
     { group: 'Screens', label: 'Receipt saved', onSelect: jumpSaved },
     { group: 'Screens', label: 'Receipt details', onSelect: jumpDetails },
+    { group: 'Processing loader', label: 'A · After the reference', pressed: loader === 'a', onSelect: () => { setLoader('a'); startProcessing(); } },
+    { group: 'Processing loader', label: 'B · Calm', pressed: loader === 'b', onSelect: () => { setLoader('b'); startProcessing(); } },
+    { group: 'Processing loader', label: 'Glow: reference colours', pressed: palette === 'reference', onSelect: () => setPalette('reference') },
+    { group: 'Processing loader', label: 'Glow: Emlaya amber', pressed: palette === 'amber', onSelect: () => setPalette('amber') },
+    ...EXTRACT_PACES.map((p) => ({
+      group: 'Extraction pace',
+      label: `${p[0].toUpperCase()}${p.slice(1)} (${(extractPaceMs(p) / 1000).toFixed(1)}s)`,
+      pressed: pace === p,
+      onSelect: () => {
+        setExtractPace(p);
+        setPace(p);
+        startProcessing();
+      },
+    })),
     { group: 'States', label: 'Extraction error', onSelect: () => setScreen('extractError') },
     { group: 'States', label: 'Fail next request', onSelect: failNextRequest },
     { group: 'States', label: 'Hold processing', pressed: hold, onSelect: () => setHold((v) => !v) },
@@ -201,8 +230,9 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
     const t = window.setTimeout(() => setCameraLit(false), sheet);
     return () => window.clearTimeout(t);
   }, [onCamera, sheet]);
-  const onReview = screen === 'processing' || screen === 'review' || screen === 'extractError' || screen === 'saved';
-  const reviewStatus: ReviewStatus = screen === 'processing' ? 'processing' : screen === 'extractError' ? 'error' : 'ready';
+  const onReview = screen === 'processing' || screen === 'resolving' || screen === 'review' || screen === 'extractError' || screen === 'saved';
+  const reviewStatus: ReviewStatus =
+    screen === 'processing' || screen === 'resolving' ? screen : screen === 'extractError' ? 'error' : 'ready';
   const fade = tokenMs('--motion-duration-base');
 
   return (
@@ -242,6 +272,11 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
               onSave={save}
               onRetry={startProcessing}
               onNotDesigned={notDesigned}
+              loader={loader}
+              palette={palette}
+              reduced={reduced}
+              run={extractRun}
+              onSettled={settleExtraction}
             />
           </Layer>
 
@@ -283,6 +318,9 @@ function Prototype({ forceReduced, setForceReduced }: { forceReduced: boolean; s
 
       {dev && (
         <aside className="showcase" aria-label="Presentation controls">
+          <button type="button" className="showcase__button ts-label-bold-base" onClick={startProcessing}>
+            Replay extraction
+          </button>
           <button type="button" className="showcase__button ts-label-bold-base" onClick={replayCelebration}>
             Replay celebration
           </button>

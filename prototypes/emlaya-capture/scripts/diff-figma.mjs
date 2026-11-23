@@ -113,7 +113,7 @@ await click('button[aria-label="Take photo"]');
 await page.waitForTimeout(700);
 all.push(...(await measure('captured')));
 await click('.camera__continue');
-await page.waitForSelector('.review[data-status="ready"]', { timeout: 8000 });
+await page.waitForSelector('.review[data-status="ready"]', { timeout: 15000 });
 await page.waitForTimeout(900);
 all.push(...(await measure('review')));
 await click('.review__dock .button');

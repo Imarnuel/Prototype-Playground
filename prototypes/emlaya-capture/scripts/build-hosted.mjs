@@ -11,20 +11,29 @@
  *     is given in its own document skeleton, so handing it a complete document nests
  *     one <html> inside another. Browsers recover from that, but it is invalid.
  *
- * Usage: node scripts/build-hosted.mjs
+ * `--loader a|b` builds one of the two processing-loader prototypes into dist/loader-<x>/,
+ * opening on that loader and titled for it, so each has its own hosted page.
+ *
+ * Usage: node scripts/build-hosted.mjs [--loader a|b]
  */
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
 const root = path.join(import.meta.dirname, '..');
-execFileSync('npx', ['vite', 'build', '--base', './'], {
+const flag = process.argv.indexOf('--loader');
+const loader = flag === -1 ? null : process.argv[flag + 1];
+if (loader !== null && loader !== 'a' && loader !== 'b') throw new Error('--loader takes a or b');
+const outDir = loader ? path.join('dist', `loader-${loader}`) : 'dist';
+const LOADER_TITLE = { a: 'Emlaya Loader A', b: 'Emlaya Loader B' };
+
+execFileSync('npx', ['vite', 'build', '--base', './', '--outDir', outDir, '--emptyOutDir'], {
   cwd: root,
   stdio: 'inherit',
-  env: { ...process.env, VITE_SHOWCASE: '1' },
+  env: { ...process.env, VITE_SHOWCASE: '1', ...(loader ? { VITE_LOADER: loader } : {}) },
 });
 
-const indexPath = path.join(root, 'dist', 'index.html');
+const indexPath = path.join(root, outDir, 'index.html');
 const html = fs.readFileSync(indexPath, 'utf8');
 
 // Keep the stylesheet and module script from <head> and the mount point from <body>;
@@ -37,11 +46,11 @@ const keep = [...head.matchAll(/<(?:link|script)\b[^>]*>(?:<\/script>)?/g)].map(
 if (keep.length === 0) throw new Error('no stylesheet or script found in the built index.html');
 
 // The host reads the artifact's name from a <title> in the first 8KB.
-const title = head.match(/<title>[\s\S]*?<\/title>/)?.[0] ?? '';
+const title = loader ? `<title>${LOADER_TITLE[loader]}</title>` : head.match(/<title>[\s\S]*?<\/title>/)?.[0] ?? '';
 const fragment = `${title}\n${keep.join('\n')}\n${body.trim()}\n`;
 fs.writeFileSync(indexPath, fragment);
 
-const files = fs.readdirSync(path.join(root, 'dist', 'assets')).sort();
+const files = fs.readdirSync(path.join(root, outDir, 'assets')).sort();
 console.log(`\nindex.html reduced to a ${fragment.length}-byte fragment`);
 console.log(`${files.length} asset file(s) to publish alongside it:`);
 files.forEach((f) => console.log(`  assets/${f}`));

@@ -19,14 +19,15 @@ import user16 from '../assets/figma/user-16.svg';
 import minusCircleTag from '../assets/figma/minus-circle-tag.svg';
 import minusCircleShare from '../assets/figma/minus-circle-share.svg';
 import xClose12 from '../assets/figma/x-close-12.svg';
-import circleNotch from '../assets/figma/circle-notch.svg';
 import { Button, HeaderButton, Icon, Pill, TextField, inert } from '../components/ui';
 import { EvidenceRow, ItemRow, MetaBlock } from '../components/record/RecordParts';
+import { ProcessingLoader, type LoaderStatus, type LoaderVariant } from '../components/processing/ProcessingLoader';
+import type { GlowPalette } from '../components/processing/GlowShader';
 import type { LineItem, PurchaseReceipt } from '../data/records';
 import { formatFieldDate, formatNaira } from '../data/format';
 import './Review.css';
 
-export type ReviewStatus = 'processing' | 'ready' | 'error';
+export type ReviewStatus = LoaderStatus;
 
 type ReviewProps = {
   status: ReviewStatus;
@@ -36,25 +37,29 @@ type ReviewProps = {
   onSave: () => void;
   onRetry: () => void;
   onNotDesigned: (what: string) => void;
+  /** Which of the two processing loaders to show (the brief asks for both). */
+  loader: LoaderVariant;
+  palette: GlowPalette;
+  reduced: boolean;
+  /** A new run restarts the loader's cadence (retry, or the toolbar's Processing). */
+  run: number;
+  /** The loader has played its finish: the fields may arrive. */
+  onSettled: () => void;
 };
 
-export function Review({ status, draft, onDraftChange, saving, onSave, onRetry, onNotDesigned }: ReviewProps) {
+export function Review({ status, draft, onDraftChange, saving, onSave, onRetry, onNotDesigned, loader, palette, reduced, run, onSettled }: ReviewProps) {
   const ready = status === 'ready' && draft !== null;
+  const busy = status === 'processing' || status === 'resolving';
   return (
-    <section className="review" data-theme="light" data-status={status} aria-label="Review details" aria-busy={status === 'processing'}>
+    <section className="review" data-theme="light" data-status={status} aria-label="Review details" aria-busy={busy}>
       <div className="review__layer review__layer--skeleton" aria-hidden="true" {...inert(ready)}>
         <SkeletonReview />
       </div>
 
       {ready && <ReadyReview draft={draft} onDraftChange={onDraftChange} saving={saving} onSave={onSave} onNotDesigned={onNotDesigned} />}
 
-      {/* 4653:68317: the veil and its pill, over the skeleton. */}
-      <div className="review__veil" {...inert(status !== 'processing')}>
-        <div className="review__pill" role="status">
-          <Icon src={circleNotch} size={24} className="review__spinner" />
-          <span className="ts-label-base">Extracting the details...</span>
-        </div>
-      </div>
+      {/* 4653:68317 + 4653:68318: the veil and its status, redesigned (ProcessingLoader). */}
+      <ProcessingLoader key={run} variant={loader} status={status} palette={palette} reduced={reduced} onSettled={onSettled} />
 
       {status === 'error' && (
         // Error / Could Not Extract Details (4142:9167) exists in the file but could

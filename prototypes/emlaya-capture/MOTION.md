@@ -146,12 +146,31 @@ per frame. Verified: the live feed changes frame to frame; the captured frame do
 |---|---|---|
 | Live → captured | tab bar slides down; Continue bar slides up; hint, flash, controls fade | base / fast, `inOut` / `out` |
 | Captured → processing | **no zoom**: Review rises over the frozen shot as a sheet (translateY 100% → 0); the status bar turns dark once it has landed | `--motion-duration-slow`, `--motion-ease-out` |
-| Processing | pill arrives on the launch spring; spinner 900ms/turn; skeleton breathes | `--motion-duration-spinner-rev`, `--motion-ease-launch` |
-| Processing → review | skeleton and veil fade; fields rise in, 45ms apart | `--motion-delay-field-stagger` |
+| Processing | the processing loader, below | `--processing-*` |
+| Processing → review | the loader finishes (A blooms, B checks), the veil sharpens away, fields rise in, 45ms apart | `--processing-resolve`, `--motion-delay-field-stagger` |
 | Celebration → Receipt Details | Done: the celebration exits (200) over Receipt Details, which fades in beneath it | `--motion-duration-celebration-exit`, `--motion-duration-base` |
 | "Not this" | the suggestion folds away: rows collapse (grid 1fr → 0fr), fade, scale to 0.96 | `--motion-duration-base`, `--motion-ease-inOut` |
 | Screens | every layer cross-fades in **and out** (`Layer` + `usePresence`) | `--motion-duration-base` |
 | Press | 0.97 scale on every discrete control | `--motion-press-scale`, `--motion-duration-instant` |
+
+## Processing loader (user request: two prototypes after a reference video)
+
+Measured off the reference (8.2s, 1600x1200 at 2x, sampled at 10 and 30fps) and recorded in
+tokens.gaps.css, "Processing loader". Times are from Processing starting, in the production
+build, typical pace (6.2s):
+
+| Beat | A (after the reference) | B (calm) | Measured |
+|---|---|---|---|
+| Veil | once the sheet lands, the skeleton blurs to 9px over 420 | same | `blur(9px)` computed |
+| First line | sharpens in from a 6px blur, 4 up; the glow rises from the bottom (420, out) | the frame's pill; the icon spins in on the launch curve | 946ms (A), 864ms (B) |
+| Cadence | a new line every 1.7s; the old one blurs out and up on fast while the new one comes in (both mounted) | same; the pill eases to each line's width | swaps 1708 / 1730 / 1682ms apart; 2 lines mounted at a swap |
+| Holding | a light band sweeps the text (350 pause, 1.6s cycle) | the same, and the icon idles: bob, pulse, a magnifier's circle, a list's wiggle, a sparkle's glint | idle animation named per line |
+| Result lands | the line is held until it has been up 900ms | same | resolved 244ms into a line → finish at ~900 |
+| Finish | the line blurs away and the glow blooms over the screen (420, inOut), translucent | "Ready to review" with a check, no shimmer | bloom 0.94 at +345ms |
+| Hand-over (520 later) | the bloom fades as a layer, the veil sharpens, fields rise in | the pill shrinks to 0.96 and fades; the same | fields at 7554 (A), 7408 (B) |
+
+The shader stops drawing once its layer has faded (it is unmounted). Its palette is a switch:
+the reference's colours, sampled from the video, or Emlaya's yellow ramp.
 
 ## Reduced motion
 
@@ -159,4 +178,6 @@ per frame. Verified: the live feed changes frame to frame; the captured frame do
 `data-reduced-motion` on the app. Then: no confetti (never started: 0 spawned), still rays (no
 turn, no breathe), and a plain fade for all content. No flood, no pop, no rings, no rise, no
 word masks, no stroke draw. The capture scene is still: no drift, no focus hunt. Review fades in
-instead of rising. Verified by `verify:motion`.
+instead of rising. The processing loader keeps its cadence, but each line is a plain 200ms fade.
+There is no shimmer, spin or idle, and the glow is one still frame that never loops (`running: off`). Verified by `verify:motion`
+and the loader checks.

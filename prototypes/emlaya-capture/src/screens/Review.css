@@ -119,49 +119,16 @@
 .review__skPill { opacity: 0; }
 
 /* The shimmer is the skeleton breathing — "clearly alive" while extraction runs. */
-.review[data-status='processing'] .review__layer--skeleton :is(.review__skField, .itemRow__name, .itemRow__qtyRow, .itemRow__total, .metaBlock__pills) {
+.review:is([data-status='processing'], [data-status='resolving']) .review__layer--skeleton :is(.review__skField, .itemRow__name, .itemRow__qtyRow, .itemRow__total, .metaBlock__pills) {
   animation: review-breathe var(--motion-duration-rays-breathe) var(--motion-ease-inOut) infinite alternate;
 }
 @keyframes review-breathe { to { opacity: var(--motion-rays-breathe-min); } }
 
-/* 4653:68317 + 4653:68318 */
-.review__veil {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: calc(var(--safe-top) + var(--gap-processing-veil-top));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--gap-gradient-processing-veil);
-  -webkit-backdrop-filter: blur(var(--gap-blur-processing));
-  backdrop-filter: blur(var(--gap-blur-processing));
-  transition: opacity var(--motion-duration-base) var(--motion-ease-inOut);
-}
-.review__pill {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-200);
-  padding: var(--spacing-300);
-  border-radius: var(--border-radius-600);
-  background: var(--color-surface-overlay-default);
-  box-shadow: var(--gap-shadow-float);
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-  transition:
-    opacity var(--motion-duration-base) var(--motion-ease-out),
-    transform var(--motion-duration-slow) var(--motion-ease-launch);
-}
-.review__spinner { animation: review-spin var(--motion-duration-spinner-rev) linear infinite; }
-@keyframes review-spin { to { transform: rotate(1turn); } }
+/* 4653:68317 + 4653:68318, the veil and its status: components/processing/ProcessingLoader.css. */
 
 /* --- Processing → ready ------------------------------------------------------------- */
 .review__layer--skeleton { transition: opacity var(--motion-duration-base) var(--motion-ease-inOut); }
-.review:not([data-status='processing']) .review__veil { opacity: 0; pointer-events: none; }
 .review[data-status='ready'] .review__layer--skeleton { opacity: 0; }
-.review[data-status='processing'] .review__pill { animation: review-arrive var(--motion-duration-slow) var(--motion-ease-launch) both; }
-@keyframes review-arrive { from { opacity: 0; transform: scale(0.92); } }
 
 .review__layer--ready .stagger {
   animation: review-rise var(--motion-duration-base) var(--motion-ease-out) both;

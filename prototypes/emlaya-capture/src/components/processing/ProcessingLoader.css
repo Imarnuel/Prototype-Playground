@@ -1,0 +1,184 @@
+/* The processing loader (4653:68091, redesigned). Every value is a token: tokens.gaps.css,
+   "Processing loader". */
+.processing { position: absolute; inset: 0; pointer-events: none; }
+
+/* --- Veil: 4653:68317's gradient, at the reference's blur ----------------------------- */
+.processing__veil {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: calc(var(--safe-top) + var(--gap-processing-veil-top));
+  background: var(--gap-gradient-processing-veil);
+  opacity: 0;
+  -webkit-backdrop-filter: blur(0);
+  backdrop-filter: blur(0);
+  /* Leaving: the content sharpens as the fields rise in. */
+  transition:
+    opacity var(--motion-duration-slow) var(--motion-ease-out),
+    -webkit-backdrop-filter var(--motion-duration-slow) var(--motion-ease-out),
+    backdrop-filter var(--motion-duration-slow) var(--motion-ease-out);
+}
+.processing__veil[data-on='true'] {
+  opacity: 1;
+  -webkit-backdrop-filter: blur(var(--processing-blur));
+  backdrop-filter: blur(var(--processing-blur));
+  transition-duration: var(--processing-duration-veil);
+  transition-delay: var(--processing-delay-veil);
+}
+
+/* --- Glow (A) ---------------------------------------------------------------------------- */
+.processing__glow {
+  position: absolute;
+  inset: 0;
+  transition: opacity var(--motion-duration-slow) var(--motion-ease-out);
+}
+.processing__glow[data-fade='true'] { opacity: 0; }
+.processing__canvas { display: block; width: 100%; height: 100%; }
+
+/* --- Status line ------------------------------------------------------------------------- */
+.processing__centre {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: calc(var(--safe-top) + var(--gap-processing-veil-top));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-200);
+  color: var(--color-text-secondary);
+  transition:
+    opacity var(--motion-duration-base) var(--motion-ease-out),
+    filter var(--motion-duration-base) var(--motion-ease-out),
+    transform var(--motion-duration-base) var(--motion-ease-out);
+}
+.status[data-leaving='true'] { opacity: 0; filter: blur(var(--processing-line-blur)); }
+.status--pill[data-leaving='true'] { transform: scale(var(--processing-pill-exit-scale)); }
+
+/* B: the frame's own pill (4653:68318). */
+.status--pill {
+  padding: var(--spacing-300);
+  border-radius: var(--border-radius-600);
+  background: var(--color-surface-overlay-default);
+  box-shadow: var(--gap-shadow-float);
+  overflow: hidden;
+}
+
+.status__spinner { animation: processing-spin var(--motion-duration-spinner-rev) linear infinite; }
+
+.status__stack {
+  position: relative;
+  height: var(--gap-size-icon-24);
+  transition: width var(--motion-duration-base) var(--motion-ease-out);
+}
+.status__item {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: var(--gap-size-icon-24);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-200);
+  white-space: nowrap;
+}
+.status__item[data-phase='in'] { animation: processing-line-in var(--motion-duration-base) var(--motion-ease-out) both; }
+.status__item[data-phase='out'] { animation: processing-line-out var(--motion-duration-fast) var(--motion-ease-in) both; }
+
+.status__text { color: var(--color-text-secondary); }
+
+/* The shimmer: the reference's light band sweeping the letters. The text is painted by
+   its own background (background-clip: text) so the band passes through the glyphs;
+   position 100% → 0% walks the band from before the first letter to past the last. */
+.status__text[data-shimmer='true'] {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-text-secondary) 0%,
+    var(--color-text-secondary) 41%,
+    var(--processing-shimmer-band) 50%,
+    var(--color-text-secondary) 59%,
+    var(--color-text-secondary) 100%
+  );
+  background-size: 250% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: processing-shimmer var(--processing-shimmer-cycle) var(--motion-ease-inOut) var(--processing-shimmer-delay) infinite;
+}
+
+/* B's icon: it arrives with its line, on the launch curve, then idles. */
+.status__icon {
+  flex: none;
+  width: var(--gap-size-icon-24);
+  height: var(--gap-size-icon-24);
+  animation: processing-icon-in var(--motion-duration-launch) var(--motion-ease-launch) both;
+}
+.status__glyph {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-icon-brand);
+  -webkit-mask: center / contain no-repeat;
+  mask: center / contain no-repeat;
+}
+.status__icon[data-idle='bob'] .status__glyph { animation: processing-idle-bob var(--processing-idle-bob-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
+.status__icon[data-idle='pulse'] .status__glyph { animation: processing-idle-pulse var(--processing-idle-pulse-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
+.status__icon[data-idle='search'] .status__glyph { animation: processing-idle-search var(--processing-idle-search-cycle) linear var(--processing-idle-delay) infinite; }
+.status__icon[data-idle='wiggle'] .status__glyph { animation: processing-idle-wiggle var(--processing-idle-wiggle-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
+.status__icon[data-idle='twinkle'] .status__glyph { animation: processing-idle-twinkle var(--processing-idle-twinkle-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
+
+@keyframes processing-line-in {
+  from { opacity: 0; filter: blur(var(--processing-line-blur)); transform: translateY(var(--processing-line-rise)); }
+}
+@keyframes processing-line-out {
+  to { opacity: 0; filter: blur(var(--processing-line-blur)); transform: translateY(calc(var(--processing-line-rise) * -1)); }
+}
+@keyframes processing-icon-in {
+  from { opacity: 0; transform: scale(var(--processing-icon-from-scale)) rotate(var(--processing-icon-from-turn)); }
+}
+@keyframes processing-shimmer {
+  0% { background-position: 100% 0; }
+  47%, 100% { background-position: 0% 0; }
+}
+@keyframes processing-spin { to { transform: rotate(1turn); } }
+@keyframes processing-idle-bob {
+  50% { transform: translateY(calc(var(--processing-idle-bob) * -1)); }
+}
+@keyframes processing-idle-pulse {
+  50% { transform: scale(var(--processing-idle-pulse)); }
+}
+/* A magnifier hunting: a small circle, the lens leading. */
+@keyframes processing-idle-search {
+  0%, 100% { transform: translate(var(--processing-idle-search), 0) rotate(0deg); }
+  25% { transform: translate(0, var(--processing-idle-search)) rotate(-6deg); }
+  50% { transform: translate(calc(var(--processing-idle-search) * -1), 0) rotate(0deg); }
+  75% { transform: translate(0, calc(var(--processing-idle-search) * -1)) rotate(6deg); }
+}
+@keyframes processing-idle-wiggle {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(-9deg); }
+  30% { transform: rotate(7deg); }
+  45% { transform: rotate(-4deg); }
+}
+/* Sparkle: a quarter-turn glint and a breath. */
+@keyframes processing-idle-twinkle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(15deg) scale(var(--processing-idle-pulse)); }
+}
+
+/* Reduced motion: lines still change (the state change must be seen) as a short
+   cross-fade, but nothing travels, blurs, sweeps, spins or idles. The glow is a still
+   frame (GlowShader). Out-specifies the study's blanket `.review *` rule on purpose. */
+.app[data-reduced-motion='true'] .processing .status__item[data-phase='in'] { animation: processing-fade-in var(--motion-duration-fast) linear both !important; }
+.app[data-reduced-motion='true'] .processing .status__item[data-phase='out'] { animation: processing-fade-out var(--motion-duration-fast) linear both !important; }
+.app[data-reduced-motion='true'] .processing .status { filter: none; transform: none; }
+.app[data-reduced-motion='true'] .processing .status__text[data-shimmer='true'] { background-position: 0% 0; }
+.app[data-reduced-motion='true'] .processing .status__stack { transition: none; }
+@keyframes processing-fade-in { from { opacity: 0; } }
+@keyframes processing-fade-out { to { opacity: 0; } }

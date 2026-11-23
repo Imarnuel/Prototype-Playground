@@ -48,7 +48,7 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
   }, 150)));
   check('sheet: Review mid-rise, no zoom on the shot', mid.ty > 0 && mid.ty < mid.h && mid.s === 1, `translateY ${mid.ty?.toFixed(1)} of ${mid.h.toFixed(0)}, feed scale ${mid.s}`);
 
-  await page.waitForSelector('.review[data-status="ready"]', { timeout: 8000 });
+  await page.waitForSelector('.review[data-status="ready"]', { timeout: 15000 });
   await page.waitForTimeout(600);
   const thumb = await page.evaluate(() => document.querySelector('.review .evidenceRow__thumb img')?.getAttribute('src')?.slice(0, 23));
   check('evidence: the shot\'s scan is the thumbnail', thumb === 'data:image/jpeg;base64,', thumb);
@@ -167,7 +167,7 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
   await click(page, 'button[aria-label="Take photo"]');
   await page.waitForTimeout(400);
   await click(page, '.camera__continue');
-  await page.waitForSelector('.review[data-status="ready"]', { timeout: 8000 });
+  await page.waitForSelector('.review[data-status="ready"]', { timeout: 15000 });
   await page.waitForTimeout(500);
   await click(page, '.review__dock .button');
   await page.waitForSelector('.celebration[data-state="open"]', { timeout: 8000 });
@@ -185,7 +185,7 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
   await page.evaluate(() => [...document.querySelectorAll('.devbar button')].find((b) => b.textContent === 'Processing').click());
   await page.evaluate(() => document.querySelector('.devbar__handle').click());
   await page.waitForTimeout(1200);
-  const veil = await page.evaluate(() => getComputedStyle(document.querySelector('.review__veil')).backgroundImage);
+  const veil = await page.evaluate(() => getComputedStyle(document.querySelector('.processing__veil')).backgroundImage);
   check('dark host: processing veil stays light', /255, 255, 255/.test(veil) && !/34, 34, 32/.test(veil), veil.slice(0, 90));
   await ctx.close();
 }
@@ -269,7 +269,7 @@ const click = (page, sel) => page.evaluate((s) => document.querySelector(s).clic
   await page.waitForTimeout(600);
   results.captured = await clash();
   await click(page, '.camera__continue');
-  await page.waitForSelector('.review[data-status="ready"]', { timeout: 8000 });
+  await page.waitForSelector('.review[data-status="ready"]', { timeout: 15000 });
   await page.waitForTimeout(600);
   results.review = await clash();
   await click(page, '.review__dock .button');

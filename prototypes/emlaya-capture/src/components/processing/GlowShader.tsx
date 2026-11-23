@@ -1,31 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { DURATION, EASING } from '@playground/shared';
-import { easingFn } from '../lib/ease';
+import { colorResolver, tokenMs, tokenNumber, tokenString } from '../../tokens/read';
+import { easingFn } from './ease';
 
-/**
- * Glow palettes. `reference` is sampled from the reference video's own pixels (3.0s
- * and 5.85s frames, 13×13px averages), not picked by eye. `amber` is the same shader
- * on the Emlaya library's brand variables — an adaptation offered for comparison, so
- * it is a switch rather than a replacement.
- */
-export const GLOW_PALETTES = {
-  reference: {
-    edge: '#e07ae6', // magenta at the sides (#da71d7 right, #ef7ef4 bloom edge)
-    mid: '#f597df', // pink between
-    warm: '#f8b279', // orange low in the centre
-    core: '#f9c96b', // yellow at the hottest point
-  },
-  amber: {
-    // The library has three brand variables and no fourth; warm repeats one rather
-    // than inventing a value in between.
-    edge: '#feb007', // theme.colors.borderBrand
-    mid: '#ffc412', // theme.colors.containerBrandBold
-    warm: '#ffc412', // theme.colors.containerBrandBold
-    core: '#fff9d1', // theme.colors.containerBrand
-  },
-} as const;
-
-export type GlowPalette = keyof typeof GLOW_PALETTES;
+/** `reference`: the video's sampled colours. `amber`: Emlaya's brand ramp (a comparison). */
+export type GlowPalette = 'reference' | 'amber';
 
 const VERT = `
 attribute vec2 a_pos;
@@ -76,40 +54,37 @@ float blob(vec2 uv, vec2 c, vec2 r) {
 
 void main() {
   vec2 frag = gl_FragCoord.xy;
-  vec2 uv = frag / u_res;              // y up, 0 at the bottom edge
+  vec2 uv = frag / u_res;
   float aspect = u_res.x / u_res.y;
   float t = u_time;
 
-  // Soft top edge of the band, wobbling on noise; the bloom pushes it off the screen.
   float wob = (fbm(vec2(uv.x * 2.4 + t * 0.13, t * 0.21)) - 0.5) * 0.12;
   float top = (u_band + wob) * u_rise;
   top = mix(top, 1.35, u_bloom);
   float mask = 1.0 - smoothstep(top * 0.30, top, uv.y);
 
-  // Base: pink in the middle, magenta towards both sides, warped by noise.
   vec2 q = vec2(uv.x * aspect, uv.y);
   float n = fbm(q * 1.7 + vec2(t * 0.11, -t * 0.07));
-  float side = smoothstep(0.30, 0.0, uv.x) + smoothstep(0.70, 1.0, uv.x);
+  // The bloom keeps magenta at the sides and gains it along the top, ringing the warm core.
+  float side = smoothstep(0.30, 0.0, uv.x) + smoothstep(0.70, 1.0, uv.x) + smoothstep(0.62, 1.0, uv.y) * u_bloom;
   vec3 col = mix(u_mid, u_edge, clamp(side * 0.95 + (n - 0.5) * 0.9, 0.0, 1.0));
 
-  // Warm blobs drifting along the bottom; the bloom lifts them to the centre.
-  float lift = mix(0.0, 0.46, u_bloom);
+  // The bloom lifts the warm core to a little above centre (the reference's 5.85s frame)
+  // and grows it only so far: the magenta ring must survive around it.
+  float lift = mix(0.0, 0.58, u_bloom);
   float h = max(top, 0.001);
-  vec2 rW = vec2(0.30 / aspect + 0.25 * u_bloom, h * 0.55 + 0.12 * u_bloom);
-  vec2 rC = vec2(0.20 / aspect + 0.18 * u_bloom, h * 0.38 + 0.10 * u_bloom);
+  vec2 rW = vec2(0.30 / aspect + 0.12 * u_bloom, mix(h * 0.55, 0.30, u_bloom));
+  vec2 rC = vec2(0.20 / aspect + 0.07 * u_bloom, mix(h * 0.38, 0.17, u_bloom));
   float w1 = blob(uv, vec2(0.48 + 0.17 * sin(t * 0.37), lift * 0.85), rW);
   float w2 = blob(uv, vec2(0.52 - 0.20 * sin(t * 0.29 + 1.3), lift), rC);
   col = mix(col, u_warm, clamp(w1 * 1.15, 0.0, 1.0));
   col = mix(col, u_core, clamp(w2 * 1.05, 0.0, 1.0));
 
-  // Magenta hot spot, low on the right, wandering a little.
   float m = blob(uv, vec2(0.86 + 0.06 * sin(t * 0.41), 0.06 + lift * 0.4), vec2(0.16 / aspect, h * 0.42));
   col = mix(col, u_edge * 0.94, m * 0.55 * (1.0 - u_bloom * 0.5));
 
-  // Film grain, re-seeded every frame.
   col += (hash(frag + fract(t * 7.1) * 97.0) - 0.5) * 0.045;
 
-  // Sparkles: one candidate per 16pt cell, drifting up and twinkling.
   float cellPt = 16.0;
   vec2 g = frag / u_dpr / cellPt;
   g.y -= t * 0.55;
@@ -124,47 +99,52 @@ void main() {
   float sparkZone = smoothstep(0.35, 0.8, mask);
   col = mix(col, vec3(1.0), spark * sparkZone * 0.9);
 
-  float a = clamp(mask, 0.0, 1.0) * 0.96;
+  // Translucent at full bloom: the blurred content shows through it, as in the reference.
+  float a = clamp(mask, 0.0, 1.0) * mix(0.96, 0.8, u_bloom);
   gl_FragColor = vec4(col * a, a);
 }
 `;
 
-function hexToRgb(hex: string): [number, number, number] {
-  const n = parseInt(hex.slice(1), 16);
-  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+type Rgb = [number, number, number];
+type Colours = { edge: Rgb; mid: Rgb; warm: Rgb; core: Rgb };
+
+/** The palette's four tokens, resolved once per palette (never per frame). */
+function readPalette(palette: GlowPalette): Colours {
+  const r = colorResolver();
+  const channels = (part: string): Rgb => {
+    const [x, y, z] = (r.color(`--processing-glow-${palette}-${part}`).match(/[\d.]+/g) ?? []).map(Number);
+    return [x / 255, y / 255, z / 255];
+  };
+  const out = { edge: channels('edge'), mid: channels('mid'), warm: channels('warm'), core: channels('core') };
+  r.done();
+  return out;
 }
 
 type Tween = { from: number; to: number; start: number; ms: number; ease: (t: number) => number };
 
-const easeOut = easingFn(EASING.out);
-const easeInOut = easingFn(EASING.inOut);
-const easeIn = easingFn(EASING.in);
-
 type GlowShaderProps = {
-  /** Band rises from the bottom edge while on, sinks back when off. */
+  /** The band rises from the bottom edge while on, and sinks back when off. */
   on: boolean;
   /** The finish: the glow lifts over the whole screen. */
   bloom: boolean;
   palette: GlowPalette;
-  /** Fraction of the screen's height the band reaches at rest. */
-  band?: number;
-  reducedMotion: boolean;
+  reduced: boolean;
 };
 
 /**
- * The reference's "shader": a WebGL fragment shader rendered into a canvas the size of
- * the screen. It stops drawing whenever it is fully down, so a resolved screen costs
- * nothing. Under reduced motion it draws single still frames at each state change and
- * never runs a loop.
+ * The reference's "shader": a WebGL fragment shader in a canvas the size of the screen.
+ * It stops drawing whenever it is fully down, so a resolved screen costs nothing. Under
+ * reduced motion time is frozen: the glow is a still picture that fades, never a loop.
+ * Rise and bloom travel on the same curves as everything CSS animates (the shared set).
  */
-export function GlowShader({ on, bloom, palette, band = 0.36, reducedMotion }: GlowShaderProps) {
+export function GlowShader({ on, bloom, palette, reduced }: GlowShaderProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const state = useRef({
     rise: 0,
     bloom: 0,
     riseTween: null as Tween | null,
     bloomTween: null as Tween | null,
-    draw: null as null | (() => void),
+    colours: null as Colours | null,
     kick: null as null | (() => void),
   });
 
@@ -177,11 +157,11 @@ export function GlowShader({ on, bloom, palette, band = 0.36, reducedMotion }: G
     }
 
     const compile = (type: number, src: string) => {
-      const s = gl.createShader(type)!;
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s) ?? 'shader');
-      return s;
+      const sh = gl.createShader(type)!;
+      gl.shaderSource(sh, src);
+      gl.compileShader(sh);
+      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh) ?? 'shader');
+      return sh;
     };
     const prog = gl.createProgram()!;
     gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
@@ -189,8 +169,7 @@ export function GlowShader({ on, bloom, palette, band = 0.36, reducedMotion }: G
     gl.linkProgram(prog);
     gl.useProgram(prog);
 
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
     const loc = gl.getAttribLocation(prog, 'a_pos');
     gl.enableVertexAttribArray(loc);
@@ -201,6 +180,7 @@ export function GlowShader({ on, bloom, palette, band = 0.36, reducedMotion }: G
       res: u('u_res'), time: u('u_time'), rise: u('u_rise'), bloom: u('u_bloom'), band: u('u_band'),
       dpr: u('u_dpr'), edge: u('u_edge'), mid: u('u_mid'), warm: u('u_warm'), core: u('u_core'),
     };
+    const band = tokenNumber('--processing-glow-band');
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const resize = () => {
@@ -227,19 +207,20 @@ export function GlowShader({ on, bloom, palette, band = 0.36, reducedMotion }: G
       if (r) { s.rise = r.value; if (r.done) s.riseTween = null; }
       const b = step(s.bloomTween, now);
       if (b) { s.bloom = b.value; if (b.done) s.bloomTween = null; }
+      const c = s.colours;
+      if (!c) return;
 
-      const pal = GLOW_PALETTES[(canvas.dataset.palette as GlowPalette) ?? 'reference'];
       gl.uniform2f(uni.res, canvas.width, canvas.height);
-      // Reduced motion freezes time: the glow is a still picture of itself.
-      gl.uniform1f(uni.time, reducedMotion ? 4.2 : (now - t0) / 1000);
+      // Reduced motion freezes time at a representative moment of the drift.
+      gl.uniform1f(uni.time, reduced ? 4.2 : (now - t0) / 1000);
       gl.uniform1f(uni.rise, s.rise);
       gl.uniform1f(uni.bloom, s.bloom);
-      gl.uniform1f(uni.band, Number(canvas.dataset.band));
+      gl.uniform1f(uni.band, band);
       gl.uniform1f(uni.dpr, dpr);
-      gl.uniform3fv(uni.edge, hexToRgb(pal.edge));
-      gl.uniform3fv(uni.mid, hexToRgb(pal.mid));
-      gl.uniform3fv(uni.warm, hexToRgb(pal.warm));
-      gl.uniform3fv(uni.core, hexToRgb(pal.core));
+      gl.uniform3fv(uni.edge, c.edge);
+      gl.uniform3fv(uni.mid, c.mid);
+      gl.uniform3fv(uni.warm, c.warm);
+      gl.uniform3fv(uni.core, c.core);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -251,7 +232,7 @@ export function GlowShader({ on, bloom, palette, band = 0.36, reducedMotion }: G
       draw();
       const idle = s.rise === 0 && s.bloom === 0 && !s.riseTween && !s.bloomTween;
       const settled = !s.riseTween && !s.bloomTween;
-      if (idle || (reducedMotion && settled)) {
+      if (idle || (reduced && settled)) {
         raf = 0;
         canvas.dataset.running = 'off';
         return;
@@ -260,7 +241,6 @@ export function GlowShader({ on, bloom, palette, band = 0.36, reducedMotion }: G
       raf = requestAnimationFrame(loop);
     };
 
-    s.draw = draw;
     s.kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
     s.kick();
 
@@ -269,42 +249,41 @@ export function GlowShader({ on, bloom, palette, band = 0.36, reducedMotion }: G
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
-      s.draw = null;
       s.kick = null;
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [reducedMotion]);
+  }, [reduced]);
 
-  // Targets → tweens on the shared curves. Rising decelerates in; sinking accelerates out.
+  useEffect(() => {
+    state.current.colours = readPalette(palette);
+    canvasRef.current!.dataset.palette = palette;
+    state.current.kick?.();
+  }, [palette]);
+
+  // Targets → tweens. Rising decelerates in (out curve); sinking accelerates away (in curve).
   useEffect(() => {
     const s = state.current;
     const now = performance.now();
+    const ease = (name: string) => easingFn(tokenString(`--motion-ease-${name}`));
     const target = on || bloom ? 1 : 0;
     if (s.rise !== target || s.riseTween) {
       s.riseTween = {
         from: s.rise, to: target, start: now,
-        ms: reducedMotion ? 0 : target ? DURATION.slow : DURATION.base,
-        ease: target ? easeOut : easeIn,
+        ms: reduced ? 0 : tokenMs(target ? '--motion-duration-slow' : '--motion-duration-base'),
+        ease: ease(target ? 'out' : 'in'),
       };
     }
     const bTarget = bloom ? 1 : 0;
     if (s.bloom !== bTarget || s.bloomTween) {
       s.bloomTween = {
         from: s.bloom, to: bTarget, start: now,
-        // Off is instant: the bloom never sinks back — the layer fades out over it (CSS).
-        ms: reducedMotion || !bTarget ? 0 : DURATION.slow,
-        ease: easeInOut,
+        // Off is instant: the bloom never sinks back. Its layer fades out over it (CSS).
+        ms: reduced || !bTarget ? 0 : tokenMs('--motion-duration-slow'),
+        ease: ease('inOut'),
       };
     }
     s.kick?.();
-  }, [on, bloom, reducedMotion]);
+  }, [on, bloom, reduced]);
 
-  useEffect(() => {
-    const c = canvasRef.current!;
-    c.dataset.palette = palette;
-    c.dataset.band = String(band);
-    state.current.kick?.();
-  }, [palette, band]);
-
-  return <canvas ref={canvasRef} className="glow" aria-hidden="true" data-palette={palette} data-band={band} />;
+  return <canvas ref={canvasRef} className="processing__canvas" aria-hidden="true" />;
 }

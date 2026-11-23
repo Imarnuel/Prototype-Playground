@@ -18,6 +18,11 @@ specific to this study.
 **Hosted preview:** <https://claude.ai/artifact/QnBTfbHEStRmUdi2wAVu5X>. Rebuild it with
 `npm run build:hosted` and republish `dist/`. That build always shows the dev toolbar and the replay control, since a hosted page has no address bar for `?dev=1`.
 
+**Processing loader prototypes** (user request, P6): A <https://claude.ai/artifact/GFKq55i8wPrcp9L62Vfju7>,
+B <https://claude.ai/artifact/JxhQY7tv68ozN5Eiwgv9af>. Rebuild each with
+`node scripts/build-hosted.mjs --loader a` (or `b`) and republish `dist/loader-<x>/`. Locally,
+`?loader=b` opens on B; the toolbar switches loader, glow palette and extraction pace.
+
 ## Layout
 
 ```
@@ -27,6 +32,8 @@ src/tokens/read.ts           JS reads tokens through getComputedStyle; never lit
 src/components/ui.tsx        Button, HeaderButton, TextField, Pill, GlassButton, Icon
 src/components/celebration/  MilestoneCelebration, CheckBadge, MilestoneCard, Rays, Confetti
 src/components/capture/      CameraFeed + CaptureScene: the live camera (not in Figma, user request)
+src/components/processing/   ProcessingLoader (A/B), StatusLine, GlowShader (WebGL): user request, P6
+src/data/processingLines.ts  the loader's five lines and their Phosphor icons
 src/data/receiptDocument.ts  the paper receipt the camera sees, printed from the record
 src/screens/                 Camera (live + captured), Review (processing + ready + error), ReceiptDetails
 src/components/record/       ItemRow, MetaBlock, EvidenceRow: shared by Review and Receipt Details

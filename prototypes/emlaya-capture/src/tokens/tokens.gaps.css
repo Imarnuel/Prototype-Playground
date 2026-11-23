@@ -79,7 +79,7 @@
   --gap-shadow-tab-bar: 0 8px 6px rgb(51 41 20 / 0.02); /* 4073:1521 */
   --gap-blur-camera-control: 4px; /* 9502:21712 etc. */
   --gap-blur-tab-bar: 6px;        /* 4073:1520 */
-  --gap-blur-processing: 3px;     /* 4653:68317 */
+  /* 4653:68317 states 3px. Superseded by --processing-blur: the brief asks for the reference's blur. */
   --gap-border-hairline: 1px;     /* every stroke in the flow is 1, unbound */
   --gap-border-hairline-half: 0.5px; /* 4073:1521 */
   --gap-border-shutter: 3px;      /* 9502:21698 */
@@ -276,7 +276,12 @@
 
 :root {
   /* --- Mock API latency (prototype only; not design values) ----------------------- */
-  --api-latency-extract: 2200ms;
+  /* Extraction pace, chosen from the dev toolbar. 2200 was this flow's original latency;
+     at that pace the processing loader only reaches its second line, so the default is the
+     typical pace and the old value stays as "quick". Not measured from a real extractor. */
+  --api-latency-extract-quick: 2200ms;
+  --api-latency-extract-typical: 6200ms;
+  --api-latency-extract-slow: 13000ms;
   --api-latency-save: 700ms;
   /* How long a "not designed in this flow" notice stays up. */
   --motion-duration-notice-hold: 2600ms;
@@ -374,4 +379,76 @@
      seen (secondary action). It shares the badge's spin, pop and curves. */
   --motion-delay-celebration-star: 200ms;
   --motion-scale-star-from: 0.5;
+}
+
+/*
+ * --- Processing loader (4653:68091, redesigned) ------------------------------------------
+ * The brief: spice up processing and make it feel shorter, after a reference video (a
+ * fintech "Confirm transfer" modal: 8.2s, 1600x1200, a 2x capture of an 800x600 page).
+ * Two prototypes share everything below. A follows the reference: a bare line beside the
+ * spinner, a shader glow rising from the bottom edge, a bloom to finish. B is calmer: the
+ * frame's own pill, an icon on every line, no shader, a check to finish.
+ *
+ * Dwell times are measured off the video (sampled at 10 and 30fps):
+ *   1.4s  tap; the content blurs out over ~0.4s
+ *   1.9s  the first line sharpens in; the glow rises over ~0.5s
+ *   2.3s  a light band sweeps the line, left to right, in ~0.7s
+ *   3.75s line swap: the old line blurs out and up as the new one sharpens in (~150ms overlap)
+ *   5.3s  the result lands; the glow blooms over the whole card in ~0.5s
+ *   5.8s  the bloom fades and the content sharpens
+ * Lines held 1.85s and 1.55s. Transitions stay on the shared set (--motion-duration-*).
+ */
+:root {
+  /* Content blur under the veil. Fitted, not picked: the sharp 1.2s frame, Gaussian-blurred
+     to best match the blurred 3.2s frame over the "Transfer amount" block (rms 2.86 of 255,
+     contrast 0.42), gives sigma 17.5 video px = 8.75 CSS px at 2x. CSS blur() takes sigma. */
+  --processing-blur: 9px;
+  /* The veil starts once Review's sheet has landed (--motion-duration-slow), and blurs in
+     over the reference's ~0.4s. */
+  --processing-delay-veil: var(--motion-duration-slow);
+  --processing-duration-veil: var(--motion-duration-slow);
+  /* Each line, start to start: the reference's two lines average 1.7s. */
+  --processing-line-dwell: 1700ms;
+  /* A line is never cut before it can be read. Caps what a fast extraction pays at 0.9s. */
+  --processing-min-readable: 900ms;
+  /* The finish (A's bloom, B's check) holds this long before the fields arrive. */
+  --processing-resolve: 520ms;
+
+  /* The line swap: a 6px blur and a 4px travel, in on base, out on fast. */
+  --processing-line-blur: 6px;
+  --processing-line-rise: 4px;
+  --processing-pill-exit-scale: 0.96;
+
+  /* The shimmer: a pause once the line lands, then the band sweeps; repeats while it holds.
+     The band is the line's own colour at 16%, so it reads as light passing over the text. */
+  --processing-shimmer-delay: 350ms;
+  --processing-shimmer-cycle: 1600ms;
+  --processing-shimmer-band: color-mix(in srgb, var(--color-text-secondary) 16%, transparent);
+
+  /* B's icons: each arrives with its line on the launch curve, then idles. */
+  --processing-icon-from-scale: 0.4;
+  --processing-icon-from-turn: -24deg;
+  --processing-idle-delay: 300ms;
+  --processing-idle-bob: 2px;
+  --processing-idle-bob-cycle: 1400ms;
+  --processing-idle-search: 1.5px;
+  --processing-idle-search-cycle: 1600ms;
+  --processing-idle-wiggle-cycle: 1500ms;
+  --processing-idle-pulse: 1.12;
+  --processing-idle-pulse-cycle: 1300ms;
+  --processing-idle-twinkle-cycle: 1800ms;
+
+  /* A's glow: how far up the screen the band reaches at rest (the reference: ~36%). */
+  --processing-glow-band: 0.36;
+  /* Sampled from the video's own pixels (3.0s and 5.85s frames, 13x13px averages). */
+  --processing-glow-reference-edge: #e07ae6;  /* magenta at the sides */
+  --processing-glow-reference-mid: #f597df;   /* pink between */
+  --processing-glow-reference-warm: #f8b279;  /* orange, low in the centre */
+  --processing-glow-reference-core: #f9c96b;  /* yellow at the hottest point */
+  /* The same shader on Emlaya's brand ramp, offered for comparison (a switch, not a
+     replacement). The ramp has no orange between 400 and 100, so warm repeats 400. */
+  --processing-glow-amber-edge: var(--color-yellow-500);
+  --processing-glow-amber-mid: var(--color-yellow-400);
+  --processing-glow-amber-warm: var(--color-yellow-400);
+  --processing-glow-amber-core: var(--color-yellow-100);
 }

@@ -76,9 +76,14 @@ The rendered UI marks each departure: open the dev toolbar (`?dev=1`) → *Show 
 | # | Finding | Handling | |
 |---|---|---|---|
 | P1 | The skeleton's fields run Merchant, then Amount; Review runs Amount, then Merchant. The skeleton has no Date/Time row and 5 item rows | Built as the skeleton frame draws it | doesn't depart |
-| P2 | Copy is "Extracting the details..."; the design-engineer handbook's settled microcopy is "Hunting for the total" | Figma copy used verbatim. Owner decision | doesn't depart |
+| P2 | Copy is "Extracting the details..."; the design-engineer handbook's settled microcopy is "Hunting for the total" | **Superseded by P6 (user request).** Five rotating lines replace it, "Hunting for the total..." among them | departs |
 | P3 | The skeleton is static in Figma | It breathes (opacity 0.72↔1 on the rays' 3s token) so it reads as alive; the spinner turns | departs |
 | P4 | "Real progress states" (brief) | The file designs one state. No stages invented: processing → fields arrive staggered → ready. Extraction failure → error placeholder | — |
+| P6 | **User request: redesign the processing animation** after a reference video, as two prototypes. A: the line bare on the veil beside the frame's CircleNotch, a WebGL glow rising from the bottom edge, a bloom to finish. B: the frame's pill, an icon per line (Phosphor Regular from page `4022:9650`), a "Ready to review" check to finish. Both: five lines that change every 1.7s and hold on the last, a blur swap, a shimmer, and a line never cut before 0.9s. `components/processing/`, `data/processingLines.ts`, MOTION.md "Processing loader". Copy and icons are proposals that need the owner's sign-off | departs |
+| P7 | The veil states 3px of blur (`4653:68317`) | 9px: fitted to the reference video (sigma 17.5 px at 2x; tokens.gaps.css). The brief asks for the reference's blur. The frame's gradient is kept | departs |
+| P8 | The Phosphor exports carry the library page's own background (a #1E1E1E 32x32 rect and the page frame's white rect) | Those two rects are stripped. The icon paths are untouched | departs (asset) |
+| P9 | Extraction took 2200ms, so the loader would only reach its second line | Default extraction is now 6200ms ("typical"). The toolbar's Extraction pace offers Quick 2.2s (the old value), Typical 6.2s and Slow 13s | departs (prototype) |
+| P10 | The error placeholder says "Could not extract the details". The terminology lock gives RP-04 as "Unable to process" | Not changed here: it predates this work and `4142:9167` is still uninspected. Flagged | — |
 | P5 | Captured photo carry-through (brief) | **User request: no zoom.** Review rises over the frozen shot as a sheet (420ms, the shared sheet curve); the shot stays still under it. The scan reappears as Review's evidence thumbnail | departs (motion) |
 
 ## Review (R) — `9502:21324`
@@ -208,11 +213,12 @@ under a proposed name with its node ID. In summary:
 | Type | 1 | "Large input" letter-spacing −0.32, raw |
 | Motion | 46 | the staged entrance (13 beats), start and end scales, rise distances, the word mask, natural curves, the gentle spring, the badge's spin, pop, arc and exit turn, the star, ray periods and breathe, exit, spinner, field stagger, notice hold |
 | Confetti physics | 31 | gravity, drag, terminal velocity, velocity / sway / spin / flip / size ranges, counts, trickle window, clear-by |
-| Mock API | 2 | extract 2200ms, save 700ms |
+| Mock API | 4 | extract quick 2200 / typical 6200 / slow 13000ms, save 700ms |
+| Processing loader | 35 | blur 9 (fitted to the reference), veil delay and duration, line dwell 1700, min readable 900, resolve 520, swap blur and travel, shimmer, icon entrance and idles, glow band and two palettes |
 | Live capture scene | 43 | counter, paper and ink colours; paper geometry; hand-held drift; focus, exposure, detection, outline |
 | Harness | 3 | the Figma frame's 402 × 874 and 62 safe top |
 
 236 in all (116 `--gap-*`, 46 `--motion-*`, 43 `--capture-*`, 31 `--confetti-*`). The non-motion rows were counted before Receipt Details (section D) added its layout gaps, so they sum short of 236.
 
 `npm run check:tokens` fails on any hex, rgb/hsl, px, rem, ms, s, cubic-bezier or linear()
-literal outside the two token files: **0 violations in 32 files**.
+literal outside the two token files: **0 violations in 38 files**.
