@@ -2,6 +2,15 @@
    "Processing loader". */
 .processing { position: absolute; inset: 0; pointer-events: none; }
 
+/* B is the calm one: it lingers on each line and changes it more slowly (user request,
+   "the text change is still quick for B"). Same roll, same staging, longer numbers. */
+.processing[data-variant='b'] {
+  --processing-line-dwell: var(--processing-b-line-dwell);
+  --processing-line-out: var(--processing-b-line-out);
+  --processing-line-in: var(--processing-b-line-in);
+  --processing-line-in-delay: var(--processing-b-line-in-delay);
+}
+
 /* --- Veil: 4653:68317's gradient, at the reference's blur ----------------------------- */
 .processing__veil {
   position: absolute;

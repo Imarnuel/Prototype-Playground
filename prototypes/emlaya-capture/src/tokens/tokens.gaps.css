@@ -438,6 +438,13 @@
   --processing-line-in-delay: 200ms;
   --processing-line-rise-out: 3px;
   --processing-line-rise-in: 2.5px;
+  /* B, slower still at the user's request ("still quick for B"): each line stays 2.5s
+     (three lines show at the typical pace, not four), the old line leaves over 420, and
+     the new one rises over 560, from 280ms in, when the old line is down to a third. */
+  --processing-b-line-dwell: 2500ms;
+  --processing-b-line-out: var(--motion-duration-slow);
+  --processing-b-line-in: 560ms;
+  --processing-b-line-in-delay: 280ms;
   /* Exit. A's waits this long into the bloom before it goes, as the reference's does. */
   --processing-exit-rise: 3px;
   --processing-exit-blur: 4px;

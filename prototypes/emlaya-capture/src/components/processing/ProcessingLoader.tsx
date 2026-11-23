@@ -44,6 +44,8 @@ export function ProcessingLoader({ variant, status, palette, reduced, onSettled 
   const startedRef = useRef(false);
   const shownAt = useRef(0);
   const cadence = useRef<number[]>([]);
+  // The variant's own element: B re-maps the cadence tokens there (ProcessingLoader.css).
+  const root = useRef<HTMLDivElement>(null);
   const settled = useRef(onSettled);
   settled.current = onSettled;
 
@@ -66,7 +68,7 @@ export function ProcessingLoader({ variant, status, palette, reduced, onSettled 
       setLine(i);
     };
     const first = tokenMs('--processing-delay-veil') + tokenMs('--processing-duration-veil');
-    const dwell = tokenMs('--processing-line-dwell');
+    const dwell = tokenMs('--processing-line-dwell', root.current ?? undefined);
     PROCESSING_LINES.forEach((_, i) => timers.push(window.setTimeout(() => show(i), first + i * dwell)));
     return () => {
       timers.forEach((t) => window.clearTimeout(t));
@@ -107,7 +109,7 @@ export function ProcessingLoader({ variant, status, palette, reduced, onSettled 
   const leaving = !live || finishing;
 
   return (
-    <div className="processing" data-variant={variant} data-status={status} data-finishing={finishing}>
+    <div ref={root} className="processing" data-variant={variant} data-status={status} data-finishing={finishing}>
       <div className="processing__veil" data-on={veilOn && live} />
 
       {variant === 'a' && parts.mounted && (

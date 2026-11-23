@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import type { ProcessingLine } from '../../data/processingLines';
 import { tokenMs } from '../../tokens/read';
 import { Icon } from '../ui';
@@ -28,6 +28,8 @@ type StatusLineProps = {
  */
 export function StatusLine({ line, lines, spinner, emoji, leaving }: StatusLineProps) {
   const [mounted, setMounted] = useState<Mounted[]>([{ line, phase: 'still' }]);
+  // Read on the status itself: B slows the swap by re-mapping the tokens on its loader.
+  const self = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     setMounted((prev) => {
@@ -40,7 +42,7 @@ export function StatusLine({ line, lines, spinner, emoji, leaving }: StatusLineP
     if (!mounted.some((m) => m.phase === 'out')) return;
     const t = window.setTimeout(
       () => setMounted((prev) => prev.filter((m) => m.phase !== 'out')),
-      tokenMs('--processing-line-out'),
+      tokenMs('--processing-line-out', self.current ?? undefined),
     );
     return () => window.clearTimeout(t);
   }, [mounted]);
@@ -61,7 +63,7 @@ export function StatusLine({ line, lines, spinner, emoji, leaving }: StatusLineP
   );
 
   return (
-    <div className="status" data-leaving={leaving} role="status" aria-live="polite">
+    <div ref={self} className="status" data-leaving={leaving} role="status" aria-live="polite">
       <Icon src={spinner} size={24} className="status__spinner" />
       <div className="status__stack">
         {/* Sizes the stack to the widest line; never seen, never read. */}
