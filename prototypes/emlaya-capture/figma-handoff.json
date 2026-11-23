@@ -1,0 +1,542 @@
+{
+  "file": "LPXddONZ7IMNlIowbz161x",
+  "flowNode": "9502:21986",
+  "page": "4001:1213",
+  "frameSize": {
+    "width": 402,
+    "height": 874,
+    "safeTop": 62
+  },
+  "modes": {
+    "collection": "VariableCollectionId:152:3813",
+    "light": "152:0",
+    "dark": "(second mode of Semantic)"
+  },
+  "screens": [
+    {
+      "id": "camera",
+      "node": "9502:21686",
+      "name": "Scan / Camera – Receipt in Frame",
+      "mode": "Dark",
+      "code": "src/screens/Camera.tsx (phase=live)",
+      "next": {
+        "Take photo": "captured"
+      },
+      "instances": [
+        {
+          "node": "9502:21687",
+          "component": "Status bar - iPhone (4012:27, remote)",
+          "props": {
+            "Time": "9:41"
+          },
+          "code": "shared DeviceFrame → StatusBar appearance=light"
+        },
+        {
+          "node": "9502:21688",
+          "component": "Bottom tab (4071:1317)",
+          "variant": {
+            "Active": "capture"
+          },
+          "code": "BottomTab",
+          "departs": "bottom padding gains the 22 lift so items clear the home indicator (CORRECTIONS C13)"
+        },
+        {
+          "node": "9502:21697",
+          "component": "ImageSquare (4022:25866)",
+          "variant": {
+            "Format": "Stroke",
+            "Weight": "Fill"
+          },
+          "code": "GlassButton variant=lg"
+        },
+        {
+          "node": "9502:21701",
+          "component": "FolderOpen (4022:59325)",
+          "variant": {
+            "Format": "Stroke",
+            "Weight": "Fill"
+          },
+          "code": "GlassButton variant=lg"
+        },
+        {
+          "node": "9502:21713",
+          "component": "close (4003:1295, remote, Code Connect Compose)",
+          "code": "GlassButton variant=sm"
+        },
+        {
+          "node": "9502:21715",
+          "component": "Lightning (4022:49908)",
+          "variant": {
+            "Format": "Stroke",
+            "Weight": "Fill"
+          },
+          "code": "GlassButton variant=sm"
+        }
+      ],
+      "departures": [
+        "9502:21690 stock photo → live CaptureScene (user request)"
+      ]
+    },
+    {
+      "id": "captured",
+      "node": "9502:21716",
+      "name": "Scan / Camera – Receipt in Frame",
+      "mode": "Dark",
+      "code": "src/screens/Camera.tsx (phase=captured)",
+      "next": {
+        "Continue": "processing",
+        "Retake": "camera"
+      },
+      "instances": [
+        {
+          "node": "9502:21739",
+          "component": "Button (raw frame; matches 4018:505 primary)",
+          "code": "Button hierarchy=primary trailingIcon=check",
+          "text": "Continue",
+          "departs": "its bar pads the bottom by the 34 safe-area inset, clear of the home indicator (CORRECTIONS C13)"
+        },
+        {
+          "node": "9502:21725",
+          "component": "fluent:camera-add-48-filled (raw vector)",
+          "code": "GlassButton variant=add"
+        }
+      ]
+    },
+    {
+      "id": "processing",
+      "node": "4653:68091",
+      "name": "Review Details / Payment Receipt",
+      "mode": "Light",
+      "source": "section 4810:31333 (outside the flow node)",
+      "code": "src/screens/Review.tsx status=processing",
+      "next": {
+        "extraction resolves": "review",
+        "extraction fails": "extractError"
+      },
+      "instances": [
+        {
+          "node": "4653:68108",
+          "component": "Text field (4064:685)",
+          "variant": {
+            "Filled": "yes",
+            "State": "default",
+            "Size": "large"
+          },
+          "props": {
+            "Label text": "Merchant",
+            "Input text": "Fresh Market Groceries"
+          },
+          "note": "text at opacity 0 (skeleton)"
+        },
+        {
+          "node": "4653:68109",
+          "component": "Text field (4064:685)",
+          "variant": {
+            "Filled": "yes",
+            "State": "default",
+            "Size": "large"
+          },
+          "props": {
+            "Label text": "Amount",
+            "Input text": "₦15,000"
+          },
+          "note": "text at opacity 0"
+        },
+        {
+          "node": "4653:68102",
+          "component": "Button Icon (4018:816)",
+          "variant": {
+            "Size": "default",
+            "Hierarchy": "inverse",
+            "Tone": "default",
+            "State": "default",
+            "Square": "Circle"
+          }
+        },
+        {
+          "node": "4653:68319",
+          "component": "CircleNotch (4022:35221)",
+          "variant": {
+            "Format": "Stroke",
+            "Weight": "Regular"
+          },
+          "code": "spinner"
+        }
+      ],
+      "text": {
+        "4653:68320": "Extracting the details..."
+      }
+    },
+    {
+      "id": "extractError",
+      "node": "4142:9167",
+      "name": "Error / Could Not Extract Details",
+      "status": "NOT INSPECTED — placeholder",
+      "code": "src/screens/Review.tsx status=error"
+    },
+    {
+      "id": "review",
+      "node": "9502:21324",
+      "name": "Review Details / Payment Receipt",
+      "mode": "Light",
+      "code": "src/screens/Review.tsx status=ready",
+      "next": {
+        "Save": "saved"
+      },
+      "instances": [
+        {
+          "node": "9502:21331",
+          "component": "Text field (4064:685)",
+          "variant": {
+            "Filled": "yes",
+            "State": "default",
+            "Size": "large"
+          },
+          "props": {
+            "Label text": "Amount",
+            "Input text": "₦15,000"
+          },
+          "code": "TextField size=large"
+        },
+        {
+          "node": "9502:21333",
+          "component": "Text field (4064:685)",
+          "variant": {
+            "Filled": "yes",
+            "State": "default",
+            "Size": "large"
+          },
+          "props": {
+            "Label text": "Merchant",
+            "Input text": "Fresh Market Groceries"
+          },
+          "code": "TextField size=large"
+        },
+        {
+          "node": "9502:21335",
+          "component": "Text field (4064:685)",
+          "variant": {
+            "Filled": "yes",
+            "State": "default",
+            "Size": "default"
+          },
+          "props": {
+            "Label text": "Date",
+            "Input text": "12/10/2026 → 16/08/2026",
+            "Show right icon": true
+          },
+          "code": "TextField size=default rightIcon=CalendarBlank"
+        },
+        {
+          "node": "9502:21336",
+          "component": "Text field (4064:685)",
+          "variant": {
+            "Filled": "yes",
+            "State": "default",
+            "Size": "default"
+          },
+          "props": {
+            "Label text": "Time",
+            "Input text": "09:00",
+            "Show right icon": true
+          },
+          "code": "TextField size=default rightIcon=Clock"
+        },
+        {
+          "node": "9502:21681",
+          "component": "Button Icon (4018:816)",
+          "variant": {
+            "Size": "default",
+            "Hierarchy": "inverse",
+            "Tone": "default",
+            "State": "default",
+            "Square": "Circle"
+          },
+          "size": 40,
+          "code": "HeaderButton size=40 (Back)"
+        },
+        {
+          "node": "9502:21682",
+          "component": "Button Icon (4018:816)",
+          "variant": {
+            "Size": "default",
+            "Hierarchy": "inverse",
+            "Tone": "default",
+            "State": "default",
+            "Square": "Circle"
+          },
+          "size": 44,
+          "code": "HeaderButton size=44 (More)"
+        },
+        {
+          "node": "9502:21685",
+          "component": ".Docked button (4018:1209)",
+          "variant": {
+            "Buttons": "single button"
+          },
+          "code": "Button hierarchy=primary docked",
+          "text": "Save"
+        }
+      ],
+      "removed": {
+        "node": "9502:21684",
+        "component": "Receipt actions (5359:8681)",
+        "why": "removed at the user's request"
+      }
+    },
+    {
+      "id": "saved",
+      "node": "9502:21212",
+      "name": "Receipt Details / Tags + Image Attached (sic)",
+      "mode": "Light",
+      "code": "MilestoneCelebration (src/components/celebration)",
+      "next": {
+        "Done": "details",
+        "×": "details"
+      },
+      "props": {
+        "title": "Receipt saved",
+        "body": "{merchant} • {amount} • {day month}",
+        "icon": "CheckBadge (9502:21221)",
+        "primaryAction": "Done"
+      },
+      "instances": [
+        {
+          "node": "9502:21304",
+          "component": "Button Icon (4018:816)",
+          "variant": {
+            "Size": "default",
+            "Hierarchy": "inverse",
+            "Tone": "default",
+            "State": "default",
+            "Square": "Circle"
+          },
+          "code": "HeaderButton flat"
+        },
+        {
+          "node": "9502:21323",
+          "component": "Button (4018:505)",
+          "variant": {
+            "Hierarchy": "secondary",
+            "Size": "Large",
+            "State": "Default",
+            "Tone": "Default"
+          },
+          "props": {
+            "Button Text": "Done",
+            "show left icon": false,
+            "show right icon": false
+          },
+          "code": "Button hierarchy=secondary"
+        }
+      ],
+      "slots": {
+        "children": "MilestoneCard (9502:21308): This is your {ordinal} purchase from {merchant} / {merchantTotal} there so far. {topCategory} is your top category"
+      }
+    },
+    {
+      "id": "details",
+      "node": "9564:21987",
+      "name": "Receipt Details / Tags + Image Attached",
+      "mode": "Light",
+      "code": "src/screens/ReceiptDetails.tsx",
+      "next": {
+        "Back": "camera",
+        "Not this": "suggestion dismissed"
+      },
+      "instances": [
+        {
+          "node": "9564:21994",
+          "component": "Button Icon (4018:816)",
+          "variant": {
+            "Size": "default",
+            "Hierarchy": "inverse"
+          },
+          "code": "HeaderButton size=40 (Back)"
+        },
+        {
+          "node": "9564:21995",
+          "component": "Button Icon (4018:816)",
+          "variant": {
+            "Size": "default",
+            "Hierarchy": "inverse"
+          },
+          "code": "HeaderButton size=40 (More)"
+        },
+        {
+          "node": "9564:22016",
+          "component": "Lists",
+          "code": "ItemRow (shared with Review)"
+        },
+        {
+          "node": "9564:22210",
+          "component": "Lists (4274:5809)",
+          "code": "DetailRow ×3"
+        },
+        {
+          "node": "9564:22234",
+          "component": "tag-pill ×n",
+          "code": "MetaBlock + Pill (shared with Review)"
+        },
+        {
+          "node": "9564:22297",
+          "component": "attachment row",
+          "code": "EvidenceRow caret"
+        },
+        {
+          "node": "9564:22311",
+          "component": "Inline message",
+          "code": "suggestion (derived from payments)"
+        },
+        {
+          "node": "9564:22330",
+          "component": "Button (link, quiet)",
+          "text": "Not this"
+        },
+        {
+          "node": "9564:22331",
+          "component": "Button (secondary, small)",
+          "text": "Link"
+        }
+      ],
+      "tokenBindings": {
+        "9564:22311": "Color/background/info/default, Color/border/info-subtle (dashed), Border radius/600, Color/text/accent/blue",
+        "9564:22333": "Color/border/default (dashed), Border radius/400, Color/text/secondary",
+        "9564:22001": "Display/d2, Color/text/default"
+      }
+    }
+  ],
+  "tokenBindings": {
+    "9502:21212 fill": "--gap-color-celebration-surface → --color-yellow-300 (unbound in Figma)",
+    "9502:21224 Receipt saved": "text style Display/d2 → .ts-display-d2; colour Color/text/text-black → --color-text-text-black",
+    "9502:21225 body": "Body/base → .ts-body-base",
+    "9502:21321": "Label/large → .ts-label-large; Color/text/default; emphasis #e58800 → --gap-color-milestone-emphasis",
+    "9502:21322": "Body/base + Label-Bold/small; Color/text/subtle; #524a37 → --gap-color-milestone-figure",
+    "9502:21308": "Border radius/600 → --border-radius-600; Spacing 16/12 → --spacing-400/300",
+    "9502:21323": "Border radius/full; Color/text/text-white; base #181102 → --gap-color-button-secondary",
+    "9502:21324 fill": "Color/surface/secondary/default → --color-surface-secondary-default",
+    "9502:21326": "Color/surface/default; Spacing/200, /400; radius 24",
+    "Text field large": "Color/background/neutral/subtle/default; Border radius/300; Spacing/300, /400; Label/xsmall; Large input",
+    "Text field default": "…; Body/Large",
+    "tag-pill (tag)": "Color/background/brand/default; Color/border/brand-subtle; Body/base; Spacing/50, /200",
+    "tag-pill (mention)": "Color/background/neutral/subtle/default; Color/text/secondary",
+    "9502:21342 card": "Color/surface/default; Border radius/600; shadow → --gap-shadow-card",
+    "Lists rows": "Color/border/subtler (rows 1–2; rows 3–7 bind Color/border/subtle)",
+    "Docked button": "Color/background/brand/bold/default; Label-Bold/base; Color/text/text-black",
+    "9502:21688 Bottom tab": "Color/surface/translucent/default (Dark); Color/border/subtler; Color/border/inverse-subtlest",
+    "9502:21739 Continue": "Color/background/brand/bold/default (Dark = yellow/500)",
+    "9502:21698 shutter": "Color/icon/default (Dark)",
+    "4653:68317 veil": "no-fill white → Color/surface/default; blur 3 → --gap-blur-processing",
+    "4653:68318 pill": "Color/surface/overlay/default; Color/text/secondary; Label/base"
+  },
+  "motion": {
+    "source": "none in Figma; shared playground set + brief choreography; full spec in MOTION.md",
+    "celebrationEntrance": [
+      {
+        "t": 0,
+        "el": "ground",
+        "anim": "disc from the Save button, scale 0.03→1",
+        "easing": "--motion-ease-natural-out"
+      },
+      {
+        "t": 80,
+        "el": "badge (pop + spin)",
+        "anim": "scale 0→1 critically damped, 400; rotate -160°→0 decelerating, 640; no overshoot, uniform scale",
+        "easing": "--motion-ease-launch, --motion-ease-natural-out"
+      },
+      {
+        "t": 130,
+        "el": "check stroke",
+        "anim": "draw while the disc turns",
+        "easing": "--motion-ease-natural-out"
+      },
+      {
+        "t": 140,
+        "el": "rings",
+        "anim": "2 shock rings, scale 1→3.2, 140ms apart"
+      },
+      {
+        "t": 500,
+        "el": "badge (rise)",
+        "anim": "one smooth move to its slot on an 8px arc, 1.45x→1; no dip, no overshoot",
+        "duration": "--motion-duration-celebration-settle",
+        "easing": "--motion-ease-natural"
+      },
+      {
+        "t": 520,
+        "el": "rays",
+        "anim": "scale 0.3→1 + fade",
+        "easing": "--motion-ease-launch"
+      },
+      {
+        "t": 560,
+        "el": "confetti",
+        "anim": "burst then 2.5s trickle"
+      },
+      {
+        "t": 800,
+        "el": "title",
+        "anim": "word by word out of masks",
+        "easing": "--motion-spring-gentle"
+      },
+      {
+        "t": 1050,
+        "el": "body",
+        "anim": "rise 12 + fade",
+        "easing": "--motion-spring-gentle"
+      },
+      {
+        "t": 1400,
+        "el": "card (+ star at 1600)",
+        "anim": "rise 24 + scale 0.96→1; star spins in: scale 0.5→1 critically damped, 400; rotate -160°→0 decelerating, 640; no overshoot",
+        "easing": "--motion-spring-gentle; star --motion-ease-launch, --motion-ease-natural-out"
+      },
+      {
+        "t": 1800,
+        "el": "cta + close",
+        "anim": "rise + fade; interactive on land",
+        "easing": "--motion-spring-gentle"
+      }
+    ],
+    "celebrationExit": {
+      "duration": "--motion-duration-celebration-exit",
+      "easing": "--motion-ease-natural",
+      "content": "sink/shrink + fade",
+      "ambient": "rays, confetti, ground fade together"
+    },
+    "rays": {
+      "count": 16,
+      "layers": [
+        {
+          "rays": 8,
+          "width": "--gap-ray-width-wide",
+          "color": "--gap-color-ray",
+          "revolution": "--motion-duration-rays-outer-rev",
+          "direction": "cw"
+        },
+        {
+          "rays": 8,
+          "offsetDeg": 22.5,
+          "width": "--gap-ray-width-narrow",
+          "color": "--gap-color-ray-bright",
+          "revolution": "--motion-duration-rays-inner-rev",
+          "direction": "ccw"
+        }
+      ],
+      "breathe": "--motion-duration-rays-breathe"
+    },
+    "confetti": {
+      "tokens": "--confetti-*",
+      "cap": 150,
+      "waves": [
+        "burst 90",
+        "trickle 60 over 2.5s"
+      ],
+      "clearBy": "5s"
+    },
+    "reducedMotion": "no confetti, still rays, plain fade",
+    "captureToReview": "sheet: Review rises translateY 100%→0 over the frozen shot (--motion-duration-slow, --motion-ease-out); no zoom",
+    "liveCapture": "CaptureScene: --capture-* tokens (drift, focus, detection, grain)",
+    "principles": "12 principles mapped in MOTION.md"
+  }
+}

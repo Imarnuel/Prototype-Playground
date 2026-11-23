@@ -1,0 +1,33 @@
+.notice__region {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Under the header row on every screen (68 tall below the safe area), clear of the
+     camera's shutter and the docked Save. */
+  top: calc(var(--safe-top) + var(--spacing-300) * 2 + var(--gap-size-icon-button-lg) + var(--spacing-200));
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  padding-inline: var(--spacing-400);
+}
+.notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-25);
+  padding: var(--spacing-300) var(--spacing-400);
+  border-radius: var(--border-radius-600);
+  background: var(--color-surface-overlay-default);
+  color: var(--color-text-secondary);
+  box-shadow: var(--gap-shadow-float);
+  text-align: center;
+  transition:
+    opacity var(--motion-duration-fast) var(--motion-ease-out),
+    transform var(--motion-duration-fast) var(--motion-ease-out);
+}
+.notice[data-state='enter'],
+.notice[data-state='exit'] { opacity: 0; transform: translateY(calc(var(--spacing-200) * -1)); }
+.notice[data-state='exit'] { transition-timing-function: var(--motion-ease-in); }
+.notice__badge { color: var(--color-text-brand); }
+.app[data-reduced-motion='true'] .notice[data-state='enter'],
+.app[data-reduced-motion='true'] .notice[data-state='exit'] { transform: none; }

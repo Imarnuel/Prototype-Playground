@@ -1,0 +1,290 @@
+/*
+ * Emlaya Design tokens — read off Figma file LPXddONZ7IMNlIowbz161x, the variables bound
+ * inside flow node 9502:21986 and processing frame 4653:68091.
+ *
+ * Every value here is [var]: a Figma variable, resolved per mode with use_figma
+ * (Semantic collection VariableCollectionId:152:3813, modes Light / Dark; Primitives
+ * collection, one mode). Values that a node uses raw, not bound to any variable, are
+ * NOT here — they live in tokens.gaps.css with the node they came from.
+ *
+ * Names are the Figma variable PATHS, kebab-cased (`Color/text/default` →
+ * `--color-text-default`), not the variables' Web code syntax: the code syntax collides
+ * (e.g. `Color/border/brand` and `Color/border/brand-subtle` both claim
+ * `theme.colors.borderBrand`). See CORRECTIONS.md, "Token naming".
+ *
+ * The frames pin modes explicitly: Review, Processing and the celebration set Light
+ * (mode 152:0); the two camera frames resolve Dark. Screens opt into a mode with
+ * `data-theme`, never by redefining a token locally.
+ */
+
+:root {
+  /* --- Primitives (Primitives collection, and alias targets of Semantic) -------- */
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-alpha-neutral-06: #0c0e180f;
+
+  --color-yellow-100: #fff9d1;
+  --color-yellow-300: #ffde46;
+  --color-yellow-400: #ffc412;
+  --color-yellow-500: #feb007;
+  --color-yellow-600: #e58800;
+  --color-yellow-950: #483100;
+  --color-neutral-50: #fcfbf8;
+  --color-neutral-100: #f6f3ef;
+  --color-neutral-400: #aea89b;
+  --color-neutral-600: #7a7466;
+  --color-neutral-700: #524a37;
+  --color-neutral-800: #393121;
+  --color-neutral-900: #2c271b;
+  --color-neutral-950: #181102;
+  --color-orange-500: #fd7c2b;
+  --color-orange-600: #fb5b04;
+  --color-cyan-400: #00bef3;
+  --color-cyan-600: #008ab8;
+  --color-blue-50: #dbeafe;
+  --color-blue-200: #99cbff;
+  --color-blue-300: #51a2ff;
+  --color-blue-400: #51a2ff;
+  --color-blue-600: #1b5ff6;
+  --color-blue-700: #1849e2;
+  --color-blue-950: #162456;
+  --color-alpha-neutral-300: #2c271b24;
+  --color-dark-neutral-50: #181716;
+  --color-dark-alpha-neutral-300: #e0dedc3d;
+  --color-alpha-neutral-100: #362a120f;
+  --color-alpha-neutral-200: #2c271b1a;
+  --color-alpha-neutral-500: #2a261d99;
+  --color-dark-neutral-100: #222220;
+  --color-dark-neutral-200: #302e2c;
+  --color-dark-neutral-400: #837f77;
+  --color-dark-neutral-500: #a39f99;
+  --color-dark-neutral-700: #c2c0bd;
+  --color-dark-neutral-900: #dfdedd;
+  --color-dark-alpha-neutral-25: #1d1c1b;
+  --color-dark-alpha-neutral-100: #e0dedc12;
+  --color-dark-alpha-neutral-200: #e0dedc24;
+  --color-dark-alpha-neutral-500: #e0dedca8;
+  --color-dark-alpha-neutral-600: #e0dedcc2;
+  --color-dark-alpha-neutral-800: #e0dedced;
+
+  /* --- Spacing (Primitives) ------------------------------------------------------ */
+  --spacing-0: 0px;
+  --spacing-25: 2px;
+  --spacing-50: 4px;
+  --spacing-100: 6px;
+  --spacing-200: 8px;
+  --spacing-300: 12px;
+  --spacing-400: 16px;
+  --spacing-500: 20px;
+
+  /* --- Border radius (Primitives) ------------------------------------------------ */
+  --border-radius-50: 4px;
+  --border-radius-200: 8px;
+  --border-radius-300: 12px;
+  --border-radius-400: 16px;
+  --border-radius-600: 24px;
+  --border-radius-650: 28px;
+  --border-radius-full: 9999px;
+
+  /* --- Effect style: Shadow/xs --------------------------------------------------- */
+  --shadow-xs: 0 1px 2px 0 #0a0d120d;
+
+  /* --- Type (Semantic; identical in both modes unless redefined below) ----------- */
+  --type-font-family-body: 'Geist', system-ui, sans-serif;
+  --type-font-family-label: 'Geist', system-ui, sans-serif;
+  --type-font-family-heading: 'Zalando Sans SemiExpanded', 'Geist', system-ui, sans-serif;
+  --type-font-weight-body: 400;
+  --type-font-weight-label: 500;
+  --type-font-weight-label-bold: 600;
+  --type-font-weight-heading: 600;
+
+  --type-font-size-body-xsmall: 12px;
+  --type-font-size-body-small: 13px;
+  --type-font-size-body-base: 15px;
+  --type-font-size-body-large: 17px;
+  --type-font-size-heading-h1: 22px;
+  --type-font-size-heading-h3: 17px;
+  --type-font-size-heading-h4: 15px;
+  --type-font-size-display-d2: 28px;
+
+  --type-line-height-body-base: 18px;
+  --type-line-height-body-large: 24px;
+  --type-line-height-label-small: 16px;
+  --type-line-height-label-base: 18px;
+  --type-line-height-label-large: 22px;
+  --type-line-height-heading-h1: 28px;
+  --type-line-height-heading-h3: 22px;
+  --type-line-height-heading-h4: 18px;
+  --type-line-height-display-d2: 32px;
+
+  --type-letter-spacing-body-base: 0px;
+  --type-letter-spacing-body-large: 0px;
+  --type-letter-spacing-label-small: 0px;
+  --type-letter-spacing-label-base: 0px;
+  --type-letter-spacing-label-large: -0.1px;
+  --type-letter-spacing-heading-h2: -0.32px;
+  --type-letter-spacing-heading-h3: -0.2px;
+  --type-letter-spacing-heading-h4: -0.1px;
+}
+
+/* --- Semantic colours: Light (mode 152:0) ----------------------------------------
+   Scoped to the app's own sections, never a bare [data-theme]: a host page (the hosted
+   preview's viewer) sets data-theme on <html> for its own UI. Matching that turned the
+   whole root dark — and every gap token that composes a semantic colour (the processing
+   veil's gradient) resolves at :root, so the light Review screen drew a dark veil. */
+:root,
+.app [data-theme='light'] {
+  --color-text-default: var(--color-neutral-900);
+  --color-text-subtle: var(--color-neutral-600);
+  --color-text-subtlest: var(--color-neutral-400);
+  --color-text-secondary: var(--color-neutral-700);
+  --color-text-brand: var(--color-yellow-600);
+  --color-text-text-black: var(--color-neutral-900);
+  --color-text-text-white: var(--color-neutral-50);
+  --color-text-inverse: var(--color-neutral-50);
+  --color-text-accent-blue: var(--color-blue-600);
+
+  --color-icon-default: var(--color-neutral-800);
+  --color-icon-subtle: var(--color-neutral-600);
+  --color-icon-subtlest: var(--color-neutral-400);
+  --color-icon-brand: var(--color-yellow-500);
+  --color-icon-inverse: var(--color-neutral-50);
+  --color-icon-black: var(--color-neutral-800);
+  --color-icon-accent-orange: var(--color-orange-600);
+  --color-icon-accent-blue: var(--color-blue-600);
+
+  --color-surface-default: var(--color-white);
+  /* Light only. Two variables share this name; the one bound here (code syntax
+     theme.colors.surfaceSecondary) aliases a Dark value that did not resolve
+     unambiguously, so no Dark value is emitted rather than guessing one. */
+  --color-surface-secondary-default: var(--color-neutral-100);
+  --color-surface-translucent-default: rgb(255 255 255 / 0.85);
+  --color-surface-overlay-default: var(--color-white);
+
+  --color-background-brand-default: var(--color-yellow-100);
+  --color-background-brand-bold-default: var(--color-yellow-400);
+  --color-background-brand-bolder-default: var(--color-yellow-500);
+  --color-background-neutral-default: var(--color-alpha-neutral-200);
+  --color-background-neutral-subtle-default: var(--color-alpha-neutral-100);
+  --color-background-inverse-default: var(--color-white);
+  --color-background-info-default: var(--color-blue-50);
+
+  /* Two values for Color/border/default: #252b3724 bound in 9502:21986, and
+     alpha neutral/300 (#2c271b24) bound in 9564:21987. The later screen's is used. */
+  --color-border-default: var(--color-alpha-neutral-300);
+  --color-border-info-subtle: var(--color-blue-200);
+  --color-border-subtle: var(--color-alpha-neutral-200);
+  --color-border-subtler: var(--color-alpha-neutral-100);
+  --color-border-bolder: var(--color-alpha-neutral-500);
+  --color-border-brand: var(--color-yellow-500);
+  --color-border-brand-subtle: var(--color-yellow-300);
+  --color-border-inverse: var(--color-white);
+  --color-border-inverse-subtlest: rgb(255 255 255 / 0.4);
+  --color-border-accent-cyan: var(--color-cyan-600);
+  --color-border-accent-blue: var(--color-blue-600);
+
+  --color-button-highlight: var(--color-white);
+  --color-no-fill-white: rgb(255 255 255 / 0);
+}
+
+/* --- Semantic colours: Dark ------------------------------------------------------ */
+.app [data-theme='dark'] {
+  --color-text-default: var(--color-dark-neutral-900);
+  --color-text-subtle: var(--color-dark-neutral-500);
+  --color-text-subtlest: var(--color-dark-neutral-400);
+  --color-text-secondary: var(--color-dark-neutral-700);
+  --color-text-brand: var(--color-yellow-300);
+  --color-text-text-black: var(--color-neutral-900);
+  --color-text-text-white: var(--color-neutral-50);
+  --color-text-inverse: var(--color-dark-neutral-50);
+  --color-text-accent-blue: var(--color-blue-300);
+
+  --color-icon-default: var(--color-dark-alpha-neutral-800);
+  --color-icon-subtle: var(--color-dark-alpha-neutral-600);
+  --color-icon-subtlest: var(--color-dark-alpha-neutral-500);
+  --color-icon-brand: var(--color-yellow-400);
+  --color-icon-inverse: var(--color-neutral-950);
+  --color-icon-black: var(--color-neutral-800);
+  --color-icon-accent-orange: var(--color-orange-500);
+  --color-icon-accent-blue: var(--color-blue-300);
+
+  --color-surface-default: var(--color-dark-neutral-100);
+  --color-surface-translucent-default: rgb(34 34 32 / 0.85);
+  --color-surface-overlay-default: var(--color-dark-neutral-200);
+
+  --color-background-brand-default: var(--color-yellow-950);
+  --color-background-brand-bold-default: var(--color-yellow-500);
+  --color-background-brand-bolder-default: var(--color-yellow-400);
+  --color-background-neutral-default: var(--color-dark-alpha-neutral-200);
+  --color-background-neutral-subtle-default: #222220f2;
+  --color-background-inverse-default: var(--color-dark-alpha-neutral-25);
+  --color-background-info-default: var(--color-blue-950);
+
+  --color-border-default: var(--color-dark-alpha-neutral-300);
+  --color-border-info-subtle: var(--color-blue-700);
+  --color-border-subtle: var(--color-dark-alpha-neutral-200);
+  --color-border-subtler: var(--color-dark-alpha-neutral-100);
+  --color-border-bolder: var(--color-dark-alpha-neutral-500);
+  --color-border-brand: var(--color-yellow-400);
+  --color-border-brand-subtle: var(--color-yellow-600);
+  --color-border-inverse: var(--color-dark-alpha-neutral-25);
+  --color-border-inverse-subtlest: rgb(29 28 27 / 0.4);
+  --color-border-accent-cyan: var(--color-cyan-400);
+  --color-border-accent-blue: var(--color-blue-400);
+
+  --color-button-highlight: #ffffff40;
+  --color-no-fill-white: rgb(0 0 0 / 0);
+
+  /* Type/font size/heading/h1 is the one type variable that differs by mode. */
+  --type-font-size-heading-h1: 20px;
+}
+
+/* --- Text styles ------------------------------------------------------------------
+   One class per Figma text style, composed only of the variables each style binds.
+   The bindings are reproduced as Figma has them, quirks included: Body/base takes its
+   letter-spacing from body/large, Label-Bold/base from label/large, Display/d2 from
+   heading/h2. "Large input" binds no letter-spacing variable — see tokens.gaps.css. */
+.ts-body-small {
+  font: var(--type-font-weight-body) var(--type-font-size-body-small) / var(--type-line-height-body-base) var(--type-font-family-body);
+  letter-spacing: var(--type-letter-spacing-body-base);
+}
+.ts-body-base {
+  font: var(--type-font-weight-body) var(--type-font-size-body-base) / var(--type-line-height-body-base) var(--type-font-family-body);
+  letter-spacing: var(--type-letter-spacing-body-large);
+}
+.ts-body-large {
+  font: var(--type-font-weight-body) var(--type-font-size-body-large) / var(--type-line-height-body-large) var(--type-font-family-body);
+  letter-spacing: var(--type-letter-spacing-body-large);
+}
+.ts-label-xsmall {
+  font: var(--type-font-weight-label) var(--type-font-size-body-xsmall) / var(--type-line-height-label-small) var(--type-font-family-label);
+  letter-spacing: var(--type-letter-spacing-label-small);
+}
+.ts-label-base {
+  font: var(--type-font-weight-label) var(--type-font-size-body-base) / var(--type-line-height-label-base) var(--type-font-family-label);
+  letter-spacing: var(--type-letter-spacing-label-large);
+}
+.ts-label-large {
+  font: var(--type-font-weight-label) var(--type-font-size-body-large) / var(--type-line-height-label-large) var(--type-font-family-label);
+  letter-spacing: var(--type-letter-spacing-label-large);
+}
+.ts-label-bold-small {
+  font: var(--type-font-weight-label-bold) var(--type-font-size-body-small) / var(--type-line-height-body-base) var(--type-font-family-label);
+  letter-spacing: var(--type-letter-spacing-body-base);
+}
+.ts-label-bold-base {
+  font: var(--type-font-weight-label-bold) var(--type-font-size-body-base) / var(--type-line-height-label-base) var(--type-font-family-label);
+  letter-spacing: var(--type-letter-spacing-label-large);
+}
+.ts-large-input {
+  font: var(--type-font-weight-label-bold) var(--type-font-size-heading-h1) / var(--type-line-height-heading-h1) var(--type-font-family-body);
+  letter-spacing: var(--gap-type-letter-spacing-large-input);
+}
+.ts-heading-h3 {
+  font: var(--type-font-weight-heading) var(--type-font-size-heading-h3) / var(--type-line-height-heading-h3) var(--type-font-family-heading);
+  letter-spacing: var(--type-letter-spacing-heading-h3);
+}
+.ts-display-d2 {
+  font: var(--type-font-weight-heading) var(--type-font-size-display-d2) / var(--type-line-height-display-d2) var(--type-font-family-heading);
+  letter-spacing: var(--type-letter-spacing-heading-h2);
+}
