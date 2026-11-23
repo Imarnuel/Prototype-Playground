@@ -387,7 +387,7 @@
  * fintech "Confirm transfer" modal: 8.2s, 1600x1200, a 2x capture of an 800x600 page).
  * Two prototypes share everything below. A follows the reference: a bare line beside the
  * spinner, a shader glow rising from the bottom edge, a bloom to finish. B is calmer: the
- * same line with an emoji at its right, no shader, "Ready to review" to finish.
+ * same line with an emoji at its right, no shader; the line simply leaves at the result.
  *
  * Dwell times are measured off the video (sampled at 10 and 30fps):
  *   1.4s  tap; the content blurs out over ~0.4s
@@ -428,10 +428,16 @@
   --processing-ease-arrive: cubic-bezier(0, 0, 0.58, 1);
   --processing-arrive-spinner-delay: 100ms;
   --processing-arrive-spinner: 400ms;
-  /* The swap, on --motion-duration-instant (120ms: the measured ~100-120). */
+  /* The swap: the reference's roll (out first, then in from below), slowed at the user's
+     request ("the text change should be slower"). The reference runs each half in ~120ms
+     with the in starting ~80ms after the out, when the old line is down to ~0.3. Here
+     out is 300 (linear, as measured), in is 420, and in starts 200ms after out, when the
+     old line is down to 0.33: the same staging, slower. */
+  --processing-line-out: var(--motion-duration-base);
+  --processing-line-in: var(--motion-duration-slow);
+  --processing-line-in-delay: 200ms;
   --processing-line-rise-out: 3px;
   --processing-line-rise-in: 2.5px;
-  --processing-line-in-delay: 80ms;
   /* Exit. A's waits this long into the bloom before it goes, as the reference's does. */
   --processing-exit-rise: 3px;
   --processing-exit-blur: 4px;
@@ -443,22 +449,9 @@
   --processing-shimmer-cycle: 1600ms;
   --processing-shimmer-band: color-mix(in srgb, var(--color-text-secondary) 16%, transparent);
 
-  /* B's emojis: each pops in a beat after its line, on the launch curve, then idles. */
-  --processing-emoji-from-scale: 0.4;
-  --processing-emoji-from-turn: -24deg;
-  --processing-emoji-delay: 120ms;
-  /* Not from Figma (emojis are the user's request): at the text's 15px a colour emoji draws
-     ~12px tall and reads small beside the 24px spinner. 18px draws it ~15px. */
+  /* B's emojis move with their line and nothing else (the user found a pop and an idle
+     on each "too much"). */
   --processing-emoji-size: 18px;
-  --processing-idle-delay: 600ms;  /* after the pop has landed (120 + 420) */
-  --processing-idle-bob: 2px;
-  --processing-idle-bob-cycle: 1400ms;
-  --processing-idle-search: 1.5px;
-  --processing-idle-search-cycle: 1600ms;
-  --processing-idle-wiggle-cycle: 1500ms;
-  --processing-idle-pulse: 1.12;
-  --processing-idle-pulse-cycle: 1300ms;
-  --processing-idle-twinkle-cycle: 1800ms;
 
   /* A's glow: how far up the screen the band reaches at rest (the reference: ~36%). */
   --processing-glow-band: 0.36;

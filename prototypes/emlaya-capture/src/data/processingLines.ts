@@ -15,30 +15,23 @@
  * iPhone and like Noto or Segoe elsewhere. Not in Figma.
  */
 
-/** A small motion the emoji keeps while its line holds; each suits what the line says. */
-export type Idle = 'bob' | 'pulse' | 'search' | 'wiggle' | 'twinkle' | 'none';
-
 export type ProcessingLine = {
   /** A new key is a new line, and gets the swap. */
   key: string;
   text: string;
+  /** B only. Moves with its line and has no motion of its own. */
   emoji: string;
-  idle: Idle;
-  /** A still line has nothing in progress: no shimmer, and the spinner rests. */
-  still?: boolean;
 };
 
 export const PROCESSING_LINES: readonly ProcessingLine[] = [
-  { key: 'read', text: 'Reading your receipt...', emoji: '🧾', idle: 'bob' },
-  { key: 'merchant', text: 'Spotting the merchant...', emoji: '🏪', idle: 'pulse' },
-  { key: 'total', text: 'Hunting for the total...', emoji: '🔎', idle: 'search' },
-  { key: 'items', text: 'Listing your items...', emoji: '🛒', idle: 'wiggle' },
+  { key: 'read', text: 'Reading your receipt...', emoji: '🧾' },
+  { key: 'merchant', text: 'Spotting the merchant...', emoji: '🏪' },
+  { key: 'total', text: 'Hunting for the total...', emoji: '🔎' },
+  { key: 'items', text: 'Listing your items...', emoji: '🛒' },
   // The last line holds for as long as extraction runs past the cadence.
-  { key: 'tidy', text: 'Tidying up the details...', emoji: '✨', idle: 'twinkle' },
+  { key: 'tidy', text: 'Tidying up the details...', emoji: '✨' },
 ];
 
-/** B's finish, before the fields arrive. A finishes with the bloom instead. */
-export const READY_LINE: ProcessingLine = { key: 'ready', text: 'Ready to review', emoji: '✅', idle: 'none', still: true };
-
-/** Every line B can show, for sizing: the spinner must not move when a longer line arrives. */
-export const ALL_LINES: readonly ProcessingLine[] = [...PROCESSING_LINES, READY_LINE];
+// No "done" line: extraction reports no progress, only its result, so the loader never
+// claims a stage it cannot know (the user removed "Ready to review"). The lines are a
+// cadence, not progress; when the result lands, the line simply leaves.

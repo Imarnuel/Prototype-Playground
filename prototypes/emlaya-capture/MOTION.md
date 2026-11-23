@@ -162,12 +162,12 @@ build, typical pace (6.2s):
 | Beat | A (after the reference) | B (calm) | Measured |
 |---|---|---|---|
 | Veil | once the sheet lands, the skeleton blurs to 9px over 420 | same | `blur(9px)` computed |
-| First line | text and spinner fade in from a 3px blur: opacity over 350ms, blur clearing over 530ms, the spinner 100ms behind; the glow rises from the bottom (420, out) | same; the emoji pops in on the launch curve | opacity 0.43 / 0.80 / 1.00 at 127 / 246 / 361ms (reference ≈0.48 / 0.76 / 1.00) |
-| Cadence | a new line every 1.7s, a vertical roll with no blur: the old line fades as it slides up 3px (120ms, linear); the new one rises 2.5px from below, 80ms later (120ms, out). The spinner and the text's left edge never move: the group is sized to the widest line | same, the emoji with its line | old gone by ~100ms, new settled by ~180ms (reference ≈100–120 and ≈180); spinner centre one value across 231 frames |
-| Holding | a light band sweeps the text (350 pause, 1.6s cycle) | the same, and the emoji idles: 🧾 bobs, 🏪 pulses, 🔎 circles, 🛒 wiggles, ✨ glints | idle animation named per line |
+| First line | text and spinner fade in from a 3px blur: opacity over 350ms, blur clearing over 530ms, the spinner 100ms behind; the glow rises from the bottom (420, out) | same; the emoji arrives with its line | opacity 0.43 / 0.80 / 1.00 at 127 / 246 / 361ms (reference ≈0.48 / 0.76 / 1.00) |
+| Cadence | a new line every 1.7s, the reference's vertical roll with no blur, slowed at the user's request ("the text change should be slower"): the old line fades as it slides up 3px (300, linear); the new one rises 2.5px from below once the old is down to a third, 200ms in (420, out). The reference runs the same staging in ~120 + ~120. The spinner and the text's left edge never move: the group is sized to the widest line | same; the emoji rolls with its line, nothing of its own | old 0.39 at 189ms, gone at 300; new 0.41 at 243, 0.81 at 300, settled by ~560; spinner centre one value throughout |
+| Holding | a light band sweeps the text (350 pause, 1.6s cycle) | the same; the emoji holds still (a pop-in and an idle per emoji were tried and removed: "too much") | no animation on the emoji |
 | Result lands | the line is held until it has been up 900ms | same | resolved 244ms into a line → finish at ~900 |
-| Finish | the glow blooms over the screen (420, inOut), translucent; 250ms in, the line drifts up 3px and fades (300), blurring to 4px only at the end | "Ready to review ✅" rolls in, no shimmer; the spinner fades out but keeps its slot | bloom 0.94 at +345ms |
-| Hand-over (520 later) | the bloom fades as a layer, the veil sharpens, fields rise in | the line drifts up and fades the same way; the same | fields at 7533 (A), 7406 (B) |
+| Finish | the glow blooms over the screen (420, inOut), translucent; 250ms in, the line drifts up 3px and fades (300), blurring to 4px only at the end | the line drifts up and fades the same way, at once. No "done" line: extraction reports no progress, only its result (the user removed "Ready to review") | bloom 0.94 at +345ms |
+| Hand-over (520 later) | the bloom fades as a layer, the veil sharpens, fields rise in | the veil sharpens, fields rise in | fields at 7543 (A), 7441 (B) |
 
 The shader stops drawing once its layer has faded (it is unmounted). Its palette is a switch:
 the reference's colours, sampled from the video, or Emlaya's yellow ramp.

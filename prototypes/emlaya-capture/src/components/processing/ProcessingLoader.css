@@ -76,11 +76,7 @@
   animation:
     processing-spin var(--motion-duration-spinner-rev) linear infinite,
     processing-arrive-fade var(--processing-arrive-spinner) var(--processing-ease-arrive) var(--processing-arrive-spinner-delay) backwards;
-  transition: opacity var(--motion-duration-instant) var(--motion-ease-out);
 }
-/* B's "Ready to review": nothing is in progress any more, so the spinner rests out of sight.
-   Its slot stays, so the text does not move. */
-.status__spinner--done { opacity: 0; }
 
 /* The stack is as wide as the widest line (the sizer), so the spinner never moves. */
 .status__stack { position: relative; display: grid; }
@@ -94,18 +90,17 @@
   white-space: nowrap;
 }
 .status__item { position: absolute; left: 0; top: 0; }
-/* The swap: a vertical roll, no blur. Out first; in once the old line is mostly gone. */
+/* The swap: a vertical roll, no blur. Out first, fading steadily (linear, as measured);
+   in once the old line is down to a third, so the two never sit on top of each other. */
 .status__item[data-phase='in'] {
-  animation: processing-line-in var(--motion-duration-instant) var(--motion-ease-out) var(--processing-line-in-delay) both;
+  animation: processing-line-in var(--processing-line-in) var(--motion-ease-out) var(--processing-line-in-delay) both;
 }
-.status__item[data-phase='out'] { animation: processing-line-out var(--motion-duration-instant) linear both; }
-
-.status__text { color: var(--color-text-secondary); }
+.status__item[data-phase='out'] { animation: processing-line-out var(--processing-line-out) linear both; }
 
 /* The shimmer: the reference's light band sweeping the letters. The text is painted by
    its own background (background-clip: text) so the band passes through the glyphs;
    position 100% → 0% walks the band from before the first letter to past the last. */
-.status__text[data-shimmer='true'] {
+.status__text {
   background-image: linear-gradient(
     100deg,
     var(--color-text-secondary) 0%,
@@ -122,17 +117,9 @@
   animation: processing-shimmer var(--processing-shimmer-cycle) var(--motion-ease-inOut) var(--processing-shimmer-delay) infinite;
 }
 
-/* B's emoji: it pops in a beat after its line, on the launch curve, then idles. */
-.status__emoji { flex: none; display: inline-block; font-size: var(--processing-emoji-size); line-height: 1; }
-.status__item[data-phase='in'] .status__emoji {
-  animation: processing-emoji-in var(--motion-duration-launch) var(--motion-ease-launch) calc(var(--processing-line-in-delay) + var(--processing-emoji-delay)) both;
-}
-.status__emojiGlyph { display: inline-block; }
-.status__emojiGlyph[data-idle='bob'] { animation: processing-idle-bob var(--processing-idle-bob-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
-.status__emojiGlyph[data-idle='pulse'] { animation: processing-idle-pulse var(--processing-idle-pulse-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
-.status__emojiGlyph[data-idle='search'] { animation: processing-idle-search var(--processing-idle-search-cycle) linear var(--processing-idle-delay) infinite; }
-.status__emojiGlyph[data-idle='wiggle'] { animation: processing-idle-wiggle var(--processing-idle-wiggle-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
-.status__emojiGlyph[data-idle='twinkle'] { animation: processing-idle-twinkle var(--processing-idle-twinkle-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
+/* B's emoji rides with its line: the same arrival, roll and exit as the text, nothing of
+   its own (the user: "the emoji animation is too much"). */
+.status__emoji { flex: none; font-size: var(--processing-emoji-size); line-height: 1; }
 
 @keyframes processing-arrive-fade { from { opacity: 0; } }
 @keyframes processing-arrive-focus { from { filter: blur(var(--processing-arrive-blur)); } }
@@ -142,46 +129,18 @@
 @keyframes processing-line-out {
   to { opacity: 0; transform: translateY(calc(var(--processing-line-rise-out) * -1)); }
 }
-@keyframes processing-emoji-in {
-  from { opacity: 0; transform: scale(var(--processing-emoji-from-scale)) rotate(var(--processing-emoji-from-turn)); }
-}
 @keyframes processing-shimmer {
   0% { background-position: 100% 0; }
   47%, 100% { background-position: 0% 0; }
 }
 @keyframes processing-spin { to { transform: rotate(1turn); } }
-@keyframes processing-idle-bob {
-  50% { transform: translateY(calc(var(--processing-idle-bob) * -1)); }
-}
-@keyframes processing-idle-pulse {
-  50% { transform: scale(var(--processing-idle-pulse)); }
-}
-/* A magnifier hunting: a small circle, the lens leading. */
-@keyframes processing-idle-search {
-  0%, 100% { transform: translate(var(--processing-idle-search), 0) rotate(0deg); }
-  25% { transform: translate(0, var(--processing-idle-search)) rotate(-6deg); }
-  50% { transform: translate(calc(var(--processing-idle-search) * -1), 0) rotate(0deg); }
-  75% { transform: translate(0, calc(var(--processing-idle-search) * -1)) rotate(6deg); }
-}
-@keyframes processing-idle-wiggle {
-  0%, 60%, 100% { transform: rotate(0deg); }
-  15% { transform: rotate(-9deg); }
-  30% { transform: rotate(7deg); }
-  45% { transform: rotate(-4deg); }
-}
-/* Sparkle: a glint and a breath. */
-@keyframes processing-idle-twinkle {
-  0%, 100% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(15deg) scale(var(--processing-idle-pulse)); }
-}
-
 /* Reduced motion: lines still change (the state change must be seen) as a short
-   cross-fade, but nothing travels, blurs, sweeps, spins, pops or idles. The glow is a still
+   cross-fade, but nothing travels, blurs, sweeps or spins. The glow is a still
    frame (GlowShader). Out-specifies the study's blanket `.review *` rule on purpose. */
 .app[data-reduced-motion='true'] .processing .status__item[data-phase='in'] { animation: processing-fade-in var(--motion-duration-fast) linear both !important; }
 .app[data-reduced-motion='true'] .processing .status__item[data-phase='out'] { animation: processing-fade-out var(--motion-duration-fast) linear both !important; }
 .app[data-reduced-motion='true'] .processing .status { filter: none; transform: none; }
-.app[data-reduced-motion='true'] .processing .status__text[data-shimmer='true'] { background-position: 0% 0; }
+.app[data-reduced-motion='true'] .processing .status__text { background-position: 0% 0; }
 .app[data-reduced-motion='true'] .processing .status { animation: processing-fade-in var(--motion-duration-fast) linear backwards !important; }
 @keyframes processing-fade-in { from { opacity: 0; } }
 

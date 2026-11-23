@@ -21,8 +21,9 @@ type StatusLineProps = {
 /**
  * One status line, moved the way the reference moves it (measured frame by frame, MOTION.md):
  * - the first line arrives with the spinner, fading in from a slight blur;
- * - a swap is a quick vertical roll with no blur: the old line fades as it slides up, and
- *   the new one rises from just below, starting once the old one is mostly gone;
+ * - a swap is a vertical roll with no blur: the old line fades as it slides up, and the
+ *   new one rises from just below, starting once the old one is down to a third. Slower than
+ *   the reference's ~120ms, at the user's request (tokens.gaps.css);
  * - the spinner holds still throughout, and the text stays anchored to it.
  */
 export function StatusLine({ line, lines, spinner, emoji, leaving }: StatusLineProps) {
@@ -39,21 +40,21 @@ export function StatusLine({ line, lines, spinner, emoji, leaving }: StatusLineP
     if (!mounted.some((m) => m.phase === 'out')) return;
     const t = window.setTimeout(
       () => setMounted((prev) => prev.filter((m) => m.phase !== 'out')),
-      tokenMs('--motion-duration-instant'),
+      tokenMs('--processing-line-out'),
     );
     return () => window.clearTimeout(t);
   }, [mounted]);
 
   const row = (l: ProcessingLine) => (
     <>
-      <span className="status__text ts-label-base" data-shimmer={!l.still}>
+      <span className="status__text ts-label-base">
         {l.text}
       </span>
       {/* Outside the text span: the shimmer paints the text with background-clip, which
           would turn a colour emoji transparent. Decorative: the words carry the meaning. */}
       {emoji && (
         <span className="status__emoji" aria-hidden="true">
-          <span className="status__emojiGlyph" data-idle={l.idle}>{l.emoji}</span>
+          {l.emoji}
         </span>
       )}
     </>
@@ -61,7 +62,7 @@ export function StatusLine({ line, lines, spinner, emoji, leaving }: StatusLineP
 
   return (
     <div className="status" data-leaving={leaving} role="status" aria-live="polite">
-      <Icon src={spinner} size={24} className={`status__spinner${line.still ? ' status__spinner--done' : ''}`} />
+      <Icon src={spinner} size={24} className="status__spinner" />
       <div className="status__stack">
         {/* Sizes the stack to the widest line; never seen, never read. */}
         <div className="status__sizer" aria-hidden="true">
