@@ -33,7 +33,7 @@ src/components/ui.tsx        Button, HeaderButton, TextField, Pill, GlassButton,
 src/components/celebration/  MilestoneCelebration, CheckBadge, MilestoneCard, Rays, Confetti
 src/components/capture/      CameraFeed + CaptureScene: the live camera (not in Figma, user request)
 src/components/processing/   ProcessingLoader (A/B), StatusLine, GlowShader (WebGL): user request, P6
-src/data/processingLines.ts  the loader's five lines and their Phosphor icons
+src/data/processingLines.ts  the loader's five lines and B's emojis
 src/data/receiptDocument.ts  the paper receipt the camera sees, printed from the record
 src/screens/                 Camera (live + captured), Review (processing + ready + error), ReceiptDetails
 src/components/record/       ItemRow, MetaBlock, EvidenceRow: shared by Review and Receipt Details

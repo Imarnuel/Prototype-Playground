@@ -6,13 +6,15 @@
  *
  * A follows the reference: the line bare on the veil beside the frame's spinner, a shader
  * glow rising from the bottom edge, and a bloom when the result lands.
- * B is calmer: the frame's own pill, an icon on every line, no shader, a check to finish.
+ * B is calmer: the same spinner and line, an emoji right of each line, no shader, and
+ * "Ready to review" to finish. (B first had the frame's pill and an icon in the spinner's
+ * place; the user removed the pill and asked for emojis on the right instead.)
  * Both share the veil, the lines, the swap and the cadence (tokens.gaps.css, "Processing
  * loader").
  */
 import { useEffect, useRef, useState } from 'react';
 import circleNotch from '../../assets/figma/circle-notch.svg';
-import { PROCESSING_LINES, READY_LINE } from '../../data/processingLines';
+import { ALL_LINES, PROCESSING_LINES, READY_LINE } from '../../data/processingLines';
 import { usePresence } from '../../state/usePresence';
 import { tokenMs } from '../../tokens/read';
 import { GlowShader, type GlowPalette } from './GlowShader';
@@ -101,7 +103,7 @@ export function ProcessingLoader({ variant, status, palette, reduced, onSettled 
   const parts = usePresence(live, exitMs);
 
   const current = variant === 'b' && finishing ? READY_LINE : PROCESSING_LINES[line];
-  // A's line clears as the bloom rises, as the reference's does; B's holds its check.
+  // A's line clears into the bloom, as the reference's does; B's holds "Ready to review".
   const leaving = !live || (variant === 'a' && finishing);
 
   return (
@@ -116,7 +118,13 @@ export function ProcessingLoader({ variant, status, palette, reduced, onSettled 
 
       <div className="processing__centre">
         {started && parts.mounted && (
-          <StatusLine line={current} look={variant === 'a' ? 'bare' : 'pill'} spinner={variant === 'a' ? circleNotch : undefined} leaving={leaving} />
+          <StatusLine
+            line={current}
+            lines={variant === 'a' ? PROCESSING_LINES : ALL_LINES}
+            spinner={circleNotch}
+            emoji={variant === 'b'}
+            leaving={leaving}
+          />
         )}
       </div>
     </div>

@@ -53,42 +53,52 @@
   align-items: center;
   gap: var(--spacing-200);
   color: var(--color-text-secondary);
+  /* Arrives with its first line: a fade, and a slight blur clearing more slowly (backwards
+     fill, so the exit's transitions are free to run once these have played). */
+  animation:
+    processing-arrive-fade var(--processing-arrive-fade) var(--processing-ease-arrive) backwards,
+    processing-arrive-focus var(--processing-arrive-focus) var(--processing-ease-arrive) backwards;
   transition:
-    opacity var(--motion-duration-base) var(--motion-ease-out),
-    filter var(--motion-duration-base) var(--motion-ease-out),
+    opacity var(--motion-duration-base) linear,
+    filter var(--motion-duration-base) var(--motion-ease-in),
     transform var(--motion-duration-base) var(--motion-ease-out);
 }
-.status[data-leaving='true'] { opacity: 0; filter: blur(var(--processing-line-blur)); }
-.status--pill[data-leaving='true'] { transform: scale(var(--processing-pill-exit-scale)); }
-
-/* B: the frame's own pill (4653:68318). */
-.status--pill {
-  padding: var(--spacing-300);
-  border-radius: var(--border-radius-600);
-  background: var(--color-surface-overlay-default);
-  box-shadow: var(--gap-shadow-float);
-  overflow: hidden;
+/* Exit: drifts up and fades; the blur arrives only at the end (ease-in). */
+.status[data-leaving='true'] {
+  opacity: 0;
+  filter: blur(var(--processing-exit-blur));
+  transform: translateY(calc(var(--processing-exit-rise) * -1));
 }
+/* A: the line holds into the bloom before it goes, as the reference's does. */
+.processing[data-variant='a'][data-finishing='true'] .status[data-leaving='true'] { transition-delay: var(--processing-exit-delay); }
 
-.status__spinner { animation: processing-spin var(--motion-duration-spinner-rev) linear infinite; }
-
-.status__stack {
-  position: relative;
-  height: var(--gap-size-icon-24);
-  transition: width var(--motion-duration-base) var(--motion-ease-out);
+.status__spinner {
+  animation:
+    processing-spin var(--motion-duration-spinner-rev) linear infinite,
+    processing-arrive-fade var(--processing-arrive-spinner) var(--processing-ease-arrive) var(--processing-arrive-spinner-delay) backwards;
+  transition: opacity var(--motion-duration-instant) var(--motion-ease-out);
 }
-.status__item {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: var(--gap-size-icon-24);
+/* B's "Ready to review": nothing is in progress any more, so the spinner rests out of sight.
+   Its slot stays, so the text does not move. */
+.status__spinner--done { opacity: 0; }
+
+/* The stack is as wide as the widest line (the sizer), so the spinner never moves. */
+.status__stack { position: relative; display: grid; }
+.status__sizer { grid-area: 1 / 1; display: grid; visibility: hidden; }
+.status__sizer > .status__row { grid-area: 1 / 1; }
+.status__row {
   display: flex;
   align-items: center;
-  gap: var(--spacing-200);
+  gap: var(--spacing-100);
+  height: var(--gap-size-icon-24);
   white-space: nowrap;
 }
-.status__item[data-phase='in'] { animation: processing-line-in var(--motion-duration-base) var(--motion-ease-out) both; }
-.status__item[data-phase='out'] { animation: processing-line-out var(--motion-duration-fast) var(--motion-ease-in) both; }
+.status__item { position: absolute; left: 0; top: 0; }
+/* The swap: a vertical roll, no blur. Out first; in once the old line is mostly gone. */
+.status__item[data-phase='in'] {
+  animation: processing-line-in var(--motion-duration-instant) var(--motion-ease-out) var(--processing-line-in-delay) both;
+}
+.status__item[data-phase='out'] { animation: processing-line-out var(--motion-duration-instant) linear both; }
 
 .status__text { color: var(--color-text-secondary); }
 
@@ -112,35 +122,28 @@
   animation: processing-shimmer var(--processing-shimmer-cycle) var(--motion-ease-inOut) var(--processing-shimmer-delay) infinite;
 }
 
-/* B's icon: it arrives with its line, on the launch curve, then idles. */
-.status__icon {
-  flex: none;
-  width: var(--gap-size-icon-24);
-  height: var(--gap-size-icon-24);
-  animation: processing-icon-in var(--motion-duration-launch) var(--motion-ease-launch) both;
+/* B's emoji: it pops in a beat after its line, on the launch curve, then idles. */
+.status__emoji { flex: none; display: inline-block; font-size: var(--processing-emoji-size); line-height: 1; }
+.status__item[data-phase='in'] .status__emoji {
+  animation: processing-emoji-in var(--motion-duration-launch) var(--motion-ease-launch) calc(var(--processing-line-in-delay) + var(--processing-emoji-delay)) both;
 }
-.status__glyph {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background-color: var(--color-icon-brand);
-  -webkit-mask: center / contain no-repeat;
-  mask: center / contain no-repeat;
-}
-.status__icon[data-idle='bob'] .status__glyph { animation: processing-idle-bob var(--processing-idle-bob-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
-.status__icon[data-idle='pulse'] .status__glyph { animation: processing-idle-pulse var(--processing-idle-pulse-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
-.status__icon[data-idle='search'] .status__glyph { animation: processing-idle-search var(--processing-idle-search-cycle) linear var(--processing-idle-delay) infinite; }
-.status__icon[data-idle='wiggle'] .status__glyph { animation: processing-idle-wiggle var(--processing-idle-wiggle-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
-.status__icon[data-idle='twinkle'] .status__glyph { animation: processing-idle-twinkle var(--processing-idle-twinkle-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
+.status__emojiGlyph { display: inline-block; }
+.status__emojiGlyph[data-idle='bob'] { animation: processing-idle-bob var(--processing-idle-bob-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
+.status__emojiGlyph[data-idle='pulse'] { animation: processing-idle-pulse var(--processing-idle-pulse-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
+.status__emojiGlyph[data-idle='search'] { animation: processing-idle-search var(--processing-idle-search-cycle) linear var(--processing-idle-delay) infinite; }
+.status__emojiGlyph[data-idle='wiggle'] { animation: processing-idle-wiggle var(--processing-idle-wiggle-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
+.status__emojiGlyph[data-idle='twinkle'] { animation: processing-idle-twinkle var(--processing-idle-twinkle-cycle) var(--motion-ease-inOut) var(--processing-idle-delay) infinite; }
 
+@keyframes processing-arrive-fade { from { opacity: 0; } }
+@keyframes processing-arrive-focus { from { filter: blur(var(--processing-arrive-blur)); } }
 @keyframes processing-line-in {
-  from { opacity: 0; filter: blur(var(--processing-line-blur)); transform: translateY(var(--processing-line-rise)); }
+  from { opacity: 0; transform: translateY(var(--processing-line-rise-in)); }
 }
 @keyframes processing-line-out {
-  to { opacity: 0; filter: blur(var(--processing-line-blur)); transform: translateY(calc(var(--processing-line-rise) * -1)); }
+  to { opacity: 0; transform: translateY(calc(var(--processing-line-rise-out) * -1)); }
 }
-@keyframes processing-icon-in {
-  from { opacity: 0; transform: scale(var(--processing-icon-from-scale)) rotate(var(--processing-icon-from-turn)); }
+@keyframes processing-emoji-in {
+  from { opacity: 0; transform: scale(var(--processing-emoji-from-scale)) rotate(var(--processing-emoji-from-turn)); }
 }
 @keyframes processing-shimmer {
   0% { background-position: 100% 0; }
@@ -166,19 +169,20 @@
   30% { transform: rotate(7deg); }
   45% { transform: rotate(-4deg); }
 }
-/* Sparkle: a quarter-turn glint and a breath. */
+/* Sparkle: a glint and a breath. */
 @keyframes processing-idle-twinkle {
   0%, 100% { transform: rotate(0deg) scale(1); }
   50% { transform: rotate(15deg) scale(var(--processing-idle-pulse)); }
 }
 
 /* Reduced motion: lines still change (the state change must be seen) as a short
-   cross-fade, but nothing travels, blurs, sweeps, spins or idles. The glow is a still
+   cross-fade, but nothing travels, blurs, sweeps, spins, pops or idles. The glow is a still
    frame (GlowShader). Out-specifies the study's blanket `.review *` rule on purpose. */
 .app[data-reduced-motion='true'] .processing .status__item[data-phase='in'] { animation: processing-fade-in var(--motion-duration-fast) linear both !important; }
 .app[data-reduced-motion='true'] .processing .status__item[data-phase='out'] { animation: processing-fade-out var(--motion-duration-fast) linear both !important; }
 .app[data-reduced-motion='true'] .processing .status { filter: none; transform: none; }
 .app[data-reduced-motion='true'] .processing .status__text[data-shimmer='true'] { background-position: 0% 0; }
-.app[data-reduced-motion='true'] .processing .status__stack { transition: none; }
+.app[data-reduced-motion='true'] .processing .status { animation: processing-fade-in var(--motion-duration-fast) linear backwards !important; }
 @keyframes processing-fade-in { from { opacity: 0; } }
+
 @keyframes processing-fade-out { to { opacity: 0; } }

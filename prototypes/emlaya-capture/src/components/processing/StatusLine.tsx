@@ -1,35 +1,36 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import type { ProcessingLine } from '../../data/processingLines';
 import { tokenMs } from '../../tokens/read';
 import { Icon } from '../ui';
 
-type Mounted = { line: ProcessingLine; phase: 'in' | 'out' };
+/** `still`: the first line, which arrives with the whole status, not as a swap. */
+type Mounted = { line: ProcessingLine; phase: 'still' | 'in' | 'out' };
 
 type StatusLineProps = {
   line: ProcessingLine;
-  /** `bare`: the reference, a spinner and a line straight on the veil (A). `pill`: the frame's own pill, an icon per line (B). */
-  look: 'bare' | 'pill';
-  /** A only: the frame's CircleNotch beside the line. */
-  spinner?: string;
-  /** The whole line leaves: the loader is done with it. */
+  /** Every line this status can show: the group is as wide as the widest, so the spinner never moves. */
+  lines: readonly ProcessingLine[];
+  /** The frame's CircleNotch, left of the line. */
+  spinner: string;
+  /** B: each line's emoji, right of the text (user request). */
+  emoji: boolean;
+  /** The whole status leaves: the loader is done with it. */
   leaving: boolean;
 };
 
 /**
- * One status line, swapped the way the reference swaps it: the outgoing line blurs and
- * fades up while the incoming one sharpens in beneath it, overlapping (~150ms at 30fps).
- * Both stay mounted through the swap, so neither cuts. Lines anchor left inside a stack
- * that eases to each line's width, so the group re-centres smoothly instead of jumping,
- * and B's pill hugs it.
+ * One status line, moved the way the reference moves it (measured frame by frame, MOTION.md):
+ * - the first line arrives with the spinner, fading in from a slight blur;
+ * - a swap is a quick vertical roll with no blur: the old line fades as it slides up, and
+ *   the new one rises from just below, starting once the old one is mostly gone;
+ * - the spinner holds still throughout, and the text stays anchored to it.
  */
-export function StatusLine({ line, look, spinner, leaving }: StatusLineProps) {
-  const [mounted, setMounted] = useState<Mounted[]>([{ line, phase: 'in' }]);
-  const [width, setWidth] = useState<number | null>(null);
-  const incoming = useRef<HTMLDivElement>(null);
+export function StatusLine({ line, lines, spinner, emoji, leaving }: StatusLineProps) {
+  const [mounted, setMounted] = useState<Mounted[]>([{ line, phase: 'still' }]);
 
   useLayoutEffect(() => {
     setMounted((prev) => {
-      if (prev.some((m) => m.line.key === line.key && m.phase === 'in')) return prev;
+      if (prev.some((m) => m.line.key === line.key && m.phase !== 'out')) return prev;
       return [...prev.map((m) => ({ ...m, phase: 'out' as const })), { line, phase: 'in' }];
     });
   }, [line]);
@@ -37,40 +38,41 @@ export function StatusLine({ line, look, spinner, leaving }: StatusLineProps) {
   useLayoutEffect(() => {
     if (!mounted.some((m) => m.phase === 'out')) return;
     const t = window.setTimeout(
-      () => setMounted((prev) => prev.filter((m) => m.phase === 'in')),
-      tokenMs('--motion-duration-fast'),
+      () => setMounted((prev) => prev.filter((m) => m.phase !== 'out')),
+      tokenMs('--motion-duration-instant'),
     );
     return () => window.clearTimeout(t);
   }, [mounted]);
 
-  // Measured before paint, so the width starts moving on the swap's own frame.
-  useLayoutEffect(() => {
-    if (incoming.current) setWidth(incoming.current.offsetWidth);
-  }, [mounted]);
+  const row = (l: ProcessingLine) => (
+    <>
+      <span className="status__text ts-label-base" data-shimmer={!l.still}>
+        {l.text}
+      </span>
+      {/* Outside the text span: the shimmer paints the text with background-clip, which
+          would turn a colour emoji transparent. Decorative: the words carry the meaning. */}
+      {emoji && (
+        <span className="status__emoji" aria-hidden="true">
+          <span className="status__emojiGlyph" data-idle={l.idle}>{l.emoji}</span>
+        </span>
+      )}
+    </>
+  );
 
   return (
-    <div className={`status status--${look}`} data-leaving={leaving} role="status" aria-live="polite">
-      {spinner && <Icon src={spinner} size={24} className="status__spinner" />}
-      <div className="status__stack" style={width === null ? undefined : { width }}>
+    <div className="status" data-leaving={leaving} role="status" aria-live="polite">
+      <Icon src={spinner} size={24} className={`status__spinner${line.still ? ' status__spinner--done' : ''}`} />
+      <div className="status__stack">
+        {/* Sizes the stack to the widest line; never seen, never read. */}
+        <div className="status__sizer" aria-hidden="true">
+          {lines.map((l) => (
+            <div key={l.key} className="status__row">{row(l)}</div>
+          ))}
+        </div>
         {mounted.map(({ line: l, phase }) => (
-          <div
-            key={l.key}
-            ref={phase === 'in' ? incoming : undefined}
-            className="status__item"
-            data-phase={phase}
-            // A swap is read once: only the incoming line is in the accessibility tree.
-            aria-hidden={phase === 'out'}
-          >
-            {look === 'pill' && (
-              <span className="status__icon" data-idle={l.idle} aria-hidden="true">
-                {/* A mask, not an <img>: the library's glyphs are #343330, and this slot
-                    is iconBrand, as the frame's CircleNotch in the same pill is. */}
-                <span className="status__glyph" style={{ maskImage: `url("${l.icon}")`, WebkitMaskImage: `url("${l.icon}")` }} />
-              </span>
-            )}
-            <span className="status__text ts-label-base" data-shimmer={!l.still}>
-              {l.text}
-            </span>
+          // A swap is read once: only the incoming line is in the accessibility tree.
+          <div key={l.key} className="status__item status__row" data-phase={phase} aria-hidden={phase === 'out'}>
+            {row(l)}
           </div>
         ))}
       </div>

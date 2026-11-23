@@ -10,43 +10,35 @@
  * The "..." matches the frame's own "Extracting the details...". Copy is a proposal and
  * needs the owner's sign-off.
  *
- * Icons are the library's Phosphor set (page 4022:9650), Format=Stroke, Weight=Regular,
- * exported whole from each variant node named below. Only B draws them.
+ * Emojis are B's, right of the text, at the user's request (they replaced library icons
+ * left of it). They are the platform's own emoji font, so they look like Apple's on an
+ * iPhone and like Noto or Segoe elsewhere. Not in Figma.
  */
-import receipt from '../assets/figma/line-receipt.svg';
-import storefront from '../assets/figma/line-storefront.svg';
-import magnifyingGlass from '../assets/figma/line-magnifying-glass.svg';
-import listChecks from '../assets/figma/line-list-checks.svg';
-import sparkle from '../assets/figma/line-sparkle.svg';
-import checkCircle from '../assets/figma/line-check-circle.svg';
 
-/** A small motion the icon keeps while its line holds; each suits what the line says. */
+/** A small motion the emoji keeps while its line holds; each suits what the line says. */
 export type Idle = 'bob' | 'pulse' | 'search' | 'wiggle' | 'twinkle' | 'none';
 
 export type ProcessingLine = {
   /** A new key is a new line, and gets the swap. */
   key: string;
   text: string;
-  icon: string;
+  emoji: string;
   idle: Idle;
-  /** A still line has nothing in progress: no shimmer. */
+  /** A still line has nothing in progress: no shimmer, and the spinner rests. */
   still?: boolean;
 };
 
 export const PROCESSING_LINES: readonly ProcessingLine[] = [
-  { key: 'read', text: 'Reading your receipt...', icon: receipt, idle: 'bob' }, // Receipt 4022:69406
-  { key: 'merchant', text: 'Spotting the merchant...', icon: storefront, idle: 'pulse' }, // Storefront 4022:70414
-  { key: 'total', text: 'Hunting for the total...', icon: magnifyingGlass, idle: 'search' }, // MagnifyingGlass 4022:50448
-  { key: 'items', text: 'Listing your items...', icon: listChecks, idle: 'wiggle' }, // ListChecks 4022:60178
+  { key: 'read', text: 'Reading your receipt...', emoji: '🧾', idle: 'bob' },
+  { key: 'merchant', text: 'Spotting the merchant...', emoji: '🏪', idle: 'pulse' },
+  { key: 'total', text: 'Hunting for the total...', emoji: '🔎', idle: 'search' },
+  { key: 'items', text: 'Listing your items...', emoji: '🛒', idle: 'wiggle' },
   // The last line holds for as long as extraction runs past the cadence.
-  { key: 'tidy', text: 'Tidying up the details...', icon: sparkle, idle: 'twinkle' }, // Sparkle 4022:14946
+  { key: 'tidy', text: 'Tidying up the details...', emoji: '✨', idle: 'twinkle' },
 ];
 
 /** B's finish, before the fields arrive. A finishes with the bloom instead. */
-export const READY_LINE: ProcessingLine = {
-  key: 'ready',
-  text: 'Ready to review',
-  icon: checkCircle, // CheckCircle 4022:47464
-  idle: 'none',
-  still: true,
-};
+export const READY_LINE: ProcessingLine = { key: 'ready', text: 'Ready to review', emoji: '✅', idle: 'none', still: true };
+
+/** Every line B can show, for sizing: the spinner must not move when a longer line arrives. */
+export const ALL_LINES: readonly ProcessingLine[] = [...PROCESSING_LINES, READY_LINE];

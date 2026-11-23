@@ -387,14 +387,17 @@
  * fintech "Confirm transfer" modal: 8.2s, 1600x1200, a 2x capture of an 800x600 page).
  * Two prototypes share everything below. A follows the reference: a bare line beside the
  * spinner, a shader glow rising from the bottom edge, a bloom to finish. B is calmer: the
- * frame's own pill, an icon on every line, no shader, a check to finish.
+ * same line with an emoji at its right, no shader, "Ready to review" to finish.
  *
  * Dwell times are measured off the video (sampled at 10 and 30fps):
  *   1.4s  tap; the content blurs out over ~0.4s
- *   1.9s  the first line sharpens in; the glow rises over ~0.5s
+ *   1.9s  the line and spinner fade in from a 3px blur over ~550ms; the glow rises (~0.5s)
  *   2.3s  a light band sweeps the line, left to right, in ~0.7s
- *   3.75s line swap: the old line blurs out and up as the new one sharpens in (~150ms overlap)
+ *   3.74s line swap, a vertical roll with NO blur (fitted sigma <= 0.5px per frame): the old
+ *         line fades as it slides up 3px (~120ms), and the new one rises 2.5px from below,
+ *         starting ~80ms in (~120ms). The spinner never moves.
  *   5.3s  the result lands; the glow blooms over the whole card in ~0.5s
+ *   5.55s the line drifts up 3px and fades over ~300ms, blurring to ~4px only at the end
  *   5.8s  the bloom fades and the content sharpens
  * Lines held 1.85s and 1.55s. Transitions stay on the shared set (--motion-duration-*).
  */
@@ -414,10 +417,25 @@
   /* The finish (A's bloom, B's check) holds this long before the fields arrive. */
   --processing-resolve: 520ms;
 
-  /* The line swap: a 6px blur and a 4px travel, in on base, out on fast. */
-  --processing-line-blur: 6px;
-  --processing-line-rise: 4px;
-  --processing-pill-exit-scale: 0.96;
+  /* Arrival, fitted per frame (1.90-2.45s): the text's opacity reaches 0.41 / 0.59 / 0.76 /
+     0.94 at 100 / 167 / 233 / 300ms, so it fades over 350ms on a gentle ease-out (CSS's
+     own ease-out fits within 0.03; the shared --motion-ease-out is far too front-loaded,
+     0.9 by 100ms). Its blur clears more slowly: sigma 3 -> 0 over ~530ms. The spinner
+     follows 100ms behind the text, over 400ms. */
+  --processing-arrive-fade: 350ms;
+  --processing-arrive-focus: 530ms;
+  --processing-arrive-blur: 3px;
+  --processing-ease-arrive: cubic-bezier(0, 0, 0.58, 1);
+  --processing-arrive-spinner-delay: 100ms;
+  --processing-arrive-spinner: 400ms;
+  /* The swap, on --motion-duration-instant (120ms: the measured ~100-120). */
+  --processing-line-rise-out: 3px;
+  --processing-line-rise-in: 2.5px;
+  --processing-line-in-delay: 80ms;
+  /* Exit. A's waits this long into the bloom before it goes, as the reference's does. */
+  --processing-exit-rise: 3px;
+  --processing-exit-blur: 4px;
+  --processing-exit-delay: 250ms;
 
   /* The shimmer: a pause once the line lands, then the band sweeps; repeats while it holds.
      The band is the line's own colour at 16%, so it reads as light passing over the text. */
@@ -425,10 +443,14 @@
   --processing-shimmer-cycle: 1600ms;
   --processing-shimmer-band: color-mix(in srgb, var(--color-text-secondary) 16%, transparent);
 
-  /* B's icons: each arrives with its line on the launch curve, then idles. */
-  --processing-icon-from-scale: 0.4;
-  --processing-icon-from-turn: -24deg;
-  --processing-idle-delay: 300ms;
+  /* B's emojis: each pops in a beat after its line, on the launch curve, then idles. */
+  --processing-emoji-from-scale: 0.4;
+  --processing-emoji-from-turn: -24deg;
+  --processing-emoji-delay: 120ms;
+  /* Not from Figma (emojis are the user's request): at the text's 15px a colour emoji draws
+     ~12px tall and reads small beside the 24px spinner. 18px draws it ~15px. */
+  --processing-emoji-size: 18px;
+  --processing-idle-delay: 600ms;  /* after the pop has landed (120 + 420) */
   --processing-idle-bob: 2px;
   --processing-idle-bob-cycle: 1400ms;
   --processing-idle-search: 1.5px;

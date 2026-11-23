@@ -162,12 +162,12 @@ build, typical pace (6.2s):
 | Beat | A (after the reference) | B (calm) | Measured |
 |---|---|---|---|
 | Veil | once the sheet lands, the skeleton blurs to 9px over 420 | same | `blur(9px)` computed |
-| First line | sharpens in from a 6px blur, 4 up; the glow rises from the bottom (420, out) | the frame's pill; the icon spins in on the launch curve | 946ms (A), 864ms (B) |
-| Cadence | a new line every 1.7s; the old one blurs out and up on fast while the new one comes in (both mounted) | same; the pill eases to each line's width | swaps 1708 / 1730 / 1682ms apart; 2 lines mounted at a swap |
-| Holding | a light band sweeps the text (350 pause, 1.6s cycle) | the same, and the icon idles: bob, pulse, a magnifier's circle, a list's wiggle, a sparkle's glint | idle animation named per line |
+| First line | text and spinner fade in from a 3px blur: opacity over 350ms, blur clearing over 530ms, the spinner 100ms behind; the glow rises from the bottom (420, out) | same; the emoji pops in on the launch curve | opacity 0.43 / 0.80 / 1.00 at 127 / 246 / 361ms (reference ≈0.48 / 0.76 / 1.00) |
+| Cadence | a new line every 1.7s, a vertical roll with no blur: the old line fades as it slides up 3px (120ms, linear); the new one rises 2.5px from below, 80ms later (120ms, out). The spinner and the text's left edge never move: the group is sized to the widest line | same, the emoji with its line | old gone by ~100ms, new settled by ~180ms (reference ≈100–120 and ≈180); spinner centre one value across 231 frames |
+| Holding | a light band sweeps the text (350 pause, 1.6s cycle) | the same, and the emoji idles: 🧾 bobs, 🏪 pulses, 🔎 circles, 🛒 wiggles, ✨ glints | idle animation named per line |
 | Result lands | the line is held until it has been up 900ms | same | resolved 244ms into a line → finish at ~900 |
-| Finish | the line blurs away and the glow blooms over the screen (420, inOut), translucent | "Ready to review" with a check, no shimmer | bloom 0.94 at +345ms |
-| Hand-over (520 later) | the bloom fades as a layer, the veil sharpens, fields rise in | the pill shrinks to 0.96 and fades; the same | fields at 7554 (A), 7408 (B) |
+| Finish | the glow blooms over the screen (420, inOut), translucent; 250ms in, the line drifts up 3px and fades (300), blurring to 4px only at the end | "Ready to review ✅" rolls in, no shimmer; the spinner fades out but keeps its slot | bloom 0.94 at +345ms |
+| Hand-over (520 later) | the bloom fades as a layer, the veil sharpens, fields rise in | the line drifts up and fades the same way; the same | fields at 7533 (A), 7406 (B) |
 
 The shader stops drawing once its layer has faded (it is unmounted). Its palette is a switch:
 the reference's colours, sampled from the video, or Emlaya's yellow ramp.
